@@ -76,7 +76,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 48),
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -97,7 +97,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                       background: colors.primaryContainer,
                       foreground: colors.onPrimaryContainer,
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 28),
                     _RoundIconButton(
                       icon: Icons.add,
                       onPressed: _increment,
@@ -108,6 +108,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                 ),
               ],
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
