@@ -57,9 +57,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
     if (newPokemon == null) return;
 
     setState(() {
-      _customPokemon
-        ..add(newPokemon)
-        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      _customPokemon.add(newPokemon);
     });
     await _storage.saveCustomPokemon(_customPokemon);
     await _reloadCaught();
@@ -128,7 +126,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                 padding: EdgeInsets.all(16),
                 child: Text(
                   'Selecteer Pokémon om te verwijderen',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                 ),
               ),
               Flexible(
@@ -138,7 +136,12 @@ class _PokemonListPageState extends State<PokemonListPage> {
                   itemBuilder: (context, index) {
                     final p = pokemonSorted[index];
                     return ListTile(
-                      title: Text(p.name),
+                        title: Text(
+                          p.name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                          ),
+                        ),
                       trailing: const Icon(Icons.delete_outline),
                       onTap: () => Navigator.of(context).pop(p),
                     );

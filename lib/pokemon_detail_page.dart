@@ -82,7 +82,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Aantal bewerken'),
+          title: const Text('Counter bewerken'),
           content: TextField(
             controller: controller,
             autofocus: true,
@@ -203,7 +203,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         child: Text(
-                          _isCaught ? 'Gevangen' : 'Vangen',
+                          _isCaught ? 'Caught' : 'Catch',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
