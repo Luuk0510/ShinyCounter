@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,11 +26,31 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   String get _counterKey => 'counter_${widget.pokemon.name.toLowerCase()}';
   String get _caughtKey => 'caught_${widget.pokemon.name.toLowerCase()}';
 
+  @override
+  void initState() {
+    super.initState();
+    _loadState();
+  }
+
+  Future<void> _loadState() async {
+    final prefs = await _prefs;
+    final saved = prefs.getInt(_counterKey);
+    final caught = prefs.getBool(_caughtKey) ?? false;
+    setState(() {
+      _counter = saved ?? 0;
+      _isCaught = caught;
+    });
+  }
+
+  Future<void> _persistCounter() async {
+    final prefs = await _prefs;
+    await prefs.setInt(_counterKey, _counter);
+  }
+
   Future<void> _hapticTap() async {
     try {
-      await HapticFeedback.selectionClick();
-    } catch (_) {
-    }
+      await HapticFeedback.lightImpact();
+    } catch (_) {}
   }
 
   Future<void> _increment() async {
@@ -44,30 +67,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     await _persistCounter();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadCounter();
-  }
-
-  Future<void> _loadCounter() async {
-    final prefs = await _prefs;
-    final saved = prefs.getInt(_counterKey);
-    final caught = prefs.getBool(_caughtKey) ?? false;
-    setState(() {
-      _counter = saved ?? 0;
-      _isCaught = caught;
-    });
-  }
-
-  Future<void> _persistCounter() async {
-    final prefs = await _prefs;
-    await prefs.setInt(_counterKey, _counter);
-  }
-
   Future<void> _toggleCaught() async {
-    final prefs = await _prefs;
     await _hapticTap();
+    final prefs = await _prefs;
     setState(() {
       _isCaught = !_isCaught;
     });
@@ -166,14 +168,23 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                 children: [
                   const SizedBox(height: 8),
                   Center(
-                    child: Image.asset(
-                      widget.pokemon.imagePath,
-                      width: 300,
-                      height: 300,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) =>
-                          const Icon(Icons.catching_pokemon, size: 140),
-                    ),
+                    child: widget.pokemon.isLocalFile && !kIsWeb
+                        ? Image.file(
+                            File(widget.pokemon.imagePath),
+                            width: 300,
+                            height: 300,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                const Icon(Icons.catching_pokemon, size: 140),
+                          )
+                        : Image.asset(
+                            widget.pokemon.imagePath,
+                            width: 300,
+                            height: 300,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                const Icon(Icons.catching_pokemon, size: 140),
+                          ),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
@@ -192,7 +203,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         child: Text(
-                          _isCaught ? 'Cought' : 'Catch',
+                          _isCaught ? 'Caught' : 'Catch',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -207,7 +218,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                     children: [
                       Text(
                         '$_counter',
-                          style: textTheme.displayLarge?.copyWith(
+                        style: textTheme.displayLarge?.copyWith(
                           fontWeight: FontWeight.w800,
                           color: colors.onSurface,
                         ),

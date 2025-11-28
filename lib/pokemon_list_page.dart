@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import 'add_pokemon_dialog.dart';
 import 'pokemon.dart';
+import 'pokemon_card.dart';
 import 'pokemon_detail_page.dart';
+import 'pokemon_empty_state.dart';
+import 'pokemon_storage.dart';
 
-const _pokemonList = <Pokemon>[
-  Pokemon(name: 'Arceus', imagePath: 'assets/pokemon/arceus_shiny.png'),
-  Pokemon(name: 'Darkrai', imagePath: 'assets/pokemon/darkrai_shiny.png'),
-  Pokemon(name: 'Regigigas', imagePath: 'assets/pokemon/regigigas_shiny.png'),
-];
+const _basePokemon = <Pokemon>[];
 
 class PokemonListPage extends StatefulWidget {
   const PokemonListPage({super.key});
@@ -18,30 +17,163 @@ class PokemonListPage extends StatefulWidget {
 }
 
 class _PokemonListPageState extends State<PokemonListPage> {
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  final Set<String> _caught = {};
+  final _storage = PokemonStorage();
+  final List<Pokemon> _customPokemon = [];
+  Set<String> _caught = {};
+  bool _loading = true;
+
+  List<Pokemon> get _allPokemon => [..._basePokemon, ..._customPokemon];
 
   @override
   void initState() {
     super.initState();
-    _loadCaught();
+    _loadData();
   }
 
-  Future<void> _loadCaught() async {
-    final prefs = await _prefs;
+  Future<void> _loadData() async {
+    final custom = await _storage.loadCustomPokemon();
     setState(() {
-      _caught
+      _customPokemon
         ..clear()
-        ..addAll(_pokemonList.where((p) => prefs.getBool(_keyFor(p)) ?? false).map((p) => p.name));
+        ..addAll(custom);
     });
+    await _reloadCaught();
+    if (mounted) {
+      setState(() => _loading = false);
+    }
   }
 
-  String _keyFor(Pokemon pokemon) => 'caught_${pokemon.name.toLowerCase()}';
+  Future<void> _reloadCaught() async {
+    final caught = await _storage.loadCaught(_allPokemon);
+    if (mounted) {
+      setState(() => _caught = caught);
+    }
+  }
+
   bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.name);
+
+  Future<void> _onAddPokemon() async {
+    final newPokemon = await showAddPokemonDialog(context);
+    if (newPokemon == null) return;
+
+    setState(() {
+      _customPokemon.add(newPokemon);
+    });
+    await _storage.saveCustomPokemon(_customPokemon);
+    await _reloadCaught();
+  }
+
+  Future<void> _confirmDelete(Pokemon pokemon) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Verwijderen'),
+          content: Text.rich(
+            TextSpan(
+              text: 'Weet je zeker dat je ',
+              children: [
+                TextSpan(
+                  text: pokemon.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const TextSpan(
+                  text: ' wilt verwijderen?',
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Annuleren'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Verwijder'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      setState(() {
+        _customPokemon.removeWhere((p) => p.name == pokemon.name && p.imagePath == pokemon.imagePath);
+      });
+      await _storage.saveCustomPokemon(_customPokemon);
+      await _reloadCaught();
+    }
+  }
+
+  Future<void> _onDeletePokemonList() async {
+    final pokemonSorted = [..._allPokemon]
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    if (pokemonSorted.isEmpty) return;
+
+    final selected = await showModalBottomSheet<Pokemon>(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  'Selecteer Pokémon om te verwijderen',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                ),
+              ),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: pokemonSorted.length,
+                  itemBuilder: (context, index) {
+                    final p = pokemonSorted[index];
+                    return ListTile(
+                        title: Text(
+                          p.name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                          ),
+                        ),
+                      trailing: const Icon(Icons.delete_outline),
+                      onTap: () => Navigator.of(context).pop(p),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selected != null) {
+      await _confirmDelete(selected);
+    }
+  }
+
+  Future<void> _openDetail(Pokemon pokemon) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PokemonDetailPage(pokemon: pokemon),
+      ),
+    );
+    await _reloadCaught();
+  }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final pokemonSorted = [..._allPokemon]
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     return Scaffold(
       appBar: AppBar(
@@ -69,76 +201,40 @@ class _PokemonListPageState extends State<PokemonListPage> {
             color: colors.outlineVariant,
           ),
         ),
+        actions: [
+          IconButton(
+            iconSize: 30,
+            icon: const Icon(Icons.add_circle),
+            tooltip: 'Nieuwe Pokémon',
+            onPressed: _onAddPokemon,
+          ),
+          IconButton(
+            iconSize: 28,
+            icon: const Icon(Icons.delete_outline),
+            tooltip: 'Verwijder Pokémon',
+            onPressed: _onDeletePokemonList,
+          ),
+        ],
       ),
-      body: ListView.builder(
-        itemCount: _pokemonList.length,
-        itemBuilder: (context, index) {
-          final pokemon = _pokemonList[index];
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                onTap: () async {
-                  await Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => PokemonDetailPage(pokemon: pokemon),
-                    ),
-                  );
-                  await _loadCaught();
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: ColorFiltered(
-                          colorFilter: _isCaught(pokemon)
-                              ? const ColorFilter.mode(
-                                  Colors.transparent,
-                                  BlendMode.dst,
-                                )
-                              : const ColorFilter.matrix(<double>[
-                                  0.2126, 0.7152, 0.0722, 0, 0,
-                                  0.2126, 0.7152, 0.0722, 0, 0,
-                                  0.2126, 0.7152, 0.0722, 0, 0,
-                                  0, 0, 0, 1, 0,
-                                ]),
-                          child: Image.asset(
-                            pokemon.imagePath,
-                            width: 140,
-                            height: 140,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) =>
-                                const Icon(Icons.catching_pokemon, size: 64),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          pokemon.name,
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      const Icon(Icons.chevron_right, size: 28),
-                    ],
-                  ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _allPokemon.isEmpty
+              ? PokemonEmptyState(
+                  onAddPressed: _onAddPokemon,
+                  imageAsset: 'assets/icon/pokeball_icon.png',
+                  colors: colors,
+                )
+              : ListView.builder(
+                  itemCount: pokemonSorted.length,
+                  itemBuilder: (context, index) {
+                    final pokemon = pokemonSorted[index];
+                    return PokemonCard(
+                      pokemon: pokemon,
+                      isCaught: _isCaught(pokemon),
+                      onTap: () => _openDetail(pokemon),
+                    );
+                  },
                 ),
-              ),
-            ),
-          );
-        },
-      ),
     );
   }
 }
