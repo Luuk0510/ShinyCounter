@@ -24,7 +24,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.pokemon.name),
+        title: Text(
+          widget.pokemon.name,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),
@@ -40,6 +45,35 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) =>
                     const Icon(Icons.catching_pokemon, size: 140),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: 150,
+              child: ElevatedButton(
+                onPressed: () {
+                  final snackBar = SnackBar(
+                    content: Text('${widget.pokemon.name} caught!'),
+                    behavior: SnackBarBehavior.floating,
+                  );
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(snackBar);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colors.secondary,
+                  foregroundColor: colors.onSecondary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  child: Text(
+                    'Catch',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -73,28 +107,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                   ],
                 ),
               ],
-            ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  final snackBar = SnackBar(
-                    content: Text('${widget.pokemon.name} caught!'),
-                    behavior: SnackBarBehavior.floating,
-                  );
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(snackBar);
-                },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 14),
-                  child: Text(
-                    'Catch',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                  ),
-                ),
-              ),
             ),
           ],
         ),
