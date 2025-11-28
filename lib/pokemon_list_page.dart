@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'add_pokemon_dialog.dart';
 import 'pokemon.dart';
+import 'pokemon_card.dart';
 import 'pokemon_detail_page.dart';
+import 'pokemon_empty_state.dart';
+import 'pokemon_storage.dart';
 
-const _pokemonList = <Pokemon>[
-  Pokemon(name: 'Arceus', imagePath: 'assets/pokemon/arceus_shiny.png'),
-  Pokemon(name: 'Darkrai', imagePath: 'assets/pokemon/darkrai_shiny.png'),
-  Pokemon(name: 'Regigigas', imagePath: 'assets/pokemon/regigigas_shiny.png'),
-];
+const _basePokemon = <Pokemon>[];
 
 class PokemonListPage extends StatefulWidget {
   const PokemonListPage({super.key});
@@ -18,12 +18,22 @@ class PokemonListPage extends StatefulWidget {
 }
 
 class _PokemonListPageState extends State<PokemonListPage> {
+<<<<<<< Updated upstream
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   final Set<String> _caught = {};
+=======
+  final _storage = PokemonStorage();
+  final List<Pokemon> _customPokemon = [];
+  Set<String> _caught = {};
+  bool _loading = true;
+
+  List<Pokemon> get _allPokemon => [..._basePokemon, ..._customPokemon];
+>>>>>>> Stashed changes
 
   @override
   void initState() {
     super.initState();
+<<<<<<< Updated upstream
     _loadCaught();
   }
 
@@ -39,6 +49,53 @@ class _PokemonListPageState extends State<PokemonListPage> {
   String _keyFor(Pokemon pokemon) => 'caught_${pokemon.name.toLowerCase()}';
   bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.name);
 
+=======
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final custom = await _storage.loadCustomPokemon();
+    setState(() {
+      _customPokemon
+        ..clear()
+        ..addAll(custom);
+    });
+    await _reloadCaught();
+    if (mounted) {
+      setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _reloadCaught() async {
+    final caught = await _storage.loadCaught(_allPokemon);
+    if (mounted) {
+      setState(() => _caught = caught);
+    }
+  }
+
+  bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.name);
+
+  Future<void> _onAddPokemon() async {
+    final newPokemon = await showAddPokemonDialog(context);
+    if (newPokemon == null) return;
+
+    setState(() {
+      _customPokemon.add(newPokemon);
+    });
+    await _storage.saveCustomPokemon(_customPokemon);
+    await _reloadCaught();
+  }
+
+  Future<void> _openDetail(Pokemon pokemon) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PokemonDetailPage(pokemon: pokemon),
+      ),
+    );
+    await _reloadCaught();
+  }
+
+>>>>>>> Stashed changes
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -69,6 +126,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
             color: colors.outlineVariant,
           ),
         ),
+<<<<<<< Updated upstream
       ),
       body: ListView.builder(
         itemCount: _pokemonList.length,
@@ -133,12 +191,35 @@ class _PokemonListPageState extends State<PokemonListPage> {
                       const Icon(Icons.chevron_right, size: 28),
                     ],
                   ),
-                ),
-              ),
-            ),
-          );
-        },
+=======
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: 'Nieuwe Pokémon',
+            onPressed: _onAddPokemon,
+          ),
+        ],
       ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _allPokemon.isEmpty
+              ? PokemonEmptyState(
+                  onAddPressed: _onAddPokemon,
+                  imageAsset: 'assets/icon/pokeball_icon.png',
+                  colors: colors,
+                )
+              : ListView.builder(
+                  itemCount: _allPokemon.length,
+                  itemBuilder: (context, index) {
+                    final pokemon = _allPokemon[index];
+                    return PokemonCard(
+                      pokemon: pokemon,
+                      isCaught: _isCaught(pokemon),
+                      onTap: () => _openDetail(pokemon),
+                    );
+                  },
+>>>>>>> Stashed changes
+                ),
     );
   }
 }

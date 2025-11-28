@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,11 +26,39 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   String get _counterKey => 'counter_${widget.pokemon.name.toLowerCase()}';
   String get _caughtKey => 'caught_${widget.pokemon.name.toLowerCase()}';
 
+<<<<<<< Updated upstream
   Future<void> _hapticTap() async {
     try {
       await HapticFeedback.selectionClick();
     } catch (_) {
     }
+=======
+  @override
+  void initState() {
+    super.initState();
+    _loadState();
+  }
+
+  Future<void> _loadState() async {
+    final prefs = await _prefs;
+    final saved = prefs.getInt(_counterKey);
+    final caught = prefs.getBool(_caughtKey) ?? false;
+    setState(() {
+      _counter = saved ?? 0;
+      _isCaught = caught;
+    });
+  }
+
+  Future<void> _persistCounter() async {
+    final prefs = await _prefs;
+    await prefs.setInt(_counterKey, _counter);
+  }
+
+  Future<void> _hapticTap() async {
+    try {
+      await HapticFeedback.lightImpact();
+    } catch (_) {}
+>>>>>>> Stashed changes
   }
 
   Future<void> _increment() async {
@@ -44,6 +75,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     await _persistCounter();
   }
 
+<<<<<<< Updated upstream
   @override
   void initState() {
     super.initState();
@@ -68,6 +100,11 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   Future<void> _toggleCaught() async {
     final prefs = await _prefs;
     await _hapticTap();
+=======
+  Future<void> _toggleCaught() async {
+    await _hapticTap();
+    final prefs = await _prefs;
+>>>>>>> Stashed changes
     setState(() {
       _isCaught = !_isCaught;
     });
@@ -166,6 +203,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                 children: [
                   const SizedBox(height: 8),
                   Center(
+<<<<<<< Updated upstream
                     child: Image.asset(
                       widget.pokemon.imagePath,
                       width: 300,
@@ -235,6 +273,86 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                       ),
                     ],
                   ),
+=======
+                    child: widget.pokemon.isLocalFile && !kIsWeb
+                        ? Image.file(
+                            File(widget.pokemon.imagePath),
+                            width: 300,
+                            height: 300,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                const Icon(Icons.catching_pokemon, size: 140),
+                          )
+                        : Image.asset(
+                            widget.pokemon.imagePath,
+                            width: 300,
+                            height: 300,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                const Icon(Icons.catching_pokemon, size: 140),
+                          ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: 150,
+                    child: ElevatedButton(
+                      onPressed: _toggleCaught,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            _isCaught ? Colors.green.shade600 : colors.secondary,
+                        foregroundColor:
+                            _isCaught ? Colors.white : colors.onSecondary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        child: Text(
+                          _isCaught ? 'Catched' : 'Catch',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '$_counter',
+                        style: textTheme.displayLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: colors.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _RoundIconButton(
+                            icon: Icons.remove,
+                            onPressed: _decrement,
+                            background: colors.primaryContainer,
+                            foreground: colors.onPrimaryContainer,
+                            enabled: !_isCaught,
+                          ),
+                          const SizedBox(width: 28),
+                          _RoundIconButton(
+                            icon: Icons.add,
+                            onPressed: _increment,
+                            background: colors.primaryContainer,
+                            foreground: colors.onPrimaryContainer,
+                            enabled: !_isCaught,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+>>>>>>> Stashed changes
                   const SizedBox(height: 16),
                 ],
               ),
