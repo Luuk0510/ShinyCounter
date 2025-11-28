@@ -11,12 +11,44 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lightScheme = ColorScheme.fromSeed(seedColor: Colors.indigo);
+    final darkSchemeBase = ColorScheme.fromSeed(
+      seedColor: Colors.indigo,
+      brightness: Brightness.dark,
+    );
+    final darkScheme = darkSchemeBase.copyWith(
+      background: const Color(0xFF151924),
+      surface: const Color(0xFF1E2430),
+      surfaceVariant: const Color(0xFF252C3A),
+    );
+
     return MaterialApp(
       title: 'Pokémon List',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        colorScheme: lightScheme,
+        scaffoldBackgroundColor: lightScheme.background,
+        cardTheme: CardThemeData(
+          color: lightScheme.surface,
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
         useMaterial3: true,
       ),
+      darkTheme: ThemeData(
+        colorScheme: darkScheme,
+        scaffoldBackgroundColor: darkScheme.background,
+        cardTheme: CardThemeData(
+          color: darkScheme.surface,
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        useMaterial3: true,
+      ),
+      themeMode: ThemeMode.system,
       home: const PokemonListPage(),
     );
   }

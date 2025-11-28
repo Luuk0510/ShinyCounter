@@ -19,6 +19,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.pokemon.name),
@@ -28,38 +31,46 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Center(
               child: Image.asset(
                 widget.pokemon.imagePath,
-                width: 220,
-                height: 220,
+                width: 300,
+                height: 300,
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) =>
                     const Icon(Icons.catching_pokemon, size: 140),
               ),
             ),
-            const SizedBox(height: 28),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            const SizedBox(height: 24),
+            Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                  onPressed: _decrement,
-                  icon: const Icon(Icons.remove_circle_outline, size: 32),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  child: Text(
-                    '$_counter',
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Text(
+                  '$_counter',
+                    style: textTheme.displayLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: colors.onSurface,
                   ),
                 ),
-                IconButton(
-                  onPressed: _increment,
-                  icon: const Icon(Icons.add_circle_outline, size: 32),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _RoundIconButton(
+                      icon: Icons.remove,
+                      onPressed: _decrement,
+                      background: colors.primaryContainer,
+                      foreground: colors.onPrimaryContainer,
+                    ),
+                    const SizedBox(width: 16),
+                    _RoundIconButton(
+                      icon: Icons.add,
+                      onPressed: _increment,
+                      background: colors.primaryContainer,
+                      foreground: colors.onPrimaryContainer,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -88,6 +99,35 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _RoundIconButton extends StatelessWidget {
+  const _RoundIconButton({
+    required this.icon,
+    required this.onPressed,
+    required this.background,
+    required this.foreground,
+  });
+
+  final IconData icon;
+  final VoidCallback onPressed;
+  final Color background;
+  final Color foreground;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: background,
+        foregroundColor: foreground,
+        shape: const CircleBorder(),
+        padding: const EdgeInsets.all(18),
+        minimumSize: const Size(72, 72),
+      ),
+      child: Icon(icon, size: 32),
     );
   }
 }
