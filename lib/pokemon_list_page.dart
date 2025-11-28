@@ -57,10 +57,104 @@ class _PokemonListPageState extends State<PokemonListPage> {
     if (newPokemon == null) return;
 
     setState(() {
-      _customPokemon.add(newPokemon);
+      _customPokemon
+        ..add(newPokemon)
+        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     });
     await _storage.saveCustomPokemon(_customPokemon);
     await _reloadCaught();
+  }
+
+  Future<void> _confirmDelete(Pokemon pokemon) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Verwijderen'),
+          content: Text.rich(
+            TextSpan(
+              text: 'Weet je zeker dat je ',
+              children: [
+                TextSpan(
+                  text: pokemon.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const TextSpan(
+                  text: ' wilt verwijderen?',
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Annuleren'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Verwijder'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      setState(() {
+        _customPokemon.removeWhere((p) => p.name == pokemon.name && p.imagePath == pokemon.imagePath);
+      });
+      await _storage.saveCustomPokemon(_customPokemon);
+      await _reloadCaught();
+    }
+  }
+
+  Future<void> _onDeletePokemonList() async {
+    final pokemonSorted = [..._allPokemon]
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    if (pokemonSorted.isEmpty) return;
+
+    final selected = await showModalBottomSheet<Pokemon>(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  'Selecteer Pokémon om te verwijderen',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+              ),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: pokemonSorted.length,
+                  itemBuilder: (context, index) {
+                    final p = pokemonSorted[index];
+                    return ListTile(
+                      title: Text(p.name),
+                      trailing: const Icon(Icons.delete_outline),
+                      onTap: () => Navigator.of(context).pop(p),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selected != null) {
+      await _confirmDelete(selected);
+    }
   }
 
   Future<void> _openDetail(Pokemon pokemon) async {
@@ -75,6 +169,8 @@ class _PokemonListPageState extends State<PokemonListPage> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final pokemonSorted = [..._allPokemon]
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     return Scaffold(
       appBar: AppBar(
@@ -104,9 +200,16 @@ class _PokemonListPageState extends State<PokemonListPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            iconSize: 30,
+            icon: const Icon(Icons.add_circle),
             tooltip: 'Nieuwe Pokémon',
             onPressed: _onAddPokemon,
+          ),
+          IconButton(
+            iconSize: 28,
+            icon: const Icon(Icons.delete_outline),
+            tooltip: 'Verwijder Pokémon',
+            onPressed: _onDeletePokemonList,
           ),
         ],
       ),
@@ -119,9 +222,9 @@ class _PokemonListPageState extends State<PokemonListPage> {
                   colors: colors,
                 )
               : ListView.builder(
-                  itemCount: _allPokemon.length,
+                  itemCount: pokemonSorted.length,
                   itemBuilder: (context, index) {
-                    final pokemon = _allPokemon[index];
+                    final pokemon = pokemonSorted[index];
                     return PokemonCard(
                       pokemon: pokemon,
                       isCaught: _isCaught(pokemon),
