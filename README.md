@@ -1,2 +1,2 @@
 # ShinyCounter
-Pokémon shiny counter
+Personal Pokémon shiny counter app made in Flutter
