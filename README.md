@@ -1,0 +1,2 @@
+# ShinyCounter
+Pokémon shiny counter
