@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'add_pokemon_dialog.dart';
 import 'pokemon.dart';
@@ -18,38 +17,16 @@ class PokemonListPage extends StatefulWidget {
 }
 
 class _PokemonListPageState extends State<PokemonListPage> {
-<<<<<<< Updated upstream
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  final Set<String> _caught = {};
-=======
   final _storage = PokemonStorage();
   final List<Pokemon> _customPokemon = [];
   Set<String> _caught = {};
   bool _loading = true;
 
   List<Pokemon> get _allPokemon => [..._basePokemon, ..._customPokemon];
->>>>>>> Stashed changes
 
   @override
   void initState() {
     super.initState();
-<<<<<<< Updated upstream
-    _loadCaught();
-  }
-
-  Future<void> _loadCaught() async {
-    final prefs = await _prefs;
-    setState(() {
-      _caught
-        ..clear()
-        ..addAll(_pokemonList.where((p) => prefs.getBool(_keyFor(p)) ?? false).map((p) => p.name));
-    });
-  }
-
-  String _keyFor(Pokemon pokemon) => 'caught_${pokemon.name.toLowerCase()}';
-  bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.name);
-
-=======
     _loadData();
   }
 
@@ -95,7 +72,6 @@ class _PokemonListPageState extends State<PokemonListPage> {
     await _reloadCaught();
   }
 
->>>>>>> Stashed changes
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -126,72 +102,6 @@ class _PokemonListPageState extends State<PokemonListPage> {
             color: colors.outlineVariant,
           ),
         ),
-<<<<<<< Updated upstream
-      ),
-      body: ListView.builder(
-        itemCount: _pokemonList.length,
-        itemBuilder: (context, index) {
-          final pokemon = _pokemonList[index];
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                onTap: () async {
-                  await Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => PokemonDetailPage(pokemon: pokemon),
-                    ),
-                  );
-                  await _loadCaught();
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: ColorFiltered(
-                          colorFilter: _isCaught(pokemon)
-                              ? const ColorFilter.mode(
-                                  Colors.transparent,
-                                  BlendMode.dst,
-                                )
-                              : const ColorFilter.matrix(<double>[
-                                  0.2126, 0.7152, 0.0722, 0, 0,
-                                  0.2126, 0.7152, 0.0722, 0, 0,
-                                  0.2126, 0.7152, 0.0722, 0, 0,
-                                  0, 0, 0, 1, 0,
-                                ]),
-                          child: Image.asset(
-                            pokemon.imagePath,
-                            width: 140,
-                            height: 140,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) =>
-                                const Icon(Icons.catching_pokemon, size: 64),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          pokemon.name,
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      const Icon(Icons.chevron_right, size: 28),
-                    ],
-                  ),
-=======
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -218,7 +128,6 @@ class _PokemonListPageState extends State<PokemonListPage> {
                       onTap: () => _openDetail(pokemon),
                     );
                   },
->>>>>>> Stashed changes
                 ),
     );
   }
