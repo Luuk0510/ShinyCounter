@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'pokemon.dart';
@@ -14,20 +15,31 @@ class PokemonDetailPage extends StatefulWidget {
 
 class _PokemonDetailPageState extends State<PokemonDetailPage> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  final GlobalKey _contentKey = GlobalKey();
   int _counter = 0;
   bool _isCaught = false;
+  bool _needsScroll = true;
 
   String get _counterKey => 'counter_${widget.pokemon.name.toLowerCase()}';
   String get _caughtKey => 'caught_${widget.pokemon.name.toLowerCase()}';
 
+  Future<void> _hapticTap() async {
+    try {
+      await HapticFeedback.selectionClick();
+    } catch (_) {
+    }
+  }
+
   Future<void> _increment() async {
     if (_isCaught) return;
+    await _hapticTap();
     setState(() => _counter++);
     await _persistCounter();
   }
 
   Future<void> _decrement() async {
     if (_isCaught || _counter == 0) return;
+    await _hapticTap();
     setState(() => _counter--);
     await _persistCounter();
   }
@@ -55,6 +67,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
   Future<void> _toggleCaught() async {
     final prefs = await _prefs;
+    await _hapticTap();
     setState(() {
       _isCaught = !_isCaught;
     });
@@ -86,6 +99,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
               onPressed: () {
                 final value = int.tryParse(controller.text.trim());
                 if (value != null && value >= 0) {
+                  _hapticTap();
                   Navigator.of(context).pop(value);
                 }
               },
@@ -131,10 +145,22 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-          return SingleChildScrollView(
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final ctx = _contentKey.currentContext;
+            final box = ctx?.findRenderObject() as RenderBox?;
+            if (box != null) {
+              final contentHeight = box.size.height + bottomInset;
+              final needsScroll = contentHeight > constraints.maxHeight;
+              if (needsScroll != _needsScroll) {
+                setState(() => _needsScroll = needsScroll);
+              }
+            }
+          });
+
+          final content = Padding(
             padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + bottomInset),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: KeyedSubtree(
+              key: _contentKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -214,6 +240,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
               ),
             ),
           );
+
+          if (_needsScroll) {
+            return SingleChildScrollView(
+              padding: EdgeInsets.zero,
+              child: content,
+            );
+          }
+          return content;
         },
       ),
     );

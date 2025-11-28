@@ -41,32 +41,32 @@ class _PokemonListPageState extends State<PokemonListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         elevation: 8,
         centerTitle: true,
-        toolbarHeight: 60,
+        toolbarHeight: 40,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
         ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Theme.of(context).colorScheme.primaryContainer,
-                Theme.of(context).colorScheme.secondaryContainer,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
+        backgroundColor: colors.surface,
+        foregroundColor: colors.onSurface,
         title: const Text(
           'Pokémon shiny counter',
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.5,
+          ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(8),
+          child: Container(
+            height: 1,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            color: colors.outlineVariant,
           ),
         ),
       ),
