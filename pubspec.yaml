@@ -64,7 +64,6 @@ flutter:
   assets:
     - assets/pokemon/
     - assets/icon/pokeball_icon.png
-    - assets/icon/pokeball_icon.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
