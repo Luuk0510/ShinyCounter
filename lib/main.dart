@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
     );
 
     return MaterialApp(
-      title: 'Pokémon List',
+      title: 'Shiny Counter',
       theme: ThemeData(
         colorScheme: lightScheme,
         scaffoldBackgroundColor: lightScheme.background,
