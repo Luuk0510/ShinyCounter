@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'pokemon.dart';
 
@@ -12,10 +13,53 @@ class PokemonDetailPage extends StatefulWidget {
 }
 
 class _PokemonDetailPageState extends State<PokemonDetailPage> {
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   int _counter = 0;
+  bool _isCaught = false;
 
-  void _increment() => setState(() => _counter++);
-  void _decrement() => setState(() => _counter = _counter > 0 ? _counter - 1 : 0);
+  String get _counterKey => 'counter_${widget.pokemon.name.toLowerCase()}';
+  String get _caughtKey => 'caught_${widget.pokemon.name.toLowerCase()}';
+
+  Future<void> _increment() async {
+    if (_isCaught) return;
+    setState(() => _counter++);
+    await _persistCounter();
+  }
+
+  Future<void> _decrement() async {
+    if (_isCaught || _counter == 0) return;
+    setState(() => _counter--);
+    await _persistCounter();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCounter();
+  }
+
+  Future<void> _loadCounter() async {
+    final prefs = await _prefs;
+    final saved = prefs.getInt(_counterKey);
+    final caught = prefs.getBool(_caughtKey) ?? false;
+    setState(() {
+      _counter = saved ?? 0;
+      _isCaught = caught;
+    });
+  }
+
+  Future<void> _persistCounter() async {
+    final prefs = await _prefs;
+    await prefs.setInt(_counterKey, _counter);
+  }
+
+  Future<void> _toggleCaught() async {
+    final prefs = await _prefs;
+    setState(() {
+      _isCaught = !_isCaught;
+    });
+    await prefs.setBool(_caughtKey, _isCaught);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,27 +95,24 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
             SizedBox(
               width: 150,
               child: ElevatedButton(
-                onPressed: () {
-                  final snackBar = SnackBar(
-                    content: Text('${widget.pokemon.name} caught!'),
-                    behavior: SnackBarBehavior.floating,
-                  );
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(snackBar);
-                },
+                onPressed: _toggleCaught,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: colors.secondary,
-                  foregroundColor: colors.onSecondary,
+                  backgroundColor:
+                      _isCaught ? Colors.green.shade600 : colors.secondary,
+                  foregroundColor:
+                      _isCaught ? Colors.white : colors.onSecondary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 14),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   child: Text(
-                    'Catch',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    _isCaught ? 'Catched' : 'Catch',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
@@ -96,6 +137,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                       onPressed: _decrement,
                       background: colors.primaryContainer,
                       foreground: colors.onPrimaryContainer,
+                      enabled: !_isCaught,
                     ),
                     const SizedBox(width: 28),
                     _RoundIconButton(
@@ -103,6 +145,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                       onPressed: _increment,
                       background: colors.primaryContainer,
                       foreground: colors.onPrimaryContainer,
+                      enabled: !_isCaught,
                     ),
                   ],
                 ),
@@ -122,20 +165,26 @@ class _RoundIconButton extends StatelessWidget {
     required this.onPressed,
     required this.background,
     required this.foreground,
+    this.enabled = true,
   });
 
   final IconData icon;
   final VoidCallback onPressed;
   final Color background;
   final Color foreground;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final Color effectiveBg = enabled ? background : colors.surfaceVariant;
+    final Color effectiveFg = enabled ? foreground : colors.onSurfaceVariant;
+
     return ElevatedButton(
-      onPressed: onPressed,
+      onPressed: enabled ? onPressed : null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: background,
-        foregroundColor: foreground,
+        backgroundColor: effectiveBg,
+        foregroundColor: effectiveFg,
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(18),
         minimumSize: const Size(72, 72),
