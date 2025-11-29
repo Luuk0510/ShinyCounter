@@ -253,6 +253,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
       appBar: AppBar(
         scrolledUnderElevation: 0,
         elevation: 0,
+        centerTitle: true,
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         flexibleSpace: ClipRect(
@@ -267,6 +268,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
           widget.pokemon.name,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
+                fontSize: 24,
               ),
         ),
         actions: [

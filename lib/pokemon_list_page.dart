@@ -309,12 +309,15 @@ class _PokemonListPageState extends State<PokemonListPage> {
           ),
         ),
         foregroundColor: colors.onSurface,
-        title: const Text(
-          'Pokémon shiny counter',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            'Pokémon shiny counter',
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
+            ),
           ),
         ),
         actions: [
