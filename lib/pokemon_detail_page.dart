@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'controllers/counter_controller.dart';
-import 'services/counter_sync_service.dart';
 
 import 'pokemon.dart';
 
@@ -21,20 +20,17 @@ class PokemonDetailPage extends StatefulWidget {
 
 class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindingObserver {
   late final CounterController _controller = CounterController(pokemon: widget.pokemon);
-  late final StreamSubscription _overlaySub;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _overlaySub = CounterSyncService.overlayStream.listen((_) {});
     _controller.addListener(() => mounted ? setState(() {}) : null);
     _controller.init();
   }
 
   @override
   void dispose() {
-    _overlaySub.cancel();
     _controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();

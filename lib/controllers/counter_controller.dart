@@ -28,6 +28,7 @@ class CounterController extends ChangeNotifier {
   CounterSyncService? _sync;
   StreamSubscription<dynamic>? _overlaySub;
   Timer? _pollTimer;
+  bool _initialized = false;
 
   int get counter => _counter;
   bool get isCaught => _isCaught;
@@ -42,9 +43,12 @@ class CounterController extends ChangeNotifier {
 
   Future<void> init() async {
     _sync ??= await CounterSyncService.instance();
-    _overlaySub = CounterSyncService.overlayStream.listen(_onOverlayData);
+    _overlaySub ??= CounterSyncService.overlayStream.listen(_onOverlayData);
     await _loadState();
-    _startPeriodicSync();
+    if (!_initialized) {
+      _startPeriodicSync();
+      _initialized = true;
+    }
   }
 
   @override
