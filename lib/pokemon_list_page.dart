@@ -274,6 +274,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     final uncaught = _allPokemon
         .where((p) => !_isCaught(p))
         .toList()
@@ -346,7 +347,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                   colors: colors,
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  padding: EdgeInsets.fromLTRB(0, 4, 0, bottomPadding),
                   itemCount: _sectionedCount(uncaught, caught),
                   itemBuilder: (context, index) {
                     final entry = _sectionedItem(uncaught, caught, index);

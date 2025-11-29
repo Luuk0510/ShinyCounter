@@ -157,98 +157,109 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+          final mediaQuery = MediaQuery.of(context);
+          final bottomInset = mediaQuery.viewInsets.bottom;
+          final isPortrait = mediaQuery.orientation == Orientation.portrait;
+          final bottomPadding = mediaQuery.padding.bottom + bottomInset + (isPortrait ? 110 : 24);
 
           return SingleChildScrollView(
             padding: EdgeInsets.zero,
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: constraints.maxHeight),
               child: Padding(
-                padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + bottomInset),
+                padding: EdgeInsets.fromLTRB(24, 24, 24, bottomPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
-                    const SizedBox(height: 8),
-                    Center(
-                      child: widget.pokemon.isLocalFile && !kIsWeb
-                          ? Image.file(
-                              File(widget.pokemon.imagePath),
-                              width: 300,
-                              height: 300,
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) =>
-                                  const Icon(Icons.catching_pokemon, size: 140),
-                            )
-                          : Image.asset(
-                              widget.pokemon.imagePath,
-                              width: 300,
-                              height: 300,
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) =>
-                                  const Icon(Icons.catching_pokemon, size: 140),
-                            ),
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: 150,
-                      child: ElevatedButton(
-                        onPressed: _toggleCaught,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              _isCaught ? Colors.green.shade600 : colors.secondary,
-                          foregroundColor:
-                              _isCaught ? Colors.white : colors.onSecondary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          child: Text(
-                            _isCaught ? 'Caught' : 'Catch',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 48),
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          '$_counter',
-                          style: textTheme.displayLarge?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: colors.onSurface,
-                          ),
+                        const SizedBox(height: 8),
+                        Center(
+                          child: widget.pokemon.isLocalFile && !kIsWeb
+                              ? Image.file(
+                                  File(widget.pokemon.imagePath),
+                                  width: 300,
+                                  height: 300,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) =>
+                                      const Icon(Icons.catching_pokemon, size: 140),
+                                )
+                              : Image.asset(
+                                  widget.pokemon.imagePath,
+                                  width: 300,
+                                  height: 300,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) =>
+                                      const Icon(Icons.catching_pokemon, size: 140),
+                                ),
                         ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _RoundIconButton(
-                              icon: Icons.remove,
-                              onPressed: _decrement,
-                              background: colors.primaryContainer,
-                              foreground: colors.onPrimaryContainer,
-                              enabled: !_isCaught,
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: 150,
+                          child: ElevatedButton(
+                            onPressed: _toggleCaught,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  _isCaught ? Colors.green.shade600 : colors.secondary,
+                              foregroundColor:
+                                  _isCaught ? Colors.white : colors.onSecondary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
-                            const SizedBox(width: 28),
-                            _RoundIconButton(
-                              icon: Icons.add,
-                              onPressed: _increment,
-                              background: colors.primaryContainer,
-                              foreground: colors.onPrimaryContainer,
-                              enabled: !_isCaught,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              child: Text(
+                                _isCaught ? 'Caught' : 'Catch',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '$_counter',
+                            style: textTheme.displayLarge?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: colors.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _RoundIconButton(
+                                icon: Icons.remove,
+                                onPressed: _decrement,
+                                background: colors.primaryContainer,
+                                foreground: colors.onPrimaryContainer,
+                                enabled: !_isCaught,
+                              ),
+                              const SizedBox(width: 28),
+                              _RoundIconButton(
+                                icon: Icons.add,
+                                onPressed: _increment,
+                                background: colors.primaryContainer,
+                                foreground: colors.onPrimaryContainer,
+                                enabled: !_isCaught,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

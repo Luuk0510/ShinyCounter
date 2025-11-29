@@ -21,54 +21,65 @@ class PokemonCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              children: [
-                _buildImage(),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    pokemon.name,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                const Icon(Icons.chevron_right, size: 28),
-              ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = constraints.maxWidth < 420;
+          final imageSize = isCompact ? 110.0 : 150.0;
+          final fontSize = isCompact ? 24.0 : 37.0;
+          final horizontalGap = isCompact ? 12.0 : 16.0;
+          final contentPadding = isCompact ? 12.0 : 14.0;
+          final chevronSize = isCompact ? 24.0 : 28.0;
+
+          return Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-          ),
-        ),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: onTap,
+              child: Padding(
+                padding: EdgeInsets.all(contentPadding),
+                child: Row(
+                  children: [
+                    _buildImage(imageSize),
+                    SizedBox(width: horizontalGap),
+                    Expanded(
+                      child: Text(
+                        pokemon.name,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    Icon(Icons.chevron_right, size: chevronSize),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildImage() {
+  Widget _buildImage(double size) {
     final image = pokemon.isLocalFile && !kIsWeb
         ? Image.file(
             File(pokemon.imagePath),
-            width: 140,
-            height: 140,
+            width: size,
+            height: size,
             fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => const Icon(Icons.catching_pokemon, size: 64),
+            errorBuilder: (_, __, ___) => Icon(Icons.catching_pokemon, size: size * 0.45),
           )
         : Image.asset(
             pokemon.imagePath,
-            width: 140,
-            height: 140,
+            width: size,
+            height: size,
             fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => const Icon(Icons.catching_pokemon, size: 64),
+            errorBuilder: (_, __, ___) => Icon(Icons.catching_pokemon, size: size * 0.45),
           );
 
     return ClipRRect(
