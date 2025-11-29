@@ -285,96 +285,107 @@ class _PokemonListPageState extends State<PokemonListPage> {
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        elevation: 0,
-        centerTitle: true,
-        toolbarHeight: 52,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
-        ),
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        flexibleSpace: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              decoration: BoxDecoration(
-                color: colors.surface.withOpacity(0.82),
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(30),
-                ),
+      appBar: _buildAppBar(colors),
+      body: _buildBody(colors, bottomPadding, uncaught, caught),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(ColorScheme colors) {
+    return AppBar(
+      scrolledUnderElevation: 0,
+      elevation: 0,
+      centerTitle: true,
+      toolbarHeight: 52,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+      ),
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            decoration: BoxDecoration(
+              color: colors.surface.withOpacity(0.82),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(30),
               ),
             ),
           ),
         ),
-        foregroundColor: colors.onSurface,
-        title: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            'Pokémon shiny counter',
-            style: const TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.5,
-            ),
+      ),
+      foregroundColor: colors.onSurface,
+      title: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: const Text(
+          'Pokémon shiny counter',
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
           ),
         ),
-        actions: [
-          IconButton(
-            iconSize: 26,
-            icon: const Icon(Icons.add_circle),
-            tooltip: 'Nieuwe Pokémon',
-            onPressed: _onAddPokemon,
-          ),
-          IconButton(
-            iconSize: 26,
-            icon: const Icon(Icons.edit),
-            tooltip: 'Bewerk Pokémon',
-            onPressed: _onEditPokemonList,
-          ),
-          IconButton(
-            iconSize: 26,
-            icon: const Icon(Icons.delete_outline),
-            tooltip: 'Verwijder Pokémon',
-            onPressed: _onDeletePokemonList,
-          ),
-        ],
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _allPokemon.isEmpty
-              ? PokemonEmptyState(
-                  onAddPressed: _onAddPokemon,
-                  imageAsset: 'assets/icon/pokeball_icon.png',
-                  colors: colors,
-                )
-              : ListView.builder(
-                  padding: EdgeInsets.fromLTRB(0, 4, 0, bottomPadding),
-                  itemCount: _sectionedCount(uncaught, caught),
-                  itemBuilder: (context, index) {
-                    final entry = _sectionedItem(uncaught, caught, index);
-                    if (entry is _SectionHeader) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                        child: Text(
-                          entry.title,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      );
-                    } else if (entry is Pokemon) {
-                      return PokemonCard(
-                        pokemon: entry,
-                        isCaught: _isCaught(entry),
-                        onTap: () => _openDetail(entry),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
+      actions: [
+        IconButton(
+          iconSize: 26,
+          icon: const Icon(Icons.add_circle),
+          tooltip: 'Nieuwe Pokémon',
+          onPressed: _onAddPokemon,
+        ),
+        IconButton(
+          iconSize: 26,
+          icon: const Icon(Icons.edit),
+          tooltip: 'Bewerk Pokémon',
+          onPressed: _onEditPokemonList,
+        ),
+        IconButton(
+          iconSize: 26,
+          icon: const Icon(Icons.delete_outline),
+          tooltip: 'Verwijder Pokémon',
+          onPressed: _onDeletePokemonList,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBody(ColorScheme colors, double bottomPadding, List<Pokemon> uncaught, List<Pokemon> caught) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_allPokemon.isEmpty) {
+      return PokemonEmptyState(
+        onAddPressed: _onAddPokemon,
+        imageAsset: 'assets/icon/pokeball_icon.png',
+        colors: colors,
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.fromLTRB(0, 4, 0, bottomPadding),
+      itemCount: _sectionedCount(uncaught, caught),
+      itemBuilder: (context, index) {
+        final entry = _sectionedItem(uncaught, caught, index);
+        if (entry is _SectionHeader) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              entry.title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          );
+        } else if (entry is Pokemon) {
+          return PokemonCard(
+            pokemon: entry,
+            isCaught: _isCaught(entry),
+            onTap: () => _openDetail(entry),
+          );
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 }
