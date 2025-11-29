@@ -56,18 +56,6 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: ThemeMode.system,
       home: const PokemonListPage(),
-      builder: (context, child) {
-        return Banner(
-          location: BannerLocation.topStart,
-          message: 'v1.1.1',
-          color: Colors.indigoAccent,
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 10,
-          ),
-          child: child ?? const SizedBox.shrink(),
-        );
-      },
     );
   }
 }
