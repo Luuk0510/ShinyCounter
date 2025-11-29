@@ -1,9 +1,14 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:flutter_overlay_window/src/models/overlay_position.dart';
+import 'overlay/counter_overlay_message.dart';
+import 'services/counter_sync_service.dart';
 
 import 'pokemon.dart';
 
@@ -16,12 +21,21 @@ class PokemonDetailPage extends StatefulWidget {
   State<PokemonDetailPage> createState() => _PokemonDetailPageState();
 }
 
-class _PokemonDetailPageState extends State<PokemonDetailPage> {
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  final GlobalKey _contentKey = GlobalKey();
+class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindingObserver {
   int _counter = 0;
   bool _isCaught = false;
-  bool _needsScroll = true;
+  bool _pillActive = false;
+  StreamSubscription<dynamic>? _overlaySub;
+  static final Stream<dynamic> _overlayStream = CounterSyncService.overlayStream;
+  Timer? _pollTimer;
+  CounterSyncService? _sync;
+
+  CounterOverlayMessage get _overlayPayload => CounterOverlayMessage(
+        name: widget.pokemon.name,
+        counterKey: _counterKey,
+        count: _counter,
+        enabled: !_isCaught,
+      );
 
   String get _counterKey => 'counter_${widget.pokemon.name.toLowerCase()}';
   String get _caughtKey => 'caught_${widget.pokemon.name.toLowerCase()}';
@@ -29,22 +43,56 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   @override
   void initState() {
     super.initState();
-    _loadState();
+    WidgetsBinding.instance.addObserver(this);
+    _overlaySub = _overlayStream.listen((data) {
+      if (!mounted) return;
+      if (data is String) {
+        if (data == 'closed') {
+          setState(() => _pillActive = false);
+          _pollTimer?.cancel();
+          return;
+        }
+        if (data.startsWith('counter:')) {
+          _handleOverlayMessage(data);
+        }
+      }
+    });
+    _initState();
+  }
+
+  @override
+  void dispose() {
+    _overlaySub?.cancel();
+    _pollTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadState();
+    }
+  }
+
+  Future<void> _initState() async {
+    _sync = await CounterSyncService.instance();
+    await _loadState();
+    _startPeriodicSync();
   }
 
   Future<void> _loadState() async {
-    final prefs = await _prefs;
-    final saved = prefs.getInt(_counterKey);
-    final caught = prefs.getBool(_caughtKey) ?? false;
+    final svc = await _getService();
+    final state = await svc.loadState(_counterKey, _caughtKey);
     setState(() {
-      _counter = saved ?? 0;
-      _isCaught = caught;
+      _counter = state.count;
+      _isCaught = state.isCaught;
     });
   }
 
   Future<void> _persistCounter() async {
-    final prefs = await _prefs;
-    await prefs.setInt(_counterKey, _counter);
+    final svc = await _getService();
+    await svc.setCounter(_counterKey, _counter);
   }
 
   Future<void> _hapticTap() async {
@@ -58,6 +106,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     await _hapticTap();
     setState(() => _counter++);
     await _persistCounter();
+    await _updatePill();
   }
 
   Future<void> _decrement() async {
@@ -65,15 +114,17 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     await _hapticTap();
     setState(() => _counter--);
     await _persistCounter();
+    await _updatePill();
   }
 
   Future<void> _toggleCaught() async {
     await _hapticTap();
-    final prefs = await _prefs;
+    final svc = await _getService();
     setState(() {
       _isCaught = !_isCaught;
     });
-    await prefs.setBool(_caughtKey, _isCaught);
+    await svc.setCaught(_caughtKey, _isCaught);
+    await _updatePill();
   }
 
   Future<void> _showEditDialog() async {
@@ -118,9 +169,78 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         _isCaught = false;
       });
       await _persistCounter();
-      final prefs = await _prefs;
-      await prefs.setBool(_caughtKey, _isCaught);
+      final svc = await _getService();
+      await svc.setCaught(_caughtKey, _isCaught);
+      await _updatePill();
     }
+  }
+
+  Future<void> _togglePill() async {
+    final hasPerm = await FlutterOverlayWindow.isPermissionGranted();
+    if (!hasPerm) {
+      final requested = await FlutterOverlayWindow.requestPermission();
+      if (requested != true) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Overlay permissie nodig voor mini-counter')),
+          );
+        }
+        return;
+      }
+    }
+    if (_pillActive) {
+      await _updatePill();
+      return;
+    }
+
+    final svc = await _getService();
+    await svc.showOverlay(
+      _overlayPayload,
+      height: 180,
+      width: 900,
+      start: const OverlayPosition(0, 120),
+    );
+    if (mounted) setState(() => _pillActive = true);
+  }
+
+  Future<void> _updatePill() async {
+    if (!_pillActive) return;
+    final svc = await _getService();
+    await svc.shareToOverlay(_overlayPayload);
+  }
+
+  Future<void> _handleOverlayMessage(String data) async {
+    final message = CounterOverlayMessage.tryParse(data);
+    if (message == null || message.counterKey != _counterKey) return;
+
+    if (!mounted) return;
+    setState(() {
+      _counter = message.count;
+      _isCaught = !message.enabled;
+    });
+    await _persistCounter();
+    final svc = await _getService();
+    await svc.setCaught(_caughtKey, _isCaught);
+  }
+
+  void _startPeriodicSync() {
+    _pollTimer?.cancel();
+    _pollTimer = Timer.periodic(const Duration(milliseconds: 400), (_) async {
+      final svc = await _getService();
+      final state = await svc.loadState(_counterKey, _caughtKey);
+      if (!mounted) return;
+      if (state.count != _counter || state.isCaught != _isCaught) {
+        setState(() {
+          _counter = state.count;
+          _isCaught = state.isCaught;
+        });
+      }
+    });
+  }
+
+  Future<CounterSyncService> _getService() async {
+    _sync ??= await CounterSyncService.instance();
+    return _sync!;
   }
 
   @override
@@ -130,10 +250,24 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              color: colors.surface.withOpacity(0.82),
+            ),
+          ),
+        ),
         title: Text(
           widget.pokemon.name,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
+                fontSize: 24,
               ),
         ),
         actions: [
@@ -142,123 +276,123 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
             tooltip: 'Counter bewerken',
             onPressed: _showEditDialog,
           ),
+          IconButton(
+            icon: const Icon(Icons.open_in_new_rounded),
+            tooltip: 'Mini-counter openen',
+            onPressed: _togglePill,
+          ),
         ],
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final ctx = _contentKey.currentContext;
-            final box = ctx?.findRenderObject() as RenderBox?;
-            if (box != null) {
-              final contentHeight = box.size.height + bottomInset;
-              final needsScroll = contentHeight > constraints.maxHeight;
-              if (needsScroll != _needsScroll) {
-                setState(() => _needsScroll = needsScroll);
-              }
-            }
-          });
+          final mediaQuery = MediaQuery.of(context);
+          final bottomInset = mediaQuery.viewInsets.bottom;
+          final isPortrait = mediaQuery.orientation == Orientation.portrait;
+          final bottomPadding = mediaQuery.padding.bottom + bottomInset + (isPortrait ? 110 : 24);
 
-          final content = Padding(
-            padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + bottomInset),
-            child: KeyedSubtree(
-              key: _contentKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 8),
-                  Center(
-                    child: widget.pokemon.isLocalFile && !kIsWeb
-                        ? Image.file(
-                            File(widget.pokemon.imagePath),
-                            width: 300,
-                            height: 300,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) =>
-                                const Icon(Icons.catching_pokemon, size: 140),
-                          )
-                        : Image.asset(
-                            widget.pokemon.imagePath,
-                            width: 300,
-                            height: 300,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) =>
-                                const Icon(Icons.catching_pokemon, size: 140),
-                          ),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: 150,
-                    child: ElevatedButton(
-                      onPressed: _toggleCaught,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            _isCaught ? Colors.green.shade600 : colors.secondary,
-                        foregroundColor:
-                            _isCaught ? Colors.white : colors.onSecondary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+          return SingleChildScrollView(
+            padding: EdgeInsets.zero,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(24, 24, 24, bottomPadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 8),
+                        Center(
+                          child: widget.pokemon.isLocalFile && !kIsWeb
+                              ? Image.file(
+                                  File(widget.pokemon.imagePath),
+                                  width: 300,
+                                  height: 300,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) =>
+                                      const Icon(Icons.catching_pokemon, size: 140),
+                                )
+                              : Image.asset(
+                                  widget.pokemon.imagePath,
+                                  width: 300,
+                                  height: 300,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) =>
+                                      const Icon(Icons.catching_pokemon, size: 140),
+                                ),
                         ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        child: Text(
-                          _isCaught ? 'Caught' : 'Catch',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: 150,
+                          child: ElevatedButton(
+                            onPressed: _toggleCaught,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  _isCaught ? Colors.green.shade600 : colors.secondary,
+                              foregroundColor:
+                                  _isCaught ? Colors.white : colors.onSecondary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              child: Text(
+                                _isCaught ? 'Caught' : 'Catch',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 48),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '$_counter',
-                        style: textTheme.displayLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: colors.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          _RoundIconButton(
-                            icon: Icons.remove,
-                            onPressed: _decrement,
-                            background: colors.primaryContainer,
-                            foreground: colors.onPrimaryContainer,
-                            enabled: !_isCaught,
+                          Text(
+                            '$_counter',
+                            style: textTheme.displayLarge?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: colors.onSurface,
+                            ),
                           ),
-                          const SizedBox(width: 28),
-                          _RoundIconButton(
-                            icon: Icons.add,
-                            onPressed: _increment,
-                            background: colors.primaryContainer,
-                            foreground: colors.onPrimaryContainer,
-                            enabled: !_isCaught,
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _RoundIconButton(
+                                icon: Icons.remove,
+                                onPressed: _decrement,
+                                background: colors.primaryContainer,
+                                foreground: colors.onPrimaryContainer,
+                                enabled: !_isCaught,
+                              ),
+                              const SizedBox(width: 28),
+                              _RoundIconButton(
+                                icon: Icons.add,
+                                onPressed: _increment,
+                                background: colors.primaryContainer,
+                                foreground: colors.onPrimaryContainer,
+                                enabled: !_isCaught,
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
           );
-
-          if (_needsScroll) {
-            return SingleChildScrollView(
-              padding: EdgeInsets.zero,
-              child: content,
-            );
-          }
-          return content;
         },
       ),
     );
