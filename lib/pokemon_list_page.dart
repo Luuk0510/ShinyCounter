@@ -291,7 +291,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
         centerTitle: true,
         toolbarHeight: 52,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
         ),
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
@@ -302,7 +302,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
               decoration: BoxDecoration(
                 color: colors.surface.withOpacity(0.82),
                 borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(16),
+                  bottom: Radius.circular(30),
                 ),
               ),
             ),

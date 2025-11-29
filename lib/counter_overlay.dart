@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'overlay/counter_overlay_message.dart';
 
 @pragma('vm:entry-point')
 void overlayMain() {
@@ -38,14 +39,13 @@ class _OverlayAppState extends State<_OverlayApp> {
   }
 
   Future<void> _parseContent(String content) async {
-    if (!content.startsWith('counter:')) return;
-    final parts = content.split(':');
-    if (parts.length < 5) return;
+    final message = CounterOverlayMessage.tryParse(content);
+    if (message == null) return;
     setState(() {
-      _name = parts[1];
-      _counterKey = parts[2];
-      _count = int.tryParse(parts[3]) ?? 0;
-      _enabled = parts[4] == '1';
+      _name = message.name;
+      _counterKey = message.counterKey;
+      _count = message.count;
+      _enabled = message.enabled;
     });
   }
 
@@ -63,7 +63,13 @@ class _OverlayAppState extends State<_OverlayApp> {
     if (next < 0) next = 0;
     await prefs.setInt(_counterKey, next);
     setState(() => _count = next);
-    FlutterOverlayWindow.shareData('counter:${_name}:${_counterKey}:${_count}:${_enabled ? 1 : 0}');
+    final message = CounterOverlayMessage(
+      name: _name,
+      counterKey: _counterKey,
+      count: next,
+      enabled: _enabled,
+    );
+    FlutterOverlayWindow.shareData(message.serialize());
   }
 
   @override
@@ -78,7 +84,7 @@ class _OverlayAppState extends State<_OverlayApp> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: bg,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(150),
               boxShadow: const [
                 BoxShadow(
                   color: Colors.black26,
