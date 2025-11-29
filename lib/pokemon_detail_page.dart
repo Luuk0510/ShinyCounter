@@ -5,9 +5,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:flutter_overlay_window/src/models/overlay_position.dart';
-import 'overlay/counter_overlay_message.dart';
+import 'controllers/counter_controller.dart';
 import 'services/counter_sync_service.dart';
 
 import 'pokemon.dart';
@@ -22,48 +20,22 @@ class PokemonDetailPage extends StatefulWidget {
 }
 
 class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindingObserver {
-  int _counter = 0;
-  bool _isCaught = false;
-  bool _pillActive = false;
-  StreamSubscription<dynamic>? _overlaySub;
-  static final Stream<dynamic> _overlayStream = CounterSyncService.overlayStream;
-  Timer? _pollTimer;
-  CounterSyncService? _sync;
-
-  CounterOverlayMessage get _overlayPayload => CounterOverlayMessage(
-        name: widget.pokemon.name,
-        counterKey: _counterKey,
-        count: _counter,
-        enabled: !_isCaught,
-      );
-
-  String get _counterKey => 'counter_${widget.pokemon.name.toLowerCase()}';
-  String get _caughtKey => 'caught_${widget.pokemon.name.toLowerCase()}';
+  late final CounterController _controller = CounterController(pokemon: widget.pokemon);
+  late final StreamSubscription _overlaySub;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _overlaySub = _overlayStream.listen((data) {
-      if (!mounted) return;
-      if (data is String) {
-        if (data == 'closed') {
-          setState(() => _pillActive = false);
-          _pollTimer?.cancel();
-          return;
-        }
-        if (data.startsWith('counter:')) {
-          _handleOverlayMessage(data);
-        }
-      }
-    });
-    _initState();
+    _overlaySub = CounterSyncService.overlayStream.listen((_) {});
+    _controller.addListener(() => mounted ? setState(() {}) : null);
+    _controller.init();
   }
 
   @override
   void dispose() {
-    _overlaySub?.cancel();
-    _pollTimer?.cancel();
+    _overlaySub.cancel();
+    _controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -71,28 +43,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _loadState();
+      _controller.init();
     }
-  }
-
-  Future<void> _initState() async {
-    _sync = await CounterSyncService.instance();
-    await _loadState();
-    _startPeriodicSync();
-  }
-
-  Future<void> _loadState() async {
-    final svc = await _getService();
-    final state = await svc.loadState(_counterKey, _caughtKey);
-    setState(() {
-      _counter = state.count;
-      _isCaught = state.isCaught;
-    });
-  }
-
-  Future<void> _persistCounter() async {
-    final svc = await _getService();
-    await svc.setCounter(_counterKey, _counter);
   }
 
   Future<void> _hapticTap() async {
@@ -102,33 +54,24 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
   }
 
   Future<void> _increment() async {
-    if (_isCaught) return;
+    if (_controller.isCaught) return;
     await _hapticTap();
-    setState(() => _counter++);
-    await _persistCounter();
-    await _updatePill();
+    await _controller.increment();
   }
 
   Future<void> _decrement() async {
-    if (_isCaught || _counter == 0) return;
+    if (_controller.isCaught || _controller.counter == 0) return;
     await _hapticTap();
-    setState(() => _counter--);
-    await _persistCounter();
-    await _updatePill();
+    await _controller.decrement();
   }
 
   Future<void> _toggleCaught() async {
     await _hapticTap();
-    final svc = await _getService();
-    setState(() {
-      _isCaught = !_isCaught;
-    });
-    await svc.setCaught(_caughtKey, _isCaught);
-    await _updatePill();
+    await _controller.toggleCaught();
   }
 
   Future<void> _showEditDialog() async {
-    final controller = TextEditingController(text: '$_counter');
+    final controller = TextEditingController(text: '${_controller.counter}');
     final result = await showDialog<int>(
       context: context,
       builder: (context) {
@@ -164,83 +107,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
     );
 
     if (result != null) {
-      setState(() {
-        _counter = result;
-        _isCaught = false;
-      });
-      await _persistCounter();
-      final svc = await _getService();
-      await svc.setCaught(_caughtKey, _isCaught);
-      await _updatePill();
+      await _controller.setCounter(result);
     }
   }
 
   Future<void> _togglePill() async {
-    final hasPerm = await FlutterOverlayWindow.isPermissionGranted();
-    if (!hasPerm) {
-      final requested = await FlutterOverlayWindow.requestPermission();
-      if (requested != true) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Overlay permissie nodig voor mini-counter')),
-          );
-        }
-        return;
-      }
-    }
-    if (_pillActive) {
-      await _updatePill();
-      return;
-    }
-
-    final svc = await _getService();
-    await svc.showOverlay(
-      _overlayPayload,
-      height: 180,
-      width: 900,
-      start: const OverlayPosition(0, 120),
-    );
-    if (mounted) setState(() => _pillActive = true);
-  }
-
-  Future<void> _updatePill() async {
-    if (!_pillActive) return;
-    final svc = await _getService();
-    await svc.shareToOverlay(_overlayPayload);
-  }
-
-  Future<void> _handleOverlayMessage(String data) async {
-    final message = CounterOverlayMessage.tryParse(data);
-    if (message == null || message.counterKey != _counterKey) return;
-
-    if (!mounted) return;
-    setState(() {
-      _counter = message.count;
-      _isCaught = !message.enabled;
-    });
-    await _persistCounter();
-    final svc = await _getService();
-    await svc.setCaught(_caughtKey, _isCaught);
-  }
-
-  void _startPeriodicSync() {
-    _pollTimer?.cancel();
-    _pollTimer = Timer.periodic(const Duration(milliseconds: 400), (_) async {
-      final svc = await _getService();
-      final state = await svc.loadState(_counterKey, _caughtKey);
-      if (!mounted) return;
-      if (state.count != _counter || state.isCaught != _isCaught) {
-        setState(() {
-          _counter = state.count;
-          _isCaught = state.isCaught;
-        });
-      }
-    });
-  }
-
-  Future<CounterSyncService> _getService() async {
-    _sync ??= await CounterSyncService.instance();
-    return _sync!;
+    await _controller.toggleOverlay();
   }
 
   @override
@@ -331,9 +203,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                             onPressed: _toggleCaught,
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
-                                  _isCaught ? Colors.green.shade600 : colors.secondary,
+                              _controller.isCaught ? Colors.green.shade600 : colors.secondary,
                               foregroundColor:
-                                  _isCaught ? Colors.white : colors.onSecondary,
+                                  _controller.isCaught ? Colors.white : colors.onSecondary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -341,7 +213,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               child: Text(
-                                _isCaught ? 'Caught' : 'Catch',
+                                _controller.isCaught ? 'Caught' : 'Catch',
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -358,7 +230,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            '$_counter',
+                            '${_controller.counter}',
                             style: textTheme.displayLarge?.copyWith(
                               fontWeight: FontWeight.w800,
                               color: colors.onSurface,
@@ -368,23 +240,23 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              _RoundIconButton(
-                                icon: Icons.remove,
-                                onPressed: _decrement,
-                                background: colors.primaryContainer,
-                                foreground: colors.onPrimaryContainer,
-                                enabled: !_isCaught,
-                              ),
-                              const SizedBox(width: 28),
-                              _RoundIconButton(
-                                icon: Icons.add,
-                                onPressed: _increment,
-                                background: colors.primaryContainer,
-                                foreground: colors.onPrimaryContainer,
-                                enabled: !_isCaught,
-                              ),
-                            ],
+                          _RoundIconButton(
+                            icon: Icons.remove,
+                            onPressed: _decrement,
+                            background: colors.primaryContainer,
+                            foreground: colors.onPrimaryContainer,
+                            enabled: !_controller.isCaught,
                           ),
+                          const SizedBox(width: 28),
+                          _RoundIconButton(
+                            icon: Icons.add,
+                            onPressed: _increment,
+                            background: colors.primaryContainer,
+                            foreground: colors.onPrimaryContainer,
+                            enabled: !_controller.isCaught,
+                          ),
+                        ],
+                      ),
                         ],
                       ),
                     ),
