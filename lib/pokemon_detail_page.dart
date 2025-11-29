@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
@@ -5,6 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:flutter_overlay_window/src/models/overlay_position.dart';
+import 'package:flutter_overlay_window/src/overlay_config.dart';
 
 import 'pokemon.dart';
 
@@ -17,10 +21,14 @@ class PokemonDetailPage extends StatefulWidget {
   State<PokemonDetailPage> createState() => _PokemonDetailPageState();
 }
 
-class _PokemonDetailPageState extends State<PokemonDetailPage> {
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindingObserver {
   int _counter = 0;
   bool _isCaught = false;
+  bool _pillActive = false;
+  StreamSubscription<dynamic>? _overlaySub;
+  static final Stream<dynamic> _overlayStream =
+      FlutterOverlayWindow.overlayListener.asBroadcastStream();
+  Timer? _pollTimer;
 
   String get _counterKey => 'counter_${widget.pokemon.name.toLowerCase()}';
   String get _caughtKey => 'caught_${widget.pokemon.name.toLowerCase()}';
@@ -28,11 +36,42 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _overlaySub = _overlayStream.listen((data) {
+      if (!mounted) return;
+      if (data is String) {
+        if (data == 'closed') {
+          setState(() => _pillActive = false);
+          _pollTimer?.cancel();
+          return;
+        }
+        if (data.startsWith('counter:')) {
+          _handleOverlayMessage(data);
+        }
+      }
+    });
     _loadState();
+    _startPeriodicSync();
+  }
+
+  @override
+  void dispose() {
+    _overlaySub?.cancel();
+    _pollTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadState();
+    }
   }
 
   Future<void> _loadState() async {
-    final prefs = await _prefs;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
     final saved = prefs.getInt(_counterKey);
     final caught = prefs.getBool(_caughtKey) ?? false;
     setState(() {
@@ -42,7 +81,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   Future<void> _persistCounter() async {
-    final prefs = await _prefs;
+    final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_counterKey, _counter);
   }
 
@@ -57,6 +96,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     await _hapticTap();
     setState(() => _counter++);
     await _persistCounter();
+    await _updatePill();
   }
 
   Future<void> _decrement() async {
@@ -64,15 +104,17 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     await _hapticTap();
     setState(() => _counter--);
     await _persistCounter();
+    await _updatePill();
   }
 
   Future<void> _toggleCaught() async {
     await _hapticTap();
-    final prefs = await _prefs;
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
       _isCaught = !_isCaught;
     });
     await prefs.setBool(_caughtKey, _isCaught);
+    await _updatePill();
   }
 
   Future<void> _showEditDialog() async {
@@ -117,9 +159,89 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         _isCaught = false;
       });
       await _persistCounter();
-      final prefs = await _prefs;
+      final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_caughtKey, _isCaught);
+      await _updatePill();
     }
+  }
+
+  Future<void> _togglePill() async {
+    final hasPerm = await FlutterOverlayWindow.isPermissionGranted();
+    if (!hasPerm) {
+      final requested = await FlutterOverlayWindow.requestPermission();
+      if (requested != true) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Overlay permissie nodig voor mini-counter')),
+          );
+        }
+        return;
+      }
+    }
+    if (_pillActive) {
+      await _updatePill();
+      return;
+    }
+
+    await FlutterOverlayWindow.showOverlay(
+      enableDrag: true,
+      overlayTitle: widget.pokemon.name,
+      overlayContent: 'counter:${widget.pokemon.name}:${_counterKey}:${_counter}:${_isCaught ? 0 : 1}',
+      flag: OverlayFlag.defaultFlag,
+      visibility: NotificationVisibility.visibilityPublic,
+      positionGravity: PositionGravity.none,
+      height: 220,
+      width: 1000,
+      startPosition: const OverlayPosition(0, 120),
+    );
+    await FlutterOverlayWindow.shareData(
+      'counter:${widget.pokemon.name}:${_counterKey}:${_counter}:${_isCaught ? 0 : 1}',
+    );
+    if (mounted) setState(() => _pillActive = true);
+  }
+
+  Future<void> _updatePill() async {
+    if (!_pillActive) return;
+    await FlutterOverlayWindow.shareData(
+      'counter:${widget.pokemon.name}:${_counterKey}:${_counter}:${_isCaught ? 0 : 1}',
+    );
+  }
+
+  Future<void> _handleOverlayMessage(String data) async {
+    final parts = data.split(':');
+    if (parts.length < 5) return;
+    final key = parts[2];
+    if (key != _counterKey) return;
+    final newCount = int.tryParse(parts[3]);
+    final enabled = parts[4] == '1';
+    if (newCount == null) return;
+
+    if (!mounted) return;
+    setState(() {
+      _counter = newCount;
+      _isCaught = !enabled;
+    });
+    await _persistCounter();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_caughtKey, _isCaught);
+  }
+
+  void _startPeriodicSync() {
+    _pollTimer?.cancel();
+    _pollTimer = Timer.periodic(const Duration(milliseconds: 400), (_) async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.reload();
+      final saved = prefs.getInt(_counterKey);
+      final caught = prefs.getBool(_caughtKey) ?? false;
+      final newCount = saved ?? _counter;
+      if (!mounted) return;
+      if (newCount != _counter || caught != _isCaught) {
+        setState(() {
+          _counter = newCount;
+          _isCaught = caught;
+        });
+      }
+    });
   }
 
   @override
@@ -152,6 +274,11 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
             icon: const Icon(Icons.edit),
             tooltip: 'Counter bewerken',
             onPressed: _showEditDialog,
+          ),
+          IconButton(
+            icon: const Icon(Icons.open_in_new_rounded),
+            tooltip: 'Mini-counter openen',
+            onPressed: _togglePill,
           ),
         ],
       ),

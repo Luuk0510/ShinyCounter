@@ -1,0 +1,142 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:shared_preferences_android/shared_preferences_android.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+@pragma('vm:entry-point')
+void overlayMain() {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    SharedPreferencesAndroid.registerWith();
+  } catch (_) {}
+  runApp(const _OverlayApp());
+}
+
+class _OverlayApp extends StatefulWidget {
+  const _OverlayApp();
+
+  @override
+  State<_OverlayApp> createState() => _OverlayAppState();
+}
+
+class _OverlayAppState extends State<_OverlayApp> {
+  StreamSubscription<dynamic>? _sub;
+  String _name = 'Pokémon';
+  String _counterKey = '';
+  int _count = 0;
+  bool _enabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _sub = FlutterOverlayWindow.overlayListener.listen((data) {
+      if (data is String) {
+        _parseContent(data);
+      }
+    });
+  }
+
+  Future<void> _parseContent(String content) async {
+    if (!content.startsWith('counter:')) return;
+    final parts = content.split(':');
+    if (parts.length < 5) return;
+    setState(() {
+      _name = parts[1];
+      _counterKey = parts[2];
+      _count = int.tryParse(parts[3]) ?? 0;
+      _enabled = parts[4] == '1';
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _bump(int delta) async {
+    if (!_enabled || _counterKey.isEmpty) return;
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getInt(_counterKey) ?? _count;
+    var next = current + delta;
+    if (next < 0) next = 0;
+    await prefs.setInt(_counterKey, next);
+    setState(() => _count = next);
+    FlutterOverlayWindow.shareData('counter:${_name}:${_counterKey}:${_count}:${_enabled ? 1 : 0}');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = const Color(0xFF1E1E1E).withOpacity(0.9);
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: Offset(0, 6),
+                )
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove),
+                  color: Colors.white,
+                  onPressed: _enabled ? () => _bump(-1) : null,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _name,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        '$_count',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  color: Colors.white,
+                  onPressed: _enabled ? () => _bump(1) : null,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  color: Colors.white70,
+                  onPressed: () async {
+                    await FlutterOverlayWindow.closeOverlay();
+                    await FlutterOverlayWindow.shareData('closed');
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

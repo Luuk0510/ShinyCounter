@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'pokemon_list_page.dart';
+import 'counter_overlay.dart' as counter_overlay;
 
 void main() {
   runApp(const MyApp());
+}
+
+@pragma('vm:entry-point')
+void overlayMain() {
+  counter_overlay.overlayMain();
 }
 
 class MyApp extends StatelessWidget {
