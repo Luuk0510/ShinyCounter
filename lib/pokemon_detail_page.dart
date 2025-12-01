@@ -232,7 +232,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                               color: colors.onSurface,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -253,6 +253,33 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                           ),
                         ],
                       ),
+                          const SizedBox(height: 30),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ConstrainedBox(
+                                  constraints: const BoxConstraints(maxWidth: 400),
+                                  child: _HuntDatesCard(
+                                    colors: colors,
+                                    startedAt: _controller.startedAt,
+                                    caughtAt: _controller.caughtAt,
+                                    formatter: _formatDate,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                ConstrainedBox(
+                                  constraints: const BoxConstraints(maxWidth: 200),
+                                  child: _DailyCountsList(
+                                    colors: colors,
+                                    dailyCounts: _controller.dailyCounts,
+                                    dayFormatter: _formatDayKey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -264,6 +291,21 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
         },
       ),
     );
+  }
+
+  String _formatDate(DateTime? value) {
+    if (value == null) return '--';
+    final local = value.toLocal();
+    String two(int v) => v.toString().padLeft(2, '0');
+    return '${two(local.day)}-${two(local.month)}-${local.year} ${two(local.hour)}:${two(local.minute)}';
+  }
+
+  String _formatDayKey(String key) {
+    final parsed = DateTime.tryParse(key);
+    if (parsed == null) return key;
+    String two(int v) => v.toString().padLeft(2, '0');
+    final local = parsed.toLocal();
+    return '${two(local.day)}-${two(local.month)}-${local.year}';
   }
 }
 
@@ -298,6 +340,182 @@ class _RoundIconButton extends StatelessWidget {
         minimumSize: const Size(72, 72),
       ),
       child: Icon(icon, size: 32),
+    );
+  }
+}
+
+class _HuntDatesCard extends StatelessWidget {
+  const _HuntDatesCard({
+    required this.colors,
+    required this.startedAt,
+    required this.caughtAt,
+    required this.formatter,
+  });
+
+  final ColorScheme colors;
+  final DateTime? startedAt;
+  final DateTime? caughtAt;
+  final String Function(DateTime?) formatter;
+
+  @override
+  Widget build(BuildContext context) {
+    final labelStyle = TextStyle(
+      color: colors.onSurfaceVariant,
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+    );
+    final valueStyle = TextStyle(
+      color: colors.onSurface,
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: colors.surfaceVariant.withOpacity(0.65),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outlineVariant.withOpacity(0.4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _HuntCell(label: 'Start', value: formatter(startedAt), labelStyle: labelStyle, valueStyle: valueStyle),
+          const SizedBox(width: 18),
+          _HuntCell(label: 'Catch', value: formatter(caughtAt), labelStyle: labelStyle, valueStyle: valueStyle),
+        ],
+      ),
+    );
+  }
+}
+
+class _HuntCell extends StatelessWidget {
+  const _HuntCell({
+    required this.label,
+    required this.value,
+    required this.labelStyle,
+    required this.valueStyle,
+  });
+
+  final String label;
+  final String value;
+  final TextStyle labelStyle;
+  final TextStyle valueStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label, style: labelStyle),
+        const SizedBox(height: 4),
+        Text(value, style: valueStyle),
+      ],
+    );
+  }
+}
+
+class _DailyCountsList extends StatelessWidget {
+  const _DailyCountsList({
+    required this.colors,
+    required this.dailyCounts,
+    required this.dayFormatter,
+  });
+
+  final ColorScheme colors;
+  final Map<String, int> dailyCounts;
+  final String Function(String) dayFormatter;
+
+  @override
+  Widget build(BuildContext context) {
+    final entries = dailyCounts.entries.toList()
+      ..sort((a, b) => b.key.compareTo(a.key));
+
+    if (entries.isEmpty) {
+      return Container(
+        height: 150,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: colors.surfaceVariant.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: colors.outlineVariant.withOpacity(0.35)),
+        ),
+        child: Text(
+          'Nog geen tellingen',
+          style: TextStyle(color: colors.onSurfaceVariant, fontWeight: FontWeight.w600),
+        ),
+      );
+    }
+
+    return Container(
+      height: 150,
+      decoration: BoxDecoration(
+        color: colors.surfaceVariant.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outlineVariant.withOpacity(0.35)),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Datum',
+                  style: TextStyle(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  'Aantal',
+                  style: TextStyle(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, thickness: 1, color: Colors.black12),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              itemBuilder: (context, index) {
+                final entry = entries[index];
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      dayFormatter(entry.key),
+                      style: TextStyle(
+                        color: colors.onSurface,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      '${entry.value}',
+                      style: TextStyle(
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                );
+              },
+              separatorBuilder: (_, __) =>
+                  const Divider(height: 16, thickness: 1, color: Colors.black12),
+              itemCount: entries.length,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
