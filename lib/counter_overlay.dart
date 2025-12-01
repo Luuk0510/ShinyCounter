@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
@@ -74,71 +75,72 @@ class _OverlayAppState extends State<_OverlayApp> {
 
   @override
   Widget build(BuildContext context) {
-    final bg = const Color(0xFF1E1E1E).withOpacity(0.9);
+    final bg = const Color(0xFF1E1E1E).withOpacity(0.8);
+    final borderRadius = BorderRadius.circular(150);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.circular(150),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  offset: Offset(0, 6),
-                )
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  color: Colors.white,
-                  onPressed: _enabled ? () => _bump(-1) : null,
+          child: ClipRRect(
+            borderRadius: borderRadius,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: bg,
+                  borderRadius: borderRadius,
+                  border: Border.all(color: Colors.white24, width: 1),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _name,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.remove),
+                      color: Colors.white,
+                      onPressed: _enabled ? () => _bump(-1) : null,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _name,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            '$_count',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '$_count',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 26,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      color: Colors.white,
+                      onPressed: _enabled ? () => _bump(1) : null,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      color: Colors.white70,
+                      onPressed: () async {
+                        await FlutterOverlayWindow.closeOverlay();
+                        await FlutterOverlayWindow.shareData('closed');
+                      },
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  color: Colors.white,
-                  onPressed: _enabled ? () => _bump(1) : null,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  color: Colors.white70,
-                  onPressed: () async {
-                    await FlutterOverlayWindow.closeOverlay();
-                    await FlutterOverlayWindow.shareData('closed');
-                  },
-                ),
-              ],
+              ),
             ),
           ),
         ),
