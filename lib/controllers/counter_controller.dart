@@ -105,6 +105,27 @@ class CounterController extends ChangeNotifier {
     await _updateOverlay();
   }
 
+  Future<void> setCounterManual(int value) async {
+    final previous = _counter;
+    _counter = value;
+    if (_counter == 0) {
+      _isCaught = false;
+      _caughtAt = null;
+    }
+    final sync = await _getSync();
+    await _persist(sync: sync);
+    if (_counter == 0) {
+      await _setCaught(false, sync: sync);
+    }
+    await _handleHuntStartReset(previous, _counter, sync: sync);
+    final delta = _counter - previous;
+    if (delta != 0) {
+      await _applyDailyDelta(delta, sync: sync);
+    }
+    notifyListeners();
+    await _updateOverlay();
+  }
+
   Future<void> toggleCaught() async {
     _isCaught = !_isCaught;
     final sync = await _getSync();
@@ -122,6 +143,26 @@ class CounterController extends ChangeNotifier {
     }
     notifyListeners();
     await _updateOverlay();
+  }
+
+  Future<void> setStartedAtDate(DateTime? value) async {
+    _startedAt = value;
+    final sync = await _getSync();
+    await sync.setStartedAt(_counterKey, value);
+    await _updateOverlay();
+    notifyListeners();
+  }
+
+  Future<void> setCaughtAtDate(DateTime? value) async {
+    _caughtAt = value;
+    final sync = await _getSync();
+    await sync.setCaughtAt(_counterKey, value);
+    if (value != null) {
+      _isCaught = true;
+      await _setCaught(true, sync: sync);
+    }
+    await _updateOverlay();
+    notifyListeners();
   }
 
   Future<void> toggleOverlay() async {

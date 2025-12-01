@@ -67,43 +67,31 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
   }
 
   Future<void> _showEditDialog() async {
-    final controller = TextEditingController(text: '${_controller.counter}');
-    final result = await showDialog<int>(
+    final result = await showModalBottomSheet<_EditSheetResult>(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Counter bewerken'),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Waarde',
-              hintText: 'Voer een getal in',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Annuleren'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final value = int.tryParse(controller.text.trim());
-                if (value != null && value >= 0) {
-                  _hapticTap();
-                  Navigator.of(context).pop(value);
-                }
-              },
-              child: const Text('Opslaan'),
-            ),
-          ],
+        return _EditCountersSheet(
+          counter: _controller.counter,
+          startedAt: _controller.startedAt,
+          caughtAt: _controller.caughtAt,
         );
       },
     );
 
-    if (result != null) {
-      await _controller.setCounter(result);
+    if (result == null) return;
+    if (result.counter != null && result.counter != _controller.counter) {
+      await _controller.setCounterManual(result.counter!);
+    }
+    if (result.startedChanged) {
+      await _controller.setStartedAtDate(result.startedAt);
+    }
+    if (result.caughtChanged) {
+      await _controller.setCaughtAtDate(result.caughtAt);
     }
   }
 
@@ -516,6 +504,250 @@ class _DailyCountsList extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _EditSheetResult {
+  const _EditSheetResult({
+    this.counter,
+    this.startedAt,
+    this.caughtAt,
+    this.startedChanged = false,
+    this.caughtChanged = false,
+  });
+
+  final int? counter;
+  final DateTime? startedAt;
+  final DateTime? caughtAt;
+  final bool startedChanged;
+  final bool caughtChanged;
+}
+
+class _EditCountersSheet extends StatefulWidget {
+  const _EditCountersSheet({
+    required this.counter,
+    required this.startedAt,
+    required this.caughtAt,
+  });
+
+  final int counter;
+  final DateTime? startedAt;
+  final DateTime? caughtAt;
+
+  @override
+  State<_EditCountersSheet> createState() => _EditCountersSheetState();
+}
+
+class _EditCountersSheetState extends State<_EditCountersSheet> {
+  late final TextEditingController _counterCtrl =
+      TextEditingController(text: '${widget.counter}');
+  DateTime? _start;
+  DateTime? _catch;
+  bool _startChanged = false;
+  bool _catchChanged = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _start = widget.startedAt;
+    _catch = widget.caughtAt;
+  }
+
+  @override
+  void dispose() {
+    _counterCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        top: 12,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 44,
+            height: 5,
+            decoration: BoxDecoration(
+              color: colors.outlineVariant,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Aanpassen',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _counterCtrl,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Counter',
+              hintText: 'Voer een getal in',
+            ),
+          ),
+          const SizedBox(height: 16),
+          _DateRow(
+            label: 'Start',
+            value: _start,
+            onPick: () => _pickDateTime(_start).then((value) {
+              if (value != null) {
+                setState(() {
+                  _start = value;
+                  _startChanged = true;
+                });
+              }
+            }),
+            onClear: () {
+              setState(() {
+                _start = null;
+                _startChanged = true;
+              });
+            },
+          ),
+          const SizedBox(height: 12),
+          _DateRow(
+            label: 'Catch',
+            value: _catch,
+            onPick: () => _pickDateTime(_catch).then((value) {
+              if (value != null) {
+                setState(() {
+                  _catch = value;
+                  _catchChanged = true;
+                });
+              }
+            }),
+            onClear: () {
+              setState(() {
+                _catch = null;
+                _catchChanged = true;
+              });
+            },
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Annuleren'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _submit,
+                  child: const Text('Opslaan'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<DateTime?> _pickDateTime(DateTime? initial) async {
+    final now = DateTime.now();
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial ?? now,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (date == null) return null;
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial ?? now),
+    );
+    if (time == null) return null;
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  }
+
+  void _submit() {
+    final parsed = int.tryParse(_counterCtrl.text.trim());
+    if (parsed == null || parsed < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Voer een geldige counter in')),
+      );
+      return;
+    }
+    Navigator.of(context).pop(
+      _EditSheetResult(
+        counter: parsed,
+        startedAt: _start,
+        caughtAt: _catch,
+        startedChanged: _startChanged,
+        caughtChanged: _catchChanged,
+      ),
+    );
+  }
+}
+
+class _DateRow extends StatelessWidget {
+  const _DateRow({
+    required this.label,
+    required this.value,
+    required this.onPick,
+    required this.onClear,
+  });
+
+  final String label;
+  final DateTime? value;
+  final VoidCallback onPick;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    String two(int v) => v.toString().padLeft(2, '0');
+    final formatted = value == null
+        ? '--'
+        : '${two(value!.day)}-${two(value!.month)}-${value!.year} ${two(value!.hour)}:${two(value!.minute)}';
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                formatted,
+                style: TextStyle(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.edit_calendar),
+          onPressed: onPick,
+        ),
+        IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: onClear,
+        ),
+      ],
     );
   }
 }
