@@ -1,14 +1,17 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:provider/provider.dart';
 
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
-import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
-import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_detail_page.dart';
+import 'package:shiny_counter/core/routing/app_router.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/add_pokemon_dialog.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_empty_state.dart';
@@ -23,7 +26,9 @@ class PokemonListPage extends StatefulWidget {
 }
 
 class _PokemonListPageState extends State<PokemonListPage> {
-  late final PokemonRepository _repository;
+  late final LoadCustomPokemonUseCase _loadCustomPokemon;
+  late final SaveCustomPokemonUseCase _saveCustomPokemon;
+  late final LoadCaughtUseCase _loadCaught;
   final List<Pokemon> _customPokemon = [];
   Set<String> _caught = {};
   bool _loading = true;
@@ -33,12 +38,14 @@ class _PokemonListPageState extends State<PokemonListPage> {
   @override
   void initState() {
     super.initState();
-    _repository = context.read<PokemonRepository>();
+    _loadCustomPokemon = context.read<LoadCustomPokemonUseCase>();
+    _saveCustomPokemon = context.read<SaveCustomPokemonUseCase>();
+    _loadCaught = context.read<LoadCaughtUseCase>();
     _loadData();
   }
 
   Future<void> _loadData() async {
-    final custom = await _repository.loadCustomPokemon();
+    final custom = await _loadCustomPokemon();
     setState(() {
       _customPokemon
         ..clear()
@@ -51,7 +58,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> _reloadCaught() async {
-    final caught = await _repository.loadCaught(_allPokemon);
+    final caught = await _loadCaught(_allPokemon);
     if (mounted) {
       setState(() => _caught = caught);
     }
@@ -66,7 +73,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
     setState(() {
       _customPokemon.add(newPokemon);
     });
-    await _repository.saveCustomPokemon(_customPokemon);
+    await _saveCustomPokemon(_customPokemon);
     await _reloadCaught();
   }
 
@@ -150,7 +157,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
       _customPokemon[index] = updated;
     });
 
-    await _repository.saveCustomPokemon(_customPokemon);
+    await _saveCustomPokemon(_customPokemon);
     await _migratePokemonState(original, updated);
     await _reloadCaught();
   }
@@ -251,7 +258,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
       setState(() {
         _customPokemon.removeWhere((p) => p.name == pokemon.name && p.imagePath == pokemon.imagePath);
       });
-      await _repository.saveCustomPokemon(_customPokemon);
+      await _saveCustomPokemon(_customPokemon);
       await _clearPokemonState(pokemon);
       await _reloadCaught();
     }
@@ -318,11 +325,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> _openDetail(Pokemon pokemon) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => PokemonDetailPage(pokemon: pokemon),
-      ),
-    );
+    await context.push(AppRoutes.pokemonDetail, extra: pokemon);
     await _reloadCaught();
   }
 

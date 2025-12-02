@@ -5,13 +5,16 @@ import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 
 class CounterController extends ChangeNotifier {
   CounterController({
     required this.pokemon,
     CounterSyncService? sync,
-  }) : _sync = sync;
+    ToggleCaughtUseCase? toggleCaughtUseCase,
+  })  : _sync = sync,
+        _toggleCaughtUseCase = toggleCaughtUseCase;
 
   final Pokemon pokemon;
   final int overlayHeight = 200;
@@ -28,6 +31,7 @@ class CounterController extends ChangeNotifier {
   late final String _caughtKey = 'caught_${pokemon.name.toLowerCase()}';
 
   CounterSyncService? _sync;
+  ToggleCaughtUseCase? _toggleCaughtUseCase;
   StreamSubscription<dynamic>? _overlaySub;
   Timer? _pollTimer;
   bool _initialized = false;
@@ -215,6 +219,10 @@ class CounterController extends ChangeNotifier {
   }
 
   Future<void> _setCaught(bool value, {CounterSyncService? sync}) async {
+    if (_toggleCaughtUseCase != null) {
+      await _toggleCaughtUseCase!.call(_caughtKey, value);
+      return;
+    }
     final service = sync ?? await _getSync();
     await service.setCaught(_caughtKey, value);
   }

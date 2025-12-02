@@ -27,6 +27,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
     _controller = CounterController(
       pokemon: widget.pokemon,
       sync: context.read(),
+      toggleCaughtUseCase: context.read(),
     );
     WidgetsBinding.instance.addObserver(this);
     _controller.addListener(() => mounted ? setState(() {}) : null);
