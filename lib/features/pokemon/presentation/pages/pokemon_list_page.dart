@@ -1,11 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:shiny_counter/core/routing/app_router.dart';
+import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:provider/provider.dart';
@@ -324,7 +324,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> _openDetail(Pokemon pokemon) async {
-    await context.push(AppRoutes.pokemonDetail, extra: pokemon);
+    await context.goToPokemon(pokemon);
     await _reloadCaught();
   }
 
