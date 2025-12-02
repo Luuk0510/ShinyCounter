@@ -195,12 +195,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                           child: ElevatedButton(
                             onPressed: _toggleCaught,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: _controller.isCaught
-                                  ? colors.tertiary
-                                  : colors.secondary,
-                              foregroundColor: _controller.isCaught
-                                  ? colors.onTertiary
-                                  : colors.onSecondary,
+                              backgroundColor:
+                                  _controller.isCaught ? Colors.green.shade600 : colors.secondary,
+                              foregroundColor:
+                                  _controller.isCaught ? Colors.white : colors.onSecondary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
