@@ -6,6 +6,7 @@ import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
+import 'package:shiny_counter/features/pokemon/overlay/widgets/round_control.dart';
 
 @pragma('vm:entry-point')
 void overlayMain() {
@@ -135,10 +136,9 @@ class _OverlayAppState extends State<_OverlayApp> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove),
-                          color: Colors.white,
-                          onPressed: _enabled ? () => _bump(-1) : null,
+                        RoundControl(
+                          icon: Icons.remove,
+                          onTap: _enabled ? () => _bump(-1) : null,
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -164,10 +164,9 @@ class _OverlayAppState extends State<_OverlayApp> {
                             ],
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.add),
-                          color: Colors.white,
-                          onPressed: _enabled ? () => _bump(1) : null,
+                        RoundControl(
+                          icon: Icons.add,
+                          onTap: _enabled ? () => _bump(1) : null,
                         ),
                         IconButton(
                           icon: const Icon(Icons.close),

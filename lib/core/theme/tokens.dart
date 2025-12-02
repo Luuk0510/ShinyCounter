@@ -4,7 +4,8 @@ class AppColors {
   static const seed = Color(0xFF3F51B5);
   static const darkBackground = Color(0xFF151924);
   static const darkSurface = Color(0xFF1E2430);
-  static const darkSurfaceVariant = Color(0xFF252C3A);
+  static const oledBackground = Color(0xFF000000);
+  static const oledSurface = Color(0xFF0A0A0A);
 }
 
 class AppSpacing {
@@ -36,13 +37,21 @@ class AppTypography {
 }
 
 class AppTheme {
+  static final themes = <String, ThemeData>{
+    'light': light(),
+    'dark': dark(),
+    'oled': oled(),
+  };
+
   static ThemeData light() {
     final scheme = ColorScheme.fromSeed(seedColor: AppColors.seed);
+    final cardColor = scheme.surface;
     return ThemeData(
       colorScheme: scheme,
-      scaffoldBackgroundColor: scheme.background,
+      scaffoldBackgroundColor: scheme.surface,
+      cardColor: cardColor,
       cardTheme: CardThemeData(
-        color: scheme.surface,
+        color: cardColor,
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.md),
@@ -59,21 +68,55 @@ class AppTheme {
       brightness: Brightness.dark,
     );
     final scheme = darkSchemeBase.copyWith(
-      background: AppColors.darkBackground,
       surface: AppColors.darkSurface,
-      surfaceVariant: AppColors.darkSurfaceVariant,
+      surfaceContainerHighest: Colors.black.withValues(alpha: 0.12),
     );
+    final cardColor = scheme.surfaceContainerHighest;
     return ThemeData(
       colorScheme: scheme,
-      scaffoldBackgroundColor: scheme.background,
+      scaffoldBackgroundColor: AppColors.darkBackground,
+      cardColor: cardColor,
       cardTheme: CardThemeData(
-        color: scheme.surface,
-        elevation: 2,
+        color: cardColor,
+        elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.md),
         ),
       ),
       appBarTheme: const AppBarTheme(),
+      useMaterial3: true,
+    );
+  }
+
+  static ThemeData oled() {
+    final darkSchemeBase = ColorScheme.fromSeed(
+      seedColor: AppColors.seed,
+      brightness: Brightness.dark,
+    );
+    final scheme = darkSchemeBase.copyWith(
+      surface: AppColors.oledSurface,
+      surfaceContainerHighest: Colors.white.withValues(alpha: 0.06),
+    );
+    final cardColor = scheme.surfaceContainerHighest;
+    return ThemeData(
+      colorScheme: scheme,
+      scaffoldBackgroundColor: AppColors.oledBackground,
+      cardColor: cardColor,
+      cardTheme: CardThemeData(
+        color: cardColor,
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadii.md),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.06)),
+        ),
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: const Color(0xFF0A0A0A),
+        surfaceTintColor: Colors.black,
+        foregroundColor: scheme.onSurface,
+        elevation: 0,
+      ),
+      dividerColor: Colors.white10,
       useMaterial3: true,
     );
   }
