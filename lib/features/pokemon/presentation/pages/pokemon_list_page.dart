@@ -214,24 +214,31 @@ class _PokemonListPageState extends State<PokemonListPage> {
   Future<void> _confirmDelete(Pokemon pokemon) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) {
-        final colors = Theme.of(context).colorScheme;
-        return AlertDialog(
-          title: const Text('Verwijderen'),
-          content: Text.rich(
-            TextSpan(
-              text: 'Weet je zeker dat je ',
-              children: [
+          builder: (context) {
+            final colors = Theme.of(context).colorScheme;
+            return AlertDialog(
+              title: const Text('Verwijderen'),
+              content: Text.rich(
                 TextSpan(
-                  text: pokemon.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  text: 'Weet je zeker dat je ',
+                  children: [
+                    TextSpan(
+                      text: pokemon.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    const TextSpan(
+                      text: ' wilt verwijderen?',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
                 ),
-                const TextSpan(text: ' wilt verwijderen?'),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
+              ),
+              actions: [
+                TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: const Text('Annuleren'),
             ),
