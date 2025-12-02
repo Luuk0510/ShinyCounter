@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'core/di/app_locator.dart';
 import 'core/routing/app_router.dart';
+import 'core/theme/tokens.dart';
 import 'features/pokemon/data/datasources/counter_sync_service.dart';
 import 'features/pokemon/domain/repositories/pokemon_repository.dart';
 import 'features/pokemon/overlay/counter_overlay.dart' as counter_overlay;
@@ -23,17 +24,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lightScheme = ColorScheme.fromSeed(seedColor: Colors.indigo);
-    final darkSchemeBase = ColorScheme.fromSeed(
-      seedColor: Colors.indigo,
-      brightness: Brightness.dark,
-    );
-    final darkScheme = darkSchemeBase.copyWith(
-      background: const Color(0xFF151924),
-      surface: const Color(0xFF1E2430),
-      surfaceVariant: const Color(0xFF252C3A),
-    );
-
     final router = AppRouter.instance.router;
     return MultiProvider(
       providers: [
@@ -46,30 +36,8 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp.router(
         title: 'Shiny Counter',
-        theme: ThemeData(
-          colorScheme: lightScheme,
-          scaffoldBackgroundColor: lightScheme.background,
-          cardTheme: CardThemeData(
-            color: lightScheme.surface,
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-          useMaterial3: true,
-        ),
-        darkTheme: ThemeData(
-          colorScheme: darkScheme,
-          scaffoldBackgroundColor: darkScheme.background,
-          cardTheme: CardThemeData(
-            color: darkScheme.surface,
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-          useMaterial3: true,
-        ),
+        theme: AppTheme.light(),
+        darkTheme: AppTheme.dark(),
         themeMode: ThemeMode.system,
         routerConfig: router,
       ),

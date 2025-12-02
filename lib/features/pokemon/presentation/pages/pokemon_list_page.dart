@@ -5,10 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:provider/provider.dart';
-
-import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/core/routing/app_router.dart';
+import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:provider/provider.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
@@ -220,6 +220,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
+        final colors = Theme.of(context).colorScheme;
         return AlertDialog(
           title: const Text('Verwijderen'),
           content: Text.rich(
@@ -244,8 +245,8 @@ class _PokemonListPageState extends State<PokemonListPage> {
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+                backgroundColor: colors.error,
+                foregroundColor: colors.onError,
               ),
               child: const Text('Verwijder'),
             ),
@@ -375,14 +376,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
       foregroundColor: colors.onSurface,
       title: FittedBox(
         fit: BoxFit.scaleDown,
-        child: const Text(
-          'Pokémon shiny counter',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
-          ),
-        ),
+        child: Text('Pokémon shiny counter', style: AppTypography.title),
       ),
       actions: [
         IconButton(
@@ -429,10 +423,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
               entry.title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
+              style: AppTypography.sectionTitle,
             ),
           );
         } else if (entry is Pokemon) {

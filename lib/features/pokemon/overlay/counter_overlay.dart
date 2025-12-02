@@ -109,7 +109,7 @@ class _OverlayAppState extends State<_OverlayApp> {
 
   @override
   Widget build(BuildContext context) {
-    final bg = const Color(0xFF1E1E1E).withOpacity(0.8);
+    final bg = const Color(0xFF1E1E1E).withOpacity(0.9);
     final borderRadius = BorderRadius.circular(150);
     return MaterialApp(
       debugShowCheckedModeBanner: false,

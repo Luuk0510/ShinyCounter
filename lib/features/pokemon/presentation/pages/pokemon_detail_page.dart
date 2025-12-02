@@ -191,10 +191,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                           child: ElevatedButton(
                             onPressed: _toggleCaught,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                              _controller.isCaught ? Colors.green.shade600 : colors.secondary,
+                              backgroundColor: _controller.isCaught ? colors.tertiary : colors.secondary,
                               foregroundColor:
-                                  _controller.isCaught ? Colors.white : colors.onSecondary,
+                                  _controller.isCaught ? colors.onTertiary : colors.onSecondary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -474,7 +473,7 @@ class _DailyCountsList extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(height: 1, thickness: 1, color: Colors.black12),
+          Divider(height: 1, thickness: 1, color: colors.outlineVariant.withOpacity(0.25)),
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -503,7 +502,7 @@ class _DailyCountsList extends StatelessWidget {
                 );
               },
               separatorBuilder: (_, __) =>
-                  const Divider(height: 16, thickness: 1, color: Colors.black12),
+                  Divider(height: 16, thickness: 1, color: colors.outlineVariant.withOpacity(0.25)),
               itemCount: entries.length,
             ),
           ),
