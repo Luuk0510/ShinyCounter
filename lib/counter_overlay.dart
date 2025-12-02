@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
@@ -27,6 +28,8 @@ class _OverlayAppState extends State<_OverlayApp> {
   String _counterKey = '';
   int _count = 0;
   bool _enabled = true;
+  DateTime? _startedAt;
+  DateTime? _caughtAt;
 
   @override
   void initState() {
@@ -41,11 +44,15 @@ class _OverlayAppState extends State<_OverlayApp> {
   Future<void> _parseContent(String content) async {
     final message = CounterOverlayMessage.tryParse(content);
     if (message == null) return;
+    final dates = await _loadHuntDatesFor(message.counterKey);
+    if (!mounted) return;
     setState(() {
       _name = message.name;
       _counterKey = message.counterKey;
       _count = message.count;
       _enabled = message.enabled;
+      _startedAt = dates.$1;
+      _caughtAt = dates.$2;
     });
   }
 
@@ -61,8 +68,30 @@ class _OverlayAppState extends State<_OverlayApp> {
     final current = prefs.getInt(_counterKey) ?? _count;
     var next = current + delta;
     if (next < 0) next = 0;
+
+    final wasZero = current <= 0;
+    DateTime? startedAt = _startedAt;
+    DateTime? caughtAt = _caughtAt;
+
+    if (wasZero && next > 0) {
+      startedAt = DateTime.now();
+      caughtAt = null;
+      await prefs.setString(_startedAtKey, startedAt.toIso8601String());
+      await prefs.remove(_caughtAtKey);
+    } else if (next == 0) {
+      startedAt = null;
+      caughtAt = null;
+      await prefs.remove(_startedAtKey);
+      await prefs.remove(_caughtAtKey);
+    }
+
     await prefs.setInt(_counterKey, next);
-    setState(() => _count = next);
+    if (!mounted) return;
+    setState(() {
+      _count = next;
+      _startedAt = startedAt;
+      _caughtAt = caughtAt;
+    });
     final message = CounterOverlayMessage(
       name: _name,
       counterKey: _counterKey,
@@ -74,75 +103,177 @@ class _OverlayAppState extends State<_OverlayApp> {
 
   @override
   Widget build(BuildContext context) {
-    final bg = const Color(0xFF1E1E1E).withOpacity(0.9);
+    final bg = const Color(0xFF1E1E1E).withOpacity(0.8);
+    final borderRadius = BorderRadius.circular(150);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.circular(150),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  offset: Offset(0, 6),
-                )
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  color: Colors.white,
-                  onPressed: _enabled ? () => _bump(-1) : null,
+          child: ClipRRect(
+            borderRadius: borderRadius,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: bg,
+                  borderRadius: borderRadius,
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _name,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        '$_count',
-                        style: const TextStyle(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove),
                           color: Colors.white,
-                          fontSize: 26,
-                          fontWeight: FontWeight.w800,
+                          onPressed: _enabled ? () => _bump(-1) : null,
                         ),
-                      ),
-                    ],
-                  ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _name,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                '$_count',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          color: Colors.white,
+                          onPressed: _enabled ? () => _bump(1) : null,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          color: Colors.white70,
+                          onPressed: () async {
+                            await FlutterOverlayWindow.closeOverlay();
+                            await FlutterOverlayWindow.shareData('closed');
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    _HuntDatesTable(
+                      startedAt: _startedAt,
+                      caughtAt: _caughtAt,
+                      formatter: _formatDate,
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  color: Colors.white,
-                  onPressed: _enabled ? () => _bump(1) : null,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  color: Colors.white70,
-                  onPressed: () async {
-                    await FlutterOverlayWindow.closeOverlay();
-                    await FlutterOverlayWindow.shareData('closed');
-                  },
-                ),
-              ],
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  String _formatDate(DateTime? value) {
+    if (value == null) return '--';
+    final local = value.toLocal();
+    String two(int v) => v.toString().padLeft(2, '0');
+    return '${two(local.day)}-${two(local.month)}-${local.year} ${two(local.hour)}:${two(local.minute)}';
+  }
+
+  String get _startedAtKey => '${_counterKey}_startedAt';
+
+  String get _caughtAtKey => '${_counterKey}_caughtAt';
+
+  Future<(DateTime?, DateTime?)> _loadHuntDatesFor(String counterKey) async {
+    if (counterKey.isEmpty) return (null, null);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    final startedRaw = prefs.getString('${counterKey}_startedAt');
+    final caughtRaw = prefs.getString('${counterKey}_caughtAt');
+    return (_parseDate(startedRaw), _parseDate(caughtRaw));
+  }
+
+  DateTime? _parseDate(String? raw) => raw == null ? null : DateTime.tryParse(raw);
+}
+
+class _HuntDatesTable extends StatelessWidget {
+  const _HuntDatesTable({
+    required this.startedAt,
+    required this.caughtAt,
+    required this.formatter,
+  });
+
+  final DateTime? startedAt;
+  final DateTime? caughtAt;
+  final String Function(DateTime?) formatter;
+
+  @override
+  Widget build(BuildContext context) {
+    const labelStyle = TextStyle(
+      color: Colors.white70,
+      fontSize: 12,
+      fontWeight: FontWeight.w600,
+    );
+    const valueStyle = TextStyle(
+      color: Colors.white,
+      fontSize: 14,
+      fontWeight: FontWeight.w700,
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _HuntCell(label: 'Start', value: formatter(startedAt), labelStyle: labelStyle, valueStyle: valueStyle),
+          const SizedBox(width: 16),
+          _HuntCell(label: 'Catch', value: formatter(caughtAt), labelStyle: labelStyle, valueStyle: valueStyle),
+        ],
+      ),
+    );
+  }
+}
+
+class _HuntCell extends StatelessWidget {
+  const _HuntCell({
+    required this.label,
+    required this.value,
+    required this.labelStyle,
+    required this.valueStyle,
+  });
+
+  final String label;
+  final String value;
+  final TextStyle labelStyle;
+  final TextStyle valueStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label, style: labelStyle),
+        const SizedBox(height: 2),
+        Text(value, style: valueStyle),
+      ],
     );
   }
 }
