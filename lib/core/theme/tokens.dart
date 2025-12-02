@@ -5,6 +5,9 @@ class AppColors {
   static const darkBackground = Color(0xFF151924);
   static const darkSurface = Color(0xFF1E2430);
   static const darkSurfaceVariant = Color(0xFF252C3A);
+  static const oledBackground = Color(0xFF000000);
+  static const oledSurface = Color(0xFF0A0A0A);
+  static const oledSurfaceVariant = Color(0xFF121212);
 }
 
 class AppSpacing {
@@ -36,6 +39,12 @@ class AppTypography {
 }
 
 class AppTheme {
+  static final themes = <String, ThemeData>{
+    'light': light(),
+    'dark': dark(),
+    'oled': oled(),
+  };
+
   static ThemeData light() {
     final scheme = ColorScheme.fromSeed(seedColor: AppColors.seed);
     return ThemeData(
@@ -67,13 +76,43 @@ class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: scheme.background,
       cardTheme: CardThemeData(
-        color: scheme.surface,
-        elevation: 2,
+        color: scheme.surfaceVariant.withOpacity(0.92),
+        elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.md),
         ),
       ),
       appBarTheme: const AppBarTheme(),
+      useMaterial3: true,
+    );
+  }
+
+  static ThemeData oled() {
+    final darkSchemeBase = ColorScheme.fromSeed(
+      seedColor: AppColors.seed,
+      brightness: Brightness.dark,
+    );
+    final scheme = darkSchemeBase.copyWith(
+      background: AppColors.oledBackground,
+      surface: AppColors.oledSurface,
+      surfaceVariant: AppColors.oledSurfaceVariant,
+    );
+    return ThemeData(
+      colorScheme: scheme,
+      scaffoldBackgroundColor: scheme.background,
+      cardTheme: CardThemeData(
+        color: scheme.surfaceVariant.withOpacity(0.95),
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadii.md),
+        ),
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.black.withOpacity(0.85),
+        surfaceTintColor: Colors.black,
+        foregroundColor: scheme.onSurface,
+      ),
+      dividerColor: Colors.white10,
       useMaterial3: true,
     );
   }

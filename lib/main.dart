@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'core/di/app_locator.dart';
 import 'core/routing/app_router.dart';
 import 'core/theme/tokens.dart';
+import 'core/theme/theme_controller.dart';
 import 'features/pokemon/data/datasources/counter_sync_service.dart';
 import 'features/pokemon/domain/repositories/pokemon_repository.dart';
 import 'features/pokemon/overlay/counter_overlay.dart' as counter_overlay;
@@ -38,12 +39,21 @@ class MyApp extends StatelessWidget {
         Provider.value(value: AppLocator.instance.loadCaught),
         Provider.value(value: AppLocator.instance.toggleCaught),
       ],
-      child: MaterialApp.router(
-        title: 'Shiny Counter',
-        theme: AppTheme.light(),
-        darkTheme: AppTheme.dark(),
-        themeMode: ThemeMode.system,
-        routerConfig: router,
+      child: ThemeController(
+        child: Builder(
+          builder: (context) {
+            final themeCtrl = ThemeController.of(context);
+            return MaterialApp.router(
+              title: 'Shiny Counter',
+              theme: AppTheme.light(),
+              darkTheme: themeCtrl.useOledDark
+                  ? AppTheme.oled()
+                  : AppTheme.dark(),
+              themeMode: themeCtrl.mode,
+              routerConfig: router,
+            );
+          },
+        ),
       ),
     );
   }

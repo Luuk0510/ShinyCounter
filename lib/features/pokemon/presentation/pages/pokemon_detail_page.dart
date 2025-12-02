@@ -120,7 +120,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         flexibleSpace: ClipRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(color: colors.surface.withOpacity(0.82)),
+            child: Container(color: Theme.of(context).cardColor.withOpacity(0.95)),
           ),
         ),
         title: Text(
@@ -376,9 +376,9 @@ class _HuntDatesCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: colors.surfaceVariant.withOpacity(0.65),
+        color: colors.surfaceVariant.withOpacity(0.9),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.outlineVariant.withOpacity(0.4)),
+        border: Border.all(color: colors.outlineVariant.withOpacity(0.6)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -450,9 +450,9 @@ class _DailyCountsList extends StatelessWidget {
         height: 210,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: colors.surfaceVariant.withOpacity(0.6),
+          color: colors.surfaceVariant.withOpacity(0.9),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colors.outlineVariant.withOpacity(0.35)),
+          border: Border.all(color: colors.outlineVariant.withOpacity(0.6)),
         ),
         child: Text(
           'Nog geen tellingen',
@@ -467,9 +467,9 @@ class _DailyCountsList extends StatelessWidget {
     return Container(
       height: 210,
       decoration: BoxDecoration(
-        color: colors.surfaceVariant.withOpacity(0.6),
+        color: colors.surfaceVariant.withOpacity(0.9),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.outlineVariant.withOpacity(0.35)),
+        border: Border.all(color: colors.outlineVariant.withOpacity(0.6)),
       ),
       child: Column(
         children: [
@@ -500,7 +500,7 @@ class _DailyCountsList extends StatelessWidget {
           Divider(
             height: 1,
             thickness: 1,
-            color: colors.outlineVariant.withOpacity(0.25),
+            color: colors.outlineVariant.withOpacity(0.35),
           ),
           Expanded(
             child: ListView.separated(
