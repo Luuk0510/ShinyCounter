@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'pokemon.dart';
+import '../../domain/entities/pokemon.dart';
 
 class PokemonStorage {
   PokemonStorage() : _prefs = SharedPreferences.getInstance();
@@ -14,16 +14,20 @@ class PokemonStorage {
     final raw = prefs.getString(_customKey);
     if (raw == null) return [];
 
-    final List<dynamic> decoded = jsonDecode(raw);
-    return decoded
-        .map(
-          (e) => Pokemon(
-            name: e['name'] as String,
-            imagePath: e['imagePath'] as String,
-            isLocalFile: e['isLocalFile'] as bool? ?? false,
-          ),
-        )
-        .toList();
+    try {
+      final List<dynamic> decoded = jsonDecode(raw);
+      return decoded
+          .map(
+            (e) => Pokemon(
+              name: e['name'] as String,
+              imagePath: e['imagePath'] as String,
+              isLocalFile: e['isLocalFile'] as bool? ?? false,
+            ),
+          )
+          .toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<void> saveCustomPokemon(List<Pokemon> custom) async {
