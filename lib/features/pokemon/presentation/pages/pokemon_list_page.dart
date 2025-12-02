@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:shiny_counter/features/pokemon/data/repositories/prefs_pokemon_repository.dart';
+import 'package:provider/provider.dart';
+
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_detail_page.dart';
@@ -22,7 +23,7 @@ class PokemonListPage extends StatefulWidget {
 }
 
 class _PokemonListPageState extends State<PokemonListPage> {
-  final PokemonRepository _repository = PrefsPokemonRepository();
+  late final PokemonRepository _repository;
   final List<Pokemon> _customPokemon = [];
   Set<String> _caught = {};
   bool _loading = true;
@@ -32,6 +33,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   @override
   void initState() {
     super.initState();
+    _repository = context.read<PokemonRepository>();
     _loadData();
   }
 

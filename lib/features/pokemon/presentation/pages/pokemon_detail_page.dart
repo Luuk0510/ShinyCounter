@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
 
@@ -18,11 +19,15 @@ class PokemonDetailPage extends StatefulWidget {
 }
 
 class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindingObserver {
-  late final CounterController _controller = CounterController(pokemon: widget.pokemon);
+  late final CounterController _controller;
 
   @override
   void initState() {
     super.initState();
+    _controller = CounterController(
+      pokemon: widget.pokemon,
+      sync: context.read(),
+    );
     WidgetsBinding.instance.addObserver(this);
     _controller.addListener(() => mounted ? setState(() {}) : null);
     _controller.init();
