@@ -1,14 +1,14 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:shiny_counter/core/routing/app_router.dart';
+import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:provider/provider.dart';
+import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
@@ -224,9 +224,16 @@ class _PokemonListPageState extends State<PokemonListPage> {
               children: [
                 TextSpan(
                   text: pokemon.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    letterSpacing: 0.2,
+                  ),
                 ),
-                const TextSpan(text: ' wilt verwijderen?'),
+                const TextSpan(
+                  text: ' wilt verwijderen?',
+                  style: TextStyle(fontSize: 16),
+                ),
               ],
             ),
           ),
@@ -316,8 +323,20 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> _openDetail(Pokemon pokemon) async {
-    await context.push(AppRoutes.pokemonDetail, extra: pokemon);
+    await context.goToPokemon(pokemon);
     await _reloadCaught();
+  }
+
+  Future<void> _openSettings() async {
+    if (!mounted) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: false,
+      builder: (context) {
+        return const _SettingsSheet();
+      },
+    );
+    setState(() {});
   }
 
   @override
@@ -346,18 +365,18 @@ class _PokemonListPageState extends State<PokemonListPage> {
       ),
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
-      flexibleSpace: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
+      flexibleSpace: Builder(
+        builder: (context) {
+          final scopedCard = Theme.of(context).cardColor;
+          return Container(
             decoration: BoxDecoration(
-              color: colors.surface.withOpacity(0.82),
+              color: scopedCard,
               borderRadius: const BorderRadius.vertical(
                 bottom: Radius.circular(30),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
       foregroundColor: colors.onSurface,
       title: FittedBox(
@@ -382,6 +401,12 @@ class _PokemonListPageState extends State<PokemonListPage> {
           icon: const Icon(Icons.delete_outline),
           tooltip: 'Verwijder Pokémon',
           onPressed: _onDeletePokemonList,
+        ),
+        IconButton(
+          iconSize: 26,
+          icon: const Icon(Icons.settings),
+          tooltip: 'Instellingen',
+          onPressed: _openSettings,
         ),
       ],
     );
@@ -468,6 +493,119 @@ dynamic _sectionedItem(
 class _SectionHeader {
   const _SectionHeader(this.title);
   final String title;
+}
+
+class _SettingsSheet extends StatefulWidget {
+  const _SettingsSheet();
+
+  @override
+  State<_SettingsSheet> createState() => _SettingsSheetState();
+}
+
+class _SettingsSheetState extends State<_SettingsSheet> {
+  late ThemeMode _mode;
+
+  @override
+  void initState() {
+    super.initState();
+    _mode = context.read<ThemeNotifier>().mode;
+  }
+
+  void _setMode(ThemeMode mode, {bool? useOled}) {
+    final notifier = context.read<ThemeNotifier>();
+    notifier.setMode(mode, useOledDark: useOled ?? notifier.useOledDark);
+    setState(() => _mode = notifier.mode);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 44,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: colors.outlineVariant,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Thema',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 12),
+            _ThemeOption(
+              label: 'Systeem',
+              selected: _mode == ThemeMode.system,
+              onTap: () => _setMode(ThemeMode.system),
+            ),
+            _ThemeOption(
+              label: 'Licht',
+              selected: _mode == ThemeMode.light,
+              onTap: () => _setMode(ThemeMode.light),
+            ),
+            _ThemeOption(
+              label: 'Donker',
+              selected:
+                  _mode == ThemeMode.dark &&
+                  !context.watch<ThemeNotifier>().useOledDark,
+              onTap: () => _setMode(ThemeMode.dark, useOled: false),
+            ),
+            _ThemeOption(
+              label: 'OLED',
+              selected:
+                  _mode == ThemeMode.dark &&
+                  context.watch<ThemeNotifier>().useOledDark,
+              onTap: () => _setMode(ThemeMode.dark, useOled: true),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemeOption extends StatelessWidget {
+  const _ThemeOption({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(
+        label,
+        style: TextStyle(
+          fontWeight: FontWeight.w700,
+          color: selected ? colors.primary : colors.onSurface,
+        ),
+      ),
+      trailing: selected
+          ? Icon(Icons.check_circle, color: colors.primary)
+          : Icon(Icons.circle_outlined, color: colors.onSurfaceVariant),
+      onTap: onTap,
+    );
+  }
 }
 
 class _EditPokemonDialog extends StatefulWidget {
