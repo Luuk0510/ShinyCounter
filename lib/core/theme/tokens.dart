@@ -47,11 +47,13 @@ class AppTheme {
 
   static ThemeData light() {
     final scheme = ColorScheme.fromSeed(seedColor: AppColors.seed);
+    final cardColor = scheme.surface;
     return ThemeData(
       colorScheme: scheme,
       scaffoldBackgroundColor: scheme.background,
+      cardColor: cardColor,
       cardTheme: CardThemeData(
-        color: scheme.surface,
+        color: cardColor,
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.md),
@@ -72,11 +74,13 @@ class AppTheme {
       surface: AppColors.darkSurface,
       surfaceVariant: AppColors.darkSurfaceVariant,
     );
+    final cardColor = scheme.surfaceVariant.withOpacity(0.92);
     return ThemeData(
       colorScheme: scheme,
       scaffoldBackgroundColor: scheme.background,
+      cardColor: cardColor,
       cardTheme: CardThemeData(
-        color: scheme.surfaceVariant.withOpacity(0.92),
+        color: cardColor,
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.md),
@@ -97,20 +101,24 @@ class AppTheme {
       surface: AppColors.oledSurface,
       surfaceVariant: AppColors.oledSurfaceVariant,
     );
+    const cardColor = Color(0xFF111111);
     return ThemeData(
       colorScheme: scheme,
       scaffoldBackgroundColor: scheme.background,
+      cardColor: cardColor,
       cardTheme: CardThemeData(
-        color: scheme.surfaceVariant.withOpacity(0.95),
+        color: cardColor,
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.md),
+          side: BorderSide(color: Colors.white.withOpacity(0.04)),
         ),
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.black.withOpacity(0.85),
+        backgroundColor: const Color(0xFF0A0A0A),
         surfaceTintColor: Colors.black,
         foregroundColor: scheme.onSurface,
+        elevation: 0,
       ),
       dividerColor: Colors.white10,
       useMaterial3: true,

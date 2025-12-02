@@ -367,18 +367,18 @@ class _PokemonListPageState extends State<PokemonListPage> {
       ),
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
-      flexibleSpace: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
+      flexibleSpace: Builder(
+        builder: (context) {
+          final scopedCard = Theme.of(context).cardColor;
+          return Container(
             decoration: BoxDecoration(
-              color: cardColor.withOpacity(0.95),
+              color: scopedCard,
               borderRadius: const BorderRadius.vertical(
                 bottom: Radius.circular(30),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
       foregroundColor: colors.onSurface,
       title: FittedBox(

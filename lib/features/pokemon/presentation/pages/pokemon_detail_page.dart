@@ -117,11 +117,11 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         centerTitle: true,
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
-        flexibleSpace: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(color: Theme.of(context).cardColor.withOpacity(0.95)),
-          ),
+        flexibleSpace: Builder(
+          builder: (context) {
+            final scopedCard = Theme.of(context).cardColor;
+            return Container(color: scopedCard);
+          },
         ),
         title: Text(
           widget.pokemon.name,

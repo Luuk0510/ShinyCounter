@@ -28,9 +28,7 @@ class MyApp extends StatelessWidget {
     final router = AppRouter.instance.router;
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<ThemeNotifier>(
-          create: (_) => ThemeNotifier(),
-        ),
+        ChangeNotifierProvider<ThemeNotifier>(create: (_) => ThemeNotifier()),
         Provider<PokemonRepository>.value(
           value: AppLocator.instance.pokemonRepository,
         ),
@@ -48,8 +46,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp.router(
             title: 'Shiny Counter',
             theme: AppTheme.light(),
-            darkTheme:
-                theme.useOledDark ? AppTheme.oled() : AppTheme.dark(),
+            darkTheme: theme.useOledDark ? AppTheme.oled() : AppTheme.dark(),
             themeMode: theme.mode,
             routerConfig: router,
           );
