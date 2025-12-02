@@ -171,7 +171,14 @@ class CounterController extends ChangeNotifier {
       final requested = await FlutterOverlayWindow.requestPermission();
       if (requested != true) return;
     }
-    if (_pillActive) {
+
+    final isActive = await FlutterOverlayWindow.isActive();
+    if (!isActive && _pillActive) {
+      _pillActive = false;
+      notifyListeners();
+    } else if (isActive) {
+      _pillActive = true;
+      notifyListeners();
       await _updateOverlay();
       return;
     }
