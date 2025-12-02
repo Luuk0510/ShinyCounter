@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 
 class PokemonCard extends StatelessWidget {
   const PokemonCard({

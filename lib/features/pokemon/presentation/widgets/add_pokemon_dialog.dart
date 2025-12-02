@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 
 class AddPokemonDialog extends StatefulWidget {
   const AddPokemonDialog({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'pokemon_list_page.dart';
-import 'counter_overlay.dart' as counter_overlay;
+import 'features/pokemon/overlay/counter_overlay.dart' as counter_overlay;
+import 'features/pokemon/presentation/pages/pokemon_list_page.dart';
 
 void main() {
   runApp(const MyApp());

@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
-import '../overlay/counter_overlay_message.dart';
-import '../pokemon.dart';
-import '../services/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 
 class CounterController extends ChangeNotifier {
   CounterController({
@@ -193,7 +193,6 @@ class CounterController extends ChangeNotifier {
       _message,
       height: overlayHeight,
       width: overlayWidth,
-      start: const OverlayPosition(0, 120),
     );
     _pillActive = true;
     notifyListeners();

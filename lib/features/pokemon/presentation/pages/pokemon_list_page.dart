@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'add_pokemon_dialog.dart';
-import 'pokemon.dart';
-import 'pokemon_card.dart';
-import 'pokemon_detail_page.dart';
-import 'pokemon_empty_state.dart';
-import 'pokemon_storage.dart';
+import 'package:shiny_counter/features/pokemon/data/repositories/prefs_pokemon_repository.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
+import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_detail_page.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/add_pokemon_dialog.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_card.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_empty_state.dart';
 
 const _basePokemon = <Pokemon>[];
 
@@ -21,7 +22,7 @@ class PokemonListPage extends StatefulWidget {
 }
 
 class _PokemonListPageState extends State<PokemonListPage> {
-  final _storage = PokemonStorage();
+  final PokemonRepository _repository = PrefsPokemonRepository();
   final List<Pokemon> _customPokemon = [];
   Set<String> _caught = {};
   bool _loading = true;
@@ -35,7 +36,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> _loadData() async {
-    final custom = await _storage.loadCustomPokemon();
+    final custom = await _repository.loadCustomPokemon();
     setState(() {
       _customPokemon
         ..clear()
@@ -48,7 +49,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> _reloadCaught() async {
-    final caught = await _storage.loadCaught(_allPokemon);
+    final caught = await _repository.loadCaught(_allPokemon);
     if (mounted) {
       setState(() => _caught = caught);
     }
@@ -63,7 +64,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
     setState(() {
       _customPokemon.add(newPokemon);
     });
-    await _storage.saveCustomPokemon(_customPokemon);
+    await _repository.saveCustomPokemon(_customPokemon);
     await _reloadCaught();
   }
 
@@ -147,7 +148,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
       _customPokemon[index] = updated;
     });
 
-    await _storage.saveCustomPokemon(_customPokemon);
+    await _repository.saveCustomPokemon(_customPokemon);
     await _migratePokemonState(original, updated);
     await _reloadCaught();
   }
@@ -248,7 +249,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
       setState(() {
         _customPokemon.removeWhere((p) => p.name == pokemon.name && p.imagePath == pokemon.imagePath);
       });
-      await _storage.saveCustomPokemon(_customPokemon);
+      await _repository.saveCustomPokemon(_customPokemon);
       await _clearPokemonState(pokemon);
       await _reloadCaught();
     }

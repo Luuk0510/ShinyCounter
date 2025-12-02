@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'overlay/counter_overlay_message.dart';
+import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 
 @pragma('vm:entry-point')
 void overlayMain() {

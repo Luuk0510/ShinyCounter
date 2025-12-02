@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../overlay/counter_overlay_message.dart';
+import '../../overlay/counter_overlay_message.dart';
 
 class CounterState {
   const CounterState({
@@ -100,7 +100,6 @@ class CounterSyncService {
     CounterOverlayMessage message, {
     int width = 360,
     int height = 220,
-    OverlayPosition? start,
   }) async {
     await FlutterOverlayWindow.showOverlay(
       enableDrag: true,
@@ -111,7 +110,6 @@ class CounterSyncService {
       positionGravity: PositionGravity.none,
       height: height,
       width: width,
-      startPosition: start,
     );
     await shareToOverlay(message);
   }

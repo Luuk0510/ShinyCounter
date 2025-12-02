@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'pokemon.dart';
+import '../../domain/entities/pokemon.dart';
 
 class PokemonStorage {
   PokemonStorage() : _prefs = SharedPreferences.getInstance();
