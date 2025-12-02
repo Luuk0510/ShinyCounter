@@ -160,9 +160,18 @@ class _PokemonListPageState extends State<PokemonListPage> {
     final newCounterKey = 'counter_${updated.name.toLowerCase()}';
     final oldCaughtKey = 'caught_${original.name.toLowerCase()}';
     final newCaughtKey = 'caught_${updated.name.toLowerCase()}';
+    final oldStartedKey = '${oldCounterKey}_startedAt';
+    final newStartedKey = '${newCounterKey}_startedAt';
+    final oldCaughtAtKey = '${oldCounterKey}_caughtAt';
+    final newCaughtAtKey = '${newCounterKey}_caughtAt';
+    final oldDailyCountsKey = '${oldCounterKey}_dailyCounts';
+    final newDailyCountsKey = '${newCounterKey}_dailyCounts';
 
     final oldCounter = prefs.getInt(oldCounterKey);
     final oldCaught = prefs.getBool(oldCaughtKey);
+    final oldStartedAt = prefs.getString(oldStartedKey);
+    final oldCaughtAt = prefs.getString(oldCaughtAtKey);
+    final oldDailyCounts = prefs.getString(oldDailyCountsKey);
 
     if (oldCounter != null) {
       await prefs.setInt(newCounterKey, oldCounter);
@@ -170,9 +179,31 @@ class _PokemonListPageState extends State<PokemonListPage> {
     if (oldCaught != null) {
       await prefs.setBool(newCaughtKey, oldCaught);
     }
+    if (oldStartedAt != null) {
+      await prefs.setString(newStartedKey, oldStartedAt);
+    }
+    if (oldCaughtAt != null) {
+      await prefs.setString(newCaughtAtKey, oldCaughtAt);
+    }
+    if (oldDailyCounts != null) {
+      await prefs.setString(newDailyCountsKey, oldDailyCounts);
+    }
 
     await prefs.remove(oldCounterKey);
     await prefs.remove(oldCaughtKey);
+    await prefs.remove(oldStartedKey);
+    await prefs.remove(oldCaughtAtKey);
+    await prefs.remove(oldDailyCountsKey);
+  }
+
+  Future<void> _clearPokemonState(Pokemon pokemon) async {
+    final prefs = await SharedPreferences.getInstance();
+    final counterKey = 'counter_${pokemon.name.toLowerCase()}';
+    await prefs.remove(counterKey);
+    await prefs.remove('caught_${pokemon.name.toLowerCase()}');
+    await prefs.remove('${counterKey}_startedAt');
+    await prefs.remove('${counterKey}_caughtAt');
+    await prefs.remove('${counterKey}_dailyCounts');
   }
 
   Future<void> _confirmDelete(Pokemon pokemon) async {
@@ -218,6 +249,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
         _customPokemon.removeWhere((p) => p.name == pokemon.name && p.imagePath == pokemon.imagePath);
       });
       await _storage.saveCustomPokemon(_customPokemon);
+      await _clearPokemonState(pokemon);
       await _reloadCaught();
     }
   }

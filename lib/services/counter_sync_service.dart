@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:flutter_overlay_window/src/models/overlay_position.dart';
-import 'package:flutter_overlay_window/src/overlay_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../overlay/counter_overlay_message.dart';

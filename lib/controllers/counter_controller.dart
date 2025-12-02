@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:flutter_overlay_window/src/models/overlay_position.dart';
 
 import '../overlay/counter_overlay_message.dart';
 import '../pokemon.dart';
@@ -46,10 +45,14 @@ class CounterController extends ChangeNotifier {
         count: _counter,
         enabled: !_isCaught,
       );
+  bool get _overlaySupported =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
   Future<void> init() async {
     _sync ??= await CounterSyncService.instance();
-    _overlaySub ??= CounterSyncService.overlayStream.listen(_onOverlayData);
+    if (_overlaySupported) {
+      _overlaySub ??= CounterSyncService.overlayStream.listen(_onOverlayData);
+    }
     await _loadState();
     if (!_initialized) {
       _startPeriodicSync();
@@ -166,6 +169,8 @@ class CounterController extends ChangeNotifier {
   }
 
   Future<void> toggleOverlay() async {
+    if (!_overlaySupported) return;
+
     final hasPerm = await FlutterOverlayWindow.isPermissionGranted();
     if (!hasPerm) {
       final requested = await FlutterOverlayWindow.requestPermission();
@@ -216,7 +221,7 @@ class CounterController extends ChangeNotifier {
   }
 
   Future<void> _updateOverlay() async {
-    if (!_pillActive) return;
+    if (!_pillActive || !_overlaySupported) return;
     final sync = await _getSync();
     await sync.shareToOverlay(_message);
   }
@@ -268,7 +273,7 @@ class CounterController extends ChangeNotifier {
 
   void _startPeriodicSync() {
     _pollTimer?.cancel();
-    _pollTimer = Timer.periodic(const Duration(milliseconds: 400), (_) async {
+    _pollTimer = Timer.periodic(const Duration(seconds: 1), (_) async {
       final sync = await _getSync();
       final state = await sync.loadState(_counterKey, _caughtKey);
       final changed = state.count != _counter ||
