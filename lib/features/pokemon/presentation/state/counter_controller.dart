@@ -257,6 +257,7 @@ class CounterController extends ChangeNotifier {
   }
 
   void _onOverlayData(dynamic data) async {
+    // Overlay sends back the latest state (or a pin toggle). Keep controller in sync.
     if (data is! String) return;
     if (data == 'closed') {
       _pillActive = false;
@@ -284,6 +285,7 @@ class CounterController extends ChangeNotifier {
 
   void _startPeriodicSync() {
     _pollTimer?.cancel();
+    // Poll shared prefs so the pill and detail page stay aligned if they change each other.
     _pollTimer = Timer.periodic(const Duration(seconds: 1), (_) async {
       final sync = await _getSync();
       final state = await sync.loadState(_counterKey, _caughtKey);

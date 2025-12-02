@@ -4,10 +4,8 @@ class AppColors {
   static const seed = Color(0xFF3F51B5);
   static const darkBackground = Color(0xFF151924);
   static const darkSurface = Color(0xFF1E2430);
-  static const darkSurfaceVariant = Color(0xFF252C3A);
   static const oledBackground = Color(0xFF000000);
   static const oledSurface = Color(0xFF0A0A0A);
-  static const oledSurfaceVariant = Color(0xFF121212);
 }
 
 class AppSpacing {
@@ -50,7 +48,7 @@ class AppTheme {
     final cardColor = scheme.surface;
     return ThemeData(
       colorScheme: scheme,
-      scaffoldBackgroundColor: scheme.background,
+      scaffoldBackgroundColor: scheme.surface,
       cardColor: cardColor,
       cardTheme: CardThemeData(
         color: cardColor,
@@ -70,14 +68,13 @@ class AppTheme {
       brightness: Brightness.dark,
     );
     final scheme = darkSchemeBase.copyWith(
-      background: AppColors.darkBackground,
       surface: AppColors.darkSurface,
-      surfaceVariant: AppColors.darkSurfaceVariant,
+      surfaceContainerHighest: Colors.black.withValues(alpha: 0.12),
     );
-    final cardColor = scheme.surfaceVariant.withOpacity(0.92);
+    final cardColor = scheme.surfaceContainerHighest;
     return ThemeData(
       colorScheme: scheme,
-      scaffoldBackgroundColor: scheme.background,
+      scaffoldBackgroundColor: AppColors.darkBackground,
       cardColor: cardColor,
       cardTheme: CardThemeData(
         color: cardColor,
@@ -97,21 +94,20 @@ class AppTheme {
       brightness: Brightness.dark,
     );
     final scheme = darkSchemeBase.copyWith(
-      background: AppColors.oledBackground,
       surface: AppColors.oledSurface,
-      surfaceVariant: AppColors.oledSurfaceVariant,
+      surfaceContainerHighest: Colors.white.withValues(alpha: 0.06),
     );
-    const cardColor = Color(0xFF111111);
+    final cardColor = scheme.surfaceContainerHighest;
     return ThemeData(
       colorScheme: scheme,
-      scaffoldBackgroundColor: scheme.background,
+      scaffoldBackgroundColor: AppColors.oledBackground,
       cardColor: cardColor,
       cardTheme: CardThemeData(
         color: cardColor,
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.md),
-          side: BorderSide(color: Colors.white.withOpacity(0.04)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.06)),
         ),
       ),
       appBarTheme: AppBarTheme(
