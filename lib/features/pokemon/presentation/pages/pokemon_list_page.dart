@@ -9,7 +9,7 @@ import 'package:shiny_counter/core/routing/app_router.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:provider/provider.dart';
-import 'package:shiny_counter/core/theme/theme_controller.dart';
+import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
@@ -510,13 +510,13 @@ class _SettingsSheetState extends State<_SettingsSheet> {
   @override
   void initState() {
     super.initState();
-    _mode = ThemeController.of(context).mode;
+    _mode = context.read<ThemeNotifier>().mode;
   }
 
   void _setMode(ThemeMode mode, {bool? useOled}) {
-    final controller = ThemeController.of(context);
-    controller.setMode(mode, useOledDark: useOled ?? controller.useOledDark);
-    setState(() => _mode = controller.mode);
+    final notifier = context.read<ThemeNotifier>();
+    notifier.setMode(mode, useOledDark: useOled ?? notifier.useOledDark);
+    setState(() => _mode = notifier.mode);
   }
 
   @override
@@ -561,14 +561,14 @@ class _SettingsSheetState extends State<_SettingsSheet> {
               label: 'Donker',
               selected:
                   _mode == ThemeMode.dark &&
-                  !ThemeController.of(context).useOledDark,
+                  !context.watch<ThemeNotifier>().useOledDark,
               onTap: () => _setMode(ThemeMode.dark, useOled: false),
             ),
             _ThemeOption(
               label: 'OLED',
               selected:
                   _mode == ThemeMode.dark &&
-                  ThemeController.of(context).useOledDark,
+                  context.watch<ThemeNotifier>().useOledDark,
               onTap: () => _setMode(ThemeMode.dark, useOled: true),
             ),
             const SizedBox(height: 8),
