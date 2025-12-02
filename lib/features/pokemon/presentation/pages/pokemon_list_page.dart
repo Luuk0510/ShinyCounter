@@ -120,12 +120,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                   itemBuilder: (context, index) {
                     final p = pokemonSorted[index];
                     return ListTile(
-                      title: Text(
-                        p.name,
-                        style: const TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
+                      title: Text(p.name, style: const TextStyle(fontSize: 20)),
                       trailing: const Icon(Icons.edit),
                       onTap: () => Navigator.of(context).pop(p),
                     );
@@ -231,9 +226,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                   text: pokemon.name,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                const TextSpan(
-                  text: ' wilt verwijderen?',
-                ),
+                const TextSpan(text: ' wilt verwijderen?'),
               ],
             ),
           ),
@@ -257,7 +250,9 @@ class _PokemonListPageState extends State<PokemonListPage> {
 
     if (confirmed == true) {
       setState(() {
-        _customPokemon.removeWhere((p) => p.name == pokemon.name && p.imagePath == pokemon.imagePath);
+        _customPokemon.removeWhere(
+          (p) => p.name == pokemon.name && p.imagePath == pokemon.imagePath,
+        );
       });
       await _saveCustomPokemon(_customPokemon);
       await _clearPokemonState(pokemon);
@@ -301,12 +296,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                   itemBuilder: (context, index) {
                     final p = pokemonSorted[index];
                     return ListTile(
-                        title: Text(
-                          p.name,
-                          style: const TextStyle(
-                            fontSize: 20,
-                          ),
-                        ),
+                      title: Text(p.name, style: const TextStyle(fontSize: 20)),
                       trailing: const Icon(Icons.delete_outline),
                       onTap: () => Navigator.of(context).pop(p),
                     );
@@ -334,13 +324,9 @@ class _PokemonListPageState extends State<PokemonListPage> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final uncaught = _allPokemon
-        .where((p) => !_isCaught(p))
-        .toList()
+    final uncaught = _allPokemon.where((p) => !_isCaught(p)).toList()
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    final caught = _allPokemon
-        .where((p) => _isCaught(p))
-        .toList()
+    final caught = _allPokemon.where((p) => _isCaught(p)).toList()
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     return Scaffold(
@@ -401,7 +387,12 @@ class _PokemonListPageState extends State<PokemonListPage> {
     );
   }
 
-  Widget _buildBody(ColorScheme colors, double bottomPadding, List<Pokemon> uncaught, List<Pokemon> caught) {
+  Widget _buildBody(
+    ColorScheme colors,
+    double bottomPadding,
+    List<Pokemon> uncaught,
+    List<Pokemon> caught,
+  ) {
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -421,10 +412,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
         if (entry is _SectionHeader) {
           return Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(
-              entry.title,
-              style: AppTypography.sectionTitle,
-            ),
+            child: Text(entry.title, style: AppTypography.sectionTitle),
           );
         } else if (entry is Pokemon) {
           return PokemonCard(
@@ -450,7 +438,11 @@ int _sectionedCount(List<Pokemon> uncaught, List<Pokemon> caught) {
   return count;
 }
 
-dynamic _sectionedItem(List<Pokemon> uncaught, List<Pokemon> caught, int index) {
+dynamic _sectionedItem(
+  List<Pokemon> uncaught,
+  List<Pokemon> caught,
+  int index,
+) {
   var cursor = 0;
 
   if (uncaught.isNotEmpty) {
@@ -530,7 +522,9 @@ class _EditPokemonDialogState extends State<_EditPokemonDialog> {
             children: [
               ElevatedButton.icon(
                 onPressed: () async {
-                  final picked = await _picker.pickImage(source: ImageSource.gallery);
+                  final picked = await _picker.pickImage(
+                    source: ImageSource.gallery,
+                  );
                   if (picked != null) {
                     setState(() => _pickedImage = picked);
                   }

@@ -27,8 +27,9 @@ class CounterSyncService {
 
   final SharedPreferences _prefs;
   static CounterSyncService? _instance;
-  static final Stream<dynamic> overlayStream =
-      FlutterOverlayWindow.overlayListener.asBroadcastStream();
+  static final Stream<dynamic> overlayStream = FlutterOverlayWindow
+      .overlayListener
+      .asBroadcastStream();
 
   static Future<CounterSyncService> instance() async {
     if (_instance != null) return _instance!;
@@ -44,11 +45,17 @@ class CounterSyncService {
       isCaught: _prefs.getBool(caughtKey) ?? false,
       startedAt: _readDate(_prefs.getString(_startedAtKey(counterKey))),
       caughtAt: _readDate(_prefs.getString(_caughtAtKey(counterKey))),
-      dailyCounts: _readDailyCounts(_prefs.getString(_dailyCountsKey(counterKey))),
+      dailyCounts: _readDailyCounts(
+        _prefs.getString(_dailyCountsKey(counterKey)),
+      ),
     );
   }
 
-  Future<void> saveState(String counterKey, String caughtKey, CounterState state) async {
+  Future<void> saveState(
+    String counterKey,
+    String caughtKey,
+    CounterState state,
+  ) async {
     await _prefs.setInt(counterKey, state.count);
     await _prefs.setBool(caughtKey, state.isCaught);
     await setStartedAt(counterKey, state.startedAt);
@@ -87,7 +94,10 @@ class CounterSyncService {
     await _prefs.remove(_caughtAtKey(counterKey));
   }
 
-  Future<void> setDailyCounts(String counterKey, Map<String, int> counts) async {
+  Future<void> setDailyCounts(
+    String counterKey,
+    Map<String, int> counts,
+  ) async {
     final key = _dailyCountsKey(counterKey);
     if (counts.isEmpty) {
       await _prefs.remove(key);
@@ -126,7 +136,8 @@ class CounterSyncService {
 
   String _dailyCountsKey(String counterKey) => '${counterKey}_dailyCounts';
 
-  DateTime? _readDate(String? raw) => raw == null ? null : DateTime.tryParse(raw);
+  DateTime? _readDate(String? raw) =>
+      raw == null ? null : DateTime.tryParse(raw);
 
   Map<String, int> _readDailyCounts(String? raw) {
     if (raw == null) return {};

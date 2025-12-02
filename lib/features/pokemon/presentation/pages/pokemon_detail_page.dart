@@ -18,7 +18,8 @@ class PokemonDetailPage extends StatefulWidget {
   State<PokemonDetailPage> createState() => _PokemonDetailPageState();
 }
 
-class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindingObserver {
+class _PokemonDetailPageState extends State<PokemonDetailPage>
+    with WidgetsBindingObserver {
   late final CounterController _controller;
 
   @override
@@ -119,17 +120,15 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
         flexibleSpace: ClipRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              color: colors.surface.withOpacity(0.82),
-            ),
+            child: Container(color: colors.surface.withOpacity(0.82)),
           ),
         ),
         title: Text(
           widget.pokemon.name,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                fontSize: 24,
-              ),
+            fontWeight: FontWeight.w700,
+            fontSize: 24,
+          ),
         ),
         actions: [
           IconButton(
@@ -149,7 +148,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
           final mediaQuery = MediaQuery.of(context);
           final bottomInset = mediaQuery.viewInsets.bottom;
           final isPortrait = mediaQuery.orientation == Orientation.portrait;
-          final bottomPadding = mediaQuery.padding.bottom + bottomInset + (isPortrait ? 110 : 24);
+          final bottomPadding =
+              mediaQuery.padding.bottom + bottomInset + (isPortrait ? 110 : 24);
 
           return SingleChildScrollView(
             padding: EdgeInsets.zero,
@@ -173,16 +173,20 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                                   width: 300,
                                   height: 300,
                                   fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) =>
-                                      const Icon(Icons.catching_pokemon, size: 140),
+                                  errorBuilder: (_, __, ___) => const Icon(
+                                    Icons.catching_pokemon,
+                                    size: 140,
+                                  ),
                                 )
                               : Image.asset(
                                   widget.pokemon.imagePath,
                                   width: 300,
                                   height: 300,
                                   fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) =>
-                                      const Icon(Icons.catching_pokemon, size: 140),
+                                  errorBuilder: (_, __, ___) => const Icon(
+                                    Icons.catching_pokemon,
+                                    size: 140,
+                                  ),
                                 ),
                         ),
                         const SizedBox(height: 16),
@@ -191,9 +195,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                           child: ElevatedButton(
                             onPressed: _toggleCaught,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: _controller.isCaught ? colors.tertiary : colors.secondary,
-                              foregroundColor:
-                                  _controller.isCaught ? colors.onTertiary : colors.onSecondary,
+                              backgroundColor: _controller.isCaught
+                                  ? colors.tertiary
+                                  : colors.secondary,
+                              foregroundColor: _controller.isCaught
+                                  ? colors.onTertiary
+                                  : colors.onSecondary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -228,23 +235,23 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                          _RoundIconButton(
-                            icon: Icons.remove,
-                            onPressed: _decrement,
-                            background: colors.primaryContainer,
-                            foreground: colors.onPrimaryContainer,
-                            enabled: !_controller.isCaught,
+                              _RoundIconButton(
+                                icon: Icons.remove,
+                                onPressed: _decrement,
+                                background: colors.primaryContainer,
+                                foreground: colors.onPrimaryContainer,
+                                enabled: !_controller.isCaught,
+                              ),
+                              const SizedBox(width: 28),
+                              _RoundIconButton(
+                                icon: Icons.add,
+                                onPressed: _increment,
+                                background: colors.primaryContainer,
+                                foreground: colors.onPrimaryContainer,
+                                enabled: !_controller.isCaught,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 28),
-                          _RoundIconButton(
-                            icon: Icons.add,
-                            onPressed: _increment,
-                            background: colors.primaryContainer,
-                            foreground: colors.onPrimaryContainer,
-                            enabled: !_controller.isCaught,
-                          ),
-                        ],
-                      ),
                           const SizedBox(height: 30),
                           Align(
                             alignment: Alignment.center,
@@ -252,7 +259,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 ConstrainedBox(
-                                  constraints: const BoxConstraints(maxWidth: 400),
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 400,
+                                  ),
                                   child: _HuntDatesCard(
                                     colors: colors,
                                     startedAt: _controller.startedAt,
@@ -262,7 +271,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                                 ),
                                 const SizedBox(height: 16),
                                 ConstrainedBox(
-                                  constraints: const BoxConstraints(maxWidth: 200),
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 200,
+                                  ),
                                   child: _DailyCountsList(
                                     colors: colors,
                                     dailyCounts: _controller.dailyCounts,
@@ -372,9 +383,19 @@ class _HuntDatesCard extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _HuntCell(label: 'Start', value: formatter(startedAt), labelStyle: labelStyle, valueStyle: valueStyle),
+          _HuntCell(
+            label: 'Start',
+            value: formatter(startedAt),
+            labelStyle: labelStyle,
+            valueStyle: valueStyle,
+          ),
           const SizedBox(width: 18),
-          _HuntCell(label: 'Catch', value: formatter(caughtAt), labelStyle: labelStyle, valueStyle: valueStyle),
+          _HuntCell(
+            label: 'Catch',
+            value: formatter(caughtAt),
+            labelStyle: labelStyle,
+            valueStyle: valueStyle,
+          ),
         ],
       ),
     );
@@ -435,7 +456,10 @@ class _DailyCountsList extends StatelessWidget {
         ),
         child: Text(
           'Nog geen tellingen',
-          style: TextStyle(color: colors.onSurfaceVariant, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: colors.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       );
     }
@@ -473,7 +497,11 @@ class _DailyCountsList extends StatelessWidget {
               ],
             ),
           ),
-          Divider(height: 1, thickness: 1, color: colors.outlineVariant.withOpacity(0.25)),
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: colors.outlineVariant.withOpacity(0.25),
+          ),
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -501,8 +529,11 @@ class _DailyCountsList extends StatelessWidget {
                   ],
                 );
               },
-              separatorBuilder: (_, __) =>
-                  Divider(height: 16, thickness: 1, color: colors.outlineVariant.withOpacity(0.25)),
+              separatorBuilder: (_, __) => Divider(
+                height: 16,
+                thickness: 1,
+                color: colors.outlineVariant.withOpacity(0.25),
+              ),
               itemCount: entries.length,
             ),
           ),
@@ -544,8 +575,9 @@ class _EditCountersSheet extends StatefulWidget {
 }
 
 class _EditCountersSheetState extends State<_EditCountersSheet> {
-  late final TextEditingController _counterCtrl =
-      TextEditingController(text: '${widget.counter}');
+  late final TextEditingController _counterCtrl = TextEditingController(
+    text: '${widget.counter}',
+  );
   DateTime? _start;
   DateTime? _catch;
   bool _startChanged = false;
@@ -586,31 +618,31 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
             ),
           ),
           const SizedBox(height: 16),
-              Text(
-                'Aanpassen',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 18,
-                    ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _counterCtrl,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Counter',
-                  hintText: 'Voer een getal in',
-                  labelStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                  hintStyle: TextStyle(fontSize: 17),
-                ),
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-              ),
+          Text(
+            'Aanpassen',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+              fontSize: 18,
+            ),
+          ),
           const SizedBox(height: 16),
-              _DateRow(
-                label: 'Start',
-                value: _start,
-                onPick: () => _pickDateTime(_start).then((value) {
-                  if (value != null) {
+          TextField(
+            controller: _counterCtrl,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Counter',
+              hintText: 'Voer een getal in',
+              labelStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              hintStyle: TextStyle(fontSize: 17),
+            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 16),
+          _DateRow(
+            label: 'Start',
+            value: _start,
+            onPick: () => _pickDateTime(_start).then((value) {
+              if (value != null) {
                 setState(() {
                   _start = value;
                   _startChanged = true;
@@ -625,11 +657,11 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
             },
           ),
           const SizedBox(height: 12),
-              _DateRow(
-                label: 'Catch',
-                value: _catch,
-                onPick: () => _pickDateTime(_catch).then((value) {
-                  if (value != null) {
+          _DateRow(
+            label: 'Catch',
+            value: _catch,
+            onPick: () => _pickDateTime(_catch).then((value) {
+              if (value != null) {
                 setState(() {
                   _catch = value;
                   _catchChanged = true;
@@ -654,7 +686,10 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
                     side: BorderSide(color: colors.primary, width: 1.4),
                     backgroundColor: colors.primary.withOpacity(0.08),
                   ),
-                  child: const Text('Annuleren', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  child: const Text(
+                    'Annuleren',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -665,7 +700,10 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
                     backgroundColor: colors.primary,
                     foregroundColor: colors.onPrimary,
                   ),
-                  child: const Text('Opslaan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  child: const Text(
+                    'Opslaan',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  ),
                 ),
               ),
             ],
@@ -758,14 +796,8 @@ class _DateRow extends StatelessWidget {
             ],
           ),
         ),
-        IconButton(
-          icon: const Icon(Icons.edit_calendar),
-          onPressed: onPick,
-        ),
-        IconButton(
-          icon: const Icon(Icons.clear),
-          onPressed: onClear,
-        ),
+        IconButton(icon: const Icon(Icons.edit_calendar), onPressed: onPick),
+        IconButton(icon: const Icon(Icons.clear), onPressed: onClear),
       ],
     );
   }

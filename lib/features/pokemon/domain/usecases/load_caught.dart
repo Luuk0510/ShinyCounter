@@ -6,5 +6,6 @@ class LoadCaughtUseCase {
 
   final PokemonRepository _repository;
 
-  Future<Set<String>> call(List<Pokemon> allPokemon) => _repository.loadCaught(allPokemon);
+  Future<Set<String>> call(List<Pokemon> allPokemon) =>
+      _repository.loadCaught(allPokemon);
 }

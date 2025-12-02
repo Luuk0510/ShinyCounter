@@ -10,25 +10,28 @@ class AppRoutes {
 }
 
 class AppRouter {
-  AppRouter._() : router = GoRouter(
-          initialLocation: AppRoutes.home,
-          routes: [
-            GoRoute(
-              path: AppRoutes.home,
-              builder: (context, state) => const PokemonListPage(),
-            ),
-            GoRoute(
-              path: AppRoutes.pokemonDetail,
-              builder: (context, state) {
-                final extra = state.extra;
-                if (extra is! Pokemon) {
-                  return const _RouteErrorPage(message: 'Geen Pokémon meegegeven');
-                }
-                return PokemonDetailPage(pokemon: extra);
-              },
-            ),
-          ],
-        );
+  AppRouter._()
+    : router = GoRouter(
+        initialLocation: AppRoutes.home,
+        routes: [
+          GoRoute(
+            path: AppRoutes.home,
+            builder: (context, state) => const PokemonListPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.pokemonDetail,
+            builder: (context, state) {
+              final extra = state.extra;
+              if (extra is! Pokemon) {
+                return const _RouteErrorPage(
+                  message: 'Geen Pokémon meegegeven',
+                );
+              }
+              return PokemonDetailPage(pokemon: extra);
+            },
+          ),
+        ],
+      );
 
   static final AppRouter instance = AppRouter._();
 
@@ -42,8 +45,6 @@ class _RouteErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(child: Text(message)),
-    );
+    return Scaffold(body: Center(child: Text(message)));
   }
 }

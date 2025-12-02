@@ -13,8 +13,8 @@ class CounterController extends ChangeNotifier {
     required this.pokemon,
     CounterSyncService? sync,
     ToggleCaughtUseCase? toggleCaughtUseCase,
-  })  : _sync = sync,
-        _toggleCaughtUseCase = toggleCaughtUseCase;
+  }) : _sync = sync,
+       _toggleCaughtUseCase = toggleCaughtUseCase;
 
   final Pokemon pokemon;
   final int overlayHeight = 200;
@@ -44,11 +44,11 @@ class CounterController extends ChangeNotifier {
   Map<String, int> get dailyCounts => _dailyCounts;
 
   CounterOverlayMessage get _message => CounterOverlayMessage(
-        name: pokemon.name,
-        counterKey: _counterKey,
-        count: _counter,
-        enabled: !_isCaught,
-      );
+    name: pokemon.name,
+    counterKey: _counterKey,
+    count: _counter,
+    enabled: !_isCaught,
+  );
   bool get _overlaySupported =>
       !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
@@ -233,7 +233,11 @@ class CounterController extends ChangeNotifier {
     await sync.shareToOverlay(_message);
   }
 
-  Future<void> _handleHuntStartReset(int previousCount, int nextCount, {CounterSyncService? sync}) async {
+  Future<void> _handleHuntStartReset(
+    int previousCount,
+    int nextCount, {
+    CounterSyncService? sync,
+  }) async {
     final service = sync ?? await _getSync();
     if (previousCount == 0 && nextCount > 0) {
       final now = DateTime.now();
@@ -283,7 +287,8 @@ class CounterController extends ChangeNotifier {
     _pollTimer = Timer.periodic(const Duration(seconds: 1), (_) async {
       final sync = await _getSync();
       final state = await sync.loadState(_counterKey, _caughtKey);
-      final changed = state.count != _counter ||
+      final changed =
+          state.count != _counter ||
           state.isCaught != _isCaught ||
           !_isSameMoment(state.startedAt, _startedAt) ||
           !_isSameMoment(state.caughtAt, _caughtAt) ||
@@ -310,7 +315,11 @@ class CounterController extends ChangeNotifier {
     return _sync!;
   }
 
-  Future<void> _applyDailyDelta(int delta, {CounterSyncService? sync, DateTime? day}) async {
+  Future<void> _applyDailyDelta(
+    int delta, {
+    CounterSyncService? sync,
+    DateTime? day,
+  }) async {
     if (delta == 0) return;
     final service = sync ?? await _getSync();
     final key = _dayKey(day ?? DateTime.now());

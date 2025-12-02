@@ -27,8 +27,12 @@ class MyApp extends StatelessWidget {
     final router = AppRouter.instance.router;
     return MultiProvider(
       providers: [
-        Provider<PokemonRepository>.value(value: AppLocator.instance.pokemonRepository),
-        Provider<CounterSyncService>.value(value: AppLocator.instance.counterSyncService),
+        Provider<PokemonRepository>.value(
+          value: AppLocator.instance.pokemonRepository,
+        ),
+        Provider<CounterSyncService>.value(
+          value: AppLocator.instance.counterSyncService,
+        ),
         Provider.value(value: AppLocator.instance.loadCustomPokemon),
         Provider.value(value: AppLocator.instance.saveCustomPokemon),
         Provider.value(value: AppLocator.instance.loadCaught),

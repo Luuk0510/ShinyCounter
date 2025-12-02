@@ -6,5 +6,6 @@ class SaveCustomPokemonUseCase {
 
   final PokemonRepository _repository;
 
-  Future<void> call(List<Pokemon> custom) => _repository.saveCustomPokemon(custom);
+  Future<void> call(List<Pokemon> custom) =>
+      _repository.saveCustomPokemon(custom);
 }

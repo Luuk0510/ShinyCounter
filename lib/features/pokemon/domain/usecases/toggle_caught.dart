@@ -5,5 +5,6 @@ class ToggleCaughtUseCase {
 
   final CounterSyncService _sync;
 
-  Future<void> call(String caughtKey, bool isCaught) => _sync.setCaught(caughtKey, isCaught);
+  Future<void> call(String caughtKey, bool isCaught) =>
+      _sync.setCaught(caughtKey, isCaught);
 }

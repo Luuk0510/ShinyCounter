@@ -121,7 +121,10 @@ class _OverlayAppState extends State<_OverlayApp> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: bg,
                   borderRadius: borderRadius,
@@ -214,7 +217,8 @@ class _OverlayAppState extends State<_OverlayApp> {
     return (_parseDate(startedRaw), _parseDate(caughtRaw));
   }
 
-  DateTime? _parseDate(String? raw) => raw == null ? null : DateTime.tryParse(raw);
+  DateTime? _parseDate(String? raw) =>
+      raw == null ? null : DateTime.tryParse(raw);
 
   Future<void> _updateDailyCounts(SharedPreferences prefs, int delta) async {
     if (delta == 0) return;
@@ -289,9 +293,19 @@ class _HuntDatesTable extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _HuntCell(label: 'Start', value: formatter(startedAt), labelStyle: labelStyle, valueStyle: valueStyle),
+          _HuntCell(
+            label: 'Start',
+            value: formatter(startedAt),
+            labelStyle: labelStyle,
+            valueStyle: valueStyle,
+          ),
           const SizedBox(width: 16),
-          _HuntCell(label: 'Catch', value: formatter(caughtAt), labelStyle: labelStyle, valueStyle: valueStyle),
+          _HuntCell(
+            label: 'Catch',
+            value: formatter(caughtAt),
+            labelStyle: labelStyle,
+            valueStyle: valueStyle,
+          ),
         ],
       ),
     );

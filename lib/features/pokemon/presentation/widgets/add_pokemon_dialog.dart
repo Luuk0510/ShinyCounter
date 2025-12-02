@@ -41,7 +41,9 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
             children: [
               ElevatedButton.icon(
                 onPressed: () async {
-                  final picked = await _picker.pickImage(source: ImageSource.gallery);
+                  final picked = await _picker.pickImage(
+                    source: ImageSource.gallery,
+                  );
                   if (picked != null) {
                     setState(() => _pickedImage = picked);
                   }

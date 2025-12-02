@@ -23,8 +23,15 @@ class AppRadii {
 }
 
 class AppTypography {
-  static const title = TextStyle(fontSize: 26, fontWeight: FontWeight.w700, letterSpacing: 0.5);
-  static const sectionTitle = TextStyle(fontSize: 18, fontWeight: FontWeight.w700);
+  static const title = TextStyle(
+    fontSize: 26,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0.5,
+  );
+  static const sectionTitle = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+  );
   static const button = TextStyle(fontSize: 16, fontWeight: FontWeight.w700);
 }
 
@@ -47,7 +54,10 @@ class AppTheme {
   }
 
   static ThemeData dark() {
-    final darkSchemeBase = ColorScheme.fromSeed(seedColor: AppColors.seed, brightness: Brightness.dark);
+    final darkSchemeBase = ColorScheme.fromSeed(
+      seedColor: AppColors.seed,
+      brightness: Brightness.dark,
+    );
     final scheme = darkSchemeBase.copyWith(
       background: AppColors.darkBackground,
       surface: AppColors.darkSurface,
