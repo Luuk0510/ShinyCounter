@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:shiny_counter/core/routing/app_router.dart';
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
@@ -356,7 +355,6 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   PreferredSizeWidget _buildAppBar(ColorScheme colors) {
-    final cardColor = Theme.of(context).cardColor;
     return AppBar(
       scrolledUnderElevation: 0,
       elevation: 0,
