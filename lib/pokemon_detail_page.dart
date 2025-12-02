@@ -67,43 +67,31 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
   }
 
   Future<void> _showEditDialog() async {
-    final controller = TextEditingController(text: '${_controller.counter}');
-    final result = await showDialog<int>(
+    final result = await showModalBottomSheet<_EditSheetResult>(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Counter bewerken'),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Waarde',
-              hintText: 'Voer een getal in',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Annuleren'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final value = int.tryParse(controller.text.trim());
-                if (value != null && value >= 0) {
-                  _hapticTap();
-                  Navigator.of(context).pop(value);
-                }
-              },
-              child: const Text('Opslaan'),
-            ),
-          ],
+        return _EditCountersSheet(
+          counter: _controller.counter,
+          startedAt: _controller.startedAt,
+          caughtAt: _controller.caughtAt,
         );
       },
     );
 
-    if (result != null) {
-      await _controller.setCounter(result);
+    if (result == null) return;
+    if (result.counter != null && result.counter != _controller.counter) {
+      await _controller.setCounterManual(result.counter!);
+    }
+    if (result.startedChanged) {
+      await _controller.setStartedAtDate(result.startedAt);
+    }
+    if (result.caughtChanged) {
+      await _controller.setCaughtAtDate(result.caughtAt);
     }
   }
 
@@ -232,7 +220,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                               color: colors.onSurface,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -253,6 +241,33 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
                           ),
                         ],
                       ),
+                          const SizedBox(height: 30),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ConstrainedBox(
+                                  constraints: const BoxConstraints(maxWidth: 400),
+                                  child: _HuntDatesCard(
+                                    colors: colors,
+                                    startedAt: _controller.startedAt,
+                                    caughtAt: _controller.caughtAt,
+                                    formatter: _formatDate,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                ConstrainedBox(
+                                  constraints: const BoxConstraints(maxWidth: 200),
+                                  child: _DailyCountsList(
+                                    colors: colors,
+                                    dailyCounts: _controller.dailyCounts,
+                                    dayFormatter: _formatDayKey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -264,6 +279,21 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> with WidgetsBindi
         },
       ),
     );
+  }
+
+  String _formatDate(DateTime? value) {
+    if (value == null) return '--';
+    final local = value.toLocal();
+    String two(int v) => v.toString().padLeft(2, '0');
+    return '${two(local.day)}-${two(local.month)}-${local.year} ${two(local.hour)}:${two(local.minute)}';
+  }
+
+  String _formatDayKey(String key) {
+    final parsed = DateTime.tryParse(key);
+    if (parsed == null) return key;
+    String two(int v) => v.toString().padLeft(2, '0');
+    final local = parsed.toLocal();
+    return '${two(local.day)}-${two(local.month)}-${local.year}';
   }
 }
 
@@ -298,6 +328,426 @@ class _RoundIconButton extends StatelessWidget {
         minimumSize: const Size(72, 72),
       ),
       child: Icon(icon, size: 32),
+    );
+  }
+}
+
+class _HuntDatesCard extends StatelessWidget {
+  const _HuntDatesCard({
+    required this.colors,
+    required this.startedAt,
+    required this.caughtAt,
+    required this.formatter,
+  });
+
+  final ColorScheme colors;
+  final DateTime? startedAt;
+  final DateTime? caughtAt;
+  final String Function(DateTime?) formatter;
+
+  @override
+  Widget build(BuildContext context) {
+    final labelStyle = TextStyle(
+      color: colors.onSurfaceVariant,
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+    );
+    final valueStyle = TextStyle(
+      color: colors.onSurface,
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: colors.surfaceVariant.withOpacity(0.65),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outlineVariant.withOpacity(0.4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _HuntCell(label: 'Start', value: formatter(startedAt), labelStyle: labelStyle, valueStyle: valueStyle),
+          const SizedBox(width: 18),
+          _HuntCell(label: 'Catch', value: formatter(caughtAt), labelStyle: labelStyle, valueStyle: valueStyle),
+        ],
+      ),
+    );
+  }
+}
+
+class _HuntCell extends StatelessWidget {
+  const _HuntCell({
+    required this.label,
+    required this.value,
+    required this.labelStyle,
+    required this.valueStyle,
+  });
+
+  final String label;
+  final String value;
+  final TextStyle labelStyle;
+  final TextStyle valueStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label, style: labelStyle),
+        const SizedBox(height: 4),
+        Text(value, style: valueStyle),
+      ],
+    );
+  }
+}
+
+class _DailyCountsList extends StatelessWidget {
+  const _DailyCountsList({
+    required this.colors,
+    required this.dailyCounts,
+    required this.dayFormatter,
+  });
+
+  final ColorScheme colors;
+  final Map<String, int> dailyCounts;
+  final String Function(String) dayFormatter;
+
+  @override
+  Widget build(BuildContext context) {
+    final entries = dailyCounts.entries.toList()
+      ..sort((a, b) => b.key.compareTo(a.key));
+
+    if (entries.isEmpty) {
+      return Container(
+        height: 150,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: colors.surfaceVariant.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: colors.outlineVariant.withOpacity(0.35)),
+        ),
+        child: Text(
+          'Nog geen tellingen',
+          style: TextStyle(color: colors.onSurfaceVariant, fontWeight: FontWeight.w600),
+        ),
+      );
+    }
+
+    return Container(
+      height: 150,
+      decoration: BoxDecoration(
+        color: colors.surfaceVariant.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outlineVariant.withOpacity(0.35)),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Datum',
+                  style: TextStyle(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  'Aantal',
+                  style: TextStyle(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, thickness: 1, color: Colors.black12),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              itemBuilder: (context, index) {
+                final entry = entries[index];
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      dayFormatter(entry.key),
+                      style: TextStyle(
+                        color: colors.onSurface,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      '${entry.value}',
+                      style: TextStyle(
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                );
+              },
+              separatorBuilder: (_, __) =>
+                  const Divider(height: 16, thickness: 1, color: Colors.black12),
+              itemCount: entries.length,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EditSheetResult {
+  const _EditSheetResult({
+    this.counter,
+    this.startedAt,
+    this.caughtAt,
+    this.startedChanged = false,
+    this.caughtChanged = false,
+  });
+
+  final int? counter;
+  final DateTime? startedAt;
+  final DateTime? caughtAt;
+  final bool startedChanged;
+  final bool caughtChanged;
+}
+
+class _EditCountersSheet extends StatefulWidget {
+  const _EditCountersSheet({
+    required this.counter,
+    required this.startedAt,
+    required this.caughtAt,
+  });
+
+  final int counter;
+  final DateTime? startedAt;
+  final DateTime? caughtAt;
+
+  @override
+  State<_EditCountersSheet> createState() => _EditCountersSheetState();
+}
+
+class _EditCountersSheetState extends State<_EditCountersSheet> {
+  late final TextEditingController _counterCtrl =
+      TextEditingController(text: '${widget.counter}');
+  DateTime? _start;
+  DateTime? _catch;
+  bool _startChanged = false;
+  bool _catchChanged = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _start = widget.startedAt;
+    _catch = widget.caughtAt;
+  }
+
+  @override
+  void dispose() {
+    _counterCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        top: 12,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 44,
+            height: 5,
+            decoration: BoxDecoration(
+              color: colors.outlineVariant,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Aanpassen',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _counterCtrl,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Counter',
+              hintText: 'Voer een getal in',
+            ),
+          ),
+          const SizedBox(height: 16),
+          _DateRow(
+            label: 'Start',
+            value: _start,
+            onPick: () => _pickDateTime(_start).then((value) {
+              if (value != null) {
+                setState(() {
+                  _start = value;
+                  _startChanged = true;
+                });
+              }
+            }),
+            onClear: () {
+              setState(() {
+                _start = null;
+                _startChanged = true;
+              });
+            },
+          ),
+          const SizedBox(height: 12),
+          _DateRow(
+            label: 'Catch',
+            value: _catch,
+            onPick: () => _pickDateTime(_catch).then((value) {
+              if (value != null) {
+                setState(() {
+                  _catch = value;
+                  _catchChanged = true;
+                });
+              }
+            }),
+            onClear: () {
+              setState(() {
+                _catch = null;
+                _catchChanged = true;
+              });
+            },
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Annuleren'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _submit,
+                  child: const Text('Opslaan'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<DateTime?> _pickDateTime(DateTime? initial) async {
+    final now = DateTime.now();
+    final date = await showDatePicker(
+      context: context,
+      initialDate: initial ?? now,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (date == null) return null;
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial ?? now),
+    );
+    if (time == null) return null;
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  }
+
+  void _submit() {
+    final parsed = int.tryParse(_counterCtrl.text.trim());
+    if (parsed == null || parsed < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Voer een geldige counter in')),
+      );
+      return;
+    }
+    Navigator.of(context).pop(
+      _EditSheetResult(
+        counter: parsed,
+        startedAt: _start,
+        caughtAt: _catch,
+        startedChanged: _startChanged,
+        caughtChanged: _catchChanged,
+      ),
+    );
+  }
+}
+
+class _DateRow extends StatelessWidget {
+  const _DateRow({
+    required this.label,
+    required this.value,
+    required this.onPick,
+    required this.onClear,
+  });
+
+  final String label;
+  final DateTime? value;
+  final VoidCallback onPick;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    String two(int v) => v.toString().padLeft(2, '0');
+    final formatted = value == null
+        ? '--'
+        : '${two(value!.day)}-${two(value!.month)}-${value!.year} ${two(value!.hour)}:${two(value!.minute)}';
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                formatted,
+                style: TextStyle(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.edit_calendar),
+          onPressed: onPick,
+        ),
+        IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: onClear,
+        ),
+      ],
     );
   }
 }
