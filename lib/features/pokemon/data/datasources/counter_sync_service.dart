@@ -2,11 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:flutter_overlay_window/src/models/overlay_position.dart';
-import 'package:flutter_overlay_window/src/overlay_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../overlay/counter_overlay_message.dart';
+import '../../overlay/counter_overlay_message.dart';
 
 class CounterState {
   const CounterState({
@@ -29,8 +27,9 @@ class CounterSyncService {
 
   final SharedPreferences _prefs;
   static CounterSyncService? _instance;
-  static final Stream<dynamic> overlayStream =
-      FlutterOverlayWindow.overlayListener.asBroadcastStream();
+  static final Stream<dynamic> overlayStream = FlutterOverlayWindow
+      .overlayListener
+      .asBroadcastStream();
 
   static Future<CounterSyncService> instance() async {
     if (_instance != null) return _instance!;
@@ -46,11 +45,17 @@ class CounterSyncService {
       isCaught: _prefs.getBool(caughtKey) ?? false,
       startedAt: _readDate(_prefs.getString(_startedAtKey(counterKey))),
       caughtAt: _readDate(_prefs.getString(_caughtAtKey(counterKey))),
-      dailyCounts: _readDailyCounts(_prefs.getString(_dailyCountsKey(counterKey))),
+      dailyCounts: _readDailyCounts(
+        _prefs.getString(_dailyCountsKey(counterKey)),
+      ),
     );
   }
 
-  Future<void> saveState(String counterKey, String caughtKey, CounterState state) async {
+  Future<void> saveState(
+    String counterKey,
+    String caughtKey,
+    CounterState state,
+  ) async {
     await _prefs.setInt(counterKey, state.count);
     await _prefs.setBool(caughtKey, state.isCaught);
     await setStartedAt(counterKey, state.startedAt);
@@ -89,7 +94,10 @@ class CounterSyncService {
     await _prefs.remove(_caughtAtKey(counterKey));
   }
 
-  Future<void> setDailyCounts(String counterKey, Map<String, int> counts) async {
+  Future<void> setDailyCounts(
+    String counterKey,
+    Map<String, int> counts,
+  ) async {
     final key = _dailyCountsKey(counterKey);
     if (counts.isEmpty) {
       await _prefs.remove(key);
@@ -102,7 +110,6 @@ class CounterSyncService {
     CounterOverlayMessage message, {
     int width = 360,
     int height = 220,
-    OverlayPosition? start,
   }) async {
     await FlutterOverlayWindow.showOverlay(
       enableDrag: true,
@@ -113,7 +120,6 @@ class CounterSyncService {
       positionGravity: PositionGravity.none,
       height: height,
       width: width,
-      startPosition: start,
     );
     await shareToOverlay(message);
   }
@@ -130,7 +136,8 @@ class CounterSyncService {
 
   String _dailyCountsKey(String counterKey) => '${counterKey}_dailyCounts';
 
-  DateTime? _readDate(String? raw) => raw == null ? null : DateTime.tryParse(raw);
+  DateTime? _readDate(String? raw) =>
+      raw == null ? null : DateTime.tryParse(raw);
 
   Map<String, int> _readDailyCounts(String? raw) {
     if (raw == null) return {};

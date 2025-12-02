@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'overlay/counter_overlay_message.dart';
+import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 
 @pragma('vm:entry-point')
 void overlayMain() {
@@ -109,7 +109,7 @@ class _OverlayAppState extends State<_OverlayApp> {
 
   @override
   Widget build(BuildContext context) {
-    final bg = const Color(0xFF1E1E1E).withOpacity(0.8);
+    final bg = const Color(0xFF1E1E1E).withOpacity(0.9);
     final borderRadius = BorderRadius.circular(150);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -121,7 +121,10 @@ class _OverlayAppState extends State<_OverlayApp> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: bg,
                   borderRadius: borderRadius,
@@ -214,7 +217,8 @@ class _OverlayAppState extends State<_OverlayApp> {
     return (_parseDate(startedRaw), _parseDate(caughtRaw));
   }
 
-  DateTime? _parseDate(String? raw) => raw == null ? null : DateTime.tryParse(raw);
+  DateTime? _parseDate(String? raw) =>
+      raw == null ? null : DateTime.tryParse(raw);
 
   Future<void> _updateDailyCounts(SharedPreferences prefs, int delta) async {
     if (delta == 0) return;
@@ -289,9 +293,19 @@ class _HuntDatesTable extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _HuntCell(label: 'Start', value: formatter(startedAt), labelStyle: labelStyle, valueStyle: valueStyle),
+          _HuntCell(
+            label: 'Start',
+            value: formatter(startedAt),
+            labelStyle: labelStyle,
+            valueStyle: valueStyle,
+          ),
           const SizedBox(width: 16),
-          _HuntCell(label: 'Catch', value: formatter(caughtAt), labelStyle: labelStyle, valueStyle: valueStyle),
+          _HuntCell(
+            label: 'Catch',
+            value: formatter(caughtAt),
+            labelStyle: labelStyle,
+            valueStyle: valueStyle,
+          ),
         ],
       ),
     );

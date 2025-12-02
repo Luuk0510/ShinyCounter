@@ -1,15 +1,20 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'add_pokemon_dialog.dart';
-import 'pokemon.dart';
-import 'pokemon_card.dart';
-import 'pokemon_detail_page.dart';
-import 'pokemon_empty_state.dart';
-import 'pokemon_storage.dart';
+import 'package:shiny_counter/core/routing/app_router.dart';
+import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:provider/provider.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/add_pokemon_dialog.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_card.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_empty_state.dart';
 
 const _basePokemon = <Pokemon>[];
 
@@ -21,7 +26,9 @@ class PokemonListPage extends StatefulWidget {
 }
 
 class _PokemonListPageState extends State<PokemonListPage> {
-  final _storage = PokemonStorage();
+  late final LoadCustomPokemonUseCase _loadCustomPokemon;
+  late final SaveCustomPokemonUseCase _saveCustomPokemon;
+  late final LoadCaughtUseCase _loadCaught;
   final List<Pokemon> _customPokemon = [];
   Set<String> _caught = {};
   bool _loading = true;
@@ -31,11 +38,14 @@ class _PokemonListPageState extends State<PokemonListPage> {
   @override
   void initState() {
     super.initState();
+    _loadCustomPokemon = context.read<LoadCustomPokemonUseCase>();
+    _saveCustomPokemon = context.read<SaveCustomPokemonUseCase>();
+    _loadCaught = context.read<LoadCaughtUseCase>();
     _loadData();
   }
 
   Future<void> _loadData() async {
-    final custom = await _storage.loadCustomPokemon();
+    final custom = await _loadCustomPokemon();
     setState(() {
       _customPokemon
         ..clear()
@@ -48,7 +58,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> _reloadCaught() async {
-    final caught = await _storage.loadCaught(_allPokemon);
+    final caught = await _loadCaught(_allPokemon);
     if (mounted) {
       setState(() => _caught = caught);
     }
@@ -63,7 +73,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
     setState(() {
       _customPokemon.add(newPokemon);
     });
-    await _storage.saveCustomPokemon(_customPokemon);
+    await _saveCustomPokemon(_customPokemon);
     await _reloadCaught();
   }
 
@@ -110,12 +120,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                   itemBuilder: (context, index) {
                     final p = pokemonSorted[index];
                     return ListTile(
-                      title: Text(
-                        p.name,
-                        style: const TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
+                      title: Text(p.name, style: const TextStyle(fontSize: 20)),
                       trailing: const Icon(Icons.edit),
                       onTap: () => Navigator.of(context).pop(p),
                     );
@@ -147,7 +152,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
       _customPokemon[index] = updated;
     });
 
-    await _storage.saveCustomPokemon(_customPokemon);
+    await _saveCustomPokemon(_customPokemon);
     await _migratePokemonState(original, updated);
     await _reloadCaught();
   }
@@ -160,9 +165,18 @@ class _PokemonListPageState extends State<PokemonListPage> {
     final newCounterKey = 'counter_${updated.name.toLowerCase()}';
     final oldCaughtKey = 'caught_${original.name.toLowerCase()}';
     final newCaughtKey = 'caught_${updated.name.toLowerCase()}';
+    final oldStartedKey = '${oldCounterKey}_startedAt';
+    final newStartedKey = '${newCounterKey}_startedAt';
+    final oldCaughtAtKey = '${oldCounterKey}_caughtAt';
+    final newCaughtAtKey = '${newCounterKey}_caughtAt';
+    final oldDailyCountsKey = '${oldCounterKey}_dailyCounts';
+    final newDailyCountsKey = '${newCounterKey}_dailyCounts';
 
     final oldCounter = prefs.getInt(oldCounterKey);
     final oldCaught = prefs.getBool(oldCaughtKey);
+    final oldStartedAt = prefs.getString(oldStartedKey);
+    final oldCaughtAt = prefs.getString(oldCaughtAtKey);
+    final oldDailyCounts = prefs.getString(oldDailyCountsKey);
 
     if (oldCounter != null) {
       await prefs.setInt(newCounterKey, oldCounter);
@@ -170,15 +184,38 @@ class _PokemonListPageState extends State<PokemonListPage> {
     if (oldCaught != null) {
       await prefs.setBool(newCaughtKey, oldCaught);
     }
+    if (oldStartedAt != null) {
+      await prefs.setString(newStartedKey, oldStartedAt);
+    }
+    if (oldCaughtAt != null) {
+      await prefs.setString(newCaughtAtKey, oldCaughtAt);
+    }
+    if (oldDailyCounts != null) {
+      await prefs.setString(newDailyCountsKey, oldDailyCounts);
+    }
 
     await prefs.remove(oldCounterKey);
     await prefs.remove(oldCaughtKey);
+    await prefs.remove(oldStartedKey);
+    await prefs.remove(oldCaughtAtKey);
+    await prefs.remove(oldDailyCountsKey);
+  }
+
+  Future<void> _clearPokemonState(Pokemon pokemon) async {
+    final prefs = await SharedPreferences.getInstance();
+    final counterKey = 'counter_${pokemon.name.toLowerCase()}';
+    await prefs.remove(counterKey);
+    await prefs.remove('caught_${pokemon.name.toLowerCase()}');
+    await prefs.remove('${counterKey}_startedAt');
+    await prefs.remove('${counterKey}_caughtAt');
+    await prefs.remove('${counterKey}_dailyCounts');
   }
 
   Future<void> _confirmDelete(Pokemon pokemon) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
+        final colors = Theme.of(context).colorScheme;
         return AlertDialog(
           title: const Text('Verwijderen'),
           content: Text.rich(
@@ -189,9 +226,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                   text: pokemon.name,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                const TextSpan(
-                  text: ' wilt verwijderen?',
-                ),
+                const TextSpan(text: ' wilt verwijderen?'),
               ],
             ),
           ),
@@ -203,8 +238,8 @@ class _PokemonListPageState extends State<PokemonListPage> {
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+                backgroundColor: colors.error,
+                foregroundColor: colors.onError,
               ),
               child: const Text('Verwijder'),
             ),
@@ -215,9 +250,12 @@ class _PokemonListPageState extends State<PokemonListPage> {
 
     if (confirmed == true) {
       setState(() {
-        _customPokemon.removeWhere((p) => p.name == pokemon.name && p.imagePath == pokemon.imagePath);
+        _customPokemon.removeWhere(
+          (p) => p.name == pokemon.name && p.imagePath == pokemon.imagePath,
+        );
       });
-      await _storage.saveCustomPokemon(_customPokemon);
+      await _saveCustomPokemon(_customPokemon);
+      await _clearPokemonState(pokemon);
       await _reloadCaught();
     }
   }
@@ -258,12 +296,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                   itemBuilder: (context, index) {
                     final p = pokemonSorted[index];
                     return ListTile(
-                        title: Text(
-                          p.name,
-                          style: const TextStyle(
-                            fontSize: 20,
-                          ),
-                        ),
+                      title: Text(p.name, style: const TextStyle(fontSize: 20)),
                       trailing: const Icon(Icons.delete_outline),
                       onTap: () => Navigator.of(context).pop(p),
                     );
@@ -283,11 +316,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> _openDetail(Pokemon pokemon) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => PokemonDetailPage(pokemon: pokemon),
-      ),
-    );
+    await context.push(AppRoutes.pokemonDetail, extra: pokemon);
     await _reloadCaught();
   }
 
@@ -295,13 +324,9 @@ class _PokemonListPageState extends State<PokemonListPage> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final uncaught = _allPokemon
-        .where((p) => !_isCaught(p))
-        .toList()
+    final uncaught = _allPokemon.where((p) => !_isCaught(p)).toList()
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    final caught = _allPokemon
-        .where((p) => _isCaught(p))
-        .toList()
+    final caught = _allPokemon.where((p) => _isCaught(p)).toList()
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     return Scaffold(
@@ -337,14 +362,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
       foregroundColor: colors.onSurface,
       title: FittedBox(
         fit: BoxFit.scaleDown,
-        child: const Text(
-          'Pokémon shiny counter',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
-          ),
-        ),
+        child: Text('Pokémon shiny counter', style: AppTypography.title),
       ),
       actions: [
         IconButton(
@@ -369,7 +387,12 @@ class _PokemonListPageState extends State<PokemonListPage> {
     );
   }
 
-  Widget _buildBody(ColorScheme colors, double bottomPadding, List<Pokemon> uncaught, List<Pokemon> caught) {
+  Widget _buildBody(
+    ColorScheme colors,
+    double bottomPadding,
+    List<Pokemon> uncaught,
+    List<Pokemon> caught,
+  ) {
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -389,13 +412,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
         if (entry is _SectionHeader) {
           return Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(
-              entry.title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            child: Text(entry.title, style: AppTypography.sectionTitle),
           );
         } else if (entry is Pokemon) {
           return PokemonCard(
@@ -421,7 +438,11 @@ int _sectionedCount(List<Pokemon> uncaught, List<Pokemon> caught) {
   return count;
 }
 
-dynamic _sectionedItem(List<Pokemon> uncaught, List<Pokemon> caught, int index) {
+dynamic _sectionedItem(
+  List<Pokemon> uncaught,
+  List<Pokemon> caught,
+  int index,
+) {
   var cursor = 0;
 
   if (uncaught.isNotEmpty) {
@@ -501,7 +522,9 @@ class _EditPokemonDialogState extends State<_EditPokemonDialog> {
             children: [
               ElevatedButton.icon(
                 onPressed: () async {
-                  final picked = await _picker.pickImage(source: ImageSource.gallery);
+                  final picked = await _picker.pickImage(
+                    source: ImageSource.gallery,
+                  );
                   if (picked != null) {
                     setState(() => _pickedImage = picked);
                   }
