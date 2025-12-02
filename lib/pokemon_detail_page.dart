@@ -349,13 +349,13 @@ class _HuntDatesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final labelStyle = TextStyle(
       color: colors.onSurfaceVariant,
-      fontSize: 14,
-      fontWeight: FontWeight.w600,
+      fontSize: 15,
+      fontWeight: FontWeight.w700,
     );
     final valueStyle = TextStyle(
       color: colors.onSurface,
-      fontSize: 16,
-      fontWeight: FontWeight.w700,
+      fontSize: 17,
+      fontWeight: FontWeight.w800,
     );
 
     return Container(
@@ -422,7 +422,7 @@ class _DailyCountsList extends StatelessWidget {
 
     if (entries.isEmpty) {
       return Container(
-        height: 150,
+        height: 210,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: colors.surfaceVariant.withOpacity(0.6),
@@ -437,7 +437,7 @@ class _DailyCountsList extends StatelessWidget {
     }
 
     return Container(
-      height: 150,
+      height: 210,
       decoration: BoxDecoration(
         color: colors.surfaceVariant.withOpacity(0.6),
         borderRadius: BorderRadius.circular(16),
@@ -455,7 +455,7 @@ class _DailyCountsList extends StatelessWidget {
                   style: TextStyle(
                     color: colors.onSurfaceVariant,
                     fontWeight: FontWeight.w700,
-                    fontSize: 14,
+                    fontSize: 15,
                   ),
                 ),
                 Text(
@@ -463,7 +463,7 @@ class _DailyCountsList extends StatelessWidget {
                   style: TextStyle(
                     color: colors.onSurfaceVariant,
                     fontWeight: FontWeight.w700,
-                    fontSize: 14,
+                    fontSize: 15,
                   ),
                 ),
               ],
@@ -482,7 +482,7 @@ class _DailyCountsList extends StatelessWidget {
                       dayFormatter(entry.key),
                       style: TextStyle(
                         color: colors.onSurface,
-                        fontSize: 16,
+                        fontSize: 17,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -490,7 +490,7 @@ class _DailyCountsList extends StatelessWidget {
                       '${entry.value}',
                       style: TextStyle(
                         color: colors.primary,
-                        fontSize: 16,
+                        fontSize: 17,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
