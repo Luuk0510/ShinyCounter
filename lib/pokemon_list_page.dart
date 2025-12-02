@@ -82,10 +82,20 @@ class _PokemonListPageState extends State<PokemonListPage> {
     final selected = await showModalBottomSheet<Pokemon>(
       context: context,
       builder: (context) {
+        final colors = Theme.of(context).colorScheme;
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              const SizedBox(height: 10),
+              Container(
+                width: 44,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: colors.outlineVariant.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               const Padding(
                 padding: EdgeInsets.all(16),
                 child: Text(
@@ -220,10 +230,20 @@ class _PokemonListPageState extends State<PokemonListPage> {
     final selected = await showModalBottomSheet<Pokemon>(
       context: context,
       builder: (context) {
+        final colors = Theme.of(context).colorScheme;
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              const SizedBox(height: 10),
+              Container(
+                width: 44,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: colors.outlineVariant.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               const Padding(
                 padding: EdgeInsets.all(16),
                 child: Text(
