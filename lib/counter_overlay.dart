@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
@@ -68,6 +69,7 @@ class _OverlayAppState extends State<_OverlayApp> {
     final current = prefs.getInt(_counterKey) ?? _count;
     var next = current + delta;
     if (next < 0) next = 0;
+    final appliedDelta = next - current;
 
     final wasZero = current <= 0;
     DateTime? startedAt = _startedAt;
@@ -86,6 +88,9 @@ class _OverlayAppState extends State<_OverlayApp> {
     }
 
     await prefs.setInt(_counterKey, next);
+    if (appliedDelta != 0) {
+      await _updateDailyCounts(prefs, appliedDelta);
+    }
     if (!mounted) return;
     setState(() {
       _count = next;
@@ -197,6 +202,8 @@ class _OverlayAppState extends State<_OverlayApp> {
 
   String get _caughtAtKey => '${_counterKey}_caughtAt';
 
+  String get _dailyCountsKey => '${_counterKey}_dailyCounts';
+
   Future<(DateTime?, DateTime?)> _loadHuntDatesFor(String counterKey) async {
     if (counterKey.isEmpty) return (null, null);
     final prefs = await SharedPreferences.getInstance();
@@ -207,6 +214,45 @@ class _OverlayAppState extends State<_OverlayApp> {
   }
 
   DateTime? _parseDate(String? raw) => raw == null ? null : DateTime.tryParse(raw);
+
+  Future<void> _updateDailyCounts(SharedPreferences prefs, int delta) async {
+    if (delta == 0) return;
+    final key = _dailyCountsKey;
+    final current = _readDailyCounts(prefs.getString(key));
+    final dayKey = _dayKey(DateTime.now());
+    final next = (current[dayKey] ?? 0) + delta;
+    if (next <= 0) {
+      current.remove(dayKey);
+    } else {
+      current[dayKey] = next;
+    }
+    if (current.isEmpty) {
+      await prefs.remove(key);
+    } else {
+      await prefs.setString(key, jsonEncode(current));
+    }
+  }
+
+  Map<String, int> _readDailyCounts(String? raw) {
+    if (raw == null) return {};
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) return {};
+      return decoded.map<String, int>((key, value) {
+        final k = key.toString();
+        final v = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        return MapEntry(k, v);
+      })..removeWhere((_, v) => v == 0);
+    } catch (_) {
+      return {};
+    }
+  }
+
+  String _dayKey(DateTime date) {
+    String two(int v) => v.toString().padLeft(2, '0');
+    final local = date.toLocal();
+    return '${local.year}-${two(local.month)}-${two(local.day)}';
+  }
 }
 
 class _HuntDatesTable extends StatelessWidget {
