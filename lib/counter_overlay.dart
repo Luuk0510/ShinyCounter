@@ -66,6 +66,7 @@ class _OverlayAppState extends State<_OverlayApp> {
   Future<void> _bump(int delta) async {
     if (!_enabled || _counterKey.isEmpty) return;
     final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
     final current = prefs.getInt(_counterKey) ?? _count;
     var next = current + delta;
     if (next < 0) next = 0;
