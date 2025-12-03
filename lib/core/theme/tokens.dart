@@ -45,16 +45,22 @@ class AppTheme {
 
   static ThemeData light() {
     final scheme = ColorScheme.fromSeed(seedColor: AppColors.seed);
-    final cardColor = scheme.surface;
+    final cardColor = scheme.surfaceContainerHigh;
     return ThemeData(
-      colorScheme: scheme,
+      colorScheme: scheme.copyWith(
+        surface: scheme.surface,
+        surfaceContainerHighest: scheme.surfaceContainerHighest,
+      ),
       scaffoldBackgroundColor: scheme.surface,
       cardColor: cardColor,
       cardTheme: CardThemeData(
         color: cardColor,
-        elevation: 2,
+        elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.md),
+          side: BorderSide(
+            color: scheme.outlineVariant.withValues(alpha: 0.25),
+          ),
         ),
       ),
       appBarTheme: const AppBarTheme(),

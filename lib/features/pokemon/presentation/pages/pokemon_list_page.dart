@@ -295,12 +295,9 @@ class _PokemonListPageState extends State<PokemonListPage> {
 
   Future<void> _openSettings() async {
     if (!mounted) return;
-    await showModalBottomSheet<void>(
+    await showDialog<void>(
       context: context,
-      showDragHandle: false,
-      builder: (context) {
-        return const SettingsSheet();
-      },
+      builder: (context) => const SettingsDialog(),
     );
     setState(() {});
   }
