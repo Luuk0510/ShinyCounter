@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
+import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 
@@ -13,11 +14,13 @@ class SettingsSheet extends StatefulWidget {
 
 class _SettingsSheetState extends State<SettingsSheet> {
   late ThemeMode _mode;
+  Locale? _locale;
 
   @override
   void initState() {
     super.initState();
     _mode = context.read<ThemeNotifier>().mode;
+    _locale = context.read<LocaleNotifier>().locale;
   }
 
   void _setMode(ThemeMode mode, {bool? useOled}) {
@@ -26,66 +29,91 @@ class _SettingsSheetState extends State<SettingsSheet> {
     setState(() => _mode = notifier.mode);
   }
 
+  void _setLocale(Locale locale) {
+    context.read<LocaleNotifier>().setLocale(locale);
+    setState(() => _locale = locale);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.md,
-          AppSpacing.lg,
-          AppSpacing.xl,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 44,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: colors.outlineVariant,
-                  borderRadius: BorderRadius.circular(AppRadii.sm),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            AppSpacing.xl,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 44,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: colors.outlineVariant,
+                    borderRadius: BorderRadius.circular(AppRadii.sm),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              l10n.settingsTitle,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _ThemeOption(
-              label: l10n.settingsSystem,
-              selected: _mode == ThemeMode.system,
-              onTap: () => _setMode(ThemeMode.system),
-            ),
-            _ThemeOption(
-              label: l10n.settingsLight,
-              selected: _mode == ThemeMode.light,
-              onTap: () => _setMode(ThemeMode.light),
-            ),
-            _ThemeOption(
-              label: l10n.settingsDark,
-              selected:
-                  _mode == ThemeMode.dark &&
-                  !context.watch<ThemeNotifier>().useOledDark,
-              onTap: () => _setMode(ThemeMode.dark, useOled: false),
-            ),
-            _ThemeOption(
-              label: l10n.settingsOled,
-              selected:
-                  _mode == ThemeMode.dark &&
-                  context.watch<ThemeNotifier>().useOledDark,
-              onTap: () => _setMode(ThemeMode.dark, useOled: true),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-          ],
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                l10n.settingsLanguage,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _ThemeOption(
+                label: l10n.languageEnglish,
+                selected: _locale?.languageCode == 'en',
+                onTap: () => _setLocale(const Locale('en')),
+              ),
+              _ThemeOption(
+                label: l10n.languageDutch,
+                selected: _locale?.languageCode == 'nl',
+                onTap: () => _setLocale(const Locale('nl')),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                l10n.settingsTitle,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _ThemeOption(
+                label: l10n.settingsSystem,
+                selected: _mode == ThemeMode.system,
+                onTap: () => _setMode(ThemeMode.system),
+              ),
+              _ThemeOption(
+                label: l10n.settingsLight,
+                selected: _mode == ThemeMode.light,
+                onTap: () => _setMode(ThemeMode.light),
+              ),
+              _ThemeOption(
+                label: l10n.settingsDark,
+                selected:
+                    _mode == ThemeMode.dark &&
+                    !context.watch<ThemeNotifier>().useOledDark,
+                onTap: () => _setMode(ThemeMode.dark, useOled: false),
+              ),
+              _ThemeOption(
+                label: l10n.settingsOled,
+                selected:
+                    _mode == ThemeMode.dark &&
+                    context.watch<ThemeNotifier>().useOledDark,
+                onTap: () => _setMode(ThemeMode.dark, useOled: true),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+            ],
+          ),
         ),
       ),
     );
