@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shiny_counter/core/routing/app_router.dart';
+import 'package:shiny_counter/core/theme/theme_notifier.dart';
+import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/features/pokemon/data/repositories/prefs_pokemon_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
@@ -10,6 +13,7 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokem
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 class _FakePokemonRepository extends PrefsPokemonRepository {
   final List<Pokemon> seed;
@@ -50,8 +54,20 @@ void main() {
           Provider.value(value: saveCustom),
           Provider.value(value: loadCaught),
           Provider.value(value: toggleCaught),
+          ChangeNotifierProvider(create: (_) => ThemeNotifier()),
+          ChangeNotifierProvider(create: (_) => LocaleNotifier()),
         ],
-        child: MaterialApp.router(routerConfig: AppRouter.instance.router),
+        child: MaterialApp.router(
+          routerConfig: AppRouter.instance.router,
+          supportedLocales: const [Locale('en'), Locale('nl')],
+          locale: const Locale('nl'),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+        ),
       ),
     );
 

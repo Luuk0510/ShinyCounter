@@ -50,6 +50,7 @@ class DetailHeader extends StatelessWidget {
         SizedBox(
           width: 150,
           child: ElevatedButton(
+            key: const Key('catch_button'),
             onPressed: onToggleCaught,
             style: ElevatedButton.styleFrom(
               backgroundColor: isCaught
