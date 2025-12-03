@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 import 'package:shiny_counter/features/pokemon/overlay/widgets/round_control.dart';
@@ -11,9 +10,6 @@ import 'package:shiny_counter/features/pokemon/overlay/widgets/round_control.dar
 @pragma('vm:entry-point')
 void overlayMain() {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    SharedPreferencesAndroid.registerWith();
-  } catch (_) {}
   runApp(const _OverlayApp());
 }
 
@@ -110,7 +106,7 @@ class _OverlayAppState extends State<_OverlayApp> {
 
   @override
   Widget build(BuildContext context) {
-    final bg = const Color(0xFF1E1E1E).withOpacity(0.9);
+    final bg = const Color(0xFF1E1E1E).withValues(alpha: 0.9);
     final borderRadius = BorderRadius.circular(150);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -286,7 +282,7 @@ class _HuntDatesTable extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        color: Colors.white.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(

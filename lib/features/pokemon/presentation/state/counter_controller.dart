@@ -235,13 +235,15 @@ class CounterController extends ChangeNotifier {
   }
 
   Future<void> _setCaught(bool value, {CounterSyncService? sync}) async {
-    if (_toggleCaughtUseCase != null) {
-      await _toggleCaughtUseCase!.call(_caughtKey, value);
+    final useCase = _toggleCaughtUseCase;
+    if (useCase != null) {
+      await useCase.call(_caughtKey, value);
       return;
     }
     final service = sync ?? await _getSync();
     await service.setCaught(_caughtKey, value);
   }
+
 
   Future<void> _updateOverlay() async {
     if (!_pillActive || !_overlaySupported) return;

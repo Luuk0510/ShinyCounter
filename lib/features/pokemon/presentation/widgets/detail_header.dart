@@ -34,7 +34,7 @@ class DetailHeader extends StatelessWidget {
                   width: 300,
                   height: 300,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) =>
+                  errorBuilder: (context, error, stack) =>
                       const Icon(Icons.catching_pokemon, size: 140),
                 )
               : Image.asset(
@@ -42,7 +42,7 @@ class DetailHeader extends StatelessWidget {
                   width: 300,
                   height: 300,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) =>
+                  errorBuilder: (context, error, stack) =>
                       const Icon(Icons.catching_pokemon, size: 140),
                 ),
         ),

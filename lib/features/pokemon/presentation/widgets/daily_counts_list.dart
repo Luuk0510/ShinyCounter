@@ -106,7 +106,7 @@ class DailyCountsList extends StatelessWidget {
                   ],
                 );
               },
-              separatorBuilder: (_, __) => Divider(
+              separatorBuilder: (context, _) => Divider(
                 height: 16,
                 thickness: 1,
                 color: colors.outlineVariant.withValues(alpha: 0.25),

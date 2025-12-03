@@ -64,7 +64,7 @@ class GameDropdown extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xs),
         DropdownButtonFormField<String?>(
-          value: value?.isEmpty == true ? null : value,
+          initialValue: value?.isEmpty == true ? null : value,
           items: games
               .map(
                 (g) => DropdownMenuItem<String?>(

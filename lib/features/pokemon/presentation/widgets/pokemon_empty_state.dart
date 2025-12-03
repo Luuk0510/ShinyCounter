@@ -27,7 +27,7 @@ class PokemonEmptyState extends StatelessWidget {
             width: 96,
             height: 96,
             fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) =>
+            errorBuilder: (context, error, stack) =>
                 const Icon(Icons.catching_pokemon, size: 72),
           ),
           const SizedBox(height: 12),

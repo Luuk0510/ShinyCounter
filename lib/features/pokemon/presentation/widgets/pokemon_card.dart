@@ -72,7 +72,7 @@ class PokemonCard extends StatelessWidget {
             width: size,
             height: size,
             fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) =>
+          errorBuilder: (context, error, stack) =>
                 Icon(Icons.catching_pokemon, size: size * 0.45),
           )
         : Image.asset(
@@ -80,7 +80,7 @@ class PokemonCard extends StatelessWidget {
             width: size,
             height: size,
             fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) =>
+            errorBuilder: (context, error, stack) =>
                 Icon(Icons.catching_pokemon, size: size * 0.45),
           );
 

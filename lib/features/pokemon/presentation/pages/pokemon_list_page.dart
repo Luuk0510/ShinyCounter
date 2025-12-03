@@ -326,7 +326,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                         ),
                       );
                     },
-                    separatorBuilder: (_, __) =>
+                    separatorBuilder: (context, _) =>
                         const Divider(height: AppSpacing.md),
                   ),
                 ),
@@ -338,6 +338,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
     );
 
     if (action == null) return;
+    if (!mounted) return;
     if (action.delete) {
       await _confirmDelete(action.pokemon);
     } else {

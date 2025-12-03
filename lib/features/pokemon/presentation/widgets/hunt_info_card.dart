@@ -73,7 +73,7 @@ class HuntInfoCard extends StatelessWidget {
                 ? ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 240),
                     child: DropdownButtonFormField<String?>(
-                      value: null,
+                      initialValue: null,
                       items: GameDropdown.games
                           .map(
                             (g) => DropdownMenuItem<String?>(
