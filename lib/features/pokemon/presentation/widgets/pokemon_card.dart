@@ -72,7 +72,7 @@ class PokemonCard extends StatelessWidget {
             width: size,
             height: size,
             fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) =>
+          errorBuilder: (context, error, stack) =>
                 Icon(Icons.catching_pokemon, size: size * 0.45),
           )
         : Image.asset(
@@ -80,39 +80,10 @@ class PokemonCard extends StatelessWidget {
             width: size,
             height: size,
             fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) =>
+            errorBuilder: (context, error, stack) =>
                 Icon(Icons.catching_pokemon, size: size * 0.45),
           );
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: ColorFiltered(
-        colorFilter: isCaught
-            ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
-            : const ColorFilter.matrix(<double>[
-                0.2126,
-                0.7152,
-                0.0722,
-                0,
-                0,
-                0.2126,
-                0.7152,
-                0.0722,
-                0,
-                0,
-                0.2126,
-                0.7152,
-                0.0722,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-              ]),
-        child: image,
-      ),
-    );
+    return ClipRRect(borderRadius: BorderRadius.circular(12), child: image);
   }
 }

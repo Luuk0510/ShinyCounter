@@ -25,13 +25,14 @@ class CounterController extends ChangeNotifier {
   bool _pillActive = false;
   DateTime? _startedAt;
   DateTime? _caughtAt;
+  String? _caughtGame;
   Map<String, int> _dailyCounts = {};
 
   late final String _counterKey = 'counter_${pokemon.name.toLowerCase()}';
   late final String _caughtKey = 'caught_${pokemon.name.toLowerCase()}';
 
   CounterSyncService? _sync;
-  ToggleCaughtUseCase? _toggleCaughtUseCase;
+  final ToggleCaughtUseCase? _toggleCaughtUseCase;
   StreamSubscription<dynamic>? _overlaySub;
   Timer? _pollTimer;
   bool _initialized = false;
@@ -41,6 +42,7 @@ class CounterController extends ChangeNotifier {
   bool get pillActive => _pillActive;
   DateTime? get startedAt => _startedAt;
   DateTime? get caughtAt => _caughtAt;
+  String? get caughtGame => _caughtGame;
   Map<String, int> get dailyCounts => _dailyCounts;
 
   CounterOverlayMessage get _message => CounterOverlayMessage(
@@ -100,9 +102,11 @@ class CounterController extends ChangeNotifier {
     _counter = value;
     _isCaught = false;
     _caughtAt = null;
+    _caughtGame = null;
     final sync = await _getSync();
     await _persist(sync: sync);
     await _setCaught(false, sync: sync);
+    await sync.setCaughtGame(_counterKey, null);
     await _handleHuntStartReset(previous, _counter, sync: sync);
     final delta = _counter - previous;
     if (delta != 0) {
@@ -147,6 +151,7 @@ class CounterController extends ChangeNotifier {
     } else {
       _caughtAt = null;
       await sync.setCaughtAt(_counterKey, null);
+      // Keep game selection so user doesn't have to reselect after toggling.
     }
     notifyListeners();
     await _updateOverlay();
@@ -167,8 +172,18 @@ class CounterController extends ChangeNotifier {
     if (value != null) {
       _isCaught = true;
       await _setCaught(true, sync: sync);
+      if (_caughtGame != null) {
+        await sync.setCaughtGame(_counterKey, _caughtGame);
+      }
     }
     await _updateOverlay();
+    notifyListeners();
+  }
+
+  Future<void> setCaughtGame(String? game) async {
+    _caughtGame = game;
+    final sync = await _getSync();
+    await sync.setCaughtGame(_counterKey, game);
     notifyListeners();
   }
 
@@ -209,6 +224,7 @@ class CounterController extends ChangeNotifier {
     _isCaught = state.isCaught;
     _startedAt = state.startedAt;
     _caughtAt = state.caughtAt;
+    _caughtGame = state.caughtGame;
     _dailyCounts = state.dailyCounts;
     notifyListeners();
   }
@@ -219,13 +235,15 @@ class CounterController extends ChangeNotifier {
   }
 
   Future<void> _setCaught(bool value, {CounterSyncService? sync}) async {
-    if (_toggleCaughtUseCase != null) {
-      await _toggleCaughtUseCase!.call(_caughtKey, value);
+    final useCase = _toggleCaughtUseCase;
+    if (useCase != null) {
+      await useCase.call(_caughtKey, value);
       return;
     }
     final service = sync ?? await _getSync();
     await service.setCaught(_caughtKey, value);
   }
+
 
   Future<void> _updateOverlay() async {
     if (!_pillActive || !_overlaySupported) return;
@@ -251,6 +269,7 @@ class CounterController extends ChangeNotifier {
       _startedAt = null;
       _caughtAt = null;
       _isCaught = false;
+      _caughtGame = null;
       await service.clearHuntDates(_counterKey);
       await service.setCaught(_caughtKey, false);
     }
@@ -294,6 +313,7 @@ class CounterController extends ChangeNotifier {
           state.isCaught != _isCaught ||
           !_isSameMoment(state.startedAt, _startedAt) ||
           !_isSameMoment(state.caughtAt, _caughtAt) ||
+          state.caughtGame != _caughtGame ||
           !_sameDailyCounts(state.dailyCounts, _dailyCounts);
       if (!changed) return;
 
@@ -301,6 +321,7 @@ class CounterController extends ChangeNotifier {
       _isCaught = state.isCaught;
       _startedAt = state.startedAt;
       _caughtAt = state.caughtAt;
+      _caughtGame = state.caughtGame;
       _dailyCounts = state.dailyCounts;
       notifyListeners();
     });
