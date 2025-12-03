@@ -75,7 +75,7 @@ class AppTheme {
     );
     final scheme = darkSchemeBase.copyWith(
       surface: AppColors.darkSurface,
-      surfaceContainerHighest: Colors.black.withValues(alpha: 0.12),
+      surfaceContainerHighest: AppColors.darkSurface,
     );
     final cardColor = scheme.surfaceContainerHighest;
     return ThemeData(
@@ -87,6 +87,9 @@ class AppTheme {
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.md),
+          side: BorderSide(
+            color: scheme.outlineVariant.withValues(alpha: 0.2),
+          ),
         ),
       ),
       appBarTheme: const AppBarTheme(),
@@ -101,7 +104,7 @@ class AppTheme {
     );
     final scheme = darkSchemeBase.copyWith(
       surface: AppColors.oledSurface,
-      surfaceContainerHighest: const Color(0xFF111111),
+      surfaceContainerHighest: const Color(0xFF0F0F0F),
     );
     final cardColor = scheme.surfaceContainerHighest;
     return ThemeData(

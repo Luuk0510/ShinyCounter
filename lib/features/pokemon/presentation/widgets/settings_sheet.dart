@@ -39,6 +39,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
     final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
     return AlertDialog(
+      backgroundColor: Theme.of(context).cardColor,
+      surfaceTintColor: Colors.transparent,
       title: Text(
         l10n.tooltipSettings,
         textAlign: TextAlign.center,
