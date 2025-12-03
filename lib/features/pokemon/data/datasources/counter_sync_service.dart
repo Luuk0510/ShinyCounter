@@ -12,6 +12,7 @@ class CounterState {
     required this.isCaught,
     this.startedAt,
     this.caughtAt,
+    this.caughtGame,
     this.dailyCounts = const {},
   });
 
@@ -19,6 +20,7 @@ class CounterState {
   final bool isCaught;
   final DateTime? startedAt;
   final DateTime? caughtAt;
+  final String? caughtGame;
   final Map<String, int> dailyCounts;
 }
 
@@ -45,6 +47,7 @@ class CounterSyncService {
       isCaught: _prefs.getBool(caughtKey) ?? false,
       startedAt: _readDate(_prefs.getString(_startedAtKey(counterKey))),
       caughtAt: _readDate(_prefs.getString(_caughtAtKey(counterKey))),
+      caughtGame: _prefs.getString(_caughtGameKey(counterKey)),
       dailyCounts: _readDailyCounts(
         _prefs.getString(_dailyCountsKey(counterKey)),
       ),
@@ -60,6 +63,7 @@ class CounterSyncService {
     await _prefs.setBool(caughtKey, state.isCaught);
     await setStartedAt(counterKey, state.startedAt);
     await setCaughtAt(counterKey, state.caughtAt);
+    await setCaughtGame(counterKey, state.caughtGame);
     await setDailyCounts(counterKey, state.dailyCounts);
   }
 
@@ -89,9 +93,19 @@ class CounterSyncService {
     await _prefs.setString(key, caughtAt.toIso8601String());
   }
 
+  Future<void> setCaughtGame(String counterKey, String? game) async {
+    final key = _caughtGameKey(counterKey);
+    if (game == null || game.isEmpty) {
+      await _prefs.remove(key);
+      return;
+    }
+    await _prefs.setString(key, game);
+  }
+
   Future<void> clearHuntDates(String counterKey) async {
     await _prefs.remove(_startedAtKey(counterKey));
     await _prefs.remove(_caughtAtKey(counterKey));
+    await _prefs.remove(_caughtGameKey(counterKey));
   }
 
   Future<void> setDailyCounts(
@@ -133,6 +147,8 @@ class CounterSyncService {
   String _startedAtKey(String counterKey) => '${counterKey}_startedAt';
 
   String _caughtAtKey(String counterKey) => '${counterKey}_caughtAt';
+
+  String _caughtGameKey(String counterKey) => '${counterKey}_caughtGame';
 
   String _dailyCountsKey(String counterKey) => '${counterKey}_dailyCounts';
 

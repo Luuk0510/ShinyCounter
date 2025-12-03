@@ -85,6 +85,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
           counter: _controller.counter,
           startedAt: _controller.startedAt,
           caughtAt: _controller.caughtAt,
+          caughtGame: _controller.caughtGame,
         );
       },
     );
@@ -98,6 +99,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     }
     if (result.caughtChanged) {
       await _controller.setCaughtAtDate(result.caughtAt);
+    }
+    if (result.gameChanged) {
+      await _controller.setCaughtGame(result.caughtGame);
     }
   }
 
@@ -195,10 +199,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                           child: ElevatedButton(
                             onPressed: _toggleCaught,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  _controller.isCaught ? Colors.green.shade600 : colors.secondary,
-                              foregroundColor:
-                                  _controller.isCaught ? Colors.white : colors.onSecondary,
+                              backgroundColor: _controller.isCaught
+                                  ? Colors.green.shade600
+                                  : colors.secondary,
+                              foregroundColor: _controller.isCaught
+                                  ? Colors.white
+                                  : colors.onSecondary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -256,14 +262,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                ConstrainedBox(
-                                  constraints: const BoxConstraints(
-                                    maxWidth: 400,
-                                  ),
+                                IntrinsicWidth(
                                   child: _HuntDatesCard(
                                     colors: colors,
                                     startedAt: _controller.startedAt,
                                     caughtAt: _controller.caughtAt,
+                                    caughtGame: _controller.caughtGame,
                                     formatter: _formatDate,
                                   ),
                                 ),
@@ -328,7 +332,9 @@ class _RoundIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final Color effectiveBg = enabled ? background : colors.surfaceContainerHighest;
+    final Color effectiveBg = enabled
+        ? background
+        : colors.surfaceContainerHighest;
     final Color effectiveFg = enabled ? foreground : colors.onSurfaceVariant;
 
     return ElevatedButton(
@@ -350,12 +356,14 @@ class _HuntDatesCard extends StatelessWidget {
     required this.colors,
     required this.startedAt,
     required this.caughtAt,
+    required this.caughtGame,
     required this.formatter,
   });
 
   final ColorScheme colors;
   final DateTime? startedAt;
   final DateTime? caughtAt;
+  final String? caughtGame;
   final String Function(DateTime?) formatter;
 
   @override
@@ -379,22 +387,42 @@ class _HuntDatesCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
       ),
-      child: Row(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _HuntCell(
-            label: 'Start',
-            value: formatter(startedAt),
-            labelStyle: labelStyle,
-            valueStyle: valueStyle,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _HuntCell(
+                label: 'Start',
+                value: formatter(startedAt),
+                labelStyle: labelStyle,
+                valueStyle: valueStyle,
+              ),
+              const SizedBox(width: 18),
+              _HuntCell(
+                label: 'Catch',
+                value: formatter(caughtAt),
+                labelStyle: labelStyle,
+                valueStyle: valueStyle,
+              ),
+            ],
           ),
-          const SizedBox(width: 18),
-          _HuntCell(
-            label: 'Catch',
-            value: formatter(caughtAt),
-            labelStyle: labelStyle,
-            valueStyle: valueStyle,
-          ),
+          if (caughtGame != null && caughtGame!.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Center(
+              child: Text(
+                'Pokemon $caughtGame',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: colors.onSurface,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -451,7 +479,9 @@ class _DailyCountsList extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
+          border: Border.all(
+            color: colors.outlineVariant.withValues(alpha: 0.6),
+          ),
         ),
         child: Text(
           'Nog geen tellingen',
@@ -531,7 +561,7 @@ class _DailyCountsList extends StatelessWidget {
               separatorBuilder: (_, __) => Divider(
                 height: 16,
                 thickness: 1,
-                color: colors.outlineVariant.withOpacity(0.25),
+                color: colors.outlineVariant.withValues(alpha: 0.25),
               ),
               itemCount: entries.length,
             ),
@@ -547,15 +577,19 @@ class _EditSheetResult {
     this.counter,
     this.startedAt,
     this.caughtAt,
+    this.caughtGame,
     this.startedChanged = false,
     this.caughtChanged = false,
+    this.gameChanged = false,
   });
 
   final int? counter;
   final DateTime? startedAt;
   final DateTime? caughtAt;
+  final String? caughtGame;
   final bool startedChanged;
   final bool caughtChanged;
+  final bool gameChanged;
 }
 
 class _EditCountersSheet extends StatefulWidget {
@@ -563,11 +597,13 @@ class _EditCountersSheet extends StatefulWidget {
     required this.counter,
     required this.startedAt,
     required this.caughtAt,
+    required this.caughtGame,
   });
 
   final int counter;
   final DateTime? startedAt;
   final DateTime? caughtAt;
+  final String? caughtGame;
 
   @override
   State<_EditCountersSheet> createState() => _EditCountersSheetState();
@@ -579,14 +615,17 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
   );
   DateTime? _start;
   DateTime? _catch;
+  String? _game;
   bool _startChanged = false;
   bool _catchChanged = false;
+  bool _gameChanged = false;
 
   @override
   void initState() {
     super.initState();
     _start = widget.startedAt;
     _catch = widget.caughtAt;
+    _game = widget.caughtGame;
   }
 
   @override
@@ -674,6 +713,16 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
               });
             },
           ),
+          const SizedBox(height: 12),
+          _GameDropdown(
+            value: _game,
+            onChanged: (value) {
+              setState(() {
+                _game = value;
+                _gameChanged = true;
+              });
+            },
+          ),
           const SizedBox(height: 20),
           Row(
             children: [
@@ -737,8 +786,10 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
         counter: parsed,
         startedAt: _start,
         caughtAt: _catch,
+        caughtGame: _game,
         startedChanged: _startChanged,
         caughtChanged: _catchChanged,
+        gameChanged: _gameChanged,
       ),
     );
   }
@@ -792,6 +843,88 @@ class _DateRow extends StatelessWidget {
         ),
         IconButton(icon: const Icon(Icons.edit_calendar), onPressed: onPick),
         IconButton(icon: const Icon(Icons.clear), onPressed: onClear),
+      ],
+    );
+  }
+}
+
+class _GameDropdown extends StatelessWidget {
+  const _GameDropdown({required this.value, required this.onChanged});
+
+  final String? value;
+  final ValueChanged<String?> onChanged;
+
+  static const _games = [
+    '',
+    'Legends: ZA',
+    'Scarlet',
+    'Violet',
+    'Brilliant Diamond',
+    'Shining Pearl',
+    'Legends: Arceus',
+    'Sword',
+    'Shield',
+    "Let's Go Pikachu",
+    "Let's Go Eevee",
+    'Ultra Sun',
+    'Ultra Moon',
+    'Sun',
+    'Moon',
+    'Omega Ruby',
+    'Alpha Sapphire',
+    'X',
+    'Y',
+    'Black 2',
+    'White 2',
+    'Black',
+    'White',
+    'HeartGold',
+    'SoulSilver',
+    'Platinum',
+    'Diamond',
+    'Pearl',
+    'Emerald',
+    'Ruby',
+    'Sapphire',
+    'FireRed',
+    'LeafGreen',
+    'Crystal',
+    'Gold',
+    'Silver',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Game',
+          style: TextStyle(
+            color: colors.onSurfaceVariant,
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 4),
+        DropdownButtonFormField<String?>(
+          value: value?.isEmpty == true ? null : value,
+          items: _games
+              .map(
+                (g) => DropdownMenuItem<String?>(
+                  value: g.isEmpty ? null : g,
+                  child: Text(g.isEmpty ? 'Geen' : g),
+                ),
+              )
+              .toList(),
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          ),
+          onChanged: (val) => onChanged(val?.isEmpty == true ? null : val),
+          hint: const Text('Scroll voor game'),
+        ),
       ],
     );
   }

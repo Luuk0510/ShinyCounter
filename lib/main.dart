@@ -38,10 +38,7 @@ class MyApp extends StatelessWidget {
             themeMode: theme.mode,
             routerConfig: router,
             locale: const Locale('nl'),
-            supportedLocales: const [
-              Locale('nl'),
-              Locale('en'),
-            ],
+            supportedLocales: const [Locale('nl'), Locale('en')],
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
