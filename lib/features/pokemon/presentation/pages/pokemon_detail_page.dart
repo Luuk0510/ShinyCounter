@@ -1,14 +1,15 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:ui';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_counters_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/hunt_info_card.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/daily_counts_list.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/detail_header.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/counter_controls.dart';
 
 class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({super.key, required this.pokemon});
@@ -74,7 +75,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   }
 
   Future<void> _showEditDialog() async {
-    final result = await showModalBottomSheet<_EditSheetResult>(
+    final result = await showModalBottomSheet<EditSheetResult>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -82,7 +83,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
-        return _EditCountersSheet(
+        return EditCountersSheet(
           counter: _controller.counter,
           startedAt: _controller.startedAt,
           caughtAt: _controller.caughtAt,
@@ -113,7 +114,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -158,111 +158,36 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
           return SingleChildScrollView(
             padding: EdgeInsets.zero,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    AppSpacing.xl,
-                    AppSpacing.xl,
-                    AppSpacing.xl,
-                    bottomPadding,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(height: AppSpacing.sm),
-                          Center(
-                            child: widget.pokemon.isLocalFile && !kIsWeb
-                                ? Image.file(
-                                    File(widget.pokemon.imagePath),
-                                    width: 300,
-                                    height: 300,
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) => const Icon(
-                                    Icons.catching_pokemon,
-                                    size: 140,
-                                  ),
-                                )
-                              : Image.asset(
-                                  widget.pokemon.imagePath,
-                                  width: 300,
-                                  height: 300,
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) => const Icon(
-                                    Icons.catching_pokemon,
-                                    size: 140,
-                                  ),
-                                ),
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        SizedBox(
-                          width: 150,
-                          child: ElevatedButton(
-                            onPressed: _toggleCaught,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _controller.isCaught
-                                  ? Colors.green.shade600
-                                  : colors.secondary,
-                              foregroundColor: _controller.isCaught
-                                  ? Colors.white
-                                  : colors.onSecondary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: AppSpacing.md,
-                              ),
-                              child: Text(
-                                _controller.isCaught ? 'Caught' : 'Catch',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  AppSpacing.xl,
+                  AppSpacing.xl,
+                  AppSpacing.xl,
+                  bottomPadding,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    DetailHeader(
+                      pokemon: widget.pokemon,
+                      colors: colors,
+                      isCaught: _controller.isCaught,
+                      onToggleCaught: _toggleCaught,
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: AppSpacing.xl),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            '${_controller.counter}',
-                            style: textTheme.displayLarge?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: colors.onSurface,
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _RoundIconButton(
-                                icon: Icons.remove,
-                                onPressed: _decrement,
-                                background: colors.primaryContainer,
-                                foreground: colors.onPrimaryContainer,
-                                enabled: !_controller.isCaught,
-                              ),
-                              const SizedBox(width: AppSpacing.xl),
-                              _RoundIconButton(
-                                icon: Icons.add,
-                                onPressed: _increment,
-                                background: colors.primaryContainer,
-                                foreground: colors.onPrimaryContainer,
-                                enabled: !_controller.isCaught,
-                              ),
-                            ],
+                          CounterControls(
+                            count: _controller.counter,
+                            enabled: !_controller.isCaught,
+                            onDecrement: _decrement,
+                            onIncrement: _increment,
                           ),
                           const SizedBox(height: AppSpacing.xxl),
                           Align(
@@ -271,7 +196,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IntrinsicWidth(
-                                  child: _HuntDatesCard(
+                                  child: HuntInfoCard(
                                     colors: colors,
                                     startedAt: _controller.startedAt,
                                     caughtAt: _controller.caughtAt,
@@ -284,7 +209,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                                   constraints: const BoxConstraints(
                                     maxWidth: 200,
                                   ),
-                                  child: _DailyCountsList(
+                                  child: DailyCountsList(
                                     colors: colors,
                                     dailyCounts: _controller.dailyCounts,
                                     dayFormatter: _formatDayKey,
@@ -319,621 +244,5 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     String two(int v) => v.toString().padLeft(2, '0');
     final local = parsed.toLocal();
     return '${two(local.day)}-${two(local.month)}-${local.year}';
-  }
-}
-
-class _RoundIconButton extends StatelessWidget {
-  const _RoundIconButton({
-    required this.icon,
-    required this.onPressed,
-    required this.background,
-    required this.foreground,
-    this.enabled = true,
-  });
-
-  final IconData icon;
-  final VoidCallback onPressed;
-  final Color background;
-  final Color foreground;
-  final bool enabled;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final Color effectiveBg = enabled
-        ? background
-        : colors.surfaceContainerHighest;
-    final Color effectiveFg = enabled ? foreground : colors.onSurfaceVariant;
-
-    return ElevatedButton(
-      onPressed: enabled ? onPressed : null,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: effectiveBg,
-        foregroundColor: effectiveFg,
-        shape: const CircleBorder(),
-        padding: const EdgeInsets.all(18),
-        minimumSize: const Size(72, 72),
-      ),
-      child: Icon(icon, size: 32),
-    );
-  }
-}
-
-class _HuntDatesCard extends StatelessWidget {
-  const _HuntDatesCard({
-    required this.colors,
-    required this.startedAt,
-    required this.caughtAt,
-    required this.caughtGame,
-    required this.formatter,
-  });
-
-  final ColorScheme colors;
-  final DateTime? startedAt;
-  final DateTime? caughtAt;
-  final String? caughtGame;
-  final String Function(DateTime?) formatter;
-
-  @override
-  Widget build(BuildContext context) {
-    final labelStyle = TextStyle(
-      color: colors.onSurfaceVariant,
-      fontSize: 15,
-      fontWeight: FontWeight.w700,
-    );
-    final valueStyle = TextStyle(
-      color: colors.onSurface,
-      fontSize: 17,
-      fontWeight: FontWeight.w800,
-    );
-    final cardColor = Theme.of(context).cardColor;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _HuntCell(
-                label: 'Start',
-                value: formatter(startedAt),
-                labelStyle: labelStyle,
-                valueStyle: valueStyle,
-              ),
-              const SizedBox(width: 18),
-              _HuntCell(
-                label: 'Catch',
-                value: formatter(caughtAt),
-                labelStyle: labelStyle,
-                valueStyle: valueStyle,
-              ),
-            ],
-          ),
-          if (caughtGame != null && caughtGame!.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.md),
-            Center(
-              child: Text(
-                'Pokemon $caughtGame',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: colors.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _HuntCell extends StatelessWidget {
-  const _HuntCell({
-    required this.label,
-    required this.value,
-    required this.labelStyle,
-    required this.valueStyle,
-  });
-
-  final String label;
-  final String value;
-  final TextStyle labelStyle;
-  final TextStyle valueStyle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(label, style: labelStyle),
-        const SizedBox(height: AppSpacing.xs),
-        Text(value, style: valueStyle),
-      ],
-    );
-  }
-}
-
-class _DailyCountsList extends StatelessWidget {
-  const _DailyCountsList({
-    required this.colors,
-    required this.dailyCounts,
-    required this.dayFormatter,
-  });
-
-  final ColorScheme colors;
-  final Map<String, int> dailyCounts;
-  final String Function(String) dayFormatter;
-
-  @override
-  Widget build(BuildContext context) {
-    final entries = dailyCounts.entries.toList()
-      ..sort((a, b) => b.key.compareTo(a.key));
-
-    if (entries.isEmpty) {
-      return Container(
-        height: 210,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: colors.outlineVariant.withValues(alpha: 0.6),
-          ),
-        ),
-        child: Text(
-          'Nog geen tellingen',
-          style: TextStyle(
-            color: colors.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      height: 210,
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
-      ),
-      child: Column(
-        children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Datum',
-                style: TextStyle(
-                  color: colors.onSurfaceVariant,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
-                ),
-              ),
-              Text(
-                'Aantal',
-                style: TextStyle(
-                  color: colors.onSurfaceVariant,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Divider(
-          height: 1,
-          thickness: 1,
-          color: colors.outlineVariant.withValues(alpha: 0.35),
-        ),
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              itemBuilder: (context, index) {
-                final entry = entries[index];
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      dayFormatter(entry.key),
-                      style: TextStyle(
-                        color: colors.onSurface,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      '${entry.value}',
-                      style: TextStyle(
-                        color: colors.primary,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
-                );
-              },
-              separatorBuilder: (_, __) => Divider(
-                height: 16,
-                thickness: 1,
-                color: colors.outlineVariant.withValues(alpha: 0.25),
-              ),
-              itemCount: entries.length,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EditSheetResult {
-  const _EditSheetResult({
-    this.counter,
-    this.startedAt,
-    this.caughtAt,
-    this.caughtGame,
-    this.startedChanged = false,
-    this.caughtChanged = false,
-    this.gameChanged = false,
-  });
-
-  final int? counter;
-  final DateTime? startedAt;
-  final DateTime? caughtAt;
-  final String? caughtGame;
-  final bool startedChanged;
-  final bool caughtChanged;
-  final bool gameChanged;
-}
-
-class _EditCountersSheet extends StatefulWidget {
-  const _EditCountersSheet({
-    required this.counter,
-    required this.startedAt,
-    required this.caughtAt,
-    required this.caughtGame,
-  });
-
-  final int counter;
-  final DateTime? startedAt;
-  final DateTime? caughtAt;
-  final String? caughtGame;
-
-  @override
-  State<_EditCountersSheet> createState() => _EditCountersSheetState();
-}
-
-class _EditCountersSheetState extends State<_EditCountersSheet> {
-  late final TextEditingController _counterCtrl = TextEditingController(
-    text: '${widget.counter}',
-  );
-  DateTime? _start;
-  DateTime? _catch;
-  String? _game;
-  bool _startChanged = false;
-  bool _catchChanged = false;
-  bool _gameChanged = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _start = widget.startedAt;
-    _catch = widget.caughtAt;
-    _game = widget.caughtGame;
-  }
-
-  @override
-  void dispose() {
-    _counterCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Padding(
-      padding: EdgeInsets.only(
-        left: AppSpacing.xl,
-        right: AppSpacing.xl,
-        bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.lg,
-        top: AppSpacing.md,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 44,
-            height: 5,
-            decoration: BoxDecoration(
-              color: colors.outlineVariant,
-              borderRadius: BorderRadius.circular(AppRadii.sm),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            'Aanpassen',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w800,
-              fontSize: 18,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          TextField(
-            controller: _counterCtrl,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Counter',
-              hintText: 'Voer een getal in',
-              labelStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-              hintStyle: TextStyle(fontSize: 17),
-            ),
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _DateRow(
-            label: 'Start',
-            value: _start,
-            onPick: () => _pickDate(_start).then((value) {
-              if (value != null) {
-                setState(() {
-                  _start = value;
-                  _startChanged = true;
-                });
-              }
-            }),
-            onClear: () {
-              setState(() {
-                _start = null;
-                _startChanged = true;
-              });
-            },
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _DateRow(
-            label: 'Catch',
-            value: _catch,
-            onPick: () => _pickDate(_catch).then((value) {
-              if (value != null) {
-                setState(() {
-                  _catch = value;
-                  _catchChanged = true;
-                });
-              }
-            }),
-            onClear: () {
-              setState(() {
-                _catch = null;
-                _catchChanged = true;
-              });
-            },
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _GameDropdown(
-            value: _game,
-            onChanged: (value) {
-              setState(() {
-                _game = value;
-                _gameChanged = true;
-              });
-            },
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: colors.primary,
-                    side: BorderSide(color: colors.primary, width: 1.4),
-                    backgroundColor: colors.primary.withOpacity(0.08),
-                  ),
-                  child: const Text(
-                    'Annuleren',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colors.primary,
-                    foregroundColor: colors.onPrimary,
-                  ),
-                  child: const Text(
-                    'Opslaan',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<DateTime?> _pickDate(DateTime? initial) async {
-    final now = DateTime.now();
-    final date = await showDatePicker(
-      context: context,
-      initialDate: initial ?? now,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (date == null) return null;
-    return DateTime(date.year, date.month, date.day);
-  }
-
-  void _submit() {
-    final parsed = int.tryParse(_counterCtrl.text.trim());
-    if (parsed == null || parsed < 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Voer een geldige counter in')),
-      );
-      return;
-    }
-    Navigator.of(context).pop(
-      _EditSheetResult(
-        counter: parsed,
-        startedAt: _start,
-        caughtAt: _catch,
-        caughtGame: _game,
-        startedChanged: _startChanged,
-        caughtChanged: _catchChanged,
-        gameChanged: _gameChanged,
-      ),
-    );
-  }
-}
-
-class _DateRow extends StatelessWidget {
-  const _DateRow({
-    required this.label,
-    required this.value,
-    required this.onPick,
-    required this.onClear,
-  });
-
-  final String label;
-  final DateTime? value;
-  final VoidCallback onPick;
-  final VoidCallback onClear;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    String two(int v) => v.toString().padLeft(2, '0');
-    final formatted = value == null
-        ? '--'
-        : '${two(value!.day)}-${two(value!.month)}-${value!.year}';
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  color: colors.onSurfaceVariant,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                formatted,
-                style: TextStyle(
-                  color: colors.onSurface,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-        ),
-        IconButton(icon: const Icon(Icons.edit_calendar), onPressed: onPick),
-        IconButton(icon: const Icon(Icons.clear), onPressed: onClear),
-      ],
-    );
-  }
-}
-
-class _GameDropdown extends StatelessWidget {
-  const _GameDropdown({required this.value, required this.onChanged});
-
-  final String? value;
-  final ValueChanged<String?> onChanged;
-
-  static const _games = [
-    '',
-    'Legends: ZA',
-    'Scarlet',
-    'Violet',
-    'Brilliant Diamond',
-    'Shining Pearl',
-    'Legends: Arceus',
-    'Sword',
-    'Shield',
-    "Let's Go Pikachu",
-    "Let's Go Eevee",
-    'Ultra Sun',
-    'Ultra Moon',
-    'Sun',
-    'Moon',
-    'Omega Ruby',
-    'Alpha Sapphire',
-    'X',
-    'Y',
-    'Black 2',
-    'White 2',
-    'Black',
-    'White',
-    'HeartGold',
-    'SoulSilver',
-    'Platinum',
-    'Diamond',
-    'Pearl',
-    'Emerald',
-    'Ruby',
-    'Sapphire',
-    'FireRed',
-    'LeafGreen',
-    'Crystal',
-    'Gold',
-    'Silver',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Game',
-          style: TextStyle(
-            color: colors.onSurfaceVariant,
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        DropdownButtonFormField<String?>(
-          value: value?.isEmpty == true ? null : value,
-          items: _games
-              .map(
-                (g) => DropdownMenuItem<String?>(
-                  value: g.isEmpty ? null : g,
-                  child: Text(g.isEmpty ? 'Geen' : g),
-                ),
-              )
-              .toList(),
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          ),
-          onChanged: (val) => onChanged(val?.isEmpty == true ? null : val),
-          hint: const Text('Scroll voor game'),
-        ),
-      ],
-    );
   }
 }
