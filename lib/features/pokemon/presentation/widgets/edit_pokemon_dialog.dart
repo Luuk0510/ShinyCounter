@@ -45,9 +45,9 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
       title: Text(
         l10n.editDialogTitle,
         textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
       ),
       content: SingleChildScrollView(
         child: Column(
@@ -90,8 +90,10 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
         ),
       ),
       actionsAlignment: MainAxisAlignment.center,
-      actionsPadding:
-          const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+      actionsPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop<Pokemon?>(null),

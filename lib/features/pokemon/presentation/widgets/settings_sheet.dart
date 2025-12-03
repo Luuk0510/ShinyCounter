@@ -44,9 +44,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
       title: Text(
         l10n.tooltipSettings,
         textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
       ),
       content: SingleChildScrollView(
         child: Column(
@@ -55,9 +55,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
           children: [
             Text(
               l10n.settingsLanguage,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: AppSpacing.md),
             _ThemeOption(
@@ -73,9 +73,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
             const SizedBox(height: AppSpacing.lg),
             Text(
               l10n.settingsTitle,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: AppSpacing.md),
             _ThemeOption(
@@ -90,13 +90,15 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             _ThemeOption(
               label: l10n.settingsDark,
-              selected: _mode == ThemeMode.dark &&
+              selected:
+                  _mode == ThemeMode.dark &&
                   !context.watch<ThemeNotifier>().useOledDark,
               onTap: () => _setMode(ThemeMode.dark, useOled: false),
             ),
             _ThemeOption(
               label: l10n.settingsOled,
-              selected: _mode == ThemeMode.dark &&
+              selected:
+                  _mode == ThemeMode.dark &&
                   context.watch<ThemeNotifier>().useOledDark,
               onTap: () => _setMode(ThemeMode.dark, useOled: true),
             ),

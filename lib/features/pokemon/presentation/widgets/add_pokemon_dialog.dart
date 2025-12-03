@@ -32,9 +32,9 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
       title: Text(
         l10n.addDialogTitle,
         textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
       ),
       content: SingleChildScrollView(
         child: Column(
@@ -78,8 +78,10 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
         ),
       ),
       actionsAlignment: MainAxisAlignment.center,
-      actionsPadding:
-          const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+      actionsPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop<Pokemon?>(null),

@@ -87,9 +87,7 @@ class AppTheme {
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.md),
-          side: BorderSide(
-            color: scheme.outlineVariant.withValues(alpha: 0.2),
-          ),
+          side: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.2)),
         ),
       ),
       appBarTheme: const AppBarTheme(),

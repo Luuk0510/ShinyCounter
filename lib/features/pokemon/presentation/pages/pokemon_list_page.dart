@@ -157,29 +157,32 @@ class _PokemonListPageState extends State<PokemonListPage> {
           title: Text(
             context.l10n.confirmDeleteTitle,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
           ),
-          content: Builder(builder: (context) {
-            final message = context.l10n.confirmDeleteMessage(pokemon.name);
-            final parts = message.split(pokemon.name);
-            final after =
-                parts.length > 1 ? parts.sublist(1).join(pokemon.name) : '';
-            return RichText(
-              text: TextSpan(
-                style: TextStyle(fontSize: 16, color: colors.onSurface),
-                children: [
-                  TextSpan(text: parts.first),
-                  TextSpan(
-                    text: pokemon.name,
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                  TextSpan(text: after),
-                ],
-              ),
-            );
-          }),
+          content: Builder(
+            builder: (context) {
+              final message = context.l10n.confirmDeleteMessage(pokemon.name);
+              final parts = message.split(pokemon.name);
+              final after = parts.length > 1
+                  ? parts.sublist(1).join(pokemon.name)
+                  : '';
+              return RichText(
+                text: TextSpan(
+                  style: TextStyle(fontSize: 16, color: colors.onSurface),
+                  children: [
+                    TextSpan(text: parts.first),
+                    TextSpan(
+                      text: pokemon.name,
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    TextSpan(text: after),
+                  ],
+                ),
+              );
+            },
+          ),
           actionsAlignment: MainAxisAlignment.center,
           actionsPadding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.lg,
@@ -197,8 +200,10 @@ class _PokemonListPageState extends State<PokemonListPage> {
               ),
               child: Text(
                 context.l10n.confirmDeleteCancel,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
@@ -214,8 +219,10 @@ class _PokemonListPageState extends State<PokemonListPage> {
               ),
               child: Text(
                 context.l10n.confirmDeleteDelete,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ],
