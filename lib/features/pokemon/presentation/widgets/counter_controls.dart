@@ -8,12 +8,14 @@ class CounterControls extends StatelessWidget {
     required this.enabled,
     required this.onDecrement,
     required this.onIncrement,
+    required this.onEdit,
   });
 
   final int count;
   final bool enabled;
   final VoidCallback onDecrement;
   final VoidCallback onIncrement;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +24,14 @@ class CounterControls extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          '$count',
-          style: textTheme.displayLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-            color: colors.onSurface,
+        GestureDetector(
+          onTap: onEdit,
+          child: Text(
+            '$count',
+            style: textTheme.displayLarge?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: colors.onSurface,
+            ),
           ),
         ),
         const SizedBox(height: AppSpacing.lg),

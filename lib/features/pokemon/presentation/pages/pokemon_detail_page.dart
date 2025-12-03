@@ -191,6 +191,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                             enabled: !_controller.isCaught,
                             onDecrement: _decrement,
                             onIncrement: _increment,
+                            onEdit: _showEditDialog,
                           ),
                           const SizedBox(height: AppSpacing.xxl),
                           Align(
@@ -205,6 +206,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                                     caughtAt: _controller.caughtAt,
                                     caughtGame: _controller.caughtGame,
                                     formatter: _formatDate,
+                                    onSelectGame: _showEditDialog,
+                                    onGameChanged: (value) =>
+                                        _controller.setCaughtGame(value),
                                   ),
                                 ),
                                 const SizedBox(height: AppSpacing.lg),

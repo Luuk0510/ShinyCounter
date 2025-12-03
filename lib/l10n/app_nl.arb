@@ -48,6 +48,7 @@
       "game": {}
     }
   },
+  "selectGameHint": "Selecteer game",
   "noCounts": "Nog geen tellingen",
   "dateLabel": "Datum",
   "countLabel": "Aantal",

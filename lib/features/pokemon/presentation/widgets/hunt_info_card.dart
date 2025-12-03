@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/game_dropdown.dart';
 
 class HuntInfoCard extends StatelessWidget {
   const HuntInfoCard({
@@ -10,6 +11,8 @@ class HuntInfoCard extends StatelessWidget {
     required this.caughtAt,
     required this.caughtGame,
     required this.formatter,
+    required this.onSelectGame,
+    required this.onGameChanged,
   });
 
   final ColorScheme colors;
@@ -17,6 +20,8 @@ class HuntInfoCard extends StatelessWidget {
   final DateTime? caughtAt;
   final String? caughtGame;
   final String Function(DateTime?) formatter;
+  final VoidCallback onSelectGame;
+  final ValueChanged<String?> onGameChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -62,20 +67,58 @@ class HuntInfoCard extends StatelessWidget {
               ),
             ],
           ),
-          if (caughtGame != null && caughtGame!.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.md),
-            Center(
-              child: Text(
-                l10n.huntGame(caughtGame!),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: colors.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          ],
+          const SizedBox(height: AppSpacing.md),
+          Center(
+            child: (caughtGame == null || caughtGame!.isEmpty)
+                ? ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 240),
+                    child: DropdownButtonFormField<String?>(
+                      value: null,
+                      items: GameDropdown.games
+                          .map(
+                            (g) => DropdownMenuItem<String?>(
+                              value: g.isEmpty ? null : g,
+                              child: Text(g.isEmpty ? l10n.selectGameHint : g),
+                            ),
+                          )
+                          .toList(),
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                      ),
+                      onChanged: onGameChanged,
+                      hint: Text(l10n.selectGameHint),
+                    ),
+                  )
+                : InkWell(
+                    borderRadius: BorderRadius.circular(AppRadii.sm),
+                    onTap: onSelectGame,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: AppSpacing.xs,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            l10n.huntGame(caughtGame!),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: colors.onSurface,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+          ),
         ],
       ),
     );
