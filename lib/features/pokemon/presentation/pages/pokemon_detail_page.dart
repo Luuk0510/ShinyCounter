@@ -298,7 +298,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     if (value == null) return '--';
     final local = value.toLocal();
     String two(int v) => v.toString().padLeft(2, '0');
-    return '${two(local.day)}-${two(local.month)}-${local.year} ${two(local.hour)}:${two(local.minute)}';
+    return '${two(local.day)}-${two(local.month)}-${local.year}';
   }
 
   String _formatDayKey(String key) {
@@ -328,7 +328,7 @@ class _RoundIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final Color effectiveBg = enabled ? background : colors.surfaceVariant;
+    final Color effectiveBg = enabled ? background : colors.surfaceContainerHighest;
     final Color effectiveFg = enabled ? foreground : colors.onSurfaceVariant;
 
     return ElevatedButton(
@@ -370,13 +370,14 @@ class _HuntDatesCard extends StatelessWidget {
       fontSize: 17,
       fontWeight: FontWeight.w800,
     );
+    final cardColor = Theme.of(context).cardColor;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: colors.surfaceVariant.withOpacity(0.9),
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.outlineVariant.withOpacity(0.6)),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -448,9 +449,9 @@ class _DailyCountsList extends StatelessWidget {
         height: 210,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: colors.surfaceVariant.withOpacity(0.9),
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colors.outlineVariant.withOpacity(0.6)),
+          border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
         ),
         child: Text(
           'Nog geen tellingen',
@@ -465,9 +466,9 @@ class _DailyCountsList extends StatelessWidget {
     return Container(
       height: 210,
       decoration: BoxDecoration(
-        color: colors.surfaceVariant.withOpacity(0.9),
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.outlineVariant.withOpacity(0.6)),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
       ),
       child: Column(
         children: [
@@ -498,7 +499,7 @@ class _DailyCountsList extends StatelessWidget {
           Divider(
             height: 1,
             thickness: 1,
-            color: colors.outlineVariant.withOpacity(0.35),
+            color: colors.outlineVariant.withValues(alpha: 0.35),
           ),
           Expanded(
             child: ListView.separated(
@@ -639,7 +640,7 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
           _DateRow(
             label: 'Start',
             value: _start,
-            onPick: () => _pickDateTime(_start).then((value) {
+            onPick: () => _pickDate(_start).then((value) {
               if (value != null) {
                 setState(() {
                   _start = value;
@@ -658,7 +659,7 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
           _DateRow(
             label: 'Catch',
             value: _catch,
-            onPick: () => _pickDateTime(_catch).then((value) {
+            onPick: () => _pickDate(_catch).then((value) {
               if (value != null) {
                 setState(() {
                   _catch = value;
@@ -711,7 +712,7 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
     );
   }
 
-  Future<DateTime?> _pickDateTime(DateTime? initial) async {
+  Future<DateTime?> _pickDate(DateTime? initial) async {
     final now = DateTime.now();
     final date = await showDatePicker(
       context: context,
@@ -720,12 +721,7 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
       lastDate: DateTime(2100),
     );
     if (date == null) return null;
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(initial ?? now),
-    );
-    if (time == null) return null;
-    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    return DateTime(date.year, date.month, date.day);
   }
 
   void _submit() {
@@ -767,7 +763,7 @@ class _DateRow extends StatelessWidget {
     String two(int v) => v.toString().padLeft(2, '0');
     final formatted = value == null
         ? '--'
-        : '${two(value!.day)}-${two(value!.month)}-${value!.year} ${two(value!.hour)}:${two(value!.minute)}';
+        : '${two(value!.day)}-${two(value!.month)}-${value!.year}';
     return Row(
       children: [
         Expanded(

@@ -95,7 +95,7 @@ class AppTheme {
     );
     final scheme = darkSchemeBase.copyWith(
       surface: AppColors.oledSurface,
-      surfaceContainerHighest: Colors.white.withValues(alpha: 0.06),
+      surfaceContainerHighest: const Color(0xFF111111),
     );
     final cardColor = scheme.surfaceContainerHighest;
     return ThemeData(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'core/di/app_locator.dart';
@@ -36,6 +37,16 @@ class MyApp extends StatelessWidget {
             darkTheme: theme.useOledDark ? AppTheme.oled() : AppTheme.dark(),
             themeMode: theme.mode,
             routerConfig: router,
+            locale: const Locale('nl'),
+            supportedLocales: const [
+              Locale('nl'),
+              Locale('en'),
+            ],
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
           );
         },
       ),

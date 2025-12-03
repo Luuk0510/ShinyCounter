@@ -31,7 +31,7 @@ class CounterController extends ChangeNotifier {
   late final String _caughtKey = 'caught_${pokemon.name.toLowerCase()}';
 
   CounterSyncService? _sync;
-  ToggleCaughtUseCase? _toggleCaughtUseCase;
+  final ToggleCaughtUseCase? _toggleCaughtUseCase;
   StreamSubscription<dynamic>? _overlaySub;
   Timer? _pollTimer;
   bool _initialized = false;
