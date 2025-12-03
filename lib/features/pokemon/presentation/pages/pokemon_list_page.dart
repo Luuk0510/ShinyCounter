@@ -147,28 +147,76 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> _confirmDelete(Pokemon pokemon) async {
+    final colors = Theme.of(context).colorScheme;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
-        final colors = Theme.of(context).colorScheme;
         return AlertDialog(
-          title: Text(context.l10n.confirmDeleteTitle),
-          content: Text(
-            context.l10n.confirmDeleteMessage(pokemon.name),
-            style: const TextStyle(fontSize: 16),
+          backgroundColor: Theme.of(context).cardColor,
+          surfaceTintColor: Colors.transparent,
+          title: Text(
+            context.l10n.confirmDeleteTitle,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          content: Builder(builder: (context) {
+            final message = context.l10n.confirmDeleteMessage(pokemon.name);
+            final parts = message.split(pokemon.name);
+            final after =
+                parts.length > 1 ? parts.sublist(1).join(pokemon.name) : '';
+            return RichText(
+              text: TextSpan(
+                style: TextStyle(fontSize: 16, color: colors.onSurface),
+                children: [
+                  TextSpan(text: parts.first),
+                  TextSpan(
+                    text: pokemon.name,
+                    style: const TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                  TextSpan(text: after),
+                ],
+              ),
+            );
+          }),
+          actionsAlignment: MainAxisAlignment.center,
+          actionsPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.sm,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(context.l10n.confirmDeleteCancel),
+              style: TextButton.styleFrom(
+                foregroundColor: colors.primary,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xl,
+                  vertical: AppSpacing.sm,
+                ),
+              ),
+              child: Text(
+                context.l10n.confirmDeleteCancel,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              ),
             ),
+            const SizedBox(width: AppSpacing.sm),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: ElevatedButton.styleFrom(
                 backgroundColor: colors.error,
                 foregroundColor: colors.onError,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xl,
+                  vertical: AppSpacing.sm,
+                ),
               ),
-              child: Text(context.l10n.confirmDeleteDelete),
+              child: Text(
+                context.l10n.confirmDeleteDelete,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              ),
             ),
           ],
         );
