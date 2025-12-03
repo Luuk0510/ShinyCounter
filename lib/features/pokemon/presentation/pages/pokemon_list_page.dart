@@ -250,6 +250,11 @@ class _PokemonListPageState extends State<PokemonListPage> {
     final action = await showModalBottomSheet<_ManageAction>(
       context: context,
       showDragHandle: false,
+      backgroundColor: Theme.of(context).cardColor,
+      barrierColor: Colors.black.withValues(alpha: 0.35),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (context) {
         final colors = Theme.of(context).colorScheme;
         return SafeArea(

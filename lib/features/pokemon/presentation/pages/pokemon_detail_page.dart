@@ -83,6 +83,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
+      backgroundColor: Theme.of(context).cardColor,
+      barrierColor: Colors.black.withValues(alpha: 0.4),
       builder: (context) {
         return EditCountersSheet(
           counter: _controller.counter,
