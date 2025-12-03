@@ -18,11 +18,7 @@ class RoundControl extends StatelessWidget {
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.all(14),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 30,
-            ),
+            child: Icon(icon, color: Colors.white, size: 30),
           ),
         ),
       ),

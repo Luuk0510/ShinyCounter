@@ -1,26 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:shiny_counter/core/l10n/l10n.dart';
-import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 
-class AddPokemonDialog extends StatefulWidget {
-  const AddPokemonDialog({super.key});
+class EditPokemonDialog extends StatefulWidget {
+  const EditPokemonDialog({super.key, required this.pokemon});
+
+  final Pokemon pokemon;
 
   @override
-  State<AddPokemonDialog> createState() => _AddPokemonDialogState();
+  State<EditPokemonDialog> createState() => _EditPokemonDialogState();
 }
 
-class _AddPokemonDialogState extends State<AddPokemonDialog> {
-  final _nameController = TextEditingController();
+class _EditPokemonDialogState extends State<EditPokemonDialog> {
+  late final TextEditingController _nameController;
   final _picker = ImagePicker();
   XFile? _pickedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.pokemon.name);
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  String get _currentImageLabel {
+    if (_pickedImage != null) return _pickedImage!.name;
+    final segments = widget.pokemon.imagePath.split('/');
+    return segments.isNotEmpty ? segments.last : widget.pokemon.imagePath;
   }
 
   @override
@@ -30,7 +43,7 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
       backgroundColor: Theme.of(context).cardColor,
       surfaceTintColor: Colors.transparent,
       title: Text(
-        l10n.addDialogTitle,
+        l10n.editDialogTitle,
         textAlign: TextAlign.center,
         style: Theme.of(
           context,
@@ -64,14 +77,13 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
                   label: Text(l10n.choosePhoto),
                 ),
                 const SizedBox(width: AppSpacing.md),
-                if (_pickedImage != null)
-                  Expanded(
-                    child: Text(
-                      _pickedImage!.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                Expanded(
+                  child: Text(
+                    _currentImageLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
+                ),
               ],
             ),
           ],
@@ -105,15 +117,23 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
         ElevatedButton(
           onPressed: () {
             final name = _nameController.text.trim();
-            if (name.isNotEmpty && _pickedImage != null) {
-              Navigator.of(context).pop<Pokemon?>(
-                Pokemon(
-                  name: name,
-                  imagePath: _pickedImage!.path,
-                  isLocalFile: true,
-                ),
-              );
+            if (name.isEmpty) return;
+
+            var imagePath = widget.pokemon.imagePath;
+            var isLocalFile = widget.pokemon.isLocalFile;
+
+            if (_pickedImage != null) {
+              imagePath = _pickedImage!.path;
+              isLocalFile = true;
             }
+
+            Navigator.of(context).pop<Pokemon?>(
+              Pokemon(
+                name: name,
+                imagePath: imagePath,
+                isLocalFile: isLocalFile,
+              ),
+            );
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -133,9 +153,9 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
   }
 }
 
-Future<Pokemon?> showAddPokemonDialog(BuildContext context) {
+Future<Pokemon?> showEditPokemonDialog(BuildContext context, Pokemon pokemon) {
   return showDialog<Pokemon?>(
     context: context,
-    builder: (_) => const AddPokemonDialog(),
+    builder: (_) => EditPokemonDialog(pokemon: pokemon),
   );
 }
