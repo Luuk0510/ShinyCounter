@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
 
@@ -157,25 +158,30 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
           return SingleChildScrollView(
             padding: EdgeInsets.zero,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(24, 24, 24, bottomPadding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(height: 8),
-                        Center(
-                          child: widget.pokemon.isLocalFile && !kIsWeb
-                              ? Image.file(
-                                  File(widget.pokemon.imagePath),
-                                  width: 300,
-                                  height: 300,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    AppSpacing.xl,
+                    AppSpacing.xl,
+                    AppSpacing.xl,
+                    bottomPadding,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: AppSpacing.sm),
+                          Center(
+                            child: widget.pokemon.isLocalFile && !kIsWeb
+                                ? Image.file(
+                                    File(widget.pokemon.imagePath),
+                                    width: 300,
+                                    height: 300,
                                   fit: BoxFit.contain,
                                   errorBuilder: (_, __, ___) => const Icon(
                                     Icons.catching_pokemon,
@@ -193,7 +199,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                                   ),
                                 ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         SizedBox(
                           width: 150,
                           child: ElevatedButton(
@@ -210,7 +216,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                               ),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: AppSpacing.md,
+                              ),
                               child: Text(
                                 _controller.isCaught ? 'Caught' : 'Catch',
                                 style: const TextStyle(
@@ -224,7 +232,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                       ],
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 24),
+                      padding: const EdgeInsets.only(top: AppSpacing.xl),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -235,7 +243,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                               color: colors.onSurface,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppSpacing.lg),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -246,7 +254,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                                 foreground: colors.onPrimaryContainer,
                                 enabled: !_controller.isCaught,
                               ),
-                              const SizedBox(width: 28),
+                              const SizedBox(width: AppSpacing.xl),
                               _RoundIconButton(
                                 icon: Icons.add,
                                 onPressed: _increment,
@@ -256,7 +264,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                               ),
                             ],
                           ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: AppSpacing.xxl),
                           Align(
                             alignment: Alignment.center,
                             child: Column(
@@ -271,7 +279,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                                     formatter: _formatDate,
                                   ),
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: AppSpacing.lg),
                                 ConstrainedBox(
                                   constraints: const BoxConstraints(
                                     maxWidth: 200,
@@ -410,7 +418,7 @@ class _HuntDatesCard extends StatelessWidget {
             ],
           ),
           if (caughtGame != null && caughtGame!.isNotEmpty) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: AppSpacing.md),
             Center(
               child: Text(
                 'Pokemon $caughtGame',
@@ -449,7 +457,7 @@ class _HuntCell extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(label, style: labelStyle),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(value, style: valueStyle),
       ],
     );
@@ -502,35 +510,35 @@ class _DailyCountsList extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Datum',
-                  style: TextStyle(
-                    color: colors.onSurfaceVariant,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                  ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Datum',
+                style: TextStyle(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
                 ),
-                Text(
-                  'Aantal',
-                  style: TextStyle(
-                    color: colors.onSurfaceVariant,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                  ),
+              ),
+              Text(
+                'Aantal',
+                style: TextStyle(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: colors.outlineVariant.withValues(alpha: 0.35),
-          ),
+        ),
+        Divider(
+          height: 1,
+          thickness: 1,
+          color: colors.outlineVariant.withValues(alpha: 0.35),
+        ),
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -639,10 +647,10 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
     final colors = Theme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-        top: 12,
+        left: AppSpacing.xl,
+        right: AppSpacing.xl,
+        bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.lg,
+        top: AppSpacing.md,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -652,10 +660,10 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
             height: 5,
             decoration: BoxDecoration(
               color: colors.outlineVariant,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadii.sm),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Text(
             'Aanpassen',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -663,7 +671,7 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
               fontSize: 18,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           TextField(
             controller: _counterCtrl,
             keyboardType: TextInputType.number,
@@ -675,7 +683,7 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
             ),
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           _DateRow(
             label: 'Start',
             value: _start,
@@ -694,7 +702,7 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
               });
             },
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           _DateRow(
             label: 'Catch',
             value: _catch,
@@ -713,7 +721,7 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
               });
             },
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           _GameDropdown(
             value: _game,
             onChanged: (value) {
@@ -723,7 +731,7 @@ class _EditCountersSheetState extends State<_EditCountersSheet> {
               });
             },
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           Row(
             children: [
               Expanded(
@@ -829,7 +837,7 @@ class _DateRow extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 formatted,
                 style: TextStyle(
@@ -907,7 +915,7 @@ class _GameDropdown extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         DropdownButtonFormField<String?>(
           value: value?.isEmpty == true ? null : value,
           items: _games
