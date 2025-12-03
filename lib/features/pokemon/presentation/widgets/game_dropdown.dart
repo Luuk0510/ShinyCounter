@@ -74,7 +74,9 @@ class GameDropdown extends StatelessWidget {
               )
               .toList(),
           decoration: const InputDecoration(
-            border: OutlineInputBorder(),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(AppRadii.sm)),
+            ),
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           ),
           onChanged: (val) => onChanged(val?.isEmpty == true ? null : val),

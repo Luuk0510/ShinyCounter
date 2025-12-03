@@ -97,8 +97,12 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
-          style: TextButton.styleFrom(
+          style: OutlinedButton.styleFrom(
             foregroundColor: Theme.of(context).colorScheme.primary,
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
+              width: 1.4,
+            ),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.sm,
@@ -132,6 +136,8 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
             );
           },
           style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.sm,

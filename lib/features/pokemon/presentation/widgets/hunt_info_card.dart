@@ -83,7 +83,11 @@ class HuntInfoCard extends StatelessWidget {
                           )
                           .toList(),
                       decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(AppRadii.sm),
+                          ),
+                        ),
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 10,
