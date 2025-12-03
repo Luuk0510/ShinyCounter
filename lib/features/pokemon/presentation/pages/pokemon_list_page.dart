@@ -75,71 +75,6 @@ class _PokemonListPageState extends State<PokemonListPage> {
     await _reloadCaught();
   }
 
-  Future<void> _onEditPokemonList() async {
-    final pokemonSorted = [..._customPokemon]
-      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    if (pokemonSorted.isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Geen custom Pokémon om te bewerken.')),
-        );
-      }
-      return;
-    }
-
-    final selected = await showModalBottomSheet<Pokemon>(
-      context: context,
-      builder: (context) {
-        final colors = Theme.of(context).colorScheme;
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 10),
-              Container(
-                width: 44,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: colors.outlineVariant.withValues(alpha: 0.9),
-                  borderRadius: BorderRadius.circular(AppRadii.sm),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  'Selecteer Pokémon om te bewerken',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                ),
-              ),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: pokemonSorted.length,
-                  itemBuilder: (context, index) {
-                    final p = pokemonSorted[index];
-                    return ListTile(
-                      title: Text(p.name, style: const TextStyle(fontSize: 20)),
-                      trailing: const Icon(Icons.edit),
-                      onTap: () => Navigator.of(context).pop(p),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        );
-      },
-    );
-
-    if (selected != null) {
-      final updated = await showEditPokemonDialog(context, selected);
-      if (updated != null) {
-        await _applyPokemonEdit(selected, updated);
-      }
-    }
-  }
-
   Future<void> _applyPokemonEdit(Pokemon original, Pokemon updated) async {
     final index = _customPokemon.indexWhere(
       (p) => p.name == original.name && p.imagePath == original.imagePath,
@@ -265,58 +200,104 @@ class _PokemonListPageState extends State<PokemonListPage> {
     }
   }
 
-  Future<void> _onDeletePokemonList() async {
-    final pokemonSorted = [..._allPokemon]
+  Future<void> _openManagePokemonList() async {
+    final pokemonSorted = [..._customPokemon]
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    if (pokemonSorted.isEmpty) return;
+    if (pokemonSorted.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Geen custom Pokémon om te bewerken.')),
+        );
+      }
+      return;
+    }
 
-    final selected = await showModalBottomSheet<Pokemon>(
+    final action = await showModalBottomSheet<_ManageAction>(
       context: context,
+      showDragHandle: false,
       builder: (context) {
         final colors = Theme.of(context).colorScheme;
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 10),
-              Container(
-                width: 44,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: colors.outlineVariant.withValues(alpha: 0.9),
-                  borderRadius: BorderRadius.circular(AppRadii.sm),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.md,
+              AppSpacing.lg,
+              AppSpacing.lg,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 44,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: colors.outlineVariant.withValues(alpha: 0.9),
+                    borderRadius: BorderRadius.circular(AppRadii.sm),
+                  ),
                 ),
-              ),
-              const Padding(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  'Selecteer Pokémon om te verwijderen',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'Beheer Pokémon',
+                  style: AppTypography.sectionTitle.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-              ),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: pokemonSorted.length,
-                  itemBuilder: (context, index) {
-                    final p = pokemonSorted[index];
-                    return ListTile(
-                      title: Text(p.name, style: const TextStyle(fontSize: 20)),
-                      trailing: const Icon(Icons.delete_outline),
-                      onTap: () => Navigator.of(context).pop(p),
-                    );
-                  },
+                const SizedBox(height: AppSpacing.md),
+                Flexible(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: pokemonSorted.length,
+                    itemBuilder: (context, index) {
+                      final p = pokemonSorted[index];
+                      return ListTile(
+                        title: Text(
+                          p.name,
+                          style: AppTypography.sectionTitle.copyWith(
+                            color: colors.onSurface,
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              tooltip: 'Bewerken',
+                              onPressed: () => Navigator.of(context).pop(
+                                _ManageAction(pokemon: p, delete: false),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              tooltip: 'Verwijderen',
+                              color: colors.error,
+                              onPressed: () => Navigator.of(context).pop(
+                                _ManageAction(pokemon: p, delete: true),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    separatorBuilder: (_, __) =>
+                        const Divider(height: AppSpacing.md),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-            ],
+              ],
+            ),
           ),
         );
       },
     );
 
-    if (selected != null) {
-      await _confirmDelete(selected);
+    if (action == null) return;
+    if (action.delete) {
+      await _confirmDelete(action.pokemon);
+    } else {
+      final updated = await showEditPokemonDialog(context, action.pokemon);
+      if (updated != null) {
+        await _applyPokemonEdit(action.pokemon, updated);
+      }
     }
   }
 
@@ -390,15 +371,9 @@ class _PokemonListPageState extends State<PokemonListPage> {
         ),
         IconButton(
           iconSize: 26,
-          icon: const Icon(Icons.edit),
-          tooltip: 'Bewerk Pokémon',
-          onPressed: _onEditPokemonList,
-        ),
-        IconButton(
-          iconSize: 26,
-          icon: const Icon(Icons.delete_outline),
-          tooltip: 'Verwijder Pokémon',
-          onPressed: _onDeletePokemonList,
+          icon: const Icon(Icons.edit_note),
+          tooltip: 'Beheer Pokémon',
+          onPressed: _openManagePokemonList,
         ),
         IconButton(
           iconSize: 26,
@@ -491,4 +466,11 @@ dynamic _sectionedItem(
 class _SectionHeader {
   const _SectionHeader(this.title);
   final String title;
+}
+
+class _ManageAction {
+  const _ManageAction({required this.pokemon, required this.delete});
+
+  final Pokemon pokemon;
+  final bool delete;
 }
