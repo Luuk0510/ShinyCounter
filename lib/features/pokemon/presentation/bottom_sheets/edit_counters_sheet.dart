@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/date_row.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/game_dropdown.dart';
@@ -68,6 +69,7 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.only(
@@ -89,7 +91,7 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'Aanpassen',
+            l10n.editSheetTitle,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w800,
               fontSize: 18,
@@ -99,9 +101,9 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
           TextField(
             controller: _counterCtrl,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Counter',
-              hintText: 'Voer een getal in',
+            decoration: InputDecoration(
+              labelText: l10n.counterLabel,
+              hintText: l10n.enterNumberHint,
               labelStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
               hintStyle: TextStyle(fontSize: 17),
             ),
@@ -109,7 +111,7 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
           ),
           const SizedBox(height: AppSpacing.lg),
           DateRow(
-            label: 'Start',
+            label: l10n.huntStart,
             value: _start,
             onPick: () => _pickDate(_start).then((value) {
               if (value != null) {
@@ -128,7 +130,7 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
           ),
           const SizedBox(height: AppSpacing.md),
           DateRow(
-            label: 'Catch',
+            label: l10n.huntCatch,
             value: _catch,
             onPick: () => _pickDate(_catch).then((value) {
               if (value != null) {
@@ -166,9 +168,12 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
                     side: BorderSide(color: colors.primary, width: 1.4),
                     backgroundColor: colors.primary.withValues(alpha: 0.08),
                   ),
-                  child: const Text(
-                    'Annuleren',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  child: Text(
+                    l10n.cancel,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
@@ -180,9 +185,12 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
                     backgroundColor: colors.primary,
                     foregroundColor: colors.onPrimary,
                   ),
-                  child: const Text(
-                    'Opslaan',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  child: Text(
+                    l10n.save,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
@@ -208,9 +216,9 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
   void _submit() {
     final parsed = int.tryParse(_counterCtrl.text.trim());
     if (parsed == null || parsed < 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Voer een geldige counter in')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.invalidCounter)));
       return;
     }
     Navigator.of(context).pop(

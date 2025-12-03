@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 
 class GameDropdown extends StatelessWidget {
@@ -48,12 +49,13 @@ class GameDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Game',
+          l10n.gameLabel,
           style: TextStyle(
             color: colors.onSurfaceVariant,
             fontSize: 17,
@@ -67,7 +69,7 @@ class GameDropdown extends StatelessWidget {
               .map(
                 (g) => DropdownMenuItem<String?>(
                   value: g.isEmpty ? null : g,
-                  child: Text(g.isEmpty ? 'Geen' : g),
+                  child: Text(g.isEmpty ? l10n.gameNone : g),
                 ),
               )
               .toList(),
@@ -76,7 +78,7 @@ class GameDropdown extends StatelessWidget {
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           ),
           onChanged: (val) => onChanged(val?.isEmpty == true ? null : val),
-          hint: const Text('Scroll voor game'),
+          hint: Text(l10n.gameHint),
         ),
       ],
     );

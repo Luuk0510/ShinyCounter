@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:shiny_counter/core/l10n/l10n.dart';
+
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
@@ -150,30 +152,15 @@ class _PokemonListPageState extends State<PokemonListPage> {
       builder: (context) {
         final colors = Theme.of(context).colorScheme;
         return AlertDialog(
-          title: const Text('Verwijderen'),
-          content: Text.rich(
-            TextSpan(
-              text: 'Weet je zeker dat je ',
-              children: [
-                TextSpan(
-                  text: pokemon.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    letterSpacing: 0.2,
-                  ),
-                ),
-                const TextSpan(
-                  text: ' wilt verwijderen?',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
+          title: Text(context.l10n.confirmDeleteTitle),
+          content: Text(
+            context.l10n.confirmDeleteMessage(pokemon.name),
+            style: const TextStyle(fontSize: 16),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Annuleren'),
+              child: Text(context.l10n.confirmDeleteCancel),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
@@ -181,7 +168,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                 backgroundColor: colors.error,
                 foregroundColor: colors.onError,
               ),
-              child: const Text('Verwijder'),
+              child: Text(context.l10n.confirmDeleteDelete),
             ),
           ],
         );
@@ -205,9 +192,9 @@ class _PokemonListPageState extends State<PokemonListPage> {
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     if (pokemonSorted.isEmpty) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Geen custom Pokémon om te bewerken.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.manageNoCustom)));
       }
       return;
     }
@@ -238,7 +225,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
-                  'Beheer Pokémon',
+                  context.l10n.manageTitle,
                   style: AppTypography.sectionTitle.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
@@ -262,18 +249,18 @@ class _PokemonListPageState extends State<PokemonListPage> {
                           children: [
                             IconButton(
                               icon: const Icon(Icons.edit),
-                              tooltip: 'Bewerken',
-                              onPressed: () => Navigator.of(context).pop(
-                                _ManageAction(pokemon: p, delete: false),
-                              ),
+                              tooltip: context.l10n.manageEditTooltip,
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pop(_ManageAction(pokemon: p, delete: false)),
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete_outline),
-                              tooltip: 'Verwijderen',
+                              tooltip: context.l10n.manageDeleteTooltip,
                               color: colors.error,
-                              onPressed: () => Navigator.of(context).pop(
-                                _ManageAction(pokemon: p, delete: true),
-                              ),
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pop(_ManageAction(pokemon: p, delete: true)),
                             ),
                           ],
                         ),
@@ -360,25 +347,25 @@ class _PokemonListPageState extends State<PokemonListPage> {
       foregroundColor: colors.onSurface,
       title: FittedBox(
         fit: BoxFit.scaleDown,
-        child: Text('Pokémon shiny counter', style: AppTypography.title),
+        child: Text(context.l10n.appTitle, style: AppTypography.title),
       ),
       actions: [
         IconButton(
           iconSize: 26,
           icon: const Icon(Icons.add_circle),
-          tooltip: 'Nieuwe Pokémon',
+          tooltip: context.l10n.tooltipAddPokemon,
           onPressed: _onAddPokemon,
         ),
         IconButton(
           iconSize: 26,
           icon: const Icon(Icons.edit_note),
-          tooltip: 'Beheer Pokémon',
+          tooltip: context.l10n.tooltipManagePokemon,
           onPressed: _openManagePokemonList,
         ),
         IconButton(
           iconSize: 26,
           icon: const Icon(Icons.settings),
-          tooltip: 'Instellingen',
+          tooltip: context.l10n.tooltipSettings,
           onPressed: _openSettings,
         ),
       ],
@@ -399,6 +386,8 @@ class _PokemonListPageState extends State<PokemonListPage> {
         onAddPressed: _onAddPokemon,
         imageAsset: 'assets/icon/pokeball_icon.png',
         colors: colors,
+        title: context.l10n.emptyTitle,
+        actionLabel: context.l10n.emptyAction,
       );
     }
 
@@ -406,7 +395,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
       padding: EdgeInsets.fromLTRB(0, 4, 0, bottomPadding),
       itemCount: _sectionedCount(uncaught, caught),
       itemBuilder: (context, index) {
-        final entry = _sectionedItem(uncaught, caught, index);
+        final entry = _sectionedItem(context, uncaught, caught, index);
         if (entry is _SectionHeader) {
           return Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -437,6 +426,7 @@ int _sectionedCount(List<Pokemon> uncaught, List<Pokemon> caught) {
 }
 
 dynamic _sectionedItem(
+  BuildContext context,
   List<Pokemon> uncaught,
   List<Pokemon> caught,
   int index,
@@ -444,7 +434,7 @@ dynamic _sectionedItem(
   var cursor = 0;
 
   if (uncaught.isNotEmpty) {
-    if (index == cursor) return const _SectionHeader('Niet gevangen');
+    if (index == cursor) return _SectionHeader(context.l10n.sectionUncaught);
     cursor += 1;
     if (index < cursor + uncaught.length) {
       return uncaught[index - cursor];
@@ -453,7 +443,7 @@ dynamic _sectionedItem(
   }
 
   if (caught.isNotEmpty) {
-    if (index == cursor) return const _SectionHeader('Gevangen');
+    if (index == cursor) return _SectionHeader(context.l10n.sectionCaught);
     cursor += 1;
     if (index < cursor + caught.length) {
       return caught[index - cursor];

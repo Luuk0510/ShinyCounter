@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_counters_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
@@ -138,12 +139,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            tooltip: 'Counter bewerken',
+            tooltip: context.l10n.editCounterTooltip,
             onPressed: _showEditDialog,
           ),
           IconButton(
             icon: const Icon(Icons.open_in_new_rounded),
-            tooltip: 'Mini-counter openen',
+            tooltip: context.l10n.openOverlayTooltip,
             onPressed: _togglePill,
           ),
         ],

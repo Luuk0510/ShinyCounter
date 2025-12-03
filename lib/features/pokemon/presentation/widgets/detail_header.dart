@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/core/l10n/l10n.dart';
 
 class DetailHeader extends StatelessWidget {
   const DetailHeader({
@@ -21,6 +22,7 @@ class DetailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -61,7 +63,7 @@ class DetailHeader extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               child: Text(
-                isCaught ? 'Caught' : 'Catch',
+                isCaught ? l10n.buttonCaught : l10n.buttonCatch,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,

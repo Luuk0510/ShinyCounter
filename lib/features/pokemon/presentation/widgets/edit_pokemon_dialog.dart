@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 
 class EditPokemonDialog extends StatefulWidget {
@@ -36,16 +37,17 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AlertDialog(
-      title: const Text('Pokémon bewerken'),
+      title: Text(l10n.editDialogTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Naam',
-              hintText: 'Bijv. Mewtwo',
+            decoration: InputDecoration(
+              labelText: l10n.nameLabel,
+              hintText: l10n.nameHint,
             ),
             textCapitalization: TextCapitalization.words,
           ),
@@ -62,7 +64,7 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
                   }
                 },
                 icon: const Icon(Icons.photo_library),
-                label: const Text('Kies foto'),
+                label: Text(l10n.choosePhoto),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -79,7 +81,7 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
-          child: const Text('Annuleren'),
+          child: Text(l10n.cancel),
         ),
         ElevatedButton(
           onPressed: () {
@@ -102,17 +104,14 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
               ),
             );
           },
-          child: const Text('Opslaan'),
+          child: Text(l10n.save),
         ),
       ],
     );
   }
 }
 
-Future<Pokemon?> showEditPokemonDialog(
-  BuildContext context,
-  Pokemon pokemon,
-) {
+Future<Pokemon?> showEditPokemonDialog(BuildContext context, Pokemon pokemon) {
   return showDialog<Pokemon?>(
     context: context,
     builder: (_) => EditPokemonDialog(pokemon: pokemon),

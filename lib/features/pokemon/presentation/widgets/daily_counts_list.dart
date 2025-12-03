@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/core/l10n/l10n.dart';
 
 class DailyCountsList extends StatelessWidget {
   const DailyCountsList({
@@ -15,6 +16,7 @@ class DailyCountsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final entries = dailyCounts.entries.toList()
       ..sort((a, b) => b.key.compareTo(a.key));
 
@@ -30,7 +32,7 @@ class DailyCountsList extends StatelessWidget {
           ),
         ),
         child: Text(
-          'Nog geen tellingen',
+          l10n.noCounts,
           style: TextStyle(
             color: colors.onSurfaceVariant,
             fontWeight: FontWeight.w600,
@@ -54,7 +56,7 @@ class DailyCountsList extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Datum',
+                  l10n.dateLabel,
                   style: TextStyle(
                     color: colors.onSurfaceVariant,
                     fontWeight: FontWeight.w700,
@@ -62,7 +64,7 @@ class DailyCountsList extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Aantal',
+                  l10n.countLabel,
                   style: TextStyle(
                     color: colors.onSurfaceVariant,
                     fontWeight: FontWeight.w700,

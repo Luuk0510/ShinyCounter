@@ -1,0 +1,58 @@
+{
+  "@@locale": "en",
+  "appTitle": "Pok\u00e9mon shiny counter",
+  "sectionUncaught": "Uncaught",
+  "sectionCaught": "Caught",
+  "tooltipAddPokemon": "New Pok\u00e9mon",
+  "tooltipManagePokemon": "Manage Pok\u00e9mon",
+  "tooltipSettings": "Settings",
+  "manageTitle": "Manage Pok\u00e9mon",
+  "manageEditTooltip": "Edit",
+  "manageDeleteTooltip": "Delete",
+  "manageNoCustom": "No custom Pok\u00e9mon to manage.",
+  "confirmDeleteTitle": "Delete",
+  "confirmDeleteMessage": "Are you sure you want to delete {name}?",
+  "@confirmDeleteMessage": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "confirmDeleteCancel": "Cancel",
+  "confirmDeleteDelete": "Delete",
+  "emptyTitle": "No Pok\u00e9mon added yet",
+  "emptyAction": "Add Pok\u00e9mon",
+  "addDialogTitle": "New Pok\u00e9mon",
+  "editDialogTitle": "Edit Pok\u00e9mon",
+  "nameLabel": "Name",
+  "nameHint": "e.g. Mewtwo",
+  "choosePhoto": "Choose photo",
+  "cancel": "Cancel",
+  "save": "Save",
+  "settingsTitle": "Theme",
+  "settingsSystem": "System",
+  "settingsLight": "Light",
+  "settingsDark": "Dark",
+  "settingsOled": "OLED",
+  "editCounterTooltip": "Edit counter",
+  "openOverlayTooltip": "Open mini counter",
+  "buttonCatch": "Catch",
+  "buttonCaught": "Caught",
+  "huntStart": "Start",
+  "huntCatch": "Catch",
+  "huntGame": "Pokemon {game}",
+  "@huntGame": {
+    "placeholders": {
+      "game": {}
+    }
+  },
+  "noCounts": "No counts yet",
+  "dateLabel": "Date",
+  "countLabel": "Count",
+  "editSheetTitle": "Edit",
+  "counterLabel": "Counter",
+  "enterNumberHint": "Enter a number",
+  "invalidCounter": "Enter a valid counter",
+  "gameLabel": "Game",
+  "gameHint": "Scroll to pick a game",
+  "gameNone": "None"
+}

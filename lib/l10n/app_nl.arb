@@ -1,0 +1,58 @@
+{
+  "@@locale": "nl",
+  "appTitle": "Pok\u00e9mon shiny counter",
+  "sectionUncaught": "Niet gevangen",
+  "sectionCaught": "Gevangen",
+  "tooltipAddPokemon": "Nieuwe Pok\u00e9mon",
+  "tooltipManagePokemon": "Beheer Pok\u00e9mon",
+  "tooltipSettings": "Instellingen",
+  "manageTitle": "Beheer Pok\u00e9mon",
+  "manageEditTooltip": "Bewerken",
+  "manageDeleteTooltip": "Verwijderen",
+  "manageNoCustom": "Geen custom Pok\u00e9mon om te bewerken.",
+  "confirmDeleteTitle": "Verwijderen",
+  "confirmDeleteMessage": "Weet je zeker dat je {name} wilt verwijderen?",
+  "@confirmDeleteMessage": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "confirmDeleteCancel": "Annuleren",
+  "confirmDeleteDelete": "Verwijder",
+  "emptyTitle": "Nog geen Pok\u00e9mon toegevoegd",
+  "emptyAction": "Voeg Pok\u00e9mon toe",
+  "addDialogTitle": "Nieuwe Pok\u00e9mon",
+  "editDialogTitle": "Pok\u00e9mon bewerken",
+  "nameLabel": "Naam",
+  "nameHint": "Bijv. Mewtwo",
+  "choosePhoto": "Kies foto",
+  "cancel": "Annuleren",
+  "save": "Opslaan",
+  "settingsTitle": "Thema",
+  "settingsSystem": "Systeem",
+  "settingsLight": "Licht",
+  "settingsDark": "Donker",
+  "settingsOled": "OLED",
+  "editCounterTooltip": "Counter bewerken",
+  "openOverlayTooltip": "Mini-counter openen",
+  "buttonCatch": "Vang",
+  "buttonCaught": "Gevangen",
+  "huntStart": "Start",
+  "huntCatch": "Gevangen",
+  "huntGame": "Pokemon {game}",
+  "@huntGame": {
+    "placeholders": {
+      "game": {}
+    }
+  },
+  "noCounts": "Nog geen tellingen",
+  "dateLabel": "Datum",
+  "countLabel": "Aantal",
+  "editSheetTitle": "Aanpassen",
+  "counterLabel": "Counter",
+  "enterNumberHint": "Voer een getal in",
+  "invalidCounter": "Voer een geldige counter in",
+  "gameLabel": "Game",
+  "gameHint": "Scroll voor game",
+  "gameNone": "Geen"
+}

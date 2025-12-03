@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 
@@ -27,6 +28,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
     return SafeArea(
       child: Padding(
@@ -52,32 +54,33 @@ class _SettingsSheetState extends State<SettingsSheet> {
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              'Thema',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w800),
+              l10n.settingsTitle,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: AppSpacing.md),
             _ThemeOption(
-              label: 'Systeem',
+              label: l10n.settingsSystem,
               selected: _mode == ThemeMode.system,
               onTap: () => _setMode(ThemeMode.system),
             ),
             _ThemeOption(
-              label: 'Licht',
+              label: l10n.settingsLight,
               selected: _mode == ThemeMode.light,
               onTap: () => _setMode(ThemeMode.light),
             ),
             _ThemeOption(
-              label: 'Donker',
-              selected: _mode == ThemeMode.dark &&
+              label: l10n.settingsDark,
+              selected:
+                  _mode == ThemeMode.dark &&
                   !context.watch<ThemeNotifier>().useOledDark,
               onTap: () => _setMode(ThemeMode.dark, useOled: false),
             ),
             _ThemeOption(
-              label: 'OLED',
-              selected: _mode == ThemeMode.dark &&
+              label: l10n.settingsOled,
+              selected:
+                  _mode == ThemeMode.dark &&
                   context.watch<ThemeNotifier>().useOledDark,
               onTap: () => _setMode(ThemeMode.dark, useOled: true),
             ),

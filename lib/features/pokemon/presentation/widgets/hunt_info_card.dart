@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/core/l10n/l10n.dart';
 
 class HuntInfoCard extends StatelessWidget {
   const HuntInfoCard({
@@ -19,6 +20,7 @@ class HuntInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final labelStyle = TextStyle(
       color: colors.onSurfaceVariant,
       fontSize: 15,
@@ -46,14 +48,14 @@ class HuntInfoCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               _HuntCell(
-                label: 'Start',
+                label: l10n.huntStart,
                 value: formatter(startedAt),
                 labelStyle: labelStyle,
                 valueStyle: valueStyle,
               ),
               const SizedBox(width: AppSpacing.md),
               _HuntCell(
-                label: 'Catch',
+                label: l10n.huntCatch,
                 value: formatter(caughtAt),
                 labelStyle: labelStyle,
                 valueStyle: valueStyle,
@@ -64,7 +66,7 @@ class HuntInfoCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             Center(
               child: Text(
-                'Pokemon $caughtGame',
+                l10n.huntGame(caughtGame!),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: colors.onSurface,
