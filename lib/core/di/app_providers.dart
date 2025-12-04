@@ -22,8 +22,6 @@ List<SingleChildWidget> buildAppProviders() {
     Provider.value(value: AppLocator.instance.saveCustomPokemon),
     Provider.value(value: AppLocator.instance.loadCaught),
     Provider.value(value: AppLocator.instance.toggleCaught),
-    Provider<SpriteService>.value(
-      value: AppLocator.instance.spriteRepository,
-    ),
+    Provider<SpriteService>.value(value: AppLocator.instance.spriteRepository),
   ];
 }

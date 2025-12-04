@@ -78,9 +78,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> _applyPokemonEdit(Pokemon original, Pokemon updated) async {
-    final index = _customPokemon.indexWhere(
-      (p) => p.id == original.id,
-    );
+    final index = _customPokemon.indexWhere((p) => p.id == original.id);
     if (index == -1) return;
 
     setState(() {
@@ -187,9 +185,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
 
     if (confirmed == true) {
       setState(() {
-        _customPokemon.removeWhere(
-          (p) => p.id == pokemon.id,
-        );
+        _customPokemon.removeWhere((p) => p.id == pokemon.id);
       });
       await _saveCustomPokemon(_customPokemon);
       await _clearPokemonState(pokemon);

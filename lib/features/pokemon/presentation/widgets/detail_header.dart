@@ -48,9 +48,7 @@ class DetailHeader extends StatelessWidget {
                           const Icon(Icons.catching_pokemon, size: 140),
                     )
                   : Image.asset(
-                      showShiny || normalPath == null
-                          ? shinyPath
-                          : normalPath!,
+                      showShiny || normalPath == null ? shinyPath : normalPath!,
                       key: ValueKey(showShiny),
                       width: 300,
                       height: 300,

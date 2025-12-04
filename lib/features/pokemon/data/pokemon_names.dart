@@ -11,8 +11,9 @@ class PokemonNames {
 
   static Future<PokemonNames> load() async {
     try {
-      final raw =
-          await rootBundle.loadString('assets/data/pokemon_names_en.json');
+      final raw = await rootBundle.loadString(
+        'assets/data/pokemon_names_en.json',
+      );
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
       final map = <String, String>{};
       decoded.forEach((key, value) {

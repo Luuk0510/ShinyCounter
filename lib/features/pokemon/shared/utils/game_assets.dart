@@ -78,6 +78,5 @@ class GameAssets {
     'Silver',
   ];
 
-  static String logoFor(String? game) =>
-      gameLogos[game] ?? _defaultLogo;
+  static String logoFor(String? game) => gameLogos[game] ?? _defaultLogo;
 }

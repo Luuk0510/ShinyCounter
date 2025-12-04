@@ -19,7 +19,8 @@ class PokemonStorage {
       return decoded
           .map(
             (e) => Pokemon(
-              id: (e['id'] as String?) ??
+              id:
+                  (e['id'] as String?) ??
                   'legacy_${(e['name'] as String).toLowerCase()}',
               name: e['name'] as String,
               imagePath: e['imagePath'] as String,

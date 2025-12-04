@@ -28,6 +28,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     with WidgetsBindingObserver {
   late final CounterController _controller;
   late final SpriteService _spriteService;
+  late final PageController _pageController;
   bool _showShiny = true;
   List<_FormSprite> _forms = [];
   int _currentFormIndex = 0;
@@ -36,6 +37,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   void initState() {
     super.initState();
     _spriteService = context.read<SpriteService>();
+    _pageController = PageController();
     _controller = CounterController(
       pokemon: widget.pokemon,
       sync: context.read(),
@@ -49,6 +51,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
   @override
   void dispose() {
+    _pageController.dispose();
     _controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -126,9 +129,11 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   void _toggleSpriteView() {
     // If forms exist, respect the current form; otherwise toggle base sprite.
     if (_forms.isNotEmpty) {
-      final current =
-          _currentFormIndex < _forms.length ? _forms[_currentFormIndex] : null;
-      final hasNormal = current?.normalPath ??
+      final current = _currentFormIndex < _forms.length
+          ? _forms[_currentFormIndex]
+          : null;
+      final hasNormal =
+          current?.normalPath ??
           _deriveNormalPath(current?.shinyPath ?? widget.pokemon.imagePath);
       if (current == null || hasNormal == null) return;
       setState(() {
@@ -229,8 +234,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     _buildImageSection(colors),
-        const SizedBox(height: AppSpacing.sm),
-        _buildCatchButton(colors),
+                    const SizedBox(height: AppSpacing.sm),
+                    _buildCatchButton(colors),
                     Padding(
                       padding: const EdgeInsets.only(top: AppSpacing.md),
                       child: Column(
@@ -308,44 +313,62 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   }
 
   Future<void> _loadForms() async {
-    final dex = dexFromString(widget.pokemon.imagePath) ??
+    final dex =
+        dexFromString(widget.pokemon.imagePath) ??
         dexFromString(widget.pokemon.id);
     if (dex == null) return;
     try {
-      final parsedSprites = await _spriteService.loadSprites();
+      final parsedSprites = await _spriteService.loadSprites(refresh: true);
       final entries = parsedSprites.where((p) => p.dex == dex);
 
       final Map<String, _FormSprite> forms = {};
       for (final parsed in entries) {
-        final existing = forms[parsed.form] ?? _FormSprite(form: parsed.form);
+        final key =
+            '${parsed.form}_${parsed.gender}_${parsed.shiny ? 's' : 'n'}';
+        final label =
+            '${parsed.form} (${parsed.gender}${parsed.shiny ? ' shiny' : ' normal'})';
+        final existing = forms[key] ?? _FormSprite(form: label);
         if (parsed.shiny && existing.shinyPath == null) {
           existing.shinyPath = parsed.path;
+          if (existing.normalPath == null) {
+            existing.normalPath = _deriveNormalPath(parsed.path);
+          }
         } else if (!parsed.shiny && existing.normalPath == null) {
           existing.normalPath = parsed.path;
+          if (existing.shinyPath == null) {
+            existing.shinyPath = _deriveNormalPath(
+              parsed.path,
+            )?.replaceFirst('_n.', '_s.');
+          }
         }
-        // Fill derived normal if only shiny is present.
-        if (existing.normalPath == null) {
-          existing.normalPath = _deriveNormalPath(parsed.path);
-        }
-        forms[parsed.form] = existing;
+        forms[key] = existing;
       }
       final list =
-          forms.values.where((f) => f.shinyPath != null || f.normalPath != null).toList()
-        ..sort((a, b) {
-          int rank(String form) {
-            // Order: standard/regional (male/mf/unknown), then female-only,
-            // then mega, then gmax.
-            final lower = form.toLowerCase();
-            if (lower.contains('gmax')) return 3;
-            if (lower.contains('mega')) return 2;
-            if (lower.contains('f')) return 1; // female-only variants after base
-            return 0; // base/male/mf/unknown first
-          }
+          forms.values
+              .where((f) => f.shinyPath != null || f.normalPath != null)
+              .where((f) => f.form.isNotEmpty)
+              .toList()
+            ..sort((a, b) {
+              int rank(String form) {
+                final lower = form.toLowerCase();
+                if (lower.contains('gmax')) return 3;
+                if (lower.contains('mega')) return 2;
+                return 0;
+              }
 
-          final rDiff = rank(a.form).compareTo(rank(b.form));
-          if (rDiff != 0) return rDiff;
-          return a.form.compareTo(b.form);
-        });
+              final rDiff = rank(a.form).compareTo(rank(b.form));
+              if (rDiff != 0) return rDiff;
+              return a.form.compareTo(b.form);
+            });
+      if (list.isEmpty) {
+        list.add(
+          _FormSprite(
+            form: 'base',
+            shinyPath: widget.pokemon.imagePath,
+            normalPath: _deriveNormalPath(widget.pokemon.imagePath),
+          ),
+        );
+      }
       if (list.isEmpty) return;
       setState(() {
         _forms = list;
@@ -353,12 +376,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         _showShiny = true;
       });
     } catch (_) {}
-  }
-
-  String? _extractDex(String path) {
-    final file = path.split('/').last;
-    final match = RegExp(r'(\d{4})').firstMatch(file);
-    return match?.group(1);
   }
 
   Widget _buildImageSection(ColorScheme colors) {
@@ -383,6 +400,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         SizedBox(
           height: 320,
           child: PageView.builder(
+            controller: _pageController,
+            physics: const PageScrollPhysics(),
             itemCount: _forms.length,
             onPageChanged: (i) {
               setState(() {
@@ -394,9 +413,15 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
               final form = _forms[index];
               return DetailHeader(
                 pokemon: widget.pokemon,
-                shinyPath: form.shinyPath ?? form.normalPath ?? widget.pokemon.imagePath,
+                shinyPath:
+                    form.shinyPath ??
+                    form.normalPath ??
+                    widget.pokemon.imagePath,
                 normalPath:
-                    form.normalPath ?? _deriveNormalPath(form.shinyPath ?? widget.pokemon.imagePath),
+                    form.normalPath ??
+                    _deriveNormalPath(
+                      form.shinyPath ?? widget.pokemon.imagePath,
+                    ),
                 showShiny: index == _currentFormIndex ? _showShiny : true,
                 onToggleSprite: _toggleSpriteView,
                 colors: colors,
@@ -436,10 +461,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         key: const Key('catch_button'),
         onPressed: _toggleCaught,
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              _controller.isCaught ? Colors.green.shade600 : colors.secondary,
-          foregroundColor:
-              _controller.isCaught ? Colors.white : colors.onSecondary,
+          backgroundColor: _controller.isCaught
+              ? Colors.green.shade600
+              : colors.secondary,
+          foregroundColor: _controller.isCaught
+              ? Colors.white
+              : colors.onSecondary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -448,10 +475,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
           child: Text(
             _controller.isCaught ? l10n.buttonCaught : l10n.buttonCatch,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
           ),
         ),
       ),
@@ -471,7 +495,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 }
 
 class _FormSprite {
-  _FormSprite({required this.form});
+  _FormSprite({required this.form, this.shinyPath, this.normalPath});
   final String form;
   String? shinyPath;
   String? normalPath;
