@@ -350,6 +350,12 @@ abstract class AppLocalizations {
   /// **'Count'**
   String get countLabel;
 
+  /// No description provided for @addCountRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Add day'**
+  String get addCountRow;
+
   /// No description provided for @editSheetTitle.
   ///
   /// In en, this message translates to:

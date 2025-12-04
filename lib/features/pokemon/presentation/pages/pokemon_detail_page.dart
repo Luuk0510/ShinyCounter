@@ -6,6 +6,7 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_counters_sheet.dart';
+import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_daily_counts_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/hunt_info_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/daily_counts_list.dart';
@@ -114,6 +115,28 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     await _controller.toggleOverlay();
   }
 
+  Future<void> _showDailyCountsEditor() async {
+    final result = await showModalBottomSheet<Map<String, int>>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      backgroundColor: Theme.of(context).cardColor,
+      barrierColor: Colors.black.withValues(alpha: 0.4),
+      builder: (context) {
+        return EditDailyCountsSheet(
+          dailyCounts: _controller.dailyCounts,
+          dayFormatter: _formatDayKey,
+        );
+      },
+    );
+
+    if (result == null) return;
+    await _controller.setDailyCounts(result);
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -212,14 +235,18 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                                   ),
                                 ),
                                 const SizedBox(height: AppSpacing.lg),
-                                ConstrainedBox(
-                                  constraints: const BoxConstraints(
-                                    maxWidth: 200,
-                                  ),
-                                  child: DailyCountsList(
-                                    colors: colors,
-                                    dailyCounts: _controller.dailyCounts,
-                                    dayFormatter: _formatDayKey,
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: _showDailyCountsEditor,
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(
+                                      maxWidth: 200,
+                                    ),
+                                    child: DailyCountsList(
+                                      colors: colors,
+                                      dailyCounts: _controller.dailyCounts,
+                                      dayFormatter: _formatDayKey,
+                                    ),
                                   ),
                                 ),
                               ],
