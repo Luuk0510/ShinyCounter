@@ -323,53 +323,55 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
       final Map<String, _FormSprite> forms = {};
       for (final parsed in entries) {
-        final key =
-            '${parsed.form}_${parsed.gender}_${parsed.shiny ? 's' : 'n'}';
-        final label =
-            '${parsed.form} (${parsed.gender}${parsed.shiny ? ' shiny' : ' normal'})';
-        final existing = forms[key] ?? _FormSprite(form: label);
+        final key = parsed.form;
+        final existing = forms[key] ?? _FormSprite(form: parsed.form);
         if (parsed.shiny && existing.shinyPath == null) {
           existing.shinyPath = parsed.path;
-          if (existing.normalPath == null) {
-            existing.normalPath = _deriveNormalPath(parsed.path);
-          }
         } else if (!parsed.shiny && existing.normalPath == null) {
           existing.normalPath = parsed.path;
-          if (existing.shinyPath == null) {
-            existing.shinyPath = _deriveNormalPath(
-              parsed.path,
-            )?.replaceFirst('_n.', '_s.');
-          }
         }
         forms[key] = existing;
       }
-      final list =
-          forms.values
-              .where((f) => f.shinyPath != null || f.normalPath != null)
-              .where((f) => f.form.isNotEmpty)
-              .toList()
-            ..sort((a, b) {
-              int rank(String form) {
-                final lower = form.toLowerCase();
-                if (lower.contains('gmax')) return 3;
-                if (lower.contains('mega')) return 2;
-                return 0;
-              }
 
-              final rDiff = rank(a.form).compareTo(rank(b.form));
-              if (rDiff != 0) return rDiff;
-              return a.form.compareTo(b.form);
-            });
+      for (final f in forms.values) {
+        if (f.normalPath == null && f.shinyPath != null) {
+          f.normalPath = _deriveNormalPath(f.shinyPath!);
+        } else if (f.shinyPath == null && f.normalPath != null) {
+          final normal = f.normalPath!;
+          if (normal.contains('_n.')) {
+            f.shinyPath = normal.replaceFirst('_n.', '_s.');
+          }
+        }
+      }
+
+      final list = forms.values
+          .where((f) => f.shinyPath != null || f.normalPath != null)
+          .toList()
+        ..sort((a, b) {
+          int rank(String form) {
+            final lower = form.toLowerCase();
+            if (lower.contains('gmax')) return 3;
+            if (lower.contains('mega')) return 2;
+            return 0;
+          }
+
+          final rDiff = rank(a.form).compareTo(rank(b.form));
+          if (rDiff != 0) return rDiff;
+          return a.form.compareTo(b.form);
+        });
+
       if (list.isEmpty) {
         list.add(
           _FormSprite(
             form: 'base',
             shinyPath: widget.pokemon.imagePath,
-            normalPath: _deriveNormalPath(widget.pokemon.imagePath),
+            normalPath: widget.pokemon.isLocalFile
+                ? null
+                : _deriveNormalPath(widget.pokemon.imagePath),
           ),
         );
       }
-      if (list.isEmpty) return;
+
       setState(() {
         _forms = list;
         _currentFormIndex = 0;
