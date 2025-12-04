@@ -139,6 +139,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get countLabel => 'Count';
 
   @override
+  String get addCountRow => 'Add day';
+
+  @override
   String get editSheetTitle => 'Edit';
 
   @override

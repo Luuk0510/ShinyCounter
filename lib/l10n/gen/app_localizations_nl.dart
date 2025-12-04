@@ -139,6 +139,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get countLabel => 'Aantal';
 
   @override
+  String get addCountRow => 'Dag toevoegen';
+
+  @override
   String get editSheetTitle => 'Aanpassen';
 
   @override
