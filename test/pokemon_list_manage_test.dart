@@ -32,10 +32,15 @@ void main() {
   testWidgets('manage sheet can delete a pokemon', (tester) async {
     final repo = _SeededRepo([
       const Pokemon(
+        id: 'p-pika',
         name: 'Pikachu',
         imagePath: 'assets/icon/pokeball_icon.png',
       ),
-      const Pokemon(name: 'Eevee', imagePath: 'assets/icon/pokeball_icon.png'),
+      const Pokemon(
+        id: 'p-eevee',
+        name: 'Eevee',
+        imagePath: 'assets/icon/pokeball_icon.png',
+      ),
     ]);
 
     await tester.pumpWidget(

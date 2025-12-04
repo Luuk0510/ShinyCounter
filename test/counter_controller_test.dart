@@ -28,6 +28,7 @@ void main() {
   CounterController buildController() {
     return CounterController(
       pokemon: const Pokemon(
+        id: 'p-test',
         name: 'Testmon',
         imagePath: 'assets/icon/pokeball_icon.png',
       ),

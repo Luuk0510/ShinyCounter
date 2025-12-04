@@ -129,6 +129,7 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
 
             Navigator.of(context).pop<Pokemon?>(
               Pokemon(
+                id: widget.pokemon.id,
                 name: name,
                 imagePath: imagePath,
                 isLocalFile: isLocalFile,

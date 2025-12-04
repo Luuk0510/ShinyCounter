@@ -19,6 +19,8 @@ class PokemonStorage {
       return decoded
           .map(
             (e) => Pokemon(
+              id: (e['id'] as String?) ??
+                  'legacy_${(e['name'] as String).toLowerCase()}',
               name: e['name'] as String,
               imagePath: e['imagePath'] as String,
               isLocalFile: e['isLocalFile'] as bool? ?? false,
@@ -36,6 +38,7 @@ class PokemonStorage {
       custom
           .map(
             (p) => {
+              'id': p.id,
               'name': p.name,
               'imagePath': p.imagePath,
               'isLocalFile': p.isLocalFile,
@@ -50,13 +53,13 @@ class PokemonStorage {
     final prefs = await _prefs;
     final caught = <String>{};
     for (final p in allPokemon) {
-      if (prefs.getBool(_caughtKey(p.name)) ?? false) {
-        caught.add(p.name);
+      if (prefs.getBool(_caughtKey(p.id)) ?? false) {
+        caught.add(p.id);
       }
     }
     return caught;
   }
 
-  String _caughtKey(String name) => 'caught_${name.toLowerCase()}';
+  String _caughtKey(String id) => 'caught_${id.toLowerCase()}';
   static const _customKey = 'custom_pokemon';
 }

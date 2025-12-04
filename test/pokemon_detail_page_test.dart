@@ -23,6 +23,7 @@ void main() {
   ) async {
     final sync = await CounterSyncService.instance();
     final pokemon = const Pokemon(
+      id: 'p-eevee',
       name: 'Eevee',
       imagePath: 'assets/icon/pokeball_icon.png',
     );

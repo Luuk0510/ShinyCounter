@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:shiny_counter/core/l10n/l10n.dart';
 
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
-import 'package:provider/provider.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
@@ -64,7 +63,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
     }
   }
 
-  bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.name);
+  bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.id);
 
   Future<void> _onAddPokemon() async {
     final newPokemon = await showAddPokemonDialog(context);
@@ -79,7 +78,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
 
   Future<void> _applyPokemonEdit(Pokemon original, Pokemon updated) async {
     final index = _customPokemon.indexWhere(
-      (p) => p.name == original.name && p.imagePath == original.imagePath,
+      (p) => p.id == original.id,
     );
     if (index == -1) return;
 
@@ -88,59 +87,14 @@ class _PokemonListPageState extends State<PokemonListPage> {
     });
 
     await _saveCustomPokemon(_customPokemon);
-    await _migratePokemonState(original, updated);
     await _reloadCaught();
-  }
-
-  Future<void> _migratePokemonState(Pokemon original, Pokemon updated) async {
-    if (original.name.toLowerCase() == updated.name.toLowerCase()) return;
-
-    final prefs = await SharedPreferences.getInstance();
-    final oldCounterKey = 'counter_${original.name.toLowerCase()}';
-    final newCounterKey = 'counter_${updated.name.toLowerCase()}';
-    final oldCaughtKey = 'caught_${original.name.toLowerCase()}';
-    final newCaughtKey = 'caught_${updated.name.toLowerCase()}';
-    final oldStartedKey = '${oldCounterKey}_startedAt';
-    final newStartedKey = '${newCounterKey}_startedAt';
-    final oldCaughtAtKey = '${oldCounterKey}_caughtAt';
-    final newCaughtAtKey = '${newCounterKey}_caughtAt';
-    final oldDailyCountsKey = '${oldCounterKey}_dailyCounts';
-    final newDailyCountsKey = '${newCounterKey}_dailyCounts';
-
-    final oldCounter = prefs.getInt(oldCounterKey);
-    final oldCaught = prefs.getBool(oldCaughtKey);
-    final oldStartedAt = prefs.getString(oldStartedKey);
-    final oldCaughtAt = prefs.getString(oldCaughtAtKey);
-    final oldDailyCounts = prefs.getString(oldDailyCountsKey);
-
-    if (oldCounter != null) {
-      await prefs.setInt(newCounterKey, oldCounter);
-    }
-    if (oldCaught != null) {
-      await prefs.setBool(newCaughtKey, oldCaught);
-    }
-    if (oldStartedAt != null) {
-      await prefs.setString(newStartedKey, oldStartedAt);
-    }
-    if (oldCaughtAt != null) {
-      await prefs.setString(newCaughtAtKey, oldCaughtAt);
-    }
-    if (oldDailyCounts != null) {
-      await prefs.setString(newDailyCountsKey, oldDailyCounts);
-    }
-
-    await prefs.remove(oldCounterKey);
-    await prefs.remove(oldCaughtKey);
-    await prefs.remove(oldStartedKey);
-    await prefs.remove(oldCaughtAtKey);
-    await prefs.remove(oldDailyCountsKey);
   }
 
   Future<void> _clearPokemonState(Pokemon pokemon) async {
     final prefs = await SharedPreferences.getInstance();
-    final counterKey = 'counter_${pokemon.name.toLowerCase()}';
+    final counterKey = 'counter_${pokemon.id.toLowerCase()}';
     await prefs.remove(counterKey);
-    await prefs.remove('caught_${pokemon.name.toLowerCase()}');
+    await prefs.remove('caught_${pokemon.id.toLowerCase()}');
     await prefs.remove('${counterKey}_startedAt');
     await prefs.remove('${counterKey}_caughtAt');
     await prefs.remove('${counterKey}_dailyCounts');
@@ -233,7 +187,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
     if (confirmed == true) {
       setState(() {
         _customPokemon.removeWhere(
-          (p) => p.name == pokemon.name && p.imagePath == pokemon.imagePath,
+          (p) => p.id == pokemon.id,
         );
       });
       await _saveCustomPokemon(_customPokemon);

@@ -28,8 +28,8 @@ class CounterController extends ChangeNotifier {
   String? _caughtGame;
   Map<String, int> _dailyCounts = {};
 
-  late final String _counterKey = 'counter_${pokemon.name.toLowerCase()}';
-  late final String _caughtKey = 'caught_${pokemon.name.toLowerCase()}';
+  late final String _counterKey = 'counter_${pokemon.id.toLowerCase()}';
+  late final String _caughtKey = 'caught_${pokemon.id.toLowerCase()}';
 
   CounterSyncService? _sync;
   final ToggleCaughtUseCase? _toggleCaughtUseCase;

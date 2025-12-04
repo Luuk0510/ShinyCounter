@@ -35,6 +35,7 @@ void main() {
   ) async {
     final repo = _FakePokemonRepository([
       const Pokemon(
+        id: 'p-pika',
         name: 'Pikachu',
         imagePath: 'assets/icon/pokeball_icon.png',
       ),
@@ -75,6 +76,7 @@ void main() {
     expect(find.text('Pokémon shiny counter'), findsOneWidget);
 
     const pokemon = Pokemon(
+      id: 'p-test',
       name: 'Testmon',
       imagePath: 'assets/icon/pokeball_icon.png',
     );
