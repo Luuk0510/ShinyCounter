@@ -57,7 +57,9 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    final notifier = tester.element(find.byType(PokemonListPage)).read<ThemeNotifier>();
+    final notifier = tester
+        .element(find.byType(PokemonListPage))
+        .read<ThemeNotifier>();
     expect(notifier.mode, ThemeMode.system);
 
     // Open settings dialog.

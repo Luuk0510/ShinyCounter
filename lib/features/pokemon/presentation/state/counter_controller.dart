@@ -254,7 +254,6 @@ class CounterController extends ChangeNotifier {
     await _updateOverlay();
   }
 
-
   Future<void> _updateOverlay() async {
     if (!_pillActive || !_overlaySupported) return;
     final sync = await _getSync();

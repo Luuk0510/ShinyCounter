@@ -100,11 +100,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                   side: BorderSide(color: colors.primary, width: 1.3),
                   backgroundColor: colors.primary.withValues(alpha: 0.08),
                 ),
-              label: Text(
+                label: Text(
                   l10n.addCountRow,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),
             ),
@@ -259,9 +257,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              hintText: context.l10n.enterNumberHint,
-            ),
+            decoration: InputDecoration(hintText: context.l10n.enterNumberHint),
           ),
           actions: [
             TextButton(
@@ -302,9 +298,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
     for (final row in _rows) {
       final parsed = int.tryParse(row.controller.text.trim());
       if (parsed == null || parsed < 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.invalidCounter)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.invalidCounter)));
         return;
       }
       if (parsed == 0) continue;

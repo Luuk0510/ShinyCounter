@@ -18,8 +18,9 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('catch button toggles to caught and disables controls',
-      (tester) async {
+  testWidgets('catch button toggles to caught and disables controls', (
+    tester,
+  ) async {
     final sync = await CounterSyncService.instance();
     final pokemon = const Pokemon(
       name: 'Eevee',
@@ -68,10 +69,12 @@ void main() {
     );
 
     // Plus/minus controls should be disabled.
-    final addButton =
-        tester.widget<ElevatedButton>(find.widgetWithIcon(ElevatedButton, Icons.add));
-    final removeButton = tester
-        .widget<ElevatedButton>(find.widgetWithIcon(ElevatedButton, Icons.remove));
+    final addButton = tester.widget<ElevatedButton>(
+      find.widgetWithIcon(ElevatedButton, Icons.add),
+    );
+    final removeButton = tester.widget<ElevatedButton>(
+      find.widgetWithIcon(ElevatedButton, Icons.remove),
+    );
     expect(addButton.onPressed, isNull);
     expect(removeButton.onPressed, isNull);
   });

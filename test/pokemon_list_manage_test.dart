@@ -31,7 +31,10 @@ void main() {
 
   testWidgets('manage sheet can delete a pokemon', (tester) async {
     final repo = _SeededRepo([
-      const Pokemon(name: 'Pikachu', imagePath: 'assets/icon/pokeball_icon.png'),
+      const Pokemon(
+        name: 'Pikachu',
+        imagePath: 'assets/icon/pokeball_icon.png',
+      ),
       const Pokemon(name: 'Eevee', imagePath: 'assets/icon/pokeball_icon.png'),
     ]);
 
@@ -74,8 +77,10 @@ void main() {
       of: find.text('Pikachu'),
       matching: find.byType(ListTile),
     );
-    final deleteButton =
-        find.descendant(of: listTile, matching: find.byIcon(Icons.delete_outline));
+    final deleteButton = find.descendant(
+      of: listTile,
+      matching: find.byIcon(Icons.delete_outline),
+    );
     await tester.tap(deleteButton.first);
     await tester.pumpAndSettle();
 
