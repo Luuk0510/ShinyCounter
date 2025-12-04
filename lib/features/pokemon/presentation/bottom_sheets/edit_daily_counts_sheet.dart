@@ -84,7 +84,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
             Expanded(
               child: ListView.separated(
                 itemBuilder: (context, index) => _buildRow(context, index),
-                separatorBuilder: (_, __) =>
+                separatorBuilder: (_, idx) =>
                     const SizedBox(height: AppSpacing.md),
                 itemCount: _rows.length,
               ),

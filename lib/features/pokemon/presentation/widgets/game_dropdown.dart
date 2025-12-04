@@ -1,4 +1,3 @@
-import 'package:characters/characters.dart';
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
@@ -208,7 +207,7 @@ class GameLogo extends StatelessWidget {
       child: Image.asset(
         GameDropdown.logoFor(game),
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Center(
+        errorBuilder: (_, error, stackTrace) => Center(
           child: Text(
             label,
             style: TextStyle(

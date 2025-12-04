@@ -483,7 +483,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 }
 
 class _FormSprite {
-  _FormSprite({required this.form, this.shinyPath, this.normalPath});
+  _FormSprite({required this.form});
   final String form;
   String? shinyPath;
   String? normalPath;
