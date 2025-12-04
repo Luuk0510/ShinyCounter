@@ -73,19 +73,30 @@ class HuntInfoCard extends StatelessWidget {
                 ? ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 240),
                     child: DropdownButtonFormField<String?>(
-                      initialValue: null,
-                      isExpanded: true,
-                      items: GameDropdown.games
-                          .map(
-                            (g) => DropdownMenuItem<String?>(
-                              value: g.isEmpty ? null : g,
-                              child: Text(g.isEmpty ? l10n.selectGameHint : g),
-                            ),
-                          )
-                          .toList(),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
+                  initialValue: null,
+                  isExpanded: true,
+                  items: GameDropdown.games
+                      .map(
+                        (g) => DropdownMenuItem<String?>(
+                          value: g.isEmpty ? null : g,
+                          child: Row(
+                            children: [
+                              GameLogo(game: g, size: 24),
+                              const SizedBox(width: AppSpacing.xs),
+                              Expanded(
+                                child: Text(
+                                  g.isEmpty ? l10n.selectGameHint : g,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(
                             Radius.circular(AppRadii.sm),
                           ),
                         ),
@@ -101,20 +112,22 @@ class HuntInfoCard extends StatelessWidget {
                 : InkWell(
                     borderRadius: BorderRadius.circular(AppRadii.sm),
                     onTap: onSelectGame,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: AppSpacing.xs,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            l10n.huntGame(caughtGame!),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: colors.onSurface,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.xs,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GameLogo(game: caughtGame!, size: 22),
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          l10n.huntGame(caughtGame!),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: colors.onSurface,
                               fontSize: 17,
                               fontWeight: FontWeight.w800,
                             ),
