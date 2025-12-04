@@ -193,7 +193,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
           final bottomInset = mediaQuery.viewInsets.bottom;
           final isPortrait = mediaQuery.orientation == Orientation.portrait;
           final bottomPadding =
-              mediaQuery.padding.bottom + bottomInset + (isPortrait ? 110 : 24);
+              mediaQuery.padding.bottom + bottomInset + (isPortrait ? 60 : 16);
 
           return SingleChildScrollView(
             padding: EdgeInsets.zero,
@@ -212,6 +212,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     _buildImageSection(colors),
+        const SizedBox(height: AppSpacing.sm),
+        _buildCatchButton(colors),
                     Padding(
                       padding: const EdgeInsets.only(top: AppSpacing.md),
                       child: Column(
@@ -311,10 +313,22 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         }
         forms[parsed.form] = existing;
       }
-      final list = forms.values
-          .where((f) => f.shinyPath != null)
-          .toList()
-        ..sort((a, b) => a.form.compareTo(b.form));
+      final list = forms.values.where((f) => f.shinyPath != null).toList()
+        ..sort((a, b) {
+          int rank(String form) {
+            // Order: standard/regional (male/mf/unknown), then female-only,
+            // then mega, then gmax.
+            final lower = form.toLowerCase();
+            if (lower.contains('gmax')) return 3;
+            if (lower.contains('mega')) return 2;
+            if (lower.contains('f')) return 1; // female-only variants after base
+            return 0; // base/male/mf/unknown first
+          }
+
+          final rDiff = rank(a.form).compareTo(rank(b.form));
+          if (rDiff != 0) return rDiff;
+          return a.form.compareTo(b.form);
+        });
       if (list.isEmpty) return;
       setState(() {
         _forms = list;
@@ -327,7 +341,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   _ParsedSprite? _parseForm(String path) {
     final file = path.split('/').last.toLowerCase();
     final newPattern = RegExp(
-      r'^(\d{4})_([a-z0-9-]+).*_(m|f|mf|mo|fo|md|fd|uk)_(n|s)\.png$',
+      r'^(\d{4})_([a-z0-9-_]+)_(m|f|mf|mo|fo|md|fd|uk)_(n|s)\.png$',
     );
     final legacyPattern = RegExp(
       r'^poke_capture_(\d{4})_(\d{3})_([a-z]{2,3})_([ng])_.*?_([nr])\.png$',
@@ -337,19 +351,17 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     String shineFlag;
     if (newPattern.hasMatch(file)) {
       final m = newPattern.firstMatch(file)!;
-      form = m.group(2)!;
+      form = m.group(2)!; // full descriptor between dex and gender
       shineFlag = m.group(4)!;
     } else if (legacyPattern.hasMatch(file)) {
       final m = legacyPattern.firstMatch(file)!;
-      form = m.group(2)!;
+      final baseForm = m.group(2)!;
       final formType = m.group(4)!;
+      form = formType == 'g' ? '$baseForm-gmax' : baseForm;
       shineFlag = m.group(5)!;
-      if (formType == 'g') return null;
-      if (form != '000') return null;
     } else {
       return null;
     }
-    if (form.contains('mega') || form.contains('gmax')) return null;
     final isShiny = shineFlag == 's' || shineFlag == 'r';
     if (!isShiny && shineFlag != 'n') return null;
     return _ParsedSprite(form: form, shiny: isShiny);
@@ -381,7 +393,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     return Column(
       children: [
         SizedBox(
-          height: 380,
+          height: 320,
           child: PageView.builder(
             itemCount: _forms.length,
             onPageChanged: (i) {
@@ -425,6 +437,36 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
             }),
           ),
       ],
+    );
+  }
+
+  Widget _buildCatchButton(ColorScheme colors) {
+    final l10n = context.l10n;
+    return SizedBox(
+      width: 150,
+      child: ElevatedButton(
+        key: const Key('catch_button'),
+        onPressed: _toggleCaught,
+        style: ElevatedButton.styleFrom(
+          backgroundColor:
+              _controller.isCaught ? Colors.green.shade600 : colors.secondary,
+          foregroundColor:
+              _controller.isCaught ? Colors.white : colors.onSecondary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          child: Text(
+            _controller.isCaught ? l10n.buttonCaught : l10n.buttonCatch,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ),
     );
   }
 

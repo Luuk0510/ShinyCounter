@@ -89,9 +89,9 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
 
   _SpriteOption? _parseSprite(String path) {
     final file = path.split('/').last.toLowerCase();
-    // New scheme: {dex4}_{form}_..._{gender}_{shine}.png (allow extra segments)
+    // New scheme: {dex4}_{descriptor}_{gender}_{shine}.png (descriptor can have underscores)
     final newPattern = RegExp(
-      r'^(\d{4})_([a-z0-9-]+).*_(m|f|mf|mo|fo|md|fd|uk)_(n|s)\.png$',
+      r'^(\d{4})_([a-z0-9-_]+)_(m|f|mf|mo|fo|md|fd|uk)_(n|s)\.png$',
     );
     // Legacy: poke_capture_{dex4}_{form3}_{genderToken}_{formType}_..._{shineFlag}.png
     final legacyPattern = RegExp(
@@ -105,7 +105,7 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
     if (newPattern.hasMatch(file)) {
       final m = newPattern.firstMatch(file)!;
       dex = m.group(1)!;
-      form = m.group(2)!;
+      form = m.group(2)!; // keep full descriptor to distinguish variants
       genderToken = m.group(3)!;
       shineFlag = m.group(4)!;
     } else if (legacyPattern.hasMatch(file)) {
