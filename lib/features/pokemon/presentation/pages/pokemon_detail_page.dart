@@ -12,6 +12,8 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/hunt_info_ca
 import 'package:shiny_counter/features/pokemon/presentation/widgets/daily_counts_list.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/detail_header.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/counter_controls.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 
 class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({super.key, required this.pokemon});
@@ -25,6 +27,7 @@ class PokemonDetailPage extends StatefulWidget {
 class _PokemonDetailPageState extends State<PokemonDetailPage>
     with WidgetsBindingObserver {
   late final CounterController _controller;
+  late final SpriteService _spriteService;
   bool _showShiny = true;
   List<_FormSprite> _forms = [];
   int _currentFormIndex = 0;
@@ -32,6 +35,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   @override
   void initState() {
     super.initState();
+    _spriteService = context.read<SpriteService>();
     _controller = CounterController(
       pokemon: widget.pokemon,
       sync: context.read(),
@@ -120,12 +124,25 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   }
 
   void _toggleSpriteView() {
-    final current =
-        _currentFormIndex < _forms.length ? _forms[_currentFormIndex] : null;
-    if (current == null || current.normalPath == null) return;
-    setState(() {
-      _showShiny = !_showShiny;
-    });
+    // If forms exist, respect the current form; otherwise toggle base sprite.
+    if (_forms.isNotEmpty) {
+      final current =
+          _currentFormIndex < _forms.length ? _forms[_currentFormIndex] : null;
+      final hasNormal = current?.normalPath ??
+          _deriveNormalPath(current?.shinyPath ?? widget.pokemon.imagePath);
+      if (current == null || hasNormal == null) return;
+      setState(() {
+        _showShiny = !_showShiny;
+      });
+    } else {
+      final normal = widget.pokemon.isLocalFile
+          ? null
+          : _deriveNormalPath(widget.pokemon.imagePath);
+      if (normal == null) return;
+      setState(() {
+        _showShiny = !_showShiny;
+      });
+    }
   }
 
   Future<void> _showDailyCountsEditor() async {
@@ -291,29 +308,29 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   }
 
   Future<void> _loadForms() async {
-    final dex = _extractDex(widget.pokemon.imagePath);
+    final dex = dexFromString(widget.pokemon.imagePath) ??
+        dexFromString(widget.pokemon.id);
     if (dex == null) return;
     try {
-      final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
-      final assets = manifest.listAssets();
-      final entries = assets
-          .where((key) => key.contains('assets/pokemons/'))
-          .where((key) => key.toLowerCase().startsWith('assets/pokemons/$dex'))
-          .where((key) => key.toLowerCase().endsWith('.png'));
+      final parsedSprites = await _spriteService.loadSprites();
+      final entries = parsedSprites.where((p) => p.dex == dex);
 
       final Map<String, _FormSprite> forms = {};
-      for (final path in entries) {
-        final parsed = _parseForm(path);
-        if (parsed == null) continue;
+      for (final parsed in entries) {
         final existing = forms[parsed.form] ?? _FormSprite(form: parsed.form);
         if (parsed.shiny && existing.shinyPath == null) {
-          existing.shinyPath = path;
+          existing.shinyPath = parsed.path;
         } else if (!parsed.shiny && existing.normalPath == null) {
-          existing.normalPath = path;
+          existing.normalPath = parsed.path;
+        }
+        // Fill derived normal if only shiny is present.
+        if (existing.normalPath == null) {
+          existing.normalPath = _deriveNormalPath(parsed.path);
         }
         forms[parsed.form] = existing;
       }
-      final list = forms.values.where((f) => f.shinyPath != null).toList()
+      final list =
+          forms.values.where((f) => f.shinyPath != null || f.normalPath != null).toList()
         ..sort((a, b) {
           int rank(String form) {
             // Order: standard/regional (male/mf/unknown), then female-only,
@@ -336,35 +353,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         _showShiny = true;
       });
     } catch (_) {}
-  }
-
-  _ParsedSprite? _parseForm(String path) {
-    final file = path.split('/').last.toLowerCase();
-    final newPattern = RegExp(
-      r'^(\d{4})_([a-z0-9-_]+)_(m|f|mf|mo|fo|md|fd|uk)_(n|s)\.png$',
-    );
-    final legacyPattern = RegExp(
-      r'^poke_capture_(\d{4})_(\d{3})_([a-z]{2,3})_([ng])_.*?_([nr])\.png$',
-    );
-
-    String form;
-    String shineFlag;
-    if (newPattern.hasMatch(file)) {
-      final m = newPattern.firstMatch(file)!;
-      form = m.group(2)!; // full descriptor between dex and gender
-      shineFlag = m.group(4)!;
-    } else if (legacyPattern.hasMatch(file)) {
-      final m = legacyPattern.firstMatch(file)!;
-      final baseForm = m.group(2)!;
-      final formType = m.group(4)!;
-      form = formType == 'g' ? '$baseForm-gmax' : baseForm;
-      shineFlag = m.group(5)!;
-    } else {
-      return null;
-    }
-    final isShiny = shineFlag == 's' || shineFlag == 'r';
-    if (!isShiny && shineFlag != 'n') return null;
-    return _ParsedSprite(form: form, shiny: isShiny);
   }
 
   String? _extractDex(String path) {
@@ -406,9 +394,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
               final form = _forms[index];
               return DetailHeader(
                 pokemon: widget.pokemon,
-                shinyPath: form.shinyPath ?? widget.pokemon.imagePath,
-                normalPath: form.normalPath ??
-                    _deriveNormalPath(form.shinyPath ?? widget.pokemon.imagePath),
+                shinyPath: form.shinyPath ?? form.normalPath ?? widget.pokemon.imagePath,
+                normalPath:
+                    form.normalPath ?? _deriveNormalPath(form.shinyPath ?? widget.pokemon.imagePath),
                 showShiny: index == _currentFormIndex ? _showShiny : true,
                 onToggleSprite: _toggleSpriteView,
                 colors: colors,
@@ -487,10 +475,4 @@ class _FormSprite {
   final String form;
   String? shinyPath;
   String? normalPath;
-}
-
-class _ParsedSprite {
-  _ParsedSprite({required this.form, required this.shiny});
-  final String form;
-  final bool shiny;
 }

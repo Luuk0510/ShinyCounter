@@ -14,6 +14,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/edit_pokemon
 import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_empty_state.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/settings_sheet.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 
 const _basePokemon = <Pokemon>[];
 
@@ -197,7 +198,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> _openManagePokemonList() async {
-    final pokemonSorted = [..._customPokemon]..sort(_pokemonComparator);
+    final pokemonSorted = [..._customPokemon]..sort(pokemonDexComparator);
     if (pokemonSorted.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -321,9 +322,9 @@ class _PokemonListPageState extends State<PokemonListPage> {
     final colors = Theme.of(context).colorScheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final uncaught = _allPokemon.where((p) => !_isCaught(p)).toList()
-      ..sort(_pokemonComparator);
+      ..sort(pokemonDexComparator);
     final caught = _allPokemon.where((p) => _isCaught(p)).toList()
-      ..sort(_pokemonComparator);
+      ..sort(pokemonDexComparator);
 
     return Scaffold(
       appBar: _buildAppBar(colors),
@@ -462,25 +463,6 @@ dynamic _sectionedItem(
   }
 
   return null;
-}
-
-int _dexValue(Pokemon pokemon) {
-  final match = RegExp(r'(\d{4})').firstMatch(pokemon.imagePath);
-  if (match != null) {
-    return int.tryParse(match.group(1) ?? '') ?? 1 << 30;
-  }
-  final idMatch = RegExp(r'(\d{4})').firstMatch(pokemon.id);
-  if (idMatch != null) {
-    return int.tryParse(idMatch.group(1) ?? '') ?? 1 << 30;
-  }
-  return 1 << 30;
-}
-
-int _pokemonComparator(Pokemon a, Pokemon b) {
-  final da = _dexValue(a);
-  final db = _dexValue(b);
-  if (da != db) return da.compareTo(db);
-  return a.name.toLowerCase().compareTo(b.name.toLowerCase());
 }
 
 class _SectionHeader {

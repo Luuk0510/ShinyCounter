@@ -2,10 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 
 class AddPokemonDialog extends StatefulWidget {
   const AddPokemonDialog({super.key});
@@ -15,6 +18,7 @@ class AddPokemonDialog extends StatefulWidget {
 }
 
 class _AddPokemonDialogState extends State<AddPokemonDialog> {
+  late final SpriteService _spritesRepo;
   List<_SpriteOption> _sprites = [];
   _SpriteOption? _selectedSprite;
   String _search = '';
@@ -25,6 +29,7 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
   @override
   void initState() {
     super.initState();
+    _spritesRepo = context.read<SpriteService>();
     _loadSprites();
     _loadNames();
   }
@@ -37,16 +42,27 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
 
   Future<void> _loadSprites() async {
     try {
-      final spriteEntries = await _spriteAssetPaths();
-      debugPrint('Sprite assets found: ${spriteEntries.length}');
-      if (spriteEntries.isEmpty) {
+      final parsedSprites = await _spritesRepo.loadSprites();
+      debugPrint('Sprite assets found: ${parsedSprites.length}');
+      if (parsedSprites.isEmpty) {
         setState(() => _loadingSprites = false);
         return;
       }
       final Map<String, _SpriteOption> chosen = {};
-      for (final path in spriteEntries) {
-        final option = _parseSprite(path);
-        if (option == null) continue;
+      for (final parsed in parsedSprites) {
+        if (!parsed.shiny) continue; // only shiny choices
+        final lowerForm = parsed.form.toLowerCase();
+        if (lowerForm.contains('mega') || lowerForm.contains('gmax')) continue;
+
+        final priority = _genderPriority(parsed.gender);
+        if (priority == null) continue;
+
+        final option = _SpriteOption(
+          dex: parsed.dex,
+          path: parsed.path,
+          genderPriority: priority,
+        );
+
         final current = chosen[option.dex];
         if (current == null || option.genderPriority < current.genderPriority) {
           chosen[option.dex] = option;
@@ -61,73 +77,6 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
     } catch (_) {
       setState(() => _loadingSprites = false);
     }
-  }
-
-  Future<Iterable<String>> _spriteAssetPaths() async {
-    // Flutter 3.16+ writes AssetManifest.bin; use the API wrapper.
-    try {
-      final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
-      return manifest
-          .listAssets()
-          .where((key) => key.contains('assets/pokemons/'))
-          .where((key) => key.toLowerCase().endsWith('.png'));
-    } catch (_) {
-      // Fallback to JSON manifest if present.
-      try {
-        final manifestString = await rootBundle.loadString('AssetManifest.json');
-        final manifest = jsonDecode(manifestString) as Map<String, dynamic>;
-        return manifest.keys.where(
-          (key) =>
-              key.contains('assets/pokemons/') &&
-              key.toLowerCase().endsWith('.png'),
-        );
-      } catch (_) {
-        return const <String>[];
-      }
-    }
-  }
-
-  _SpriteOption? _parseSprite(String path) {
-    final file = path.split('/').last.toLowerCase();
-    // New scheme: {dex4}_{descriptor}_{gender}_{shine}.png (descriptor can have underscores)
-    final newPattern = RegExp(
-      r'^(\d{4})_([a-z0-9-_]+)_(m|f|mf|mo|fo|md|fd|uk)_(n|s)\.png$',
-    );
-    // Legacy: poke_capture_{dex4}_{form3}_{genderToken}_{formType}_..._{shineFlag}.png
-    final legacyPattern = RegExp(
-      r'^poke_capture_(\d{4})_(\d{3})_([a-z]{2,3})_([ng])_.*?_([nr])\.png$',
-    );
-
-    String dex;
-    String form;
-    String genderToken;
-    String shineFlag;
-    if (newPattern.hasMatch(file)) {
-      final m = newPattern.firstMatch(file)!;
-      dex = m.group(1)!;
-      form = m.group(2)!; // keep full descriptor to distinguish variants
-      genderToken = m.group(3)!;
-      shineFlag = m.group(4)!;
-    } else if (legacyPattern.hasMatch(file)) {
-      final m = legacyPattern.firstMatch(file)!;
-      dex = m.group(1)!;
-      form = m.group(2)!;
-      genderToken = m.group(3)!;
-      final formType = m.group(4)!; // n or g
-      shineFlag = m.group(5)!;
-      if (formType == 'g') return null; // skip gmax
-      if (form != '000') return null; // skip megas/alt forms
-    } else {
-      return null;
-    }
-
-    if (shineFlag != 's' && shineFlag != 'r') return null; // only shiny
-    if (form.contains('mega') || form.contains('gmax')) return null;
-
-    final genderPriority = _genderPriority(genderToken);
-    if (genderPriority == null) return null;
-
-    return _SpriteOption(dex: dex, path: path, genderPriority: genderPriority);
   }
 
   int? _genderPriority(String token) {

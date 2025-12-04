@@ -8,6 +8,7 @@ import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_ser
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_detail_page.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -33,6 +34,7 @@ void main() {
         providers: [
           Provider.value(value: sync),
           Provider.value(value: ToggleCaughtUseCase(sync)),
+          Provider<SpriteService>.value(value: SpriteRepository()),
           ChangeNotifierProvider(create: (_) => ThemeNotifier()),
           ChangeNotifierProvider(create: (_) => LocaleNotifier()),
         ],
