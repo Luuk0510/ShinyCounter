@@ -327,7 +327,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   _ParsedSprite? _parseForm(String path) {
     final file = path.split('/').last.toLowerCase();
     final newPattern = RegExp(
-      r'^(\d{4})_([a-z0-9-]+)_[a-z0-9-]+_[a-z0-9-]+_(m|f|mf)_(n|s)\.png$',
+      r'^(\d{4})_([a-z0-9-]+).*_(m|f|mf|mo|fo|md|fd|uk)_(n|s)\.png$',
     );
     final legacyPattern = RegExp(
       r'^poke_capture_(\d{4})_(\d{3})_([a-z]{2,3})_([ng])_.*?_([nr])\.png$',

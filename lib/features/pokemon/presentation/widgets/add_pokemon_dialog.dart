@@ -89,9 +89,9 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
 
   _SpriteOption? _parseSprite(String path) {
     final file = path.split('/').last.toLowerCase();
-    // New scheme: {dex4}_{form}_{region}_{variant}_{gender}_{shine}.png
+    // New scheme: {dex4}_{form}_..._{gender}_{shine}.png (allow extra segments)
     final newPattern = RegExp(
-      r'^(\d{4})_([a-z0-9-]+)_[a-z0-9-]+_[a-z0-9-]+_(m|f|mf)_(n|s)\.png$',
+      r'^(\d{4})_([a-z0-9-]+).*_(m|f|mf|mo|fo|md|fd|uk)_(n|s)\.png$',
     );
     // Legacy: poke_capture_{dex4}_{form3}_{genderToken}_{formType}_..._{shineFlag}.png
     final legacyPattern = RegExp(
