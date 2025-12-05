@@ -52,6 +52,7 @@
   "noCounts": "No counts yet",
   "dateLabel": "Date",
   "countLabel": "Count",
+  "addCountRow": "Add day",
   "editSheetTitle": "Edit",
   "counterLabel": "Counter",
   "enterNumberHint": "Enter a number",

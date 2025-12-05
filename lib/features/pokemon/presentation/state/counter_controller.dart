@@ -244,6 +244,16 @@ class CounterController extends ChangeNotifier {
     await service.setCaught(_caughtKey, value);
   }
 
+  Future<void> setDailyCounts(Map<String, int> counts) async {
+    final cleaned = Map<String, int>.from(counts)
+      ..removeWhere((_, value) => value <= 0);
+    _dailyCounts = cleaned;
+    final sync = await _getSync();
+    await sync.setDailyCounts(_counterKey, cleaned);
+    notifyListeners();
+    await _updateOverlay();
+  }
+
 
   Future<void> _updateOverlay() async {
     if (!_pillActive || !_overlaySupported) return;

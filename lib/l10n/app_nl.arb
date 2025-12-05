@@ -52,6 +52,7 @@
   "noCounts": "Nog geen tellingen",
   "dateLabel": "Datum",
   "countLabel": "Aantal",
+  "addCountRow": "Dag toevoegen",
   "editSheetTitle": "Aanpassen",
   "counterLabel": "Counter",
   "enterNumberHint": "Voer een getal in",
