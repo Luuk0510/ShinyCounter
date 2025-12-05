@@ -24,11 +24,21 @@ class AppRadii {
   static const lg = 30.0;
 }
 
+class AppSizes {
+  static const toolbarHeight = 52.0;
+  static const sheetHandleWidth = 44.0;
+  static const sheetHandleHeight = 5.0;
+}
+
 class AppTypography {
   static const title = TextStyle(
     fontSize: 26,
     fontWeight: FontWeight.w700,
     letterSpacing: 0.5,
+  );
+  static const listTitle = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
   );
   static const sectionTitle = TextStyle(
     fontSize: 18,

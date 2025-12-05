@@ -142,9 +142,7 @@ class _AddPokemonView extends StatelessWidget {
       title: Text(
         l10n.addDialogTitle,
         textAlign: TextAlign.center,
-        style: Theme.of(
-          context,
-        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+        style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
       ),
       content: SizedBox(
         width: 420,

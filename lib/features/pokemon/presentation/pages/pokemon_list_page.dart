@@ -36,11 +36,11 @@ class _PokemonListPageState extends State<PokemonListPage> {
   Set<String> _caught = {};
   bool _loading = true;
 
-List<Pokemon> get _allPokemon {
-  final combined = [..._basePokemon, ..._customPokemon];
-  combined.sort(pokemonDexComparator);
-  return combined;
-}
+  List<Pokemon> get _allPokemon {
+    final combined = [..._basePokemon, ..._customPokemon];
+    combined.sort(pokemonDexComparator);
+    return combined;
+  }
 
   @override
   void initState() {
@@ -233,8 +233,8 @@ List<Pokemon> get _allPokemon {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 44,
-                  height: 5,
+                  width: AppSizes.sheetHandleWidth,
+                  height: AppSizes.sheetHandleHeight,
                   decoration: BoxDecoration(
                     color: colors.outlineVariant.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(AppRadii.sm),
@@ -243,9 +243,7 @@ List<Pokemon> get _allPokemon {
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   context.l10n.manageTitle,
-                  style: AppTypography.sectionTitle.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Flexible(
@@ -258,8 +256,9 @@ List<Pokemon> get _allPokemon {
                         leading: _ManagePokemonImage(pokemon: p),
                         title: Text(
                           p.name,
-                          style: AppTypography.sectionTitle.copyWith(
+                          style: AppTypography.listTitle.copyWith(
                             color: colors.onSurface,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                         trailing: Row(
@@ -341,7 +340,7 @@ List<Pokemon> get _allPokemon {
       scrolledUnderElevation: 0,
       elevation: 0,
       centerTitle: true,
-      toolbarHeight: 52,
+      toolbarHeight: AppSizes.toolbarHeight,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
       ),
