@@ -12,11 +12,7 @@ import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/add_pokemon_dialog.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/edit_pokemon_dialog.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_card.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_empty_state.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/settings_sheet.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 
 const _basePokemon = <Pokemon>[];
