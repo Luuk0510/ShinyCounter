@@ -1,50 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 
-class AddPokemonDialog extends StatefulWidget {
-  const AddPokemonDialog({super.key});
+class AddPokemonController extends ChangeNotifier {
+  AddPokemonController({required SpriteService spriteService})
+      : _spriteService = spriteService {
+    _init();
+  }
 
-  @override
-  State<AddPokemonDialog> createState() => _AddPokemonDialogState();
-}
+  final SpriteService _spriteService;
 
-class _AddPokemonDialogState extends State<AddPokemonDialog> {
-  late final SpriteService _spritesRepo;
-  List<_SpriteOption> _sprites = [];
+  final List<_SpriteOption> _sprites = [];
   _SpriteOption? _selectedSprite;
   String _search = '';
-  bool _loadingSprites = true;
+  bool _loading = true;
   PokemonNames? _names;
 
-  @override
-  @override
-  void initState() {
-    super.initState();
-    _spritesRepo = context.read<SpriteService>();
-    _loadSprites();
-    _loadNames();
+  List<_SpriteOption> get sprites => List.unmodifiable(_sprites);
+  _SpriteOption? get selected => _selectedSprite;
+  bool get loading => _loading;
+  String get search => _search;
+
+  Future<void> _init() async {
+    await Future.wait([_loadNames(), _loadSprites()]);
+    _loading = false;
+    notifyListeners();
   }
 
   Future<void> _loadNames() async {
-    final names = await PokemonNames.load();
-    if (!mounted) return;
-    setState(() => _names = names);
+    _names = await PokemonNames.load();
   }
 
   Future<void> _loadSprites() async {
     try {
-      final parsedSprites = await _spritesRepo.loadSprites();
-      debugPrint('Sprite assets found: ${parsedSprites.length}');
-      if (parsedSprites.isEmpty) {
-        setState(() => _loadingSprites = false);
-        return;
-      }
+      final parsedSprites = await _spriteService.loadSprites(refresh: true);
       final Map<String, _SpriteOption> chosen = {};
       for (final parsed in parsedSprites) {
         if (!parsed.shiny) continue; // only shiny choices
@@ -61,20 +55,43 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
         );
 
         final current = chosen[option.dex];
-        if (current == null || option.genderPriority < current.genderPriority) {
+        if (current == null || option.genderPriority! < current.genderPriority!) {
           chosen[option.dex] = option;
         }
       }
-      final list = chosen.values.toList()
-        ..sort((a, b) => a.dex.compareTo(b.dex));
-      setState(() {
-        _sprites = list;
-        _loadingSprites = false;
-      });
+      _sprites
+        ..clear()
+        ..addAll(chosen.values.toList()
+          ..sort((a, b) => a.dex.compareTo(b.dex)));
     } catch (_) {
-      setState(() => _loadingSprites = false);
+      _sprites.clear();
     }
   }
+
+  List<_SpriteOption> get filteredSprites {
+    if (_search.isEmpty) return _sprites;
+    final term = _search.toLowerCase();
+    return _sprites.where((s) {
+      final name = _names?.nameFor(s.dex).toLowerCase() ?? '';
+      final combined = '${s.dex} $name';
+      return combined.contains(term);
+    }).toList();
+  }
+
+  void setSearch(String value) {
+    _search = value;
+    notifyListeners();
+  }
+
+  void clearSearch() => setSearch('');
+
+  void select(_SpriteOption sprite) {
+    _selectedSprite = sprite;
+    notifyListeners();
+  }
+
+  String displayName(_SpriteOption sprite) =>
+      _names?.nameFor(sprite.dex) ?? 'Pokémon #${sprite.dex}';
 
   int? _genderPriority(String token) {
     switch (token) {
@@ -93,168 +110,51 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
         return null;
     }
   }
+}
 
-  List<_SpriteOption> get _filteredSprites {
-    if (_search.isEmpty) return _sprites;
-    final term = _search.toLowerCase();
-    return _sprites.where((s) {
-      final name = _names?.nameFor(s.dex).toLowerCase() ?? '';
-      final combined = '${s.dex} $name';
-      return combined.contains(term);
-    }).toList();
-  }
+class AddPokemonDialog extends StatelessWidget {
+  const AddPokemonDialog({super.key});
 
-  Widget _buildSpritePicker(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          onChanged: (v) => setState(() => _search = v),
-          decoration: InputDecoration(
-            hintText: 'Search by name or dex',
-            prefixIcon: const Icon(Icons.search),
-            border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(AppRadii.sm)),
-            ),
-            isDense: true,
-            suffixIcon: _search.isEmpty
-                ? null
-                : IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () => setState(() => _search = ''),
-                  ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: colors.outlineVariant.withValues(alpha: 0.6),
-            ),
-            borderRadius: BorderRadius.circular(AppRadii.md),
-          ),
-          child: SizedBox(
-            height: 320,
-            child: _loadingSprites
-                ? const Center(child: CircularProgressIndicator())
-                : _filteredSprites.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Text(
-                      'No sprites found',
-                      style: TextStyle(color: colors.onSurfaceVariant),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: _filteredSprites.length,
-                    itemBuilder: (context, index) {
-                      final sprite = _filteredSprites[index];
-                      final selected = sprite == _selectedSprite;
-                      final name =
-                          _names?.nameFor(sprite.dex) ??
-                          'Pokémon #${sprite.dex}';
-                      return InkWell(
-                        onTap: () {
-                          setState(() {
-                            _selectedSprite = sprite;
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(AppRadii.md),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.md,
-                            vertical: AppSpacing.sm,
-                          ),
-                          decoration: BoxDecoration(
-                            color: selected
-                                ? colors.primary.withValues(alpha: 0.08)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(AppRadii.md),
-                          ),
-                          height: 104,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '#${sprite.dex}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 16,
-                                        color: selected
-                                            ? colors.primary
-                                            : colors.onSurfaceVariant,
-                                      ),
-                                    ),
-                                    const SizedBox(height: AppSpacing.xs),
-                                    Text(
-                                      name,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 18,
-                                        color: selected
-                                            ? colors.primary
-                                            : colors.onSurface,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  AppRadii.sm,
-                                ),
-                                child: Image.asset(
-                                  sprite.path,
-                                  width: 96,
-                                  height: 96,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                              if (selected) ...[
-                                const SizedBox(width: AppSpacing.xs),
-                                Icon(Icons.check_circle, color: colors.primary),
-                              ],
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ),
-      ],
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<AddPokemonController>(
+      create: (_) =>
+          AddPokemonController(spriteService: context.read<SpriteService>()),
+      child: const _AddPokemonView(),
     );
   }
+}
+
+class _AddPokemonView extends StatelessWidget {
+  const _AddPokemonView();
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final controller = context.watch<AddPokemonController>();
+    final colors = Theme.of(context).colorScheme;
+
     return AlertDialog(
       backgroundColor: Theme.of(context).cardColor,
       surfaceTintColor: Colors.transparent,
       title: Text(
         l10n.addDialogTitle,
         textAlign: TextAlign.center,
-        style: Theme.of(
-          context,
-        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+        style: Theme.of(context)
+            .textTheme
+            .headlineSmall
+            ?.copyWith(fontWeight: FontWeight.w800),
       ),
       content: SizedBox(
         width: 420,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildSpritePicker(context),
+            _SpritePicker(colors: colors),
             const SizedBox(height: AppSpacing.md),
-            if (_selectedSprite != null)
+            if (controller.selected != null)
               Text(
-                'Selected: ${_names?.nameFor(_selectedSprite!.dex) ?? '#${_selectedSprite!.dex}'}',
+                'Selected: ${controller.displayName(controller.selected!)}',
                 style: const TextStyle(
                   fontWeight: FontWeight.w800,
                   fontSize: 16,
@@ -272,9 +172,9 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
         TextButton(
           onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
           style: OutlinedButton.styleFrom(
-            foregroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: colors.primary,
             side: BorderSide(
-              color: Theme.of(context).colorScheme.primary,
+              color: colors.primary,
               width: 1.4,
             ),
             padding: const EdgeInsets.symmetric(
@@ -290,10 +190,9 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
         const SizedBox(width: AppSpacing.sm),
         ElevatedButton(
           onPressed: () {
-            final sprite = _selectedSprite;
+            final sprite = controller.selected;
             if (sprite == null) return;
-            final name =
-                _names?.nameFor(sprite.dex) ?? 'Pokémon #${sprite.dex}';
+            final name = controller.displayName(sprite);
             Navigator.of(context).pop<Pokemon?>(
               Pokemon(
                 id: _generateId(sprite.dex),
@@ -304,8 +203,8 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
             );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: colors.primary,
+            foregroundColor: colors.onPrimary,
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.sm,
@@ -321,14 +220,136 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
   }
 }
 
-String _generateId(String dex) =>
-    'custom_${dex}_${DateTime.now().microsecondsSinceEpoch}';
+class _SpritePicker extends StatelessWidget {
+  const _SpritePicker({required this.colors});
 
-Future<Pokemon?> showAddPokemonDialog(BuildContext context) {
-  return showDialog<Pokemon?>(
-    context: context,
-    builder: (_) => const AddPokemonDialog(),
-  );
+  final ColorScheme colors;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.watch<AddPokemonController>();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          onChanged: controller.setSearch,
+          decoration: InputDecoration(
+            hintText: 'Search by name or dex',
+            prefixIcon: const Icon(Icons.search),
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(AppRadii.sm)),
+            ),
+            isDense: true,
+            suffixIcon: controller.search.isEmpty
+                ? null
+                : IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: controller.clearSearch,
+                  ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: colors.outlineVariant.withValues(alpha: 0.6),
+            ),
+            borderRadius: BorderRadius.circular(AppRadii.md),
+          ),
+          child: SizedBox(
+            height: 320,
+            child: controller.loading
+                ? const Center(child: CircularProgressIndicator())
+                : controller.filteredSprites.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Text(
+                          'No sprites found',
+                          style: TextStyle(color: colors.onSurfaceVariant),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: controller.filteredSprites.length,
+                        itemBuilder: (context, index) {
+                          final sprite = controller.filteredSprites[index];
+                          final selected = sprite == controller.selected;
+                          final name = controller.displayName(sprite);
+                          return InkWell(
+                            onTap: () => controller.select(sprite),
+                            borderRadius: BorderRadius.circular(AppRadii.md),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.md,
+                                vertical: AppSpacing.sm,
+                              ),
+                              decoration: BoxDecoration(
+                                color: selected
+                                    ? colors.primary.withValues(alpha: 0.08)
+                                    : Colors.transparent,
+                                borderRadius:
+                                    BorderRadius.circular(AppRadii.md),
+                              ),
+                              height: 104,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '#${sprite.dex}',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 16,
+                                            color: selected
+                                                ? colors.primary
+                                                : colors.onSurfaceVariant,
+                                          ),
+                                        ),
+                                        const SizedBox(height: AppSpacing.xs),
+                                        Text(
+                                          name,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 18,
+                                            color: selected
+                                                ? colors.primary
+                                                : colors.onSurface,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.circular(AppRadii.sm),
+                                    child: Image.asset(
+                                      sprite.path,
+                                      width: 96,
+                                      height: 96,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                  if (selected) ...[
+                                    const SizedBox(width: AppSpacing.xs),
+                                    Icon(Icons.check_circle,
+                                        color: colors.primary),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _SpriteOption {
@@ -340,7 +361,17 @@ class _SpriteOption {
 
   final String dex;
   final String path;
-  final int genderPriority; // lower is better
+  final int? genderPriority; // lower is better
 
   String get label => 'Pokédex #$dex';
+}
+
+String _generateId(String dex) =>
+    'custom_${dex}_${DateTime.now().microsecondsSinceEpoch}';
+
+Future<Pokemon?> showAddPokemonDialog(BuildContext context) {
+  return showDialog<Pokemon?>(
+    context: context,
+    builder: (_) => const AddPokemonDialog(),
+  );
 }
