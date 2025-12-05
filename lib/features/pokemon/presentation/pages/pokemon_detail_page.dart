@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_counters_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_daily_counts_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
@@ -35,8 +37,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     _spriteController = DetailSpriteController();
     _controller = CounterController(
       pokemon: widget.pokemon,
-      sync: context.read(),
-      toggleCaughtUseCase: context.read(),
+      sync: context.read<CounterSync>(),
+      toggleCaughtUseCase: context.read<ToggleCaughtUseCase?>(),
     );
     WidgetsBinding.instance.addObserver(this);
     _controller.addListener(() => mounted ? setState(() {}) : null);
