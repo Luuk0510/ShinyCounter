@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
+import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/game_dropdown.dart';
+import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 class HuntInfoCard extends StatelessWidget {
   const HuntInfoCard({
@@ -177,7 +178,6 @@ class _GameSection extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: AppTypography.sectionTitle.copyWith(
                         color: colors.onSurface,
-                        fontSize: 19,
                         fontWeight: FontWeight.w800,
                       ),
                     ),

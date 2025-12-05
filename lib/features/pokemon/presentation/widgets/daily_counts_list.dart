@@ -51,24 +51,25 @@ class DailyCountsList extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.sm,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   l10n.dateLabel,
-                  style: TextStyle(
+                  style: AppTypography.button.copyWith(
                     color: colors.onSurfaceVariant,
                     fontWeight: FontWeight.w700,
-                    fontSize: 15,
                   ),
                 ),
                 Text(
                   l10n.countLabel,
-                  style: TextStyle(
+                  style: AppTypography.button.copyWith(
                     color: colors.onSurfaceVariant,
                     fontWeight: FontWeight.w700,
-                    fontSize: 15,
                   ),
                 ),
               ],
@@ -81,7 +82,10 @@ class DailyCountsList extends StatelessWidget {
           ),
           Expanded(
             child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
               itemBuilder: (context, index) {
                 final entry = entries[index];
                 return Row(
@@ -89,17 +93,15 @@ class DailyCountsList extends StatelessWidget {
                   children: [
                     Text(
                       dayFormatter(entry.key),
-                      style: TextStyle(
+                      style: AppTypography.sectionTitle.copyWith(
                         color: colors.onSurface,
-                        fontSize: 17,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
                       '${entry.value}',
-                      style: TextStyle(
+                      style: AppTypography.sectionTitle.copyWith(
                         color: colors.primary,
-                        fontSize: 17,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -107,7 +109,7 @@ class DailyCountsList extends StatelessWidget {
                 );
               },
               separatorBuilder: (context, _) => Divider(
-                height: 16,
+                height: AppSpacing.lg,
                 thickness: 1,
                 color: colors.outlineVariant.withValues(alpha: 0.25),
               ),

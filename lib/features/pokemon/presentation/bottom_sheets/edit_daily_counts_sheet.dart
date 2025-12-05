@@ -74,9 +74,8 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
             Center(
               child: Text(
                 l10n.editSheetTitle,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: AppTypography.sectionTitle.copyWith(
                   fontWeight: FontWeight.w800,
-                  fontSize: 18,
                 ),
               ),
             ),
@@ -102,7 +101,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                 ),
                 label: Text(
                   l10n.addCountRow,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
+                  style: AppTypography.button.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),
@@ -119,8 +120,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                     ),
                     child: Text(
                       l10n.cancel,
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: AppTypography.button.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -136,8 +136,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                     ),
                     child: Text(
                       l10n.save,
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: AppTypography.button.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -171,18 +170,17 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                 borderRadius: BorderRadius.circular(AppRadii.md),
               ),
             ),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                widget.dayFormatter(_dayKey(row.date)),
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  widget.dayFormatter(_dayKey(row.date)),
+                  style: AppTypography.button.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
         const SizedBox(width: AppSpacing.sm),
         SizedBox(
           width: 110,
