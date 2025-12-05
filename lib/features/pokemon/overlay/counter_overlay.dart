@@ -144,10 +144,8 @@ class _OverlayAppState extends State<_OverlayApp> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
                   color: bg,
                   borderRadius: borderRadius,
@@ -163,7 +161,7 @@ class _OverlayAppState extends State<_OverlayApp> {
                           onTap: _enabled ? () => _bump(-1) : null,
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
