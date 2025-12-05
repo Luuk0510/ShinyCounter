@@ -172,13 +172,13 @@ class _AddPokemonView extends StatelessWidget {
       surfaceTintColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
-        vertical: AppSpacing.none,
+        vertical: AppSpacing.lg,
       ),
       contentPadding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
-        AppSpacing.md,
-        AppSpacing.lg,
         AppSpacing.sm,
+        AppSpacing.lg,
+        AppSpacing.md,
       ),
       title: Text(
         l10n.addDialogTitle,
@@ -187,12 +187,7 @@ class _AddPokemonView extends StatelessWidget {
       ),
       content: SizedBox(
         width: 420,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _SpritePicker(colors: colors),
-          ],
-        ),
+        child: _SpritePicker(colors: colors),
       ),
       actionsAlignment: MainAxisAlignment.center,
       actionsPadding: const EdgeInsets.symmetric(
@@ -207,7 +202,7 @@ class _AddPokemonView extends StatelessWidget {
             side: BorderSide(color: colors.primary, width: 1.4),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
-              vertical: AppSpacing.sm,
+              vertical: AppSpacing.xs,
             ),
           ),
           child: Text(
@@ -240,7 +235,7 @@ class _AddPokemonView extends StatelessWidget {
                 colors.onSurfaceVariant.withValues(alpha: 0.6),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
-              vertical: AppSpacing.sm,
+              vertical: AppSpacing.xs,
             ),
           ),
           child: Text(
@@ -261,6 +256,8 @@ class _SpritePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AddPokemonController>();
+    final maxHeight =
+        MediaQuery.of(context).size.height * 0.9 - AppSpacing.sm;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -356,7 +353,7 @@ class _SpritePicker extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadii.md),
           ),
           child: SizedBox(
-            height: 400,
+            height: maxHeight.clamp(260, 420),
             child: controller.loading
                 ? const Center(child: CircularProgressIndicator())
                 : controller.filteredSprites.isEmpty
