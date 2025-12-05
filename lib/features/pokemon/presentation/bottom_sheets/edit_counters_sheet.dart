@@ -27,12 +27,14 @@ class EditSheetResult {
 class EditCountersSheet extends StatefulWidget {
   const EditCountersSheet({
     super.key,
+    required this.pokemonName,
     required this.counter,
     required this.startedAt,
     required this.caughtAt,
     required this.caughtGame,
   });
 
+  final String pokemonName;
   final int counter;
   final DateTime? startedAt;
   final DateTime? caughtAt;
@@ -91,7 +93,7 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            l10n.editSheetTitle,
+          l10n.editSheetTitle,
             style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: AppSpacing.lg),

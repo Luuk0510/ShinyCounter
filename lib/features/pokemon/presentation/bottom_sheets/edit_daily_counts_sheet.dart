@@ -62,21 +62,21 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 44,
-              height: 5,
-              decoration: BoxDecoration(
-                color: colors.outlineVariant,
-                borderRadius: BorderRadius.circular(AppRadii.sm),
+            Center(
+              child: Container(
+                width: AppSizes.sheetHandleWidth,
+                height: AppSizes.sheetHandleHeight,
+                decoration: BoxDecoration(
+                  color: colors.outlineVariant,
+                  borderRadius: BorderRadius.circular(AppRadii.sm),
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
             Center(
               child: Text(
-                l10n.editSheetTitle,
-                style: AppTypography.sectionTitle.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+                l10n.huntHistoryTitle,
+                style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
               ),
             ),
             const SizedBox(height: AppSpacing.md),

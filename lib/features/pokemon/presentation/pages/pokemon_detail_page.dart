@@ -95,6 +95,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       barrierColor: Colors.black.withValues(alpha: 0.4),
       builder: (context) {
         return EditCountersSheet(
+          pokemonName: widget.pokemon.name,
           counter: _controller.counter,
           startedAt: _controller.startedAt,
           caughtAt: _controller.caughtAt,

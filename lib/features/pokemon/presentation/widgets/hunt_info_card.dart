@@ -88,12 +88,12 @@ class _HuntCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(label, style: labelStyle),
+        Text(label, style: labelStyle, textAlign: TextAlign.center),
         const SizedBox(height: AppSpacing.xs),
-        Text(value, style: valueStyle),
+        Text(value, style: valueStyle, textAlign: TextAlign.center),
       ],
     );
   }
@@ -120,6 +120,7 @@ class _HuntDatesRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _HuntCell(
           label: startLabel,

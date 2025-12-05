@@ -359,8 +359,14 @@ abstract class AppLocalizations {
   /// No description provided for @editSheetTitle.
   ///
   /// In en, this message translates to:
-  /// **'Edit'**
+  /// **'Edit Pokémon details'**
   String get editSheetTitle;
+
+  /// No description provided for @huntHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hunt history'**
+  String get huntHistoryTitle;
 
   /// No description provided for @counterLabel.
   ///

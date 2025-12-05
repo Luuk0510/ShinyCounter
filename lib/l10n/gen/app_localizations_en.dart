@@ -142,7 +142,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addCountRow => 'Add day';
 
   @override
-  String get editSheetTitle => 'Edit';
+  String get editSheetTitle => 'Edit Pokémon details';
+
+  @override
+  String get huntHistoryTitle => 'Hunt history';
 
   @override
   String get counterLabel => 'Counter';
