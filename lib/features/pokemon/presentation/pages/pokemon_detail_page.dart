@@ -233,15 +233,19 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IntrinsicWidth(
-                                  child: HuntInfoCard(
-                                    colors: colors,
-                                    startedAt: _controller.startedAt,
-                                    caughtAt: _controller.caughtAt,
-                                    caughtGame: _controller.caughtGame,
-                                    formatter: formatDate,
-                                    onSelectGame: _showEditDialog,
-                                    onGameChanged: (value) =>
-                                        _controller.setCaughtGame(value),
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: _showEditDialog,
+                                    child: HuntInfoCard(
+                                      colors: colors,
+                                      startedAt: _controller.startedAt,
+                                      caughtAt: _controller.caughtAt,
+                                      caughtGame: _controller.caughtGame,
+                                      formatter: formatDate,
+                                      onSelectGame: _showEditDialog,
+                                      onGameChanged: (value) =>
+                                          _controller.setCaughtGame(value),
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: AppSpacing.lg),
