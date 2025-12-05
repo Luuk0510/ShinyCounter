@@ -25,11 +25,12 @@ class PokemonDetailPage extends StatefulWidget {
 class _PokemonDetailPageState extends State<PokemonDetailPage>
     with WidgetsBindingObserver {
   late final CounterController _controller;
-  bool _showShiny = true;
+  late final ValueNotifier<bool> _showShiny;
 
   @override
   void initState() {
     super.initState();
+    _showShiny = ValueNotifier<bool>(true);
     _controller = CounterController(
       pokemon: widget.pokemon,
       sync: context.read(),
@@ -42,6 +43,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
   @override
   void dispose() {
+    _showShiny.dispose();
     _controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -121,9 +123,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         ? null
         : _deriveNormalPath(widget.pokemon.imagePath);
     if (normal == null) return;
-    setState(() {
-      _showShiny = !_showShiny;
-    });
+    _showShiny.value = !_showShiny.value;
   }
 
   Future<void> _showDailyCountsEditor() async {
@@ -292,15 +292,20 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     final normal = widget.pokemon.isLocalFile
         ? null
         : _deriveNormalPath(widget.pokemon.imagePath);
-    return DetailHeader(
-      pokemon: widget.pokemon,
-      shinyPath: widget.pokemon.imagePath,
-      normalPath: normal,
-      showShiny: _showShiny,
-      onToggleSprite: _toggleSpriteView,
-      colors: colors,
-      isCaught: _controller.isCaught,
-      onToggleCaught: _toggleCaught,
+    return ValueListenableBuilder<bool>(
+      valueListenable: _showShiny,
+      builder: (context, showShiny, _) {
+        return DetailHeader(
+          pokemon: widget.pokemon,
+          shinyPath: widget.pokemon.imagePath,
+          normalPath: normal,
+          showShiny: showShiny,
+          onToggleSprite: _toggleSpriteView,
+          colors: colors,
+          isCaught: _controller.isCaught,
+          onToggleCaught: _toggleCaught,
+        );
+      },
     );
   }
 
