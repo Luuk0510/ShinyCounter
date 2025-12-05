@@ -5,6 +5,7 @@ import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../overlay/counter_overlay_message.dart';
+import '../../domain/services/counter_sync.dart';
 
 class CounterState {
   const CounterState({
@@ -24,14 +25,17 @@ class CounterState {
   final Map<String, int> dailyCounts;
 }
 
-class CounterSyncService {
+class CounterSyncService implements CounterSync {
   CounterSyncService._(this._prefs);
 
   final SharedPreferences _prefs;
   static CounterSyncService? _instance;
-  static final Stream<dynamic> overlayStream = FlutterOverlayWindow
+  static final Stream<dynamic> _overlayStream = FlutterOverlayWindow
       .overlayListener
       .asBroadcastStream();
+
+  @override
+  Stream<dynamic> get overlayStream => _overlayStream;
 
   static Future<CounterSyncService> instance() async {
     if (_instance != null) return _instance!;
@@ -40,6 +44,7 @@ class CounterSyncService {
     return _instance!;
   }
 
+  @override
   Future<CounterState> loadState(String counterKey, String caughtKey) async {
     await _prefs.reload();
     return CounterState(
@@ -71,10 +76,12 @@ class CounterSyncService {
     await _prefs.setInt(counterKey, count);
   }
 
+  @override
   Future<void> setCaught(String caughtKey, bool isCaught) async {
     await _prefs.setBool(caughtKey, isCaught);
   }
 
+  @override
   Future<void> setStartedAt(String counterKey, DateTime? startedAt) async {
     final key = _startedAtKey(counterKey);
     if (startedAt == null) {
@@ -138,10 +145,12 @@ class CounterSyncService {
     await shareToOverlay(message);
   }
 
+  @override
   Future<void> shareToOverlay(CounterOverlayMessage message) async {
     await FlutterOverlayWindow.shareData(message.serialize());
   }
 
+  @override
   Future<void> closeOverlay() => FlutterOverlayWindow.closeOverlay();
 
   String _startedAtKey(String counterKey) => '${counterKey}_startedAt';

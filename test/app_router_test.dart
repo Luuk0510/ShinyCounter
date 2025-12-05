@@ -13,6 +13,7 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokem
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 

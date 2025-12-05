@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_detail_page.dart';
