@@ -10,7 +10,7 @@ import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_d
 import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/hunt_info_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/daily_counts_list.dart';
-import 'package:shiny_counter/features/pokemon/presentation/utils/formatters.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/detail_header.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/counter_controls.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/detail_sprite_controller.dart';

@@ -6,6 +6,7 @@ import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 import 'package:shiny_counter/features/pokemon/overlay/widgets/round_control.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 
 @pragma('vm:entry-point')
 void overlayMain() {
@@ -178,7 +179,7 @@ class _OverlayAppState extends State<_OverlayApp> {
                     _HuntDatesTable(
                       startedAt: _startedAt,
                       caughtAt: _caughtAt,
-                      formatter: _formatDate,
+                      formatter: formatDate,
                     ),
                   ],
                 ),
@@ -190,69 +191,6 @@ class _OverlayAppState extends State<_OverlayApp> {
     );
   }
 
-  String _formatDate(DateTime? value) {
-    if (value == null) return '--';
-    final local = value.toLocal();
-    String two(int v) => v.toString().padLeft(2, '0');
-    return '${two(local.day)}-${two(local.month)}-${local.year} ${two(local.hour)}:${two(local.minute)}';
-  }
-
-  String get _startedAtKey => '${_counterKey}_startedAt';
-
-  String get _caughtAtKey => '${_counterKey}_caughtAt';
-
-  String get _dailyCountsKey => '${_counterKey}_dailyCounts';
-
-  Future<(DateTime?, DateTime?)> _loadHuntDatesFor(String counterKey) async {
-    if (counterKey.isEmpty) return (null, null);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.reload();
-    final startedRaw = prefs.getString('${counterKey}_startedAt');
-    final caughtRaw = prefs.getString('${counterKey}_caughtAt');
-    return (_parseDate(startedRaw), _parseDate(caughtRaw));
-  }
-
-  DateTime? _parseDate(String? raw) =>
-      raw == null ? null : DateTime.tryParse(raw);
-
-  Future<void> _updateDailyCounts(SharedPreferences prefs, int delta) async {
-    if (delta == 0) return;
-    final key = _dailyCountsKey;
-    final current = _readDailyCounts(prefs.getString(key));
-    final dayKey = _dayKey(DateTime.now());
-    final next = (current[dayKey] ?? 0) + delta;
-    if (next <= 0) {
-      current.remove(dayKey);
-    } else {
-      current[dayKey] = next;
-    }
-    if (current.isEmpty) {
-      await prefs.remove(key);
-    } else {
-      await prefs.setString(key, jsonEncode(current));
-    }
-  }
-
-  Map<String, int> _readDailyCounts(String? raw) {
-    if (raw == null) return {};
-    try {
-      final decoded = jsonDecode(raw);
-      if (decoded is! Map) return {};
-      return decoded.map<String, int>((key, value) {
-        final k = key.toString();
-        final v = value is int ? value : int.tryParse(value.toString()) ?? 0;
-        return MapEntry(k, v);
-      })..removeWhere((_, v) => v == 0);
-    } catch (_) {
-      return {};
-    }
-  }
-
-  String _dayKey(DateTime date) {
-    String two(int v) => v.toString().padLeft(2, '0');
-    final local = date.toLocal();
-    return '${local.year}-${two(local.month)}-${two(local.day)}';
-  }
 }
 
 class _HuntDatesTable extends StatelessWidget {
