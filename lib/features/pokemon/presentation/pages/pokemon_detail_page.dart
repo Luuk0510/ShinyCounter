@@ -359,10 +359,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                         ),
                       );
                 return Center(
-                  child: SizedBox(
-                    width: AppSizes.detailImageSize,
-                    height: AppSizes.detailImageSize,
-                    child: image,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: SizedBox(
+                      key: ValueKey(path),
+                      width: AppSizes.detailImageSize,
+                      height: AppSizes.detailImageSize,
+                      child: image,
+                    ),
                   ),
                 );
               },
