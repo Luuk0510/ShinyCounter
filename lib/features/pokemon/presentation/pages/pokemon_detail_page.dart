@@ -330,6 +330,18 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     }
     final canSwipe = sprites.length > 1;
 
+    for (final path in sprites) {
+      if (widget.pokemon.isLocalFile && !path.startsWith('assets/')) {
+        precacheImage(FileImage(File(path)), context);
+      } else {
+        precacheImage(AssetImage(path), context);
+      }
+      final normal = _normalMap[path];
+      if (normal != null) {
+        precacheImage(AssetImage(normal), context);
+      }
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -345,6 +357,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
             height: AppSizes.detailImageSize,
             child: PageView.builder(
               controller: _spritePager,
+              allowImplicitScrolling: true,
               itemCount: sprites.length,
               onPageChanged: (idx) => setState(() {
                 _currentSpriteIndex = idx;
