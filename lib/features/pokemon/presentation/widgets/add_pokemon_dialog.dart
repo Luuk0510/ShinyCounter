@@ -185,9 +185,23 @@ class _AddPokemonView extends StatelessWidget {
         textAlign: TextAlign.center,
         style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
       ),
-      content: SizedBox(
-        width: 420,
-        child: _SpritePicker(colors: colors),
+      content: Builder(
+        builder: (context) {
+          final media = MediaQuery.of(context);
+          final viewInsets = media.viewInsets.bottom;
+          final maxContentHeight = (media.size.height * 0.75 - viewInsets).clamp(
+            240.0,
+            media.size.height,
+          );
+          return SizedBox(
+            width: 420,
+            height: maxContentHeight,
+            child: _SpritePicker(
+              colors: colors,
+              availableHeight: maxContentHeight,
+            ),
+          );
+        },
       ),
       actionsAlignment: MainAxisAlignment.center,
       actionsPadding: const EdgeInsets.symmetric(
@@ -229,10 +243,12 @@ class _AddPokemonView extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: colors.primary,
             foregroundColor: colors.onPrimary,
-            disabledBackgroundColor:
-                colors.onSurfaceVariant.withValues(alpha: 0.2),
-            disabledForegroundColor:
-                colors.onSurfaceVariant.withValues(alpha: 0.6),
+            disabledBackgroundColor: colors.onSurfaceVariant.withValues(
+              alpha: 0.2,
+            ),
+            disabledForegroundColor: colors.onSurfaceVariant.withValues(
+              alpha: 0.6,
+            ),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.xs,
@@ -249,15 +265,17 @@ class _AddPokemonView extends StatelessWidget {
 }
 
 class _SpritePicker extends StatelessWidget {
-  const _SpritePicker({required this.colors});
+  const _SpritePicker({required this.colors, required this.availableHeight});
 
   final ColorScheme colors;
+  final double availableHeight;
 
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AddPokemonController>();
-    final maxHeight =
-        MediaQuery.of(context).size.height * 0.9 - AppSpacing.sm;
+    const headerHeightEstimate = 64.0; // search + dropdown row
+    final listHeight = (availableHeight - headerHeightEstimate - AppSpacing.sm)
+        .clamp(160.0, availableHeight);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -270,7 +288,9 @@ class _SpritePicker extends StatelessWidget {
                   hintText: context.l10n.searchByNameOrDex,
                   prefixIcon: const Icon(Icons.search),
                   border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(AppRadii.sm)),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(AppRadii.sm),
+                    ),
                   ),
                   isDense: true,
                   suffixIcon: controller.search.isEmpty
@@ -290,7 +310,9 @@ class _SpritePicker extends StatelessWidget {
                 isDense: true,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(AppRadii.sm)),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(AppRadii.sm),
+                    ),
                   ),
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: AppSpacing.sm,
@@ -299,46 +321,16 @@ class _SpritePicker extends StatelessWidget {
                 ),
                 onChanged: controller.setGen,
                 items: const [
-                  DropdownMenuItem<int?>(
-                    value: null,
-                    child: Text('All'),
-                  ),
-                  DropdownMenuItem<int?>(
-                    value: 1,
-                    child: Text('Gen 1'),
-                  ),
-                  DropdownMenuItem<int?>(
-                    value: 2,
-                    child: Text('Gen 2'),
-                  ),
-                  DropdownMenuItem<int?>(
-                    value: 3,
-                    child: Text('Gen 3'),
-                  ),
-                  DropdownMenuItem<int?>(
-                    value: 4,
-                    child: Text('Gen 4'),
-                  ),
-                  DropdownMenuItem<int?>(
-                    value: 5,
-                    child: Text('Gen 5'),
-                  ),
-                  DropdownMenuItem<int?>(
-                    value: 6,
-                    child: Text('Gen 6'),
-                  ),
-                  DropdownMenuItem<int?>(
-                    value: 7,
-                    child: Text('Gen 7'),
-                  ),
-                  DropdownMenuItem<int?>(
-                    value: 8,
-                    child: Text('Gen 8'),
-                  ),
-                  DropdownMenuItem<int?>(
-                    value: 9,
-                    child: Text('Gen 9'),
-                  ),
+                  DropdownMenuItem<int?>(value: null, child: Text('All')),
+                  DropdownMenuItem<int?>(value: 1, child: Text('Gen 1')),
+                  DropdownMenuItem<int?>(value: 2, child: Text('Gen 2')),
+                  DropdownMenuItem<int?>(value: 3, child: Text('Gen 3')),
+                  DropdownMenuItem<int?>(value: 4, child: Text('Gen 4')),
+                  DropdownMenuItem<int?>(value: 5, child: Text('Gen 5')),
+                  DropdownMenuItem<int?>(value: 6, child: Text('Gen 6')),
+                  DropdownMenuItem<int?>(value: 7, child: Text('Gen 7')),
+                  DropdownMenuItem<int?>(value: 8, child: Text('Gen 8')),
+                  DropdownMenuItem<int?>(value: 9, child: Text('Gen 9')),
                 ],
               ),
             ),
@@ -353,7 +345,7 @@ class _SpritePicker extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadii.md),
           ),
           child: SizedBox(
-            height: maxHeight.clamp(260, 420),
+            height: listHeight,
             child: controller.loading
                 ? const Center(child: CircularProgressIndicator())
                 : controller.filteredSprites.isEmpty
@@ -364,79 +356,86 @@ class _SpritePicker extends StatelessWidget {
                       style: TextStyle(color: colors.onSurfaceVariant),
                     ),
                   )
-                : ListView.builder(
-                    itemCount: controller.filteredSprites.length,
-                    itemBuilder: (context, index) {
-                      final sprite = controller.filteredSprites[index];
-                      final selected = sprite == controller.selected;
-                      final name = controller.displayName(sprite);
-                      return InkWell(
-                        onTap: () => controller.select(sprite),
-                        borderRadius: BorderRadius.circular(AppRadii.md),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.md,
-                            vertical: AppSpacing.sm,
-                          ),
-                          decoration: BoxDecoration(
-                            color: selected
-                                ? colors.primary.withValues(alpha: 0.08)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(AppRadii.md),
-                          ),
-                          height: 104,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '#${sprite.dex}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 16,
-                                        color: selected
-                                            ? colors.primary
-                                            : colors.onSurfaceVariant,
+                : Scrollbar(
+                    thumbVisibility: true,
+                    child: ListView.builder(
+                      itemCount: controller.filteredSprites.length,
+                      itemBuilder: (context, index) {
+                        final sprite = controller.filteredSprites[index];
+                        final selected = sprite == controller.selected;
+                        final name = controller.displayName(sprite);
+                        return InkWell(
+                          onTap: () => controller.select(sprite),
+                          borderRadius: BorderRadius.circular(AppRadii.md),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                              vertical: AppSpacing.sm,
+                            ),
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? colors.primary.withValues(alpha: 0.08)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(AppRadii.md),
+                            ),
+                            height: 104,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '#${sprite.dex}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 16,
+                                          color: selected
+                                              ? colors.primary
+                                              : colors.onSurfaceVariant,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: AppSpacing.xs),
-                                    Text(
-                                      name,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 18,
-                                        color: selected
-                                            ? colors.primary
-                                            : colors.onSurface,
+                                      const SizedBox(height: AppSpacing.xs),
+                                      Text(
+                                        name,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 18,
+                                          color: selected
+                                              ? colors.primary
+                                              : colors.onSurface,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  AppRadii.sm,
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadii.sm,
+                                  ),
+                                  child: Image.asset(
+                                    sprite.path,
+                                    width: 96,
+                                    height: 96,
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
-                                child: Image.asset(
-                                  sprite.path,
-                                  width: 96,
-                                  height: 96,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                              if (selected) ...[
-                                const SizedBox(width: AppSpacing.xs),
-                                Icon(Icons.check_circle, color: colors.primary),
+                                if (selected) ...[
+                                  const SizedBox(width: AppSpacing.xs),
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: colors.primary,
+                                  ),
+                                ],
                               ],
-                            ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
           ),
         ),
