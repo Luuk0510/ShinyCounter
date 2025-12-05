@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +13,8 @@ import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_d
 import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
-import 'package:shiny_counter/features/pokemon/presentation/state/detail_sprite_controller.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 
 class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({super.key, required this.pokemon});
@@ -26,12 +28,16 @@ class PokemonDetailPage extends StatefulWidget {
 class _PokemonDetailPageState extends State<PokemonDetailPage>
     with WidgetsBindingObserver {
   late final CounterController _controller;
-  late final DetailSpriteController _spriteController;
+  late final PageController _spritePager;
+  int _currentSpriteIndex = 0;
+  bool _showNormal = false;
+  List<String> _shinySprites = [];
+  final Map<String, String?> _normalMap = {};
 
   @override
   void initState() {
     super.initState();
-    _spriteController = DetailSpriteController();
+    _spritePager = PageController();
     _controller = CounterController(
       pokemon: widget.pokemon,
       sync: context.read<CounterSync>(),
@@ -40,14 +46,38 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     WidgetsBinding.instance.addObserver(this);
     _controller.addListener(() => mounted ? setState(() {}) : null);
     _controller.init();
+    _loadSprites();
   }
 
   @override
   void dispose() {
-    _spriteController.dispose();
+    _spritePager.dispose();
     _controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  Future<void> _loadSprites() async {
+    final parsed = SpriteParser.parse(widget.pokemon.imagePath.split('/').last);
+    if (parsed == null) return;
+    final service = context.read<SpriteService>();
+    final assets = await service.loadSprites();
+    final shiny = assets.where((p) => p.dex == parsed.dex && p.shiny).toList()
+      ..sort((a, b) => a.form.compareTo(b.form));
+    final normal = assets.where((p) => p.dex == parsed.dex && !p.shiny).toList();
+    _normalMap.clear();
+    for (final s in shiny) {
+      final match = normal.firstWhere(
+        (n) => n.form == s.form && n.gender == s.gender,
+        orElse: () => s,
+      );
+      _normalMap[s.path] = match.shiny ? null : match.path;
+    }
+    setState(() {
+      _shinySprites = shiny.map((e) => e.path).toList();
+      _currentSpriteIndex = 0;
+      _showNormal = false;
+    });
   }
 
   @override
@@ -118,13 +148,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
   Future<void> _togglePill() async {
     await _controller.toggleOverlay();
-  }
-
-  void _toggleSpriteView() {
-    final normal = widget.pokemon.isLocalFile
-        ? null
-        : _deriveNormalPath(widget.pokemon.imagePath);
-    _spriteController.toggle(hasNormal: normal != null);
   }
 
   Future<void> _showDailyCountsEditor() async {
@@ -278,23 +301,95 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   }
 
   Widget _buildImageSection(ColorScheme colors) {
-    final normal = widget.pokemon.isLocalFile
-        ? null
-        : _deriveNormalPath(widget.pokemon.imagePath);
-    return AnimatedBuilder(
-      animation: _spriteController,
-      builder: (context, _) {
-        return DetailHeader(
-          pokemon: widget.pokemon,
-          shinyPath: widget.pokemon.imagePath,
-          normalPath: normal,
-          showShiny: _spriteController.showShiny,
-          onToggleSprite: _toggleSpriteView,
-          colors: colors,
-          isCaught: _controller.isCaught,
-          onToggleCaught: _toggleCaught,
-        );
-      },
+    final sprites = <String>[widget.pokemon.imagePath];
+    if (_shinySprites.isNotEmpty) {
+      sprites
+        ..clear()
+        ..addAll(_shinySprites);
+    } else {
+      final normal = widget.pokemon.isLocalFile
+          ? null
+          : _deriveNormalPath(widget.pokemon.imagePath);
+      if (normal != null && normal != widget.pokemon.imagePath) {
+        sprites.add(normal);
+      }
+    }
+    final canSwipe = sprites.length > 1;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        GestureDetector(
+          onTap: () {
+            final shiny = sprites[_currentSpriteIndex];
+            final normal = _normalMap[shiny];
+            if (normal != null) {
+              setState(() => _showNormal = !_showNormal);
+            }
+          },
+          child: SizedBox(
+            height: AppSizes.detailImageSize,
+            child: PageView.builder(
+              controller: _spritePager,
+              itemCount: sprites.length,
+              onPageChanged: (idx) => setState(() {
+                _currentSpriteIndex = idx;
+                _showNormal = false;
+              }),
+              itemBuilder: (context, index) {
+                final shinyPath = sprites[index];
+                final normalPath = _normalMap[shinyPath];
+                final showNormal = _showNormal && normalPath != null;
+                final path = showNormal ? normalPath! : shinyPath;
+                final image = widget.pokemon.isLocalFile && !path.startsWith('assets/')
+                    ? Image.file(
+                        File(path),
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stack) => const Icon(
+                          Icons.catching_pokemon,
+                          size: AppSizes.detailImageFallback,
+                        ),
+                      )
+                    : Image.asset(
+                        path,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stack) => const Icon(
+                          Icons.catching_pokemon,
+                          size: AppSizes.detailImageFallback,
+                        ),
+                      );
+                return Center(
+                  child: SizedBox(
+                    width: AppSizes.detailImageSize,
+                    height: AppSizes.detailImageSize,
+                    child: image,
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        if (canSwipe) ...[
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              sprites.length,
+              (i) => Container(
+                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: i == _currentSpriteIndex
+                      ? colors.primary
+                      : colors.primary.withValues(alpha: 0.3),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 
