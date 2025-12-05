@@ -13,6 +13,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/daily_counts
 import 'package:shiny_counter/features/pokemon/presentation/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/detail_header.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/counter_controls.dart';
+import 'package:shiny_counter/features/pokemon/presentation/state/detail_sprite_controller.dart';
 
 class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({super.key, required this.pokemon});
@@ -26,12 +27,12 @@ class PokemonDetailPage extends StatefulWidget {
 class _PokemonDetailPageState extends State<PokemonDetailPage>
     with WidgetsBindingObserver {
   late final CounterController _controller;
-  late final ValueNotifier<bool> _showShiny;
+  late final DetailSpriteController _spriteController;
 
   @override
   void initState() {
     super.initState();
-    _showShiny = ValueNotifier<bool>(true);
+    _spriteController = DetailSpriteController();
     _controller = CounterController(
       pokemon: widget.pokemon,
       sync: context.read(),
@@ -44,7 +45,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
   @override
   void dispose() {
-    _showShiny.dispose();
+    _spriteController.dispose();
     _controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -123,8 +124,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     final normal = widget.pokemon.isLocalFile
         ? null
         : _deriveNormalPath(widget.pokemon.imagePath);
-    if (normal == null) return;
-    _showShiny.value = !_showShiny.value;
+    _spriteController.toggle(hasNormal: normal != null);
   }
 
   Future<void> _showDailyCountsEditor() async {
@@ -278,14 +278,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     final normal = widget.pokemon.isLocalFile
         ? null
         : _deriveNormalPath(widget.pokemon.imagePath);
-    return ValueListenableBuilder<bool>(
-      valueListenable: _showShiny,
-      builder: (context, showShiny, _) {
+    return AnimatedBuilder(
+      animation: _spriteController,
+      builder: (context, _) {
         return DetailHeader(
           pokemon: widget.pokemon,
           shinyPath: widget.pokemon.imagePath,
           normalPath: normal,
-          showShiny: showShiny,
+          showShiny: _spriteController.showShiny,
           onToggleSprite: _toggleSpriteView,
           colors: colors,
           isCaught: _controller.isCaught,
