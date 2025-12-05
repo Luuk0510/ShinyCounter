@@ -243,7 +243,9 @@ class _PokemonListPageState extends State<PokemonListPage> {
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   context.l10n.manageTitle,
-                  style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
+                  style: AppTypography.title.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Flexible(

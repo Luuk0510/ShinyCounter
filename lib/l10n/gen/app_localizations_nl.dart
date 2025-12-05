@@ -65,6 +65,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get editDialogTitle => 'Pokémon bewerken';
 
   @override
+  String get choose => 'Kies';
+
+  @override
   String get nameLabel => 'Naam';
 
   @override
@@ -146,6 +149,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get huntHistoryTitle => 'Hunt-geschiedenis';
+
+  @override
+  String get searchByNameOrDex => 'Zoek op naam of Pokédex';
 
   @override
   String get counterLabel => 'Counter';

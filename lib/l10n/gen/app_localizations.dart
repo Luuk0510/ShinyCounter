@@ -206,6 +206,12 @@ abstract class AppLocalizations {
   /// **'Edit Pokémon'**
   String get editDialogTitle;
 
+  /// No description provided for @choose.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose'**
+  String get choose;
+
   /// No description provided for @nameLabel.
   ///
   /// In en, this message translates to:
@@ -367,6 +373,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hunt history'**
   String get huntHistoryTitle;
+
+  /// No description provided for @searchByNameOrDex.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name or dex'**
+  String get searchByNameOrDex;
 
   /// No description provided for @counterLabel.
   ///

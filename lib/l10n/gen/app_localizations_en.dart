@@ -65,6 +65,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editDialogTitle => 'Edit Pokémon';
 
   @override
+  String get choose => 'Choose';
+
+  @override
   String get nameLabel => 'Name';
 
   @override
@@ -146,6 +149,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get huntHistoryTitle => 'Hunt history';
+
+  @override
+  String get searchByNameOrDex => 'Search by name or dex';
 
   @override
   String get counterLabel => 'Counter';

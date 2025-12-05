@@ -76,7 +76,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
             Center(
               child: Text(
                 l10n.huntHistoryTitle,
-                style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
+                style: AppTypography.title.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.md),

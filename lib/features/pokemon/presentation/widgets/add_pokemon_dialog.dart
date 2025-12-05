@@ -20,11 +20,13 @@ class AddPokemonController extends ChangeNotifier {
   String _search = '';
   bool _loading = true;
   PokemonNames? _names;
+  int? _selectedGen; // null = all
 
   List<_SpriteOption> get sprites => List.unmodifiable(_sprites);
   _SpriteOption? get selected => _selectedSprite;
   bool get loading => _loading;
   String get search => _search;
+  int? get selectedGen => _selectedGen;
 
   Future<void> _init() async {
     await Future.wait([_loadNames(), _loadSprites()]);
@@ -71,9 +73,12 @@ class AddPokemonController extends ChangeNotifier {
   }
 
   List<_SpriteOption> get filteredSprites {
-    if (_search.isEmpty) return _sprites;
+    final source = _selectedGen == null
+        ? _sprites
+        : _sprites.where(_matchesSelectedGen).toList();
+    if (_search.isEmpty) return source;
     final term = _search.toLowerCase();
-    return _sprites.where((s) {
+    return source.where((s) {
       final name = _names?.nameFor(s.dex).toLowerCase() ?? '';
       final combined = '${s.dex} $name';
       return combined.contains(term);
@@ -82,6 +87,11 @@ class AddPokemonController extends ChangeNotifier {
 
   void setSearch(String value) {
     _search = value;
+    notifyListeners();
+  }
+
+  void setGen(int? gen) {
+    _selectedGen = gen;
     notifyListeners();
   }
 
@@ -94,6 +104,27 @@ class AddPokemonController extends ChangeNotifier {
 
   String displayName(_SpriteOption sprite) =>
       _names?.nameFor(sprite.dex) ?? 'Pokémon #${sprite.dex}';
+
+  bool _matchesSelectedGen(_SpriteOption sprite) {
+    final gen = _selectedGen;
+    if (gen == null) return true;
+    final dexNum = int.tryParse(sprite.dex) ?? 0;
+    final range = _genRanges[gen];
+    if (range == null) return true;
+    return dexNum >= range.$1 && dexNum <= range.$2;
+  }
+
+  static const Map<int, (int, int)> _genRanges = {
+    1: (1, 151),
+    2: (152, 251),
+    3: (252, 386),
+    4: (387, 493),
+    5: (494, 649),
+    6: (650, 721),
+    7: (722, 809),
+    8: (810, 905),
+    9: (906, 1025),
+  };
 
   int? _genderPriority(String token) {
     switch (token) {
@@ -139,6 +170,16 @@ class _AddPokemonView extends StatelessWidget {
     return AlertDialog(
       backgroundColor: Theme.of(context).cardColor,
       surfaceTintColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.none,
+      ),
+      contentPadding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.md,
+        AppSpacing.lg,
+        AppSpacing.sm,
+      ),
       title: Text(
         l10n.addDialogTitle,
         textAlign: TextAlign.center,
@@ -150,15 +191,6 @@ class _AddPokemonView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             _SpritePicker(colors: colors),
-            const SizedBox(height: AppSpacing.md),
-            if (controller.selected != null)
-              Text(
-                'Selected: ${controller.displayName(controller.selected!)}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16,
-                ),
-              ),
           ],
         ),
       ),
@@ -185,29 +217,34 @@ class _AddPokemonView extends StatelessWidget {
         ),
         const SizedBox(width: AppSpacing.sm),
         ElevatedButton(
-          onPressed: () {
-            final sprite = controller.selected;
-            if (sprite == null) return;
-            final name = controller.displayName(sprite);
-            Navigator.of(context).pop<Pokemon?>(
-              Pokemon(
-                id: _generateId(sprite.dex),
-                name: name,
-                imagePath: sprite.path,
-                isLocalFile: false,
-              ),
-            );
-          },
+          onPressed: controller.selected == null
+              ? null
+              : () {
+                  final sprite = controller.selected!;
+                  final name = controller.displayName(sprite);
+                  Navigator.of(context).pop<Pokemon?>(
+                    Pokemon(
+                      id: _generateId(sprite.dex),
+                      name: name,
+                      imagePath: sprite.path,
+                      isLocalFile: false,
+                    ),
+                  );
+                },
           style: ElevatedButton.styleFrom(
             backgroundColor: colors.primary,
             foregroundColor: colors.onPrimary,
+            disabledBackgroundColor:
+                colors.onSurfaceVariant.withValues(alpha: 0.2),
+            disabledForegroundColor:
+                colors.onSurfaceVariant.withValues(alpha: 0.6),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.sm,
             ),
           ),
           child: Text(
-            l10n.save,
+            l10n.choose,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
           ),
         ),
@@ -227,22 +264,88 @@ class _SpritePicker extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
-          onChanged: controller.setSearch,
-          decoration: InputDecoration(
-            hintText: 'Search by name or dex',
-            prefixIcon: const Icon(Icons.search),
-            border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(AppRadii.sm)),
-            ),
-            isDense: true,
-            suffixIcon: controller.search.isEmpty
-                ? null
-                : IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: controller.clearSearch,
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                onChanged: controller.setSearch,
+                decoration: InputDecoration(
+                  hintText: context.l10n.searchByNameOrDex,
+                  prefixIcon: const Icon(Icons.search),
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(AppRadii.sm)),
                   ),
-          ),
+                  isDense: true,
+                  suffixIcon: controller.search.isEmpty
+                      ? null
+                      : IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: controller.clearSearch,
+                        ),
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            SizedBox(
+              width: 120,
+              child: DropdownButtonFormField<int?>(
+                value: controller.selectedGen,
+                isDense: true,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(AppRadii.sm)),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.sm,
+                  ),
+                ),
+                onChanged: controller.setGen,
+                items: const [
+                  DropdownMenuItem<int?>(
+                    value: null,
+                    child: Text('All'),
+                  ),
+                  DropdownMenuItem<int?>(
+                    value: 1,
+                    child: Text('Gen 1'),
+                  ),
+                  DropdownMenuItem<int?>(
+                    value: 2,
+                    child: Text('Gen 2'),
+                  ),
+                  DropdownMenuItem<int?>(
+                    value: 3,
+                    child: Text('Gen 3'),
+                  ),
+                  DropdownMenuItem<int?>(
+                    value: 4,
+                    child: Text('Gen 4'),
+                  ),
+                  DropdownMenuItem<int?>(
+                    value: 5,
+                    child: Text('Gen 5'),
+                  ),
+                  DropdownMenuItem<int?>(
+                    value: 6,
+                    child: Text('Gen 6'),
+                  ),
+                  DropdownMenuItem<int?>(
+                    value: 7,
+                    child: Text('Gen 7'),
+                  ),
+                  DropdownMenuItem<int?>(
+                    value: 8,
+                    child: Text('Gen 8'),
+                  ),
+                  DropdownMenuItem<int?>(
+                    value: 9,
+                    child: Text('Gen 9'),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: AppSpacing.sm),
         DecoratedBox(
@@ -253,7 +356,7 @@ class _SpritePicker extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadii.md),
           ),
           child: SizedBox(
-            height: 320,
+            height: 400,
             child: controller.loading
                 ? const Center(child: CircularProgressIndicator())
                 : controller.filteredSprites.isEmpty

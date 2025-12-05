@@ -172,9 +172,7 @@ Widget buildTestApp(
       Provider<SpriteService>.value(
         value: spriteService ?? FakeSpriteService(),
       ),
-      Provider<CounterSync>.value(
-        value: counterSync ?? FakeCounterSync(),
-      ),
+      Provider<CounterSync>.value(value: counterSync ?? FakeCounterSync()),
     ],
     child: MaterialApp(
       locale: locale,
