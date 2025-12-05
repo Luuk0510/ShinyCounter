@@ -54,7 +54,10 @@ class GameDropdown extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(AppRadii.sm)),
             ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
           ),
           onChanged: (val) => onChanged(val?.isEmpty == true ? null : val),
           hint: Text(l10n.gameHint),

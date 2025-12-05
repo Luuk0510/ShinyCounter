@@ -36,7 +36,10 @@ class HuntInfoCard extends StatelessWidget {
     final cardColor = Theme.of(context).cardColor;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(AppRadii.md),
