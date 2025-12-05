@@ -89,10 +89,7 @@ class _GameTile extends StatelessWidget {
         : AppTypography.sectionTitle.copyWith(fontWeight: FontWeight.w700);
     return Row(
       children: [
-        GameLogo(
-          game: game,
-          size: dense ? AppSpacing.xl : AppSpacing.xxl,
-        ),
+        GameLogo(game: game, size: dense ? AppSpacing.xl : AppSpacing.xxl),
         const SizedBox(width: AppSpacing.xs),
         Expanded(
           child: Text(

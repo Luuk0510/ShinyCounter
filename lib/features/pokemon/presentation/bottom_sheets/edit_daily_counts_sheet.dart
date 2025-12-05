@@ -170,17 +170,17 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                 borderRadius: BorderRadius.circular(AppRadii.md),
               ),
             ),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  widget.dayFormatter(_dayKey(row.date)),
-                  style: AppTypography.button.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                widget.dayFormatter(_dayKey(row.date)),
+                style: AppTypography.button.copyWith(
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
           ),
+        ),
         const SizedBox(width: AppSpacing.sm),
         SizedBox(
           width: 110,

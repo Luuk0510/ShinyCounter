@@ -105,7 +105,6 @@ class _OverlayAppState extends State<_OverlayApp> {
     FlutterOverlayWindow.shareData(message.serialize());
   }
 
-
   String get _startedAtKey => '${_counterKey}_startedAt';
   String get _caughtAtKey => '${_counterKey}_caughtAt';
 
@@ -124,7 +123,9 @@ class _OverlayAppState extends State<_OverlayApp> {
     final today = DateTime.now().toIso8601String().split('T').first;
     final key = '${_counterKey}_dailyCounts';
     final raw = prefs.getString(key);
-    final map = raw == null ? <String, int>{} : Map<String, int>.from(jsonDecode(raw) as Map);
+    final map = raw == null
+        ? <String, int>{}
+        : Map<String, int>.from(jsonDecode(raw) as Map);
     map[today] = (map[today] ?? 0) + delta;
     await prefs.setString(key, jsonEncode(map));
   }
@@ -214,7 +215,6 @@ class _OverlayAppState extends State<_OverlayApp> {
       ),
     );
   }
-
 }
 
 class _HuntDatesTable extends StatelessWidget {
