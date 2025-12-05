@@ -20,10 +20,8 @@ class GameDropdown extends StatelessWidget {
       children: [
         Text(
           l10n.gameLabel,
-          style: TextStyle(
+          style: AppTypography.sectionTitle.copyWith(
             color: colors.onSurfaceVariant,
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
@@ -83,13 +81,15 @@ class _GameTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = TextStyle(
-      fontSize: dense ? 14 : 16,
-      fontWeight: FontWeight.w600,
-    );
+    final textStyle = dense
+        ? AppTypography.button
+        : AppTypography.sectionTitle.copyWith(fontWeight: FontWeight.w700);
     return Row(
       children: [
-        GameLogo(game: game, size: dense ? 24 : 28),
+        GameLogo(
+          game: game,
+          size: dense ? AppSpacing.xl : AppSpacing.xxl,
+        ),
         const SizedBox(width: AppSpacing.xs),
         Expanded(
           child: Text(
@@ -108,7 +108,7 @@ class _GameTile extends StatelessWidget {
 }
 
 class GameLogo extends StatelessWidget {
-  const GameLogo({super.key, required this.game, this.size = 28});
+  const GameLogo({super.key, required this.game, this.size = AppSpacing.xxl});
 
   final String game;
   final double size;

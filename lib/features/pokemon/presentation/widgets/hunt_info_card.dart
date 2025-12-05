@@ -26,14 +26,11 @@ class HuntInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final labelStyle = TextStyle(
+    final labelStyle = AppTypography.button.copyWith(
       color: colors.onSurfaceVariant,
-      fontSize: 15,
-      fontWeight: FontWeight.w700,
     );
-    final valueStyle = TextStyle(
+    final valueStyle = AppTypography.sectionTitle.copyWith(
       color: colors.onSurface,
-      fontSize: 17,
       fontWeight: FontWeight.w800,
     );
     final cardColor = Theme.of(context).cardColor;
@@ -81,12 +78,15 @@ class HuntInfoCard extends StatelessWidget {
                               value: g.isEmpty ? null : g,
                               child: Row(
                                 children: [
-                                  GameLogo(game: g, size: 24),
+                                  GameLogo(game: g, size: AppSpacing.xxl),
                                   const SizedBox(width: AppSpacing.xs),
                                   Expanded(
                                     child: Text(
                                       g.isEmpty ? l10n.selectGameHint : g,
                                       overflow: TextOverflow.ellipsis,
+                                      style: AppTypography.sectionTitle.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -101,8 +101,8 @@ class HuntInfoCard extends StatelessWidget {
                           ),
                         ),
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.sm,
                         ),
                       ),
                       onChanged: onGameChanged,
@@ -121,14 +121,14 @@ class HuntInfoCard extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          GameLogo(game: caughtGame!, size: 22),
+                          GameLogo(game: caughtGame!, size: AppSpacing.xxl),
                           const SizedBox(width: AppSpacing.xs),
                           Text(
                             l10n.huntGame(caughtGame!),
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: AppTypography.sectionTitle.copyWith(
                               color: colors.onSurface,
-                              fontSize: 17,
+                              fontSize: 19,
                               fontWeight: FontWeight.w800,
                             ),
                           ),

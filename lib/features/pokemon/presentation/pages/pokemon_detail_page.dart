@@ -12,8 +12,6 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/hunt_info_ca
 import 'package:shiny_counter/features/pokemon/presentation/widgets/daily_counts_list.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/detail_header.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/counter_controls.dart';
-import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 
 class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({super.key, required this.pokemon});
@@ -27,23 +25,16 @@ class PokemonDetailPage extends StatefulWidget {
 class _PokemonDetailPageState extends State<PokemonDetailPage>
     with WidgetsBindingObserver {
   late final CounterController _controller;
-  late final SpriteService _spriteService;
-  late final PageController _pageController;
   bool _showShiny = true;
-  List<_FormSprite> _forms = [];
-  int _currentFormIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _spriteService = context.read<SpriteService>();
-    _pageController = PageController();
     _controller = CounterController(
       pokemon: widget.pokemon,
       sync: context.read(),
       toggleCaughtUseCase: context.read(),
     );
-    _loadForms();
     WidgetsBinding.instance.addObserver(this);
     _controller.addListener(() => mounted ? setState(() {}) : null);
     _controller.init();
@@ -51,7 +42,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
   @override
   void dispose() {
-    _pageController.dispose();
     _controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -127,27 +117,13 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   }
 
   void _toggleSpriteView() {
-    // If forms exist, respect the current form; otherwise toggle base sprite.
-    if (_forms.isNotEmpty) {
-      final current = _currentFormIndex < _forms.length
-          ? _forms[_currentFormIndex]
-          : null;
-      final hasNormal =
-          current?.normalPath ??
-          _deriveNormalPath(current?.shinyPath ?? widget.pokemon.imagePath);
-      if (current == null || hasNormal == null) return;
-      setState(() {
-        _showShiny = !_showShiny;
-      });
-    } else {
-      final normal = widget.pokemon.isLocalFile
-          ? null
-          : _deriveNormalPath(widget.pokemon.imagePath);
-      if (normal == null) return;
-      setState(() {
-        _showShiny = !_showShiny;
-      });
-    }
+    final normal = widget.pokemon.isLocalFile
+        ? null
+        : _deriveNormalPath(widget.pokemon.imagePath);
+    if (normal == null) return;
+    setState(() {
+      _showShiny = !_showShiny;
+    });
   }
 
   Future<void> _showDailyCountsEditor() async {
@@ -312,146 +288,19 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     return '${two(local.day)}-${two(local.month)}-${local.year}';
   }
 
-  Future<void> _loadForms() async {
-    final dex =
-        dexFromString(widget.pokemon.imagePath) ??
-        dexFromString(widget.pokemon.id);
-    if (dex == null) return;
-    try {
-      final parsedSprites = await _spriteService.loadSprites(refresh: true);
-      final entries = parsedSprites.where((p) => p.dex == dex);
-
-      final Map<String, _FormSprite> forms = {};
-      for (final parsed in entries) {
-        final key = parsed.form;
-        final existing = forms[key] ?? _FormSprite(form: parsed.form);
-        if (parsed.shiny && existing.shinyPath == null) {
-          existing.shinyPath = parsed.path;
-        } else if (!parsed.shiny && existing.normalPath == null) {
-          existing.normalPath = parsed.path;
-        }
-        forms[key] = existing;
-      }
-
-      for (final f in forms.values) {
-        if (f.normalPath == null && f.shinyPath != null) {
-          f.normalPath = _deriveNormalPath(f.shinyPath!);
-        } else if (f.shinyPath == null && f.normalPath != null) {
-          final normal = f.normalPath!;
-          if (normal.contains('_n.')) {
-            f.shinyPath = normal.replaceFirst('_n.', '_s.');
-          }
-        }
-      }
-
-      final list = forms.values
-          .where((f) => f.shinyPath != null || f.normalPath != null)
-          .toList()
-        ..sort((a, b) {
-          int rank(String form) {
-            final lower = form.toLowerCase();
-            if (lower.contains('gmax')) return 3;
-            if (lower.contains('mega')) return 2;
-            return 0;
-          }
-
-          final rDiff = rank(a.form).compareTo(rank(b.form));
-          if (rDiff != 0) return rDiff;
-          return a.form.compareTo(b.form);
-        });
-
-      if (list.isEmpty) {
-        list.add(
-          _FormSprite(
-            form: 'base',
-            shinyPath: widget.pokemon.imagePath,
-            normalPath: widget.pokemon.isLocalFile
-                ? null
-                : _deriveNormalPath(widget.pokemon.imagePath),
-          ),
-        );
-      }
-
-      setState(() {
-        _forms = list;
-        _currentFormIndex = 0;
-        _showShiny = true;
-      });
-    } catch (_) {}
-  }
-
   Widget _buildImageSection(ColorScheme colors) {
-    if (_forms.isEmpty) {
-      final normal = widget.pokemon.isLocalFile
-          ? null
-          : _deriveNormalPath(widget.pokemon.imagePath);
-      return DetailHeader(
-        pokemon: widget.pokemon,
-        shinyPath: widget.pokemon.imagePath,
-        normalPath: normal,
-        showShiny: _showShiny,
-        onToggleSprite: _toggleSpriteView,
-        colors: colors,
-        isCaught: _controller.isCaught,
-        onToggleCaught: _toggleCaught,
-      );
-    }
-
-    return Column(
-      children: [
-        SizedBox(
-          height: 320,
-          child: PageView.builder(
-            controller: _pageController,
-            physics: const PageScrollPhysics(),
-            itemCount: _forms.length,
-            onPageChanged: (i) {
-              setState(() {
-                _currentFormIndex = i;
-                _showShiny = true;
-              });
-            },
-            itemBuilder: (context, index) {
-              final form = _forms[index];
-              return DetailHeader(
-                pokemon: widget.pokemon,
-                shinyPath:
-                    form.shinyPath ??
-                    form.normalPath ??
-                    widget.pokemon.imagePath,
-                normalPath:
-                    form.normalPath ??
-                    _deriveNormalPath(
-                      form.shinyPath ?? widget.pokemon.imagePath,
-                    ),
-                showShiny: index == _currentFormIndex ? _showShiny : true,
-                onToggleSprite: _toggleSpriteView,
-                colors: colors,
-                isCaught: _controller.isCaught,
-                onToggleCaught: _toggleCaught,
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        if (_forms.length > 1)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(_forms.length, (i) {
-              final active = i == _currentFormIndex;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                width: active ? 14 : 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: active ? colors.primary : colors.outlineVariant,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              );
-            }),
-          ),
-      ],
+    final normal = widget.pokemon.isLocalFile
+        ? null
+        : _deriveNormalPath(widget.pokemon.imagePath);
+    return DetailHeader(
+      pokemon: widget.pokemon,
+      shinyPath: widget.pokemon.imagePath,
+      normalPath: normal,
+      showShiny: _showShiny,
+      onToggleSprite: _toggleSpriteView,
+      colors: colors,
+      isCaught: _controller.isCaught,
+      onToggleCaught: _toggleCaught,
     );
   }
 
@@ -494,11 +343,4 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     }
     return null;
   }
-}
-
-class _FormSprite {
-  _FormSprite({required this.form, this.shinyPath, this.normalPath});
-  final String form;
-  String? shinyPath;
-  String? normalPath;
 }
