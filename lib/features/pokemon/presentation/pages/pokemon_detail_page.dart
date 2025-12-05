@@ -10,6 +10,7 @@ import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_d
 import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/hunt_info_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/daily_counts_list.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/detail_header.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/counter_controls.dart';
 
@@ -139,7 +140,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       builder: (context) {
         return EditDailyCountsSheet(
           dailyCounts: _controller.dailyCounts,
-          dayFormatter: _formatDayKey,
+          dayFormatter: formatDayKey,
         );
       },
     );
@@ -236,7 +237,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                                     startedAt: _controller.startedAt,
                                     caughtAt: _controller.caughtAt,
                                     caughtGame: _controller.caughtGame,
-                                    formatter: _formatDate,
+                                    formatter: formatDate,
                                     onSelectGame: _showEditDialog,
                                     onGameChanged: (value) =>
                                         _controller.setCaughtGame(value),
@@ -253,7 +254,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                                     child: DailyCountsList(
                                       colors: colors,
                                       dailyCounts: _controller.dailyCounts,
-                                      dayFormatter: _formatDayKey,
+                                      dayFormatter: formatDayKey,
                                     ),
                                   ),
                                 ),
@@ -271,21 +272,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         },
       ),
     );
-  }
-
-  String _formatDate(DateTime? value) {
-    if (value == null) return '--';
-    final local = value.toLocal();
-    String two(int v) => v.toString().padLeft(2, '0');
-    return '${two(local.day)}-${two(local.month)}-${local.year}';
-  }
-
-  String _formatDayKey(String key) {
-    final parsed = DateTime.tryParse(key);
-    if (parsed == null) return key;
-    String two(int v) => v.toString().padLeft(2, '0');
-    final local = parsed.toLocal();
-    return '${two(local.day)}-${two(local.month)}-${local.year}';
   }
 
   Widget _buildImageSection(ColorScheme colors) {
