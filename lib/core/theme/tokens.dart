@@ -70,6 +70,34 @@ class AppSizes {
   static const emptyStateButtonPadding = 14.0;
   static const settingsActionPaddingH = AppSpacing.xl;
   static const settingsActionPaddingV = AppSpacing.sm;
+  static const overlayControlPad = 14.0;
+  static const overlayControlSize = 30.0;
+  static const overlayControlGap = 4.0;
+  static const overlayBlur = 14.0;
+  static const overlayCorner = 150.0;
+  static const overlayPadH = 12.0;
+  static const overlayPadV = 10.0;
+  static const overlayNameSize = 14.0;
+  static const overlayCountSize = 26.0;
+  static const overlayCloseSize = 24.0;
+  static const overlaySpacer = 10.0;
+  static const overlayTablePadH = 12.0;
+  static const overlayTablePadV = 8.0;
+  static const overlayTableCorner = 12.0;
+  static const overlayLabelSize = 12.0;
+  static const overlayValueSize = 14.0;
+  static const overlayCellGap = 16.0;
+  static const overlayLabelSpace = 2.0;
+  static const sheetHandleHeightPx = 5.0;
+  static const sheetHandleWidthPx = 44.0;
+  static const sheetTitleTop = AppSpacing.lg;
+  static const sheetFieldLabel = 20.0;
+  static const sheetFieldHint = 17.0;
+  static const sheetFieldText = 18.0;
+  static const sheetActionWidth = 1.4;
+  static const sheetButtonFont = 16.0;
+  static const sheetDateWidth = 110.0;
+  static const sheetListHeightFactor = 0.72;
 }
 
 class AppTypography {
