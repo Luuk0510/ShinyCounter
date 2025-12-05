@@ -133,7 +133,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       isScrollControlled: true,
       useSafeArea: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
       ),
       backgroundColor: Theme.of(context).cardColor,
       barrierColor: Colors.black.withValues(alpha: 0.4),
@@ -160,19 +161,18 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         centerTitle: true,
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
-        flexibleSpace: Builder(
-          builder: (context) {
-            final scopedCard = Theme.of(context).cardColor;
-            return Container(color: scopedCard);
-          },
-        ),
-        title: Text(
-          widget.pokemon.name,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-            fontSize: 24,
-          ),
-        ),
+      flexibleSpace: Builder(
+        builder: (context) {
+          final scopedCard = Theme.of(context).cardColor;
+          return Container(color: scopedCard);
+        },
+      ),
+      title: Text(
+        widget.pokemon.name,
+        style: Theme.of(context).textTheme.titleLarge?.merge(
+              AppTypography.title.copyWith(fontWeight: FontWeight.w700),
+            ),
+      ),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),

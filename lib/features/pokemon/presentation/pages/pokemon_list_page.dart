@@ -123,12 +123,16 @@ class _PokemonListPageState extends State<PokemonListPage> {
                   : '';
               return RichText(
                 text: TextSpan(
-                  style: TextStyle(fontSize: 16, color: colors.onSurface),
+                  style: AppTypography.button.copyWith(
+                    color: colors.onSurface,
+                  ),
                   children: [
                     TextSpan(text: parts.first),
                     TextSpan(
                       text: pokemon.name,
-                      style: const TextStyle(fontWeight: FontWeight.w800),
+                      style: AppTypography.button.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                     TextSpan(text: after),
                   ],
@@ -153,8 +157,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
               ),
               child: Text(
                 context.l10n.confirmDeleteCancel,
-                style: const TextStyle(
-                  fontSize: 16,
+                style: AppTypography.button.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -172,8 +175,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
               ),
               child: Text(
                 context.l10n.confirmDeleteDelete,
-                style: const TextStyle(
-                  fontSize: 16,
+                style: AppTypography.button.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -210,7 +212,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
       backgroundColor: Theme.of(context).cardColor,
       barrierColor: Colors.black.withValues(alpha: 0.35),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
       ),
       builder: (context) {
         final colors = Theme.of(context).colorScheme;
