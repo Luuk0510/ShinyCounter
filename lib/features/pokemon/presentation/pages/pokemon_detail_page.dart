@@ -213,7 +213,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                     const SizedBox(height: AppSpacing.sm),
                     _buildCatchButton(colors),
                     Padding(
-                      padding: const EdgeInsets.only(top: AppSpacing.md),
+                      padding: const EdgeInsets.only(top: AppSpacing.xl),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -224,7 +224,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                             onIncrement: _increment,
                             onEdit: _showEditDialog,
                           ),
-                          const SizedBox(height: AppSpacing.xxl),
+                          const SizedBox(height: AppSpacing.xl),
                           Align(
                             alignment: Alignment.center,
                             child: Column(
