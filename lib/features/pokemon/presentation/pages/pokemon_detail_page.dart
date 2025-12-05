@@ -375,7 +375,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                 return Center(
                   child: AnimatedSwitcher(
                     duration: AppAnim.switcher,
-                    transitionBuilder: (child, animation) => child,
+                    transitionBuilder: (child, animation) =>
+                        FadeTransition(opacity: animation, child: child),
                     child: SizedBox(
                       key: ValueKey(path),
                       width: AppSizes.detailImageSize,
