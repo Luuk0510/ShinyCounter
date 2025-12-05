@@ -189,12 +189,12 @@ class _AddPokemonView extends StatelessWidget {
         builder: (context) {
           final media = MediaQuery.of(context);
           final viewInsets = media.viewInsets.bottom;
-          final maxContentHeight = (media.size.height * 0.75 - viewInsets).clamp(
-            240.0,
-            media.size.height,
-          );
+          final maxContentHeight =
+              (media.size.height * AppSizes.dialogHeightFactor - viewInsets)
+                  .clamp(AppSizes.dialogMinHeight, media.size.height)
+                  .toDouble();
           return SizedBox(
-            width: 420,
+            width: AppSizes.dialogMaxWidth,
             height: maxContentHeight,
             child: _SpritePicker(
               colors: colors,
@@ -219,10 +219,7 @@ class _AddPokemonView extends StatelessWidget {
               vertical: AppSpacing.xs,
             ),
           ),
-          child: Text(
-            l10n.cancel,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-          ),
+          child: Text(l10n.cancel, style: AppTypography.button),
         ),
         const SizedBox(width: AppSpacing.sm),
         ElevatedButton(
@@ -254,10 +251,7 @@ class _AddPokemonView extends StatelessWidget {
               vertical: AppSpacing.xs,
             ),
           ),
-          child: Text(
-            l10n.choose,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-          ),
+          child: Text(l10n.choose, style: AppTypography.button),
         ),
       ],
     );
@@ -273,9 +267,10 @@ class _SpritePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AddPokemonController>();
-    const headerHeightEstimate = 64.0; // search + dropdown row
+    final headerHeightEstimate = AppSizes.toolbarHeight + AppSpacing.lg;
     final listHeight = (availableHeight - headerHeightEstimate - AppSpacing.sm)
-        .clamp(160.0, availableHeight);
+        .clamp(AppSizes.listMinHeight, availableHeight)
+        .toDouble();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -304,7 +299,7 @@ class _SpritePicker extends StatelessWidget {
             ),
             const SizedBox(width: AppSpacing.sm),
             SizedBox(
-              width: 120,
+              width: AppSizes.dropdownWidth,
               child: DropdownButtonFormField<int?>(
                 value: controller.selectedGen,
                 isDense: true,
@@ -349,94 +344,89 @@ class _SpritePicker extends StatelessWidget {
             child: controller.loading
                 ? const Center(child: CircularProgressIndicator())
                 : controller.filteredSprites.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Text(
-                      'No sprites found',
-                      style: TextStyle(color: colors.onSurfaceVariant),
-                    ),
-                  )
-                : Scrollbar(
-                    thumbVisibility: true,
-                    child: ListView.builder(
-                      itemCount: controller.filteredSprites.length,
-                      itemBuilder: (context, index) {
-                        final sprite = controller.filteredSprites[index];
-                        final selected = sprite == controller.selected;
-                        final name = controller.displayName(sprite);
-                        return InkWell(
-                          onTap: () => controller.select(sprite),
-                          borderRadius: BorderRadius.circular(AppRadii.md),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md,
-                              vertical: AppSpacing.sm,
-                            ),
-                            decoration: BoxDecoration(
-                              color: selected
-                                  ? colors.primary.withValues(alpha: 0.08)
-                                  : Colors.transparent,
+                    ? Padding(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Text(
+                          'No sprites found',
+                          style: TextStyle(color: colors.onSurfaceVariant),
+                        ),
+                      )
+                    : Scrollbar(
+                        thumbVisibility: true,
+                        child: ListView.builder(
+                          itemCount: controller.filteredSprites.length,
+                          itemBuilder: (context, index) {
+                            final sprite = controller.filteredSprites[index];
+                            final selected = sprite == controller.selected;
+                            final name = controller.displayName(sprite);
+                            return InkWell(
+                              onTap: () => controller.select(sprite),
                               borderRadius: BorderRadius.circular(AppRadii.md),
-                            ),
-                            height: 104,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '#${sprite.dex}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 16,
-                                          color: selected
-                                              ? colors.primary
-                                              : colors.onSurfaceVariant,
-                                        ),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
+                                  vertical: AppSpacing.sm,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: selected
+                                      ? colors.primary.withValues(alpha: 0.08)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(AppRadii.md),
+                                ),
+                                height: AppSizes.listItemMinHeight,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '#${sprite.dex}',
+                                            style: AppTypography.button.copyWith(
+                                              color: selected
+                                                  ? colors.primary
+                                                  : colors.onSurfaceVariant,
+                                            ),
+                                          ),
+                                          const SizedBox(height: AppSpacing.xs),
+                                          Text(
+                                            name,
+                                            style: AppTypography.sectionTitle.copyWith(
+                                              color: selected
+                                                  ? colors.primary
+                                                  : colors.onSurface,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(height: AppSpacing.xs),
-                                      Text(
-                                        name,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 18,
-                                          color: selected
-                                              ? colors.primary
-                                              : colors.onSurface,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
+                                    ),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                        AppRadii.sm,
+                                      ),
+                                      child: Image.asset(
+                                        sprite.path,
+                                        width: AppSizes.spriteThumb,
+                                        height: AppSizes.spriteThumb,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                    if (selected) ...[
+                                      const SizedBox(width: AppSpacing.xs),
+                                      Icon(
+                                        Icons.check_circle,
+                                        color: colors.primary,
                                       ),
                                     ],
-                                  ),
+                                  ],
                                 ),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(
-                                    AppRadii.sm,
-                                  ),
-                                  child: Image.asset(
-                                    sprite.path,
-                                    width: 96,
-                                    height: 96,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                                if (selected) ...[
-                                  const SizedBox(width: AppSpacing.xs),
-                                  Icon(
-                                    Icons.check_circle,
-                                    color: colors.primary,
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
           ),
         ),
       ],

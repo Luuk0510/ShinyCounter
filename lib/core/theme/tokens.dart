@@ -28,6 +28,13 @@ class AppSizes {
   static const toolbarHeight = 52.0;
   static const sheetHandleWidth = 44.0;
   static const sheetHandleHeight = 5.0;
+  static const dialogMaxWidth = 420.0;
+  static const dialogHeightFactor = 0.75;
+  static const dialogMinHeight = 240.0;
+  static const listMinHeight = 160.0;
+  static const spriteThumb = 96.0;
+  static const listItemMinHeight = 104.0;
+  static const dropdownWidth = 120.0;
 }
 
 class AppTypography {
