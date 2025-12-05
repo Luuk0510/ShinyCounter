@@ -10,7 +10,9 @@ class RoundControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.overlayControlGap),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.overlayControlGap,
+      ),
       child: Material(
         color: Colors.white.withValues(alpha: 0.0),
         shape: const CircleBorder(),

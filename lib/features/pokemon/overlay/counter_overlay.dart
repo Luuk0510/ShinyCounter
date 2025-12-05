@@ -167,7 +167,9 @@ class _OverlayAppState extends State<_OverlayApp> {
                           onTap: _enabled ? () => _bump(-1) : null,
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                          ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [

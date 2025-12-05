@@ -72,10 +72,7 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
               vertical: AppSpacing.sm,
             ),
           ),
-          child: Text(
-            l10n.cancel,
-            style: AppTypography.button,
-          ),
+          child: Text(l10n.cancel, style: AppTypography.button),
         ),
         const SizedBox(width: AppSpacing.sm),
         ElevatedButton(
@@ -100,10 +97,7 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
               vertical: AppSpacing.sm,
             ),
           ),
-          child: Text(
-            l10n.save,
-            style: AppTypography.button,
-          ),
+          child: Text(l10n.save, style: AppTypography.button),
         ),
       ],
     );

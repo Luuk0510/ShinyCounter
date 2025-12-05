@@ -170,8 +170,10 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
                   onPressed: () => Navigator.of(context).pop(),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: colors.primary,
-                    side:
-                        BorderSide(color: colors.primary, width: AppSizes.sheetActionWidth),
+                    side: BorderSide(
+                      color: colors.primary,
+                      width: AppSizes.sheetActionWidth,
+                    ),
                     backgroundColor: colors.primary.withValues(alpha: 0.08),
                   ),
                   child: Text(

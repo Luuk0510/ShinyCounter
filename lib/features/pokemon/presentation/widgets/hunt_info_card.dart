@@ -172,10 +172,7 @@ class _GameSection extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    GameLogo(
-                      game: caughtGame!,
-                      size: AppSizes.gameLogoLarge,
-                    ),
+                    GameLogo(game: caughtGame!, size: AppSizes.gameLogoLarge),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
                       l10n.huntGame(caughtGame!),
@@ -190,8 +187,9 @@ class _GameSection extends StatelessWidget {
               ),
             )
           : ConstrainedBox(
-              constraints:
-                  const BoxConstraints(maxWidth: AppSizes.gameSelectWidth),
+              constraints: const BoxConstraints(
+                maxWidth: AppSizes.gameSelectWidth,
+              ),
               child: DropdownButtonFormField<String?>(
                 initialValue: null,
                 isExpanded: true,

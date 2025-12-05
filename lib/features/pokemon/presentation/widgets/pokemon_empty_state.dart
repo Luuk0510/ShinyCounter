@@ -28,8 +28,10 @@ class PokemonEmptyState extends StatelessWidget {
             width: AppSizes.emptyStateImage,
             height: AppSizes.emptyStateImage,
             fit: BoxFit.contain,
-            errorBuilder: (context, error, stack) =>
-                const Icon(Icons.catching_pokemon, size: AppSizes.emptyStateFallback),
+            errorBuilder: (context, error, stack) => const Icon(
+              Icons.catching_pokemon,
+              size: AppSizes.emptyStateFallback,
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
@@ -56,7 +58,9 @@ class PokemonEmptyState extends StatelessWidget {
                 backgroundColor: colors.secondary,
                 foregroundColor: colors.onSecondary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSizes.emptyStateButtonRadius),
+                  borderRadius: BorderRadius.circular(
+                    AppSizes.emptyStateButtonRadius,
+                  ),
                 ),
                 padding: const EdgeInsets.symmetric(
                   vertical: AppSizes.emptyStateButtonPadding,

@@ -58,7 +58,8 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
         top: AppSpacing.md,
       ),
       child: SizedBox(
-        height: MediaQuery.of(context).size.height * AppSizes.sheetListHeightFactor,
+        height:
+            MediaQuery.of(context).size.height * AppSizes.sheetListHeightFactor,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

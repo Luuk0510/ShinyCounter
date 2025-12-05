@@ -344,89 +344,91 @@ class _SpritePicker extends StatelessWidget {
             child: controller.loading
                 ? const Center(child: CircularProgressIndicator())
                 : controller.filteredSprites.isEmpty
-                    ? Padding(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: Text(
-                          'No sprites found',
-                          style: TextStyle(color: colors.onSurfaceVariant),
-                        ),
-                      )
-                    : Scrollbar(
-                        thumbVisibility: true,
-                        child: ListView.builder(
-                          itemCount: controller.filteredSprites.length,
-                          itemBuilder: (context, index) {
-                            final sprite = controller.filteredSprites[index];
-                            final selected = sprite == controller.selected;
-                            final name = controller.displayName(sprite);
-                            return InkWell(
-                              onTap: () => controller.select(sprite),
+                ? Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Text(
+                      'No sprites found',
+                      style: TextStyle(color: colors.onSurfaceVariant),
+                    ),
+                  )
+                : Scrollbar(
+                    thumbVisibility: true,
+                    child: ListView.builder(
+                      itemCount: controller.filteredSprites.length,
+                      itemBuilder: (context, index) {
+                        final sprite = controller.filteredSprites[index];
+                        final selected = sprite == controller.selected;
+                        final name = controller.displayName(sprite);
+                        return InkWell(
+                          onTap: () => controller.select(sprite),
+                          borderRadius: BorderRadius.circular(AppRadii.md),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                              vertical: AppSpacing.sm,
+                            ),
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? colors.primary.withValues(alpha: 0.08)
+                                  : Colors.transparent,
                               borderRadius: BorderRadius.circular(AppRadii.md),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.md,
-                                  vertical: AppSpacing.sm,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: selected
-                                      ? colors.primary.withValues(alpha: 0.08)
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(AppRadii.md),
-                                ),
-                                height: AppSizes.listItemMinHeight,
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '#${sprite.dex}',
-                                            style: AppTypography.button.copyWith(
-                                              color: selected
-                                                  ? colors.primary
-                                                  : colors.onSurfaceVariant,
-                                            ),
-                                          ),
-                                          const SizedBox(height: AppSpacing.xs),
-                                          Text(
-                                            name,
-                                            style: AppTypography.sectionTitle.copyWith(
+                            ),
+                            height: AppSizes.listItemMinHeight,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '#${sprite.dex}',
+                                        style: AppTypography.button.copyWith(
+                                          color: selected
+                                              ? colors.primary
+                                              : colors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      const SizedBox(height: AppSpacing.xs),
+                                      Text(
+                                        name,
+                                        style: AppTypography.sectionTitle
+                                            .copyWith(
                                               color: selected
                                                   ? colors.primary
                                                   : colors.onSurface,
                                             ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                        AppRadii.sm,
-                                      ),
-                                      child: Image.asset(
-                                        sprite.path,
-                                        width: AppSizes.spriteThumb,
-                                        height: AppSizes.spriteThumb,
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ),
-                                    if (selected) ...[
-                                      const SizedBox(width: AppSpacing.xs),
-                                      Icon(
-                                        Icons.check_circle,
-                                        color: colors.primary,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ],
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadii.sm,
+                                  ),
+                                  child: Image.asset(
+                                    sprite.path,
+                                    width: AppSizes.spriteThumb,
+                                    height: AppSizes.spriteThumb,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                                if (selected) ...[
+                                  const SizedBox(width: AppSpacing.xs),
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: colors.primary,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
           ),
         ),
       ],

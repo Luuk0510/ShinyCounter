@@ -28,16 +28,21 @@ class PokemonCard extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isCompact = constraints.maxWidth < 420;
-          final imageSize =
-              isCompact ? AppSizes.pokemonImageSmall : AppSizes.pokemonImageLarge;
-          final fontSize =
-              isCompact ? AppSizes.pokemonNameSmall : AppSizes.pokemonNameLarge;
-          final horizontalGap =
-              isCompact ? AppSizes.pokemonGapSmall : AppSizes.pokemonGapLarge;
-          final contentPadding =
-              isCompact ? AppSizes.pokemonContentSmall : AppSizes.pokemonContentLarge;
-          final chevronSize =
-              isCompact ? AppSizes.pokemonChevronSmall : AppSizes.pokemonChevronLarge;
+          final imageSize = isCompact
+              ? AppSizes.pokemonImageSmall
+              : AppSizes.pokemonImageLarge;
+          final fontSize = isCompact
+              ? AppSizes.pokemonNameSmall
+              : AppSizes.pokemonNameLarge;
+          final horizontalGap = isCompact
+              ? AppSizes.pokemonGapSmall
+              : AppSizes.pokemonGapLarge;
+          final contentPadding = isCompact
+              ? AppSizes.pokemonContentSmall
+              : AppSizes.pokemonContentLarge;
+          final chevronSize = isCompact
+              ? AppSizes.pokemonChevronSmall
+              : AppSizes.pokemonChevronLarge;
 
           return Card(
             elevation: AppSizes.cardElevation,

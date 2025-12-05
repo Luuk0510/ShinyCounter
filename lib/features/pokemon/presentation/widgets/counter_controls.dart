@@ -90,8 +90,10 @@ class _RoundIconButton extends StatelessWidget {
         foregroundColor: effectiveFg,
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(AppSizes.counterButtonPadding),
-        minimumSize:
-            const Size(AppSizes.counterButtonSize, AppSizes.counterButtonSize),
+        minimumSize: const Size(
+          AppSizes.counterButtonSize,
+          AppSizes.counterButtonSize,
+        ),
       ),
       child: Icon(icon, size: AppSizes.counterIconSize),
     );
