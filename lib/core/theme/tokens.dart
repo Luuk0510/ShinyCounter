@@ -35,6 +35,41 @@ class AppSizes {
   static const spriteThumb = 96.0;
   static const listItemMinHeight = 104.0;
   static const dropdownWidth = 120.0;
+  static const counterButtonSize = 72.0;
+  static const counterButtonPadding = 18.0;
+  static const counterIconSize = 32.0;
+  static const dailyListHeight = 210.0;
+  static const dividerThickness = 1.0;
+  static const dateLabelSize = 17.0;
+  static const dateValueSize = 18.0;
+  static const detailImageSize = 300.0;
+  static const detailImageFallback = 140.0;
+  static const gameLogoSize = 32.0;
+  static const gameLogoLarge = 40.0;
+  static const gameSelectWidth = 240.0;
+  static const cardPaddingH = 16.0;
+  static const cardPaddingV = 12.0;
+  static const cardBorderRadius = 30.0;
+  static const cardElevation = 2.0;
+  static const pokemonImageLarge = 150.0;
+  static const pokemonImageSmall = 110.0;
+  static const pokemonNameLarge = 37.0;
+  static const pokemonNameSmall = 24.0;
+  static const pokemonGapLarge = 16.0;
+  static const pokemonGapSmall = 12.0;
+  static const pokemonContentLarge = 14.0;
+  static const pokemonContentSmall = 12.0;
+  static const pokemonChevronLarge = 28.0;
+  static const pokemonChevronSmall = 24.0;
+  static const emptyStateImage = 96.0;
+  static const emptyStateFallback = 72.0;
+  static const emptyStateTitle = 18.0;
+  static const emptyStateAction = 16.0;
+  static const emptyStateButtonRadius = 14.0;
+  static const emptyStateButtonWidth = 180.0;
+  static const emptyStateButtonPadding = 14.0;
+  static const settingsActionPaddingH = AppSpacing.xl;
+  static const settingsActionPaddingV = AppSpacing.sm;
 }
 
 class AppTypography {
