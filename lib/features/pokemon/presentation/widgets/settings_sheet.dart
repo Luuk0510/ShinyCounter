@@ -106,8 +106,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
             style: TextButton.styleFrom(
               foregroundColor: colors.primary,
               padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-                vertical: AppSpacing.sm,
+                horizontal: AppSizes.settingsActionPaddingH,
+                vertical: AppSizes.settingsActionPaddingV,
               ),
             ),
             child: Text(

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 
 class PokemonCard extends StatelessWidget {
@@ -20,20 +21,28 @@ class PokemonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.cardPaddingH,
+        vertical: AppSizes.cardPaddingV,
+      ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isCompact = constraints.maxWidth < 420;
-          final imageSize = isCompact ? 110.0 : 150.0;
-          final fontSize = isCompact ? 24.0 : 37.0;
-          final horizontalGap = isCompact ? 12.0 : 16.0;
-          final contentPadding = isCompact ? 12.0 : 14.0;
-          final chevronSize = isCompact ? 24.0 : 28.0;
+          final imageSize =
+              isCompact ? AppSizes.pokemonImageSmall : AppSizes.pokemonImageLarge;
+          final fontSize =
+              isCompact ? AppSizes.pokemonNameSmall : AppSizes.pokemonNameLarge;
+          final horizontalGap =
+              isCompact ? AppSizes.pokemonGapSmall : AppSizes.pokemonGapLarge;
+          final contentPadding =
+              isCompact ? AppSizes.pokemonContentSmall : AppSizes.pokemonContentLarge;
+          final chevronSize =
+              isCompact ? AppSizes.pokemonChevronSmall : AppSizes.pokemonChevronLarge;
 
           return Card(
-            elevation: 2,
+            elevation: AppSizes.cardElevation,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(AppSizes.cardBorderRadius),
             ),
             clipBehavior: Clip.antiAlias,
             child: InkWell(

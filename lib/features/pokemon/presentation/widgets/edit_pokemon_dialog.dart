@@ -74,7 +74,7 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
           ),
           child: Text(
             l10n.cancel,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            style: AppTypography.button,
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
@@ -102,7 +102,7 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
           ),
           child: Text(
             l10n.save,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            style: AppTypography.button,
           ),
         ),
       ],

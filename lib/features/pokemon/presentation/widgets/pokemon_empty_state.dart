@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shiny_counter/core/theme/tokens.dart';
 
 class PokemonEmptyState extends StatelessWidget {
   const PokemonEmptyState({
@@ -24,27 +25,30 @@ class PokemonEmptyState extends StatelessWidget {
         children: [
           Image.asset(
             imageAsset,
-            width: 96,
-            height: 96,
+            width: AppSizes.emptyStateImage,
+            height: AppSizes.emptyStateImage,
             fit: BoxFit.contain,
             errorBuilder: (context, error, stack) =>
-                const Icon(Icons.catching_pokemon, size: 72),
+                const Icon(Icons.catching_pokemon, size: AppSizes.emptyStateFallback),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Text(
             title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontSize: AppSizes.emptyStateTitle,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: AppSpacing.lg),
           SizedBox(
-            width: 180,
+            width: AppSizes.emptyStateButtonWidth,
             child: ElevatedButton.icon(
               onPressed: onAddPressed,
               icon: const Icon(Icons.add),
               label: Text(
                 actionLabel,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: AppSizes.emptyStateAction,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -52,9 +56,11 @@ class PokemonEmptyState extends StatelessWidget {
                 backgroundColor: colors.secondary,
                 foregroundColor: colors.onSecondary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(AppSizes.emptyStateButtonRadius),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSizes.emptyStateButtonPadding,
+                ),
               ),
             ),
           ),
