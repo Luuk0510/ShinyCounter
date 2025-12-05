@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
@@ -9,7 +10,7 @@ import 'package:shiny_counter/features/pokemon/presentation/state/counter_contro
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  late CounterSyncService sync;
+  late CounterSync sync;
   late ToggleCaughtUseCase toggleCaught;
 
   setUp(() async {
@@ -28,6 +29,7 @@ void main() {
   CounterController buildController() {
     return CounterController(
       pokemon: const Pokemon(
+        id: 'p-test',
         name: 'Testmon',
         imagePath: 'assets/icon/pokeball_icon.png',
       ),

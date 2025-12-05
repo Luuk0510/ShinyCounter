@@ -5,13 +5,14 @@ import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 
 class CounterController extends ChangeNotifier {
   CounterController({
     required this.pokemon,
-    CounterSyncService? sync,
+    CounterSync? sync,
     ToggleCaughtUseCase? toggleCaughtUseCase,
   }) : _sync = sync,
        _toggleCaughtUseCase = toggleCaughtUseCase;
@@ -28,10 +29,10 @@ class CounterController extends ChangeNotifier {
   String? _caughtGame;
   Map<String, int> _dailyCounts = {};
 
-  late final String _counterKey = 'counter_${pokemon.name.toLowerCase()}';
-  late final String _caughtKey = 'caught_${pokemon.name.toLowerCase()}';
+  late final String _counterKey = 'counter_${pokemon.id.toLowerCase()}';
+  late final String _caughtKey = 'caught_${pokemon.id.toLowerCase()}';
 
-  CounterSyncService? _sync;
+  CounterSync? _sync;
   final ToggleCaughtUseCase? _toggleCaughtUseCase;
   StreamSubscription<dynamic>? _overlaySub;
   Timer? _pollTimer;
@@ -57,7 +58,7 @@ class CounterController extends ChangeNotifier {
   Future<void> init() async {
     _sync ??= await CounterSyncService.instance();
     if (_overlaySupported) {
-      _overlaySub ??= CounterSyncService.overlayStream.listen(_onOverlayData);
+      _overlaySub ??= _sync?.overlayStream.listen(_onOverlayData);
     }
     await _loadState();
     if (!_initialized) {
@@ -229,12 +230,12 @@ class CounterController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _persist({CounterSyncService? sync}) async {
+  Future<void> _persist({CounterSync? sync}) async {
     final service = sync ?? await _getSync();
     await service.setCounter(_counterKey, _counter);
   }
 
-  Future<void> _setCaught(bool value, {CounterSyncService? sync}) async {
+  Future<void> _setCaught(bool value, {CounterSync? sync}) async {
     final useCase = _toggleCaughtUseCase;
     if (useCase != null) {
       await useCase.call(_caughtKey, value);
@@ -254,7 +255,6 @@ class CounterController extends ChangeNotifier {
     await _updateOverlay();
   }
 
-
   Future<void> _updateOverlay() async {
     if (!_pillActive || !_overlaySupported) return;
     final sync = await _getSync();
@@ -264,7 +264,7 @@ class CounterController extends ChangeNotifier {
   Future<void> _handleHuntStartReset(
     int previousCount,
     int nextCount, {
-    CounterSyncService? sync,
+    CounterSync? sync,
   }) async {
     final service = sync ?? await _getSync();
     if (previousCount == 0 && nextCount > 0) {
@@ -343,14 +343,14 @@ class CounterController extends ChangeNotifier {
     return a.isAtSameMomentAs(b);
   }
 
-  Future<CounterSyncService> _getSync() async {
+  Future<CounterSync> _getSync() async {
     _sync ??= await CounterSyncService.instance();
     return _sync!;
   }
 
   Future<void> _applyDailyDelta(
     int delta, {
-    CounterSyncService? sync,
+    CounterSync? sync,
     DateTime? day,
   }) async {
     if (delta == 0) return;

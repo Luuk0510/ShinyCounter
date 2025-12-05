@@ -14,10 +14,15 @@ void main() {
     final repo = PrefsPokemonRepository();
     final entries = [
       const Pokemon(
+        id: 'p-pika',
         name: 'Pikachu',
         imagePath: 'assets/icon/pokeball_icon.png',
       ),
-      const Pokemon(name: 'Mewtwo', imagePath: 'assets/icon/pokeball_icon.png'),
+      const Pokemon(
+        id: 'p-mewtwo',
+        name: 'Mewtwo',
+        imagePath: 'assets/icon/pokeball_icon.png',
+      ),
     ];
 
     await repo.saveCustomPokemon(entries);
@@ -30,21 +35,26 @@ void main() {
 
   test('loadCaught reads flags per pokemon', () async {
     SharedPreferences.setMockInitialValues({
-      'caught_pikachu': true,
-      'caught_mewtwo': false,
+      'caught_p-pika': true,
+      'caught_p-mewtwo': false,
     });
     final repo = PrefsPokemonRepository();
     final all = [
       const Pokemon(
+        id: 'p-pika',
         name: 'Pikachu',
         imagePath: 'assets/icon/pokeball_icon.png',
       ),
-      const Pokemon(name: 'Mewtwo', imagePath: 'assets/icon/pokeball_icon.png'),
+      const Pokemon(
+        id: 'p-mewtwo',
+        name: 'Mewtwo',
+        imagePath: 'assets/icon/pokeball_icon.png',
+      ),
     ];
 
     final caught = await repo.loadCaught(all);
 
-    expect(caught.contains('Pikachu'), isTrue);
-    expect(caught.contains('Mewtwo'), isFalse);
+    expect(caught.contains('p-pika'), isTrue);
+    expect(caught.contains('p-mewtwo'), isFalse);
   });
 }

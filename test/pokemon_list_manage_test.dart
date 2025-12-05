@@ -11,6 +11,7 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokem
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_list_page.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_card.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -31,8 +32,16 @@ void main() {
 
   testWidgets('manage sheet can delete a pokemon', (tester) async {
     final repo = _SeededRepo([
-      const Pokemon(name: 'Pikachu', imagePath: 'assets/icon/pokeball_icon.png'),
-      const Pokemon(name: 'Eevee', imagePath: 'assets/icon/pokeball_icon.png'),
+      const Pokemon(
+        id: 'p-pika',
+        name: 'Pikachu',
+        imagePath: 'assets/icon/pokeball_icon.png',
+      ),
+      const Pokemon(
+        id: 'p-eevee',
+        name: 'Eevee',
+        imagePath: 'assets/icon/pokeball_icon.png',
+      ),
     ]);
 
     await tester.pumpWidget(
@@ -45,6 +54,7 @@ void main() {
             create: (_) => SaveCustomPokemonUseCase(repo),
           ),
           Provider<LoadCaughtUseCase>(create: (_) => LoadCaughtUseCase(repo)),
+          Provider<SpriteService>.value(value: SpriteRepository()),
           ChangeNotifierProvider(create: (_) => ThemeNotifier()),
           ChangeNotifierProvider(create: (_) => LocaleNotifier()),
         ],
@@ -74,8 +84,10 @@ void main() {
       of: find.text('Pikachu'),
       matching: find.byType(ListTile),
     );
-    final deleteButton =
-        find.descendant(of: listTile, matching: find.byIcon(Icons.delete_outline));
+    final deleteButton = find.descendant(
+      of: listTile,
+      matching: find.byIcon(Icons.delete_outline),
+    );
     await tester.tap(deleteButton.first);
     await tester.pumpAndSettle();
 

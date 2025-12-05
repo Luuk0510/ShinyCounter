@@ -62,21 +62,22 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 44,
-              height: 5,
-              decoration: BoxDecoration(
-                color: colors.outlineVariant,
-                borderRadius: BorderRadius.circular(AppRadii.sm),
+            Center(
+              child: Container(
+                width: AppSizes.sheetHandleWidth,
+                height: AppSizes.sheetHandleHeight,
+                decoration: BoxDecoration(
+                  color: colors.outlineVariant,
+                  borderRadius: BorderRadius.circular(AppRadii.sm),
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
             Center(
               child: Text(
-                l10n.editSheetTitle,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                l10n.huntHistoryTitle,
+                style: AppTypography.title.copyWith(
                   fontWeight: FontWeight.w800,
-                  fontSize: 18,
                 ),
               ),
             ),
@@ -84,7 +85,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
             Expanded(
               child: ListView.separated(
                 itemBuilder: (context, index) => _buildRow(context, index),
-                separatorBuilder: (_, __) =>
+                separatorBuilder: (_, idx) =>
                     const SizedBox(height: AppSpacing.md),
                 itemCount: _rows.length,
               ),
@@ -100,9 +101,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                   side: BorderSide(color: colors.primary, width: 1.3),
                   backgroundColor: colors.primary.withValues(alpha: 0.08),
                 ),
-              label: Text(
+                label: Text(
                   l10n.addCountRow,
-                  style: const TextStyle(
+                  style: AppTypography.button.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -121,8 +122,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                     ),
                     child: Text(
                       l10n.cancel,
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: AppTypography.button.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -138,8 +138,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                     ),
                     child: Text(
                       l10n.save,
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: AppTypography.button.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -177,9 +176,8 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
               alignment: Alignment.centerLeft,
               child: Text(
                 widget.dayFormatter(_dayKey(row.date)),
-                style: const TextStyle(
+                style: AppTypography.button.copyWith(
                   fontWeight: FontWeight.w700,
-                  fontSize: 16,
                 ),
               ),
             ),
@@ -259,9 +257,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              hintText: context.l10n.enterNumberHint,
-            ),
+            decoration: InputDecoration(hintText: context.l10n.enterNumberHint),
           ),
           actions: [
             TextButton(
@@ -302,9 +298,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
     for (final row in _rows) {
       final parsed = int.tryParse(row.controller.text.trim());
       if (parsed == null || parsed < 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.invalidCounter)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.invalidCounter)));
         return;
       }
       if (parsed == 0) continue;

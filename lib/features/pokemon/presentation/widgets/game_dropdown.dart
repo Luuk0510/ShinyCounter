@@ -1,7 +1,7 @@
-import 'package:characters/characters.dart';
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/game_assets.dart';
 
 class GameDropdown extends StatelessWidget {
   const GameDropdown({super.key, required this.value, required this.onChanged});
@@ -9,83 +9,7 @@ class GameDropdown extends StatelessWidget {
   final String? value;
   final ValueChanged<String?> onChanged;
 
-  static const String _defaultLogo = 'assets/icon/pokeball_icon.png';
-  static const Map<String, String> gameLogos = {
-    'Legends: ZA': 'assets/games/legendsza.png',
-    'Scarlet': 'assets/games/scarlet.png',
-    'Violet': 'assets/games/violet.png',
-    'Brilliant Diamond': 'assets/games/brilliantdiamond.png',
-    'Shining Pearl': 'assets/games/shiningpearl.png',
-    'Legends: Arceus': 'assets/games/legendsarceus.png',
-    'Sword': 'assets/games/sword.png',
-    'Shield': 'assets/games/shield.png',
-    "Let's Go Pikachu": 'assets/games/letsgopikachu.png',
-    "Let's Go Eevee": 'assets/games/letsgoeevee.png',
-    'Ultra Sun': 'assets/games/ultrasun.png',
-    'Ultra Moon': 'assets/games/ultramoon.png',
-    'Sun': 'assets/games/sun.png',
-    'Moon': 'assets/games/moon.png',
-    'Omega Ruby': 'assets/games/omegaruby.png',
-    'Alpha Sapphire': 'assets/games/alphasapphire.png',
-    'X': 'assets/games/x.png',
-    'Y': 'assets/games/y.png',
-    'Black 2': 'assets/games/black2.png',
-    'White 2': 'assets/games/white2.png',
-    'Black': 'assets/games/black.png',
-    'White': 'assets/games/white.png',
-    'HeartGold': 'assets/games/heartgold.png',
-    'SoulSilver': 'assets/games/soulsilver.png',
-    'Platinum': 'assets/games/platinum.png',
-    'Diamond': 'assets/games/diamond.png',
-    'Pearl': 'assets/games/pearl.png',
-    'Emerald': 'assets/games/emerald.png',
-    'Ruby': 'assets/games/ruby.png',
-    'Sapphire': 'assets/games/sapphire.png',
-    'FireRed': 'assets/games/firered.png',
-    'LeafGreen': 'assets/games/leafgreen.png',
-    'Crystal': 'assets/games/crystal.png',
-    'Gold': 'assets/games/gold.png',
-    'Silver': 'assets/games/silver.png',
-  };
-
-  static const games = [
-    '',
-    'Legends: ZA',
-    'Scarlet',
-    'Violet',
-    'Legends: Arceus',
-    'Brilliant Diamond',
-    'Shining Pearl',
-    'Sword',
-    'Shield',
-    "Let's Go Pikachu",
-    "Let's Go Eevee",
-    'Ultra Sun',
-    'Ultra Moon',
-    'Sun',
-    'Moon',
-    'Omega Ruby',
-    'Alpha Sapphire',
-    'X',
-    'Y',
-    'Black 2',
-    'White 2',
-    'Black',
-    'White',
-    'HeartGold',
-    'SoulSilver',
-    'Platinum',
-    'Diamond',
-    'Pearl',
-    'Emerald',
-    'FireRed',
-    'LeafGreen',
-    'Ruby',
-    'Sapphire',
-    'Crystal',
-    'Gold',
-    'Silver',
-  ];
+  static const games = GameAssets.games;
 
   @override
   Widget build(BuildContext context) {
@@ -96,10 +20,8 @@ class GameDropdown extends StatelessWidget {
       children: [
         Text(
           l10n.gameLabel,
-          style: TextStyle(
+          style: AppTypography.sectionTitle.copyWith(
             color: colors.onSurfaceVariant,
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
@@ -132,7 +54,10 @@ class GameDropdown extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(AppRadii.sm)),
             ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
           ),
           onChanged: (val) => onChanged(val?.isEmpty == true ? null : val),
           hint: Text(l10n.gameHint),
@@ -141,10 +66,7 @@ class GameDropdown extends StatelessWidget {
     );
   }
 
-  static String logoFor(String? game) {
-    if (game == null || game.isEmpty) return _defaultLogo;
-    return gameLogos[game] ?? _defaultLogo;
-  }
+  static String logoFor(String? game) => GameAssets.logoFor(game);
 }
 
 class _GameTile extends StatelessWidget {
@@ -162,13 +84,12 @@ class _GameTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = TextStyle(
-      fontSize: dense ? 14 : 16,
-      fontWeight: FontWeight.w600,
-    );
+    final textStyle = dense
+        ? AppTypography.button
+        : AppTypography.sectionTitle.copyWith(fontWeight: FontWeight.w700);
     return Row(
       children: [
-        GameLogo(game: game, size: dense ? 24 : 28),
+        GameLogo(game: game, size: dense ? AppSpacing.xl : AppSpacing.xxl),
         const SizedBox(width: AppSpacing.xs),
         Expanded(
           child: Text(
@@ -187,7 +108,7 @@ class _GameTile extends StatelessWidget {
 }
 
 class GameLogo extends StatelessWidget {
-  const GameLogo({super.key, required this.game, this.size = 28});
+  const GameLogo({super.key, required this.game, this.size = AppSpacing.xxl});
 
   final String game;
   final double size;
@@ -208,7 +129,7 @@ class GameLogo extends StatelessWidget {
       child: Image.asset(
         GameDropdown.logoFor(game),
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Center(
+        errorBuilder: (_, error, stackTrace) => Center(
           child: Text(
             label,
             style: TextStyle(

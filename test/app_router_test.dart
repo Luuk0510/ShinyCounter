@@ -13,6 +13,8 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokem
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 class _FakePokemonRepository extends PrefsPokemonRepository {
@@ -35,6 +37,7 @@ void main() {
   ) async {
     final repo = _FakePokemonRepository([
       const Pokemon(
+        id: 'p-pika',
         name: 'Pikachu',
         imagePath: 'assets/icon/pokeball_icon.png',
       ),
@@ -54,6 +57,7 @@ void main() {
           Provider.value(value: saveCustom),
           Provider.value(value: loadCaught),
           Provider.value(value: toggleCaught),
+          Provider<SpriteService>.value(value: SpriteRepository()),
           ChangeNotifierProvider(create: (_) => ThemeNotifier()),
           ChangeNotifierProvider(create: (_) => LocaleNotifier()),
         ],
@@ -75,6 +79,7 @@ void main() {
     expect(find.text('Pokémon shiny counter'), findsOneWidget);
 
     const pokemon = Pokemon(
+      id: 'p-test',
       name: 'Testmon',
       imagePath: 'assets/icon/pokeball_icon.png',
     );

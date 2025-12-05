@@ -23,6 +23,7 @@
   "emptyAction": "Voeg Pok\u00e9mon toe",
   "addDialogTitle": "Nieuwe Pok\u00e9mon",
   "editDialogTitle": "Pok\u00e9mon bewerken",
+  "choose": "Kies",
   "nameLabel": "Naam",
   "nameHint": "Bijv. Mewtwo",
   "choosePhoto": "Kies foto",
@@ -53,11 +54,13 @@
   "dateLabel": "Datum",
   "countLabel": "Aantal",
   "addCountRow": "Dag toevoegen",
-  "editSheetTitle": "Aanpassen",
+  "editSheetTitle": "Pokémon-gegevens aanpassen",
+  "huntHistoryTitle": "Hunt-geschiedenis",
   "counterLabel": "Counter",
   "enterNumberHint": "Voer een getal in",
   "invalidCounter": "Voer een geldige counter in",
   "gameLabel": "Game",
   "gameHint": "Scroll voor game",
-  "gameNone": "Geen"
+  "gameNone": "Geen",
+  "searchByNameOrDex": "Zoek op naam of Pok\u00e9dex"
 }

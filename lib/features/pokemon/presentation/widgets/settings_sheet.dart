@@ -44,9 +44,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       title: Text(
         l10n.tooltipSettings,
         textAlign: TextAlign.center,
-        style: Theme.of(
-          context,
-        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+        style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
       ),
       content: SingleChildScrollView(
         child: Column(
@@ -55,9 +53,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
           children: [
             Text(
               l10n.settingsLanguage,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+              style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: AppSpacing.md),
             _ThemeOption(
@@ -73,9 +69,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
             const SizedBox(height: AppSpacing.lg),
             Text(
               l10n.settingsTitle,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+              style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: AppSpacing.md),
             _ThemeOption(
@@ -118,7 +112,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             child: Text(
               l10n.cancel,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              style: AppTypography.button.copyWith(fontWeight: FontWeight.w700),
             ),
           ),
         ),
@@ -145,7 +139,7 @@ class _ThemeOption extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       title: Text(
         label,
-        style: TextStyle(
+        style: AppTypography.sectionTitle.copyWith(
           fontWeight: FontWeight.w700,
           color: selected ? colors.primary : colors.onSurface,
         ),

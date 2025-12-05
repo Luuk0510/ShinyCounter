@@ -5,9 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_detail_page.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -18,10 +20,12 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('catch button toggles to caught and disables controls',
-      (tester) async {
+  testWidgets('catch button toggles to caught and disables controls', (
+    tester,
+  ) async {
     final sync = await CounterSyncService.instance();
     final pokemon = const Pokemon(
+      id: 'p-eevee',
       name: 'Eevee',
       imagePath: 'assets/icon/pokeball_icon.png',
     );
@@ -31,6 +35,7 @@ void main() {
         providers: [
           Provider.value(value: sync),
           Provider.value(value: ToggleCaughtUseCase(sync)),
+          Provider<SpriteService>.value(value: SpriteRepository()),
           ChangeNotifierProvider(create: (_) => ThemeNotifier()),
           ChangeNotifierProvider(create: (_) => LocaleNotifier()),
         ],
@@ -68,10 +73,12 @@ void main() {
     );
 
     // Plus/minus controls should be disabled.
-    final addButton =
-        tester.widget<ElevatedButton>(find.widgetWithIcon(ElevatedButton, Icons.add));
-    final removeButton = tester
-        .widget<ElevatedButton>(find.widgetWithIcon(ElevatedButton, Icons.remove));
+    final addButton = tester.widget<ElevatedButton>(
+      find.widgetWithIcon(ElevatedButton, Icons.add),
+    );
+    final removeButton = tester.widget<ElevatedButton>(
+      find.widgetWithIcon(ElevatedButton, Icons.remove),
+    );
     expect(addButton.onPressed, isNull);
     expect(removeButton.onPressed, isNull);
   });

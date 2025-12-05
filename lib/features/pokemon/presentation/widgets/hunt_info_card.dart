@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
+import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/game_dropdown.dart';
+import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 class HuntInfoCard extends StatelessWidget {
   const HuntInfoCard({
@@ -26,20 +27,20 @@ class HuntInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final labelStyle = TextStyle(
+    final labelStyle = AppTypography.button.copyWith(
       color: colors.onSurfaceVariant,
-      fontSize: 15,
-      fontWeight: FontWeight.w700,
     );
-    final valueStyle = TextStyle(
+    final valueStyle = AppTypography.sectionTitle.copyWith(
       color: colors.onSurface,
-      fontSize: 17,
       fontWeight: FontWeight.w800,
     );
     final cardColor = Theme.of(context).cardColor;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(AppRadii.md),
@@ -49,93 +50,21 @@ class HuntInfoCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _HuntCell(
-                label: l10n.huntStart,
-                value: formatter(startedAt),
-                labelStyle: labelStyle,
-                valueStyle: valueStyle,
-              ),
-              const SizedBox(width: AppSpacing.md),
-              _HuntCell(
-                label: l10n.huntCatch,
-                value: formatter(caughtAt),
-                labelStyle: labelStyle,
-                valueStyle: valueStyle,
-              ),
-            ],
+          _HuntDatesRow(
+            startLabel: l10n.huntStart,
+            catchLabel: l10n.huntCatch,
+            startValue: formatter(startedAt),
+            catchValue: formatter(caughtAt),
+            labelStyle: labelStyle,
+            valueStyle: valueStyle,
           ),
           const SizedBox(height: AppSpacing.md),
-          Center(
-            child: (caughtGame == null || caughtGame!.isEmpty)
-                ? ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 240),
-                    child: DropdownButtonFormField<String?>(
-                  initialValue: null,
-                  isExpanded: true,
-                  items: GameDropdown.games
-                      .map(
-                        (g) => DropdownMenuItem<String?>(
-                          value: g.isEmpty ? null : g,
-                          child: Row(
-                            children: [
-                              GameLogo(game: g, size: 24),
-                              const SizedBox(width: AppSpacing.xs),
-                              Expanded(
-                                child: Text(
-                                  g.isEmpty ? l10n.selectGameHint : g,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                            Radius.circular(AppRadii.sm),
-                          ),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                      ),
-                      onChanged: onGameChanged,
-                      hint: Text(l10n.selectGameHint),
-                    ),
-                  )
-                : InkWell(
-                    borderRadius: BorderRadius.circular(AppRadii.sm),
-                    onTap: onSelectGame,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: AppSpacing.xs,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GameLogo(game: caughtGame!, size: 22),
-                        const SizedBox(width: AppSpacing.xs),
-                        Text(
-                          l10n.huntGame(caughtGame!),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: colors.onSurface,
-                              fontSize: 17,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+          _GameSection(
+            colors: colors,
+            caughtGame: caughtGame,
+            l10n: l10n,
+            onSelectGame: onSelectGame,
+            onGameChanged: onGameChanged,
           ),
         ],
       ),
@@ -159,13 +88,146 @@ class _HuntCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(label, style: labelStyle),
+        Text(label, style: labelStyle, textAlign: TextAlign.center),
         const SizedBox(height: AppSpacing.xs),
-        Text(value, style: valueStyle),
+        Text(value, style: valueStyle, textAlign: TextAlign.center),
       ],
+    );
+  }
+}
+
+class _HuntDatesRow extends StatelessWidget {
+  const _HuntDatesRow({
+    required this.startLabel,
+    required this.catchLabel,
+    required this.startValue,
+    required this.catchValue,
+    required this.labelStyle,
+    required this.valueStyle,
+  });
+
+  final String startLabel;
+  final String catchLabel;
+  final String startValue;
+  final String catchValue;
+  final TextStyle labelStyle;
+  final TextStyle valueStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _HuntCell(
+          label: startLabel,
+          value: startValue,
+          labelStyle: labelStyle,
+          valueStyle: valueStyle,
+        ),
+        const SizedBox(width: AppSpacing.md),
+        _HuntCell(
+          label: catchLabel,
+          value: catchValue,
+          labelStyle: labelStyle,
+          valueStyle: valueStyle,
+        ),
+      ],
+    );
+  }
+}
+
+class _GameSection extends StatelessWidget {
+  const _GameSection({
+    required this.colors,
+    required this.caughtGame,
+    required this.l10n,
+    required this.onSelectGame,
+    required this.onGameChanged,
+  });
+
+  final ColorScheme colors;
+  final String? caughtGame;
+  final AppLocalizations l10n;
+  final VoidCallback onSelectGame;
+  final ValueChanged<String?> onGameChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasGame = caughtGame != null && caughtGame!.isNotEmpty;
+    return Center(
+      child: hasGame
+          ? InkWell(
+              borderRadius: BorderRadius.circular(AppRadii.sm),
+              onTap: onSelectGame,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GameLogo(game: caughtGame!, size: AppSpacing.xxl),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      l10n.huntGame(caughtGame!),
+                      textAlign: TextAlign.center,
+                      style: AppTypography.sectionTitle.copyWith(
+                        color: colors.onSurface,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 240),
+              child: DropdownButtonFormField<String?>(
+                initialValue: null,
+                isExpanded: true,
+                items: GameDropdown.games
+                    .map(
+                      (g) => DropdownMenuItem<String?>(
+                        value: g.isEmpty ? null : g,
+                        child: Row(
+                          children: [
+                            GameLogo(game: g, size: AppSpacing.xxl),
+                            const SizedBox(width: AppSpacing.xs),
+                            Expanded(
+                              child: Text(
+                                g.isEmpty ? l10n.selectGameHint : g,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTypography.sectionTitle.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                    .toList(),
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(AppRadii.sm),
+                    ),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                ),
+                onChanged: onGameChanged,
+                hint: Text(l10n.selectGameHint),
+              ),
+            ),
     );
   }
 }
