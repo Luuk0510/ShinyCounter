@@ -123,9 +123,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                   : '';
               return RichText(
                 text: TextSpan(
-                  style: AppTypography.button.copyWith(
-                    color: colors.onSurface,
-                  ),
+                  style: AppTypography.button.copyWith(color: colors.onSurface),
                   children: [
                     TextSpan(text: parts.first),
                     TextSpan(
