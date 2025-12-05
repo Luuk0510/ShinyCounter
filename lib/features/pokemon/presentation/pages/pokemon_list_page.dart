@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,7 +36,11 @@ class _PokemonListPageState extends State<PokemonListPage> {
   Set<String> _caught = {};
   bool _loading = true;
 
-  List<Pokemon> get _allPokemon => [..._basePokemon, ..._customPokemon];
+List<Pokemon> get _allPokemon {
+  final combined = [..._basePokemon, ..._customPokemon];
+  combined.sort(pokemonDexComparator);
+  return combined;
+}
 
   @override
   void initState() {
@@ -248,6 +255,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                     itemBuilder: (context, index) {
                       final p = pokemonSorted[index];
                       return ListTile(
+                        leading: _ManagePokemonImage(pokemon: p),
                         title: Text(
                           p.name,
                           style: AppTypography.sectionTitle.copyWith(
@@ -471,4 +479,35 @@ class _ManageAction {
 
   final Pokemon pokemon;
   final bool delete;
+}
+
+class _ManagePokemonImage extends StatelessWidget {
+  const _ManagePokemonImage({required this.pokemon});
+
+  final Pokemon pokemon;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = AppSpacing.xxl + AppSpacing.md;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppRadii.sm),
+      child: pokemon.isLocalFile && !kIsWeb
+          ? Image.file(
+              File(pokemon.imagePath),
+              width: size,
+              height: size,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stack) =>
+                  Icon(Icons.catching_pokemon, size: size * 0.55),
+            )
+          : Image.asset(
+              pokemon.imagePath,
+              width: size,
+              height: size,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stack) =>
+                  Icon(Icons.catching_pokemon, size: size * 0.55),
+            ),
+    );
+  }
 }
