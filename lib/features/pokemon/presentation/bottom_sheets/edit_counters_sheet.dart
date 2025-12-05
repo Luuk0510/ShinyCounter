@@ -84,8 +84,8 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 44,
-            height: 5,
+            width: AppSizes.sheetHandleWidthPx,
+            height: AppSizes.sheetHandleHeightPx,
             decoration: BoxDecoration(
               color: colors.outlineVariant,
               borderRadius: BorderRadius.circular(AppRadii.sm),
@@ -103,10 +103,16 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
             decoration: InputDecoration(
               labelText: l10n.counterLabel,
               hintText: l10n.enterNumberHint,
-              labelStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-              hintStyle: TextStyle(fontSize: 17),
+              labelStyle: const TextStyle(
+                fontSize: AppSizes.sheetFieldLabel,
+                fontWeight: FontWeight.w700,
+              ),
+              hintStyle: const TextStyle(fontSize: AppSizes.sheetFieldHint),
             ),
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+            style: const TextStyle(
+              fontSize: AppSizes.sheetFieldText,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
           DateRow(
@@ -164,13 +170,14 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
                   onPressed: () => Navigator.of(context).pop(),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: colors.primary,
-                    side: BorderSide(color: colors.primary, width: 1.4),
+                    side:
+                        BorderSide(color: colors.primary, width: AppSizes.sheetActionWidth),
                     backgroundColor: colors.primary.withValues(alpha: 0.08),
                   ),
                   child: Text(
                     l10n.cancel,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: AppSizes.sheetButtonFont,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -187,7 +194,7 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
                   child: Text(
                     l10n.save,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: AppSizes.sheetButtonFont,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

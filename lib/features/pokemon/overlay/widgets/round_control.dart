@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shiny_counter/core/theme/tokens.dart';
 
 class RoundControl extends StatelessWidget {
   const RoundControl({required this.icon, required this.onTap, super.key});
@@ -9,7 +10,7 @@ class RoundControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.overlayControlGap),
       child: Material(
         color: Colors.white.withValues(alpha: 0.0),
         shape: const CircleBorder(),
@@ -17,8 +18,12 @@ class RoundControl extends StatelessWidget {
           customBorder: const CircleBorder(),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Icon(icon, color: Colors.white, size: 30),
+            padding: const EdgeInsets.all(AppSizes.overlayControlPad),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: AppSizes.overlayControlSize,
+            ),
           ),
         ),
       ),

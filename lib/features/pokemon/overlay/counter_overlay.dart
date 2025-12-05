@@ -4,6 +4,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 import 'package:shiny_counter/features/pokemon/overlay/widgets/round_control.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
@@ -133,7 +134,7 @@ class _OverlayAppState extends State<_OverlayApp> {
   @override
   Widget build(BuildContext context) {
     final bg = const Color(0xFF1E1E1E).withValues(alpha: 0.9);
-    final borderRadius = BorderRadius.circular(150);
+    final borderRadius = BorderRadius.circular(AppSizes.overlayCorner);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -142,11 +143,14 @@ class _OverlayAppState extends State<_OverlayApp> {
           child: ClipRRect(
             borderRadius: borderRadius,
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+              filter: ImageFilter.blur(
+                sigmaX: AppSizes.overlayBlur,
+                sigmaY: AppSizes.overlayBlur,
+              ),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
+                  horizontal: AppSizes.overlayPadH,
+                  vertical: AppSizes.overlayPadV,
                 ),
                 decoration: BoxDecoration(
                   color: bg,
@@ -163,7 +167,7 @@ class _OverlayAppState extends State<_OverlayApp> {
                           onTap: _enabled ? () => _bump(-1) : null,
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -171,7 +175,7 @@ class _OverlayAppState extends State<_OverlayApp> {
                                 _name,
                                 style: const TextStyle(
                                   color: Colors.white70,
-                                  fontSize: 14,
+                                  fontSize: AppSizes.overlayNameSize,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -179,7 +183,7 @@ class _OverlayAppState extends State<_OverlayApp> {
                                 '$_count',
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 26,
+                                  fontSize: AppSizes.overlayCountSize,
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
@@ -193,6 +197,7 @@ class _OverlayAppState extends State<_OverlayApp> {
                         IconButton(
                           icon: const Icon(Icons.close),
                           color: Colors.white70,
+                          iconSize: AppSizes.overlayCloseSize,
                           onPressed: () async {
                             await FlutterOverlayWindow.closeOverlay();
                             await FlutterOverlayWindow.shareData('closed');
@@ -200,7 +205,7 @@ class _OverlayAppState extends State<_OverlayApp> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppSizes.overlaySpacer),
                     _HuntDatesTable(
                       startedAt: _startedAt,
                       caughtAt: _caughtAt,
@@ -232,20 +237,23 @@ class _HuntDatesTable extends StatelessWidget {
   Widget build(BuildContext context) {
     const labelStyle = TextStyle(
       color: Colors.white70,
-      fontSize: 12,
+      fontSize: AppSizes.overlayLabelSize,
       fontWeight: FontWeight.w600,
     );
     const valueStyle = TextStyle(
       color: Colors.white,
-      fontSize: 14,
+      fontSize: AppSizes.overlayValueSize,
       fontWeight: FontWeight.w700,
     );
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.overlayTablePadH,
+        vertical: AppSizes.overlayTablePadV,
+      ),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSizes.overlayTableCorner),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -256,7 +264,7 @@ class _HuntDatesTable extends StatelessWidget {
             labelStyle: labelStyle,
             valueStyle: valueStyle,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppSizes.overlayCellGap),
           _HuntCell(
             label: 'Catch',
             value: formatter(caughtAt),
@@ -289,7 +297,7 @@ class _HuntCell extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(label, style: labelStyle),
-        const SizedBox(height: 2),
+        const SizedBox(height: AppSizes.overlayLabelSpace),
         Text(value, style: valueStyle),
       ],
     );
