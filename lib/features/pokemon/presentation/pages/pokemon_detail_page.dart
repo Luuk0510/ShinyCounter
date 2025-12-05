@@ -31,6 +31,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   late final PageController _spritePager;
   int _currentSpriteIndex = 0;
   bool _showNormal = false;
+  bool _buttonPressed = false;
   List<String> _shinySprites = [];
   final Map<String, String?> _normalMap = {};
 
@@ -44,17 +45,23 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       toggleCaughtUseCase: context.read<ToggleCaughtUseCase?>(),
     );
     WidgetsBinding.instance.addObserver(this);
-    _controller.addListener(() => mounted ? setState(() {}) : null);
+    _controller.addListener(_onControllerChanged);
     _controller.init();
     _loadSprites();
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_onControllerChanged);
     _spritePager.dispose();
     _controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  void _onControllerChanged() {
+    if (!mounted) return;
+    setState(() {});
   }
 
   Future<void> _loadSprites() async {
@@ -108,6 +115,13 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   Future<void> _toggleCaught() async {
     await _hapticTap();
     await _controller.toggleCaught();
+  }
+
+  Future<void> _handleCatchTap() async {
+    setState(() => _buttonPressed = true);
+    await Future.delayed(AppAnim.fast);
+    if (mounted) setState(() => _buttonPressed = false);
+    await _toggleCaught();
   }
 
   Future<void> _showEditDialog() async {
@@ -354,13 +368,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                         path,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stack) => const Icon(
-                          Icons.catching_pokemon,
+                          Icons.catching_pokemon, 
                           size: AppSizes.detailImageFallback,
                         ),
                       );
                 return Center(
                   child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
+                    duration: AppAnim.switcher,
+                    transitionBuilder: (child, animation) => child,
                     child: SizedBox(
                       key: ValueKey(path),
                       width: AppSizes.detailImageSize,
@@ -399,30 +414,46 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
   Widget _buildCatchButton(ColorScheme colors) {
     final l10n = context.l10n;
-    return SizedBox(
-      width: 150,
-      child: ElevatedButton(
-        key: const Key('catch_button'),
-        onPressed: _toggleCaught,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _controller.isCaught
-              ? Colors.green.shade600
-              : colors.secondary,
-          foregroundColor: _controller.isCaught
-              ? Colors.white
-              : colors.onSecondary,
-          shape: RoundedRectangleBorder(
+    final caught = _controller.isCaught;
+    final bg = caught ? Colors.green.shade600 : colors.secondary;
+    final fg = caught ? Colors.black : colors.onSecondary;
+    return AnimatedScale(
+      scale: _buttonPressed ? AppAnim.buttonPressScale : 1,
+      duration: AppAnim.fast,
+      curve: AppAnim.easeOutCubic,
+      child: AnimatedContainer(
+        duration: AppAnim.normal,
+        curve: AppAnim.easeOut,
+        width: 150,
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(20),
+            onTap: _handleCatchTap,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                child: AnimatedSwitcher(
+                  duration: AppAnim.fast,
+                  child: Text(
+                    caught ? l10n.buttonCaught : l10n.buttonCatch,
+                    key: ValueKey(caught),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: fg,
+                    ),
+                  ),
+                  transitionBuilder: (child, animation) => child,
+                ),
+              ),
+            ),
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-          child: Text(
-            _controller.isCaught ? l10n.buttonCaught : l10n.buttonCatch,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-          ),
-        ),
-      ),
     );
   }
 

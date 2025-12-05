@@ -100,6 +100,17 @@ class AppSizes {
   static const sheetListHeightFactor = 0.72;
 }
 
+class AppAnim {
+  static const fast = Duration(milliseconds: 120);
+  static const normal = Duration(milliseconds: 200);
+  static const switcher = Duration(milliseconds: 220);
+
+  static const easeOut = Curves.easeOut;
+  static const easeOutCubic = Curves.easeOutCubic;
+
+  static const buttonPressScale = 0.9;
+}
+
 class AppTypography {
   static const title = TextStyle(
     fontSize: 26,

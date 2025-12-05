@@ -36,7 +36,7 @@ class DetailHeader extends StatelessWidget {
           child: GestureDetector(
             onTap: normalPath == null ? null : onToggleSprite,
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
+              duration: AppAnim.switcher,
               child: pokemon.isLocalFile && !kIsWeb
                   ? Image.file(
                       File(pokemon.imagePath),

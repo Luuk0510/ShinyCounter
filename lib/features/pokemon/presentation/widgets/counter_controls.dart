@@ -26,11 +26,20 @@ class CounterControls extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: onEdit,
-          child: Text(
-            '$count',
-            style: textTheme.displayLarge?.copyWith(
-              fontWeight: FontWeight.w800,
-              color: colors.onSurface,
+          child: TweenAnimationBuilder<double>(
+            key: ValueKey(count),
+            tween: Tween<double>(begin: 1.05, end: 1),
+            duration: AppAnim.fast,
+            builder: (context, scale, child) => Transform.scale(
+              scale: scale,
+              child: child,
+            ),
+            child: Text(
+              '$count',
+              style: textTheme.displayLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: colors.onSurface,
+              ),
             ),
           ),
         ),
