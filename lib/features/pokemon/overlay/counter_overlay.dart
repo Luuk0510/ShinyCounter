@@ -105,6 +105,30 @@ class _OverlayAppState extends State<_OverlayApp> {
     FlutterOverlayWindow.shareData(message.serialize());
   }
 
+
+  String get _startedAtKey => '${_counterKey}_startedAt';
+  String get _caughtAtKey => '${_counterKey}_caughtAt';
+
+  Future<(DateTime?, DateTime?)> _loadHuntDatesFor(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    final started = prefs.getString('${key}_startedAt');
+    final caught = prefs.getString('${key}_caughtAt');
+    return (
+      started != null ? DateTime.tryParse(started) : null,
+      caught != null ? DateTime.tryParse(caught) : null,
+    );
+  }
+
+  Future<void> _updateDailyCounts(SharedPreferences prefs, int delta) async {
+    final today = DateTime.now().toIso8601String().split('T').first;
+    final key = '${_counterKey}_dailyCounts';
+    final raw = prefs.getString(key);
+    final map = raw == null ? <String, int>{} : Map<String, int>.from(jsonDecode(raw) as Map);
+    map[today] = (map[today] ?? 0) + delta;
+    await prefs.setString(key, jsonEncode(map));
+  }
+
   @override
   Widget build(BuildContext context) {
     final bg = const Color(0xFF1E1E1E).withValues(alpha: 0.9);
