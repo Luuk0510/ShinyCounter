@@ -48,7 +48,7 @@ class HuntInfoCard extends StatelessWidget {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _HuntDatesRow(
             startLabel: l10n.huntStart,
