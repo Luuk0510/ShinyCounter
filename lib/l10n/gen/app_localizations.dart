@@ -415,6 +415,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'None'**
   String get gameNone;
+
+  /// No description provided for @noPokemonFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No Pokémon found'**
+  String get noPokemonFound;
+
+  /// No description provided for @tryAnotherFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Try another name, dex, or generation filter.'**
+  String get tryAnotherFilter;
 }
 
 class _AppLocalizationsDelegate
