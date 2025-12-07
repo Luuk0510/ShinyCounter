@@ -28,16 +28,15 @@ class DialogEntry extends StatelessWidget {
       duration: duration,
       curve: curve,
       builder: (context, value, _) {
-        final opacity =
-            ((value - startScale) / (1 - startScale)).clamp(0.0, 1.0);
+        final opacity = ((value - startScale) / (1 - startScale)).clamp(
+          0.0,
+          1.0,
+        );
         return AnimatedOpacity(
           duration: duration,
           opacity: opacity,
           curve: curve,
-          child: Transform.scale(
-            scale: value,
-            child: child,
-          ),
+          child: Transform.scale(scale: value, child: child),
         );
       },
     );

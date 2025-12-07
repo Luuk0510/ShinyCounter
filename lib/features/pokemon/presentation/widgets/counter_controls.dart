@@ -30,10 +30,8 @@ class CounterControls extends StatelessWidget {
             key: ValueKey(count),
             tween: Tween<double>(begin: 1.05, end: 1),
             duration: AppAnim.fast,
-            builder: (context, scale, child) => Transform.scale(
-              scale: scale,
-              child: child,
-            ),
+            builder: (context, scale, child) =>
+                Transform.scale(scale: scale, child: child),
             child: Text(
               '$count',
               style: textTheme.displayLarge?.copyWith(

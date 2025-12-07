@@ -56,7 +56,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
             children: [
               Text(
                 l10n.settingsLanguage,
-                style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
+                style: AppTypography.title.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
               _ThemeOption(
@@ -72,7 +74,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
               const SizedBox(height: AppSpacing.lg),
               Text(
                 l10n.settingsTitle,
-                style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
+                style: AppTypography.title.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
               _ThemeOption(
@@ -115,7 +119,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
               ),
               child: Text(
                 l10n.cancel,
-                style: AppTypography.button.copyWith(fontWeight: FontWeight.w700),
+                style: AppTypography.button.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),

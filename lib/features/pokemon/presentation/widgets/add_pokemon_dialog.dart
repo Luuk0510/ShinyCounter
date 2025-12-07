@@ -357,41 +357,41 @@ class _SpritePicker extends StatelessWidget {
             child: controller.loading
                 ? const Center(child: CircularProgressIndicator())
                 : controller.filteredSprites.isEmpty
-                    ? Padding(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.search_off,
-                                color: colors.onSurfaceVariant,
-                                size: AppSizes.spriteThumb,
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              Text(
-                                context.l10n.noPokemonFound,
-                                style: AppTypography.button.copyWith(
-                                  color: colors.onSurfaceVariant,
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                context.l10n.tryAnotherFilter,
-                                textAlign: TextAlign.center,
-                                style: AppTypography.button.copyWith(
-                                  color: colors.onSurfaceVariant.withValues(
-                                    alpha: 0.9,
-                                  ),
-                                ),
-                              ),
-                            ],
+                ? Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            color: colors.onSurfaceVariant,
+                            size: AppSizes.spriteThumb,
                           ),
-                        ),
-                      )
-                    : Scrollbar(
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            context.l10n.noPokemonFound,
+                            style: AppTypography.button.copyWith(
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            context.l10n.tryAnotherFilter,
+                            textAlign: TextAlign.center,
+                            style: AppTypography.button.copyWith(
+                              color: colors.onSurfaceVariant.withValues(
+                                alpha: 0.9,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Scrollbar(
                     thumbVisibility: true,
                     child: ListView.builder(
                       itemCount: controller.filteredSprites.length,
@@ -502,8 +502,10 @@ Future<Pokemon?> showAddPokemonDialog(BuildContext context) {
     transitionDuration: AppAnim.dialogDuration,
     pageBuilder: (_, __, ___) => const AddPokemonDialog(),
     transitionBuilder: (context, animation, _, child) {
-      final curved =
-          CurvedAnimation(parent: animation, curve: AppAnim.dialogCurve);
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: AppAnim.dialogCurve,
+      );
       final scale = Tween<double>(begin: 0.65, end: 1).animate(curved);
       return DialogEntry(
         child: FadeTransition(

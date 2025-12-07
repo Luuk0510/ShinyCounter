@@ -86,8 +86,10 @@ class _PokemonListPageState extends State<PokemonListPage>
       transitionDuration: AppAnim.dialogDuration,
       pageBuilder: (_, __, ___) => dialog,
       transitionBuilder: (context, animation, _, child) {
-        final curved =
-            CurvedAnimation(parent: animation, curve: AppAnim.dialogCurve);
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: AppAnim.dialogCurve,
+        );
         final scale = Tween<double>(
           begin: AppAnim.dialogStartScale,
           end: 1,
@@ -158,17 +160,17 @@ class _PokemonListPageState extends State<PokemonListPage>
         title: Text(
           '${context.l10n.confirmDeleteTitle} ${pokemon.name}',
           textAlign: TextAlign.center,
-          style: Theme.of(context)
-              .textTheme
-              .headlineSmall
-              ?.copyWith(fontWeight: FontWeight.w800),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
         ),
         content: Builder(
           builder: (context) {
             final message = context.l10n.confirmDeleteMessage(pokemon.name);
             final parts = message.split(pokemon.name);
-            final after =
-                parts.length > 1 ? parts.sublist(1).join(pokemon.name) : '';
+            final after = parts.length > 1
+                ? parts.sublist(1).join(pokemon.name)
+                : '';
             return RichText(
               text: TextSpan(
                 style: AppTypography.button.copyWith(color: colors.onSurface),
@@ -203,9 +205,7 @@ class _PokemonListPageState extends State<PokemonListPage>
             ),
             child: Text(
               context.l10n.confirmDeleteCancel,
-              style: AppTypography.button.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: AppTypography.button.copyWith(fontWeight: FontWeight.w700),
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -221,9 +221,7 @@ class _PokemonListPageState extends State<PokemonListPage>
             ),
             child: Text(
               context.l10n.confirmDeleteDelete,
-              style: AppTypography.button.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: AppTypography.button.copyWith(fontWeight: FontWeight.w700),
             ),
           ),
         ],

@@ -374,34 +374,32 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                       final normalPath = _normalMap[shinyPath];
                       final showNormal = _showNormal && normalPath != null;
                       final path = showNormal ? normalPath! : shinyPath;
-                      final image = widget.pokemon.isLocalFile &&
+                      final image =
+                          widget.pokemon.isLocalFile &&
                               !path.startsWith('assets/')
                           ? Image.file(
                               File(path),
                               fit: BoxFit.contain,
                               errorBuilder: (context, error, stack) =>
                                   const Icon(
-                                Icons.catching_pokemon,
-                                size: AppSizes.detailImageFallback,
-                              ),
+                                    Icons.catching_pokemon,
+                                    size: AppSizes.detailImageFallback,
+                                  ),
                             )
                           : Image.asset(
                               path,
                               fit: BoxFit.contain,
                               errorBuilder: (context, error, stack) =>
                                   const Icon(
-                                Icons.catching_pokemon,
-                                size: AppSizes.detailImageFallback,
-                              ),
+                                    Icons.catching_pokemon,
+                                    size: AppSizes.detailImageFallback,
+                                  ),
                             );
                       return Center(
                         child: AnimatedSwitcher(
                           duration: AppAnim.switcher,
                           transitionBuilder: (child, animation) =>
-                              FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          ),
+                              FadeTransition(opacity: animation, child: child),
                           child: SizedBox(
                             key: ValueKey(path),
                             width: AppSizes.detailImageSize,
@@ -460,26 +458,26 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
             onTap: _handleCatchTap,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                child: AnimatedSwitcher(
-                  duration: AppAnim.fast,
-                  child: Text(
-                    caught ? l10n.buttonCaught : l10n.buttonCatch,
-                    key: ValueKey(caught),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: fg,
-                    ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              child: AnimatedSwitcher(
+                duration: AppAnim.fast,
+                child: Text(
+                  caught ? l10n.buttonCaught : l10n.buttonCatch,
+                  key: ValueKey(caught),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: fg,
                   ),
-                  transitionBuilder: (child, animation) => child,
                 ),
+                transitionBuilder: (child, animation) => child,
               ),
             ),
           ),
         ),
+      ),
     );
   }
 

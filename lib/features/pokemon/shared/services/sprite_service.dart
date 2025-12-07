@@ -34,8 +34,10 @@ class SpriteRepository implements SpriteService {
   }
 
   @override
-  Future<List<ParsedSprite>> spritesForDex(String dex,
-      {bool refresh = false}) async {
+  Future<List<ParsedSprite>> spritesForDex(
+    String dex, {
+    bool refresh = false,
+  }) async {
     if (!refresh && _byDex.containsKey(dex)) {
       return _byDex[dex]!;
     }
@@ -49,12 +51,16 @@ class SpriteRepository implements SpriteService {
   }
 
   @override
-  Future<void> warmupForDexes(Iterable<String> dexes,
-      {bool refresh = false}) async {
+  Future<void> warmupForDexes(
+    Iterable<String> dexes, {
+    bool refresh = false,
+  }) async {
     if (dexes.isEmpty) return;
     final deduped = dexes.toSet();
     if (!refresh &&
-        deduped.every((dex) => _byDex.containsKey(dex) && _byDexForm.containsKey(dex))) {
+        deduped.every(
+          (dex) => _byDex.containsKey(dex) && _byDexForm.containsKey(dex),
+        )) {
       return;
     }
     final all = await loadSprites(refresh: refresh);

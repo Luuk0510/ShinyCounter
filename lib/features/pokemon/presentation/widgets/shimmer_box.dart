@@ -17,10 +17,8 @@ class _ShimmerBoxState extends State<ShimmerBox>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: AppAnim.switcher,
-    )..repeat();
+    _controller = AnimationController(vsync: this, duration: AppAnim.switcher)
+      ..repeat();
   }
 
   @override
@@ -34,8 +32,10 @@ class _ShimmerBoxState extends State<ShimmerBox>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
-        final alignment =
-            Alignment(-1 + 2 * _controller.value, -1 + 2 * _controller.value);
+        final alignment = Alignment(
+          -1 + 2 * _controller.value,
+          -1 + 2 * _controller.value,
+        );
         return Container(
           width: widget.size,
           height: widget.size,
