@@ -5,6 +5,7 @@ import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 
 abstract class SpriteService {
   Future<List<ParsedSprite>> loadSprites({bool refresh = false});
+  Future<List<ParsedSprite>> spritesForDex(String dex, {bool refresh = false});
 }
 
 class SpriteRepository implements SpriteService {
@@ -12,6 +13,7 @@ class SpriteRepository implements SpriteService {
 
   final AssetBundle? _bundle;
   List<ParsedSprite>? _cache;
+  final Map<String, List<ParsedSprite>> _byDex = {};
 
   AssetBundle get _assetBundle => _bundle ?? rootBundle;
 
@@ -20,7 +22,23 @@ class SpriteRepository implements SpriteService {
     if (!refresh && _cache != null) return _cache!;
     final parsed = await _load();
     _cache = parsed;
+    _byDex.clear();
+    for (final sprite in parsed) {
+      _byDex.putIfAbsent(sprite.dex, () => []).add(sprite);
+    }
     return parsed;
+  }
+
+  @override
+  Future<List<ParsedSprite>> spritesForDex(String dex,
+      {bool refresh = false}) async {
+    if (!refresh && _byDex.containsKey(dex)) {
+      return _byDex[dex]!;
+    }
+    final all = await loadSprites(refresh: refresh);
+    final filtered = all.where((p) => p.dex == dex).toList();
+    _byDex[dex] = filtered;
+    return filtered;
   }
 
   Future<List<ParsedSprite>> _load() async {

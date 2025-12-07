@@ -68,10 +68,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     final parsed = SpriteParser.parse(widget.pokemon.imagePath.split('/').last);
     if (parsed == null) return;
     final service = context.read<SpriteService>();
-    final assets = await service.loadSprites();
-    final shiny = assets.where((p) => p.dex == parsed.dex && p.shiny).toList()
+    final assets = await service.spritesForDex(parsed.dex);
+    final shiny = assets.where((p) => p.shiny).toList()
       ..sort((a, b) => a.form.compareTo(b.form));
-    final normal = assets.where((p) => p.dex == parsed.dex && !p.shiny).toList();
+    final normal = assets.where((p) => !p.shiny).toList();
     _normalMap.clear();
     for (final s in shiny) {
       final match = normal.firstWhere(
