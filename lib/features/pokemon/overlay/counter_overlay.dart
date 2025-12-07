@@ -156,64 +156,67 @@ class _OverlayAppState extends State<_OverlayApp> {
                   color: bg,
                   borderRadius: borderRadius,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        RoundControl(
-                          icon: Icons.remove,
-                          onTap: _enabled ? () => _bump(-1) : null,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.sm,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          RoundControl(
+                            icon: Icons.remove,
+                            onTap: _enabled ? () => _bump(-1) : null,
                           ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                _name,
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: AppSizes.overlayNameSize,
-                                  fontWeight: FontWeight.w600,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _name,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: AppSizes.overlayNameSize,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                '$_count',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: AppSizes.overlayCountSize,
-                                  fontWeight: FontWeight.w800,
+                                Text(
+                                  '$_count',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: AppSizes.overlayCountSize,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        RoundControl(
-                          icon: Icons.add,
-                          onTap: _enabled ? () => _bump(1) : null,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          color: Colors.white70,
-                          iconSize: AppSizes.overlayCloseSize,
-                          onPressed: () async {
-                            await FlutterOverlayWindow.closeOverlay();
-                            await FlutterOverlayWindow.shareData('closed');
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSizes.overlaySpacer),
-                    _HuntDatesTable(
-                      startedAt: _startedAt,
-                      caughtAt: _caughtAt,
-                      formatter: formatDate,
-                    ),
-                  ],
+                          RoundControl(
+                            icon: Icons.add,
+                            onTap: _enabled ? () => _bump(1) : null,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            color: Colors.white70,
+                            iconSize: AppSizes.overlayCloseSize,
+                            onPressed: () async {
+                              await FlutterOverlayWindow.closeOverlay();
+                              await FlutterOverlayWindow.shareData('closed');
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSizes.overlaySpacer),
+                      _HuntDatesTable(
+                        startedAt: _startedAt,
+                        caughtAt: _caughtAt,
+                        formatter: formatDate,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

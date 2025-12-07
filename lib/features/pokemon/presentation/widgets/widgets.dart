@@ -2,6 +2,7 @@ export 'add_pokemon_dialog.dart';
 export 'counter_controls.dart';
 export 'daily_counts_list.dart';
 export 'date_row.dart';
+export 'dialog_entry.dart';
 export 'detail_header.dart';
 export 'game_dropdown.dart';
 export 'hunt_info_card.dart';

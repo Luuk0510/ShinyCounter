@@ -67,6 +67,29 @@ class _PokemonListPageState extends State<PokemonListPage> {
     }
   }
 
+  Future<T?> _showScaledDialog<T>(Widget dialog) {
+    return showGeneralDialog<T>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black54,
+      transitionDuration: AppAnim.fast,
+      pageBuilder: (_, __, ___) => dialog,
+      transitionBuilder: (context, animation, _, child) {
+        final curved =
+            CurvedAnimation(parent: animation, curve: AppAnim.easeOutCubic);
+        final scale = Tween<double>(
+          begin: AppAnim.dialogStartScale,
+          end: 1,
+        ).animate(curved);
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(scale: scale, child: child),
+        );
+      },
+    );
+  }
+
   bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.id);
 
   Future<void> _onAddPokemon() async {
@@ -104,86 +127,83 @@ class _PokemonListPageState extends State<PokemonListPage> {
 
   Future<void> _confirmDelete(Pokemon pokemon) async {
     final colors = Theme.of(context).colorScheme;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Theme.of(context).cardColor,
-          surfaceTintColor: Colors.transparent,
-          title: Text(
-            context.l10n.confirmDeleteTitle,
-            textAlign: TextAlign.center,
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-          ),
-          content: Builder(
-            builder: (context) {
-              final message = context.l10n.confirmDeleteMessage(pokemon.name);
-              final parts = message.split(pokemon.name);
-              final after = parts.length > 1
-                  ? parts.sublist(1).join(pokemon.name)
-                  : '';
-              return RichText(
-                text: TextSpan(
-                  style: AppTypography.button.copyWith(color: colors.onSurface),
-                  children: [
-                    TextSpan(text: parts.first),
-                    TextSpan(
-                      text: pokemon.name,
-                      style: AppTypography.button.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
+    final confirmed = await _showScaledDialog<bool>(
+      AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
+        surfaceTintColor: Colors.transparent,
+        title: Text(
+          '${context.l10n.confirmDeleteTitle} ${pokemon.name}',
+          textAlign: TextAlign.center,
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall
+              ?.copyWith(fontWeight: FontWeight.w800),
+        ),
+        content: Builder(
+          builder: (context) {
+            final message = context.l10n.confirmDeleteMessage(pokemon.name);
+            final parts = message.split(pokemon.name);
+            final after =
+                parts.length > 1 ? parts.sublist(1).join(pokemon.name) : '';
+            return RichText(
+              text: TextSpan(
+                style: AppTypography.button.copyWith(color: colors.onSurface),
+                children: [
+                  TextSpan(text: parts.first),
+                  TextSpan(
+                    text: pokemon.name,
+                    style: AppTypography.button.copyWith(
+                      fontWeight: FontWeight.w800,
                     ),
-                    TextSpan(text: after),
-                  ],
-                ),
-              );
-            },
-          ),
-          actionsAlignment: MainAxisAlignment.center,
-          actionsPadding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.sm,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              style: TextButton.styleFrom(
-                foregroundColor: colors.primary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                  vertical: AppSpacing.sm,
-                ),
+                  ),
+                  TextSpan(text: after),
+                ],
               ),
-              child: Text(
-                context.l10n.confirmDeleteCancel,
-                style: AppTypography.button.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            );
+          },
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actionsPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.sm,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            style: TextButton.styleFrom(
+              foregroundColor: colors.primary,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.sm,
               ),
             ),
-            const SizedBox(width: AppSpacing.sm),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colors.error,
-                foregroundColor: colors.onError,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                  vertical: AppSpacing.sm,
-                ),
-              ),
-              child: Text(
-                context.l10n.confirmDeleteDelete,
-                style: AppTypography.button.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            child: Text(
+              context.l10n.confirmDeleteCancel,
+              style: AppTypography.button.copyWith(
+                fontWeight: FontWeight.w700,
               ),
             ),
-          ],
-        );
-      },
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colors.error,
+              foregroundColor: colors.onError,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.sm,
+              ),
+            ),
+            child: Text(
+              context.l10n.confirmDeleteDelete,
+              style: AppTypography.button.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
 
     if (confirmed == true) {
@@ -311,10 +331,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
 
   Future<void> _openSettings() async {
     if (!mounted) return;
-    await showDialog<void>(
-      context: context,
-      builder: (context) => const SettingsDialog(),
-    );
+    await _showScaledDialog(const SettingsDialog());
     setState(() {});
   }
 

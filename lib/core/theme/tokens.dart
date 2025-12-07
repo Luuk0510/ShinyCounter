@@ -109,6 +109,7 @@ class AppAnim {
   static const easeOutCubic = Curves.easeOutCubic;
 
   static const buttonPressScale = 0.9;
+  static const dialogStartScale = 0.8;
 }
 
 class AppTypography {

@@ -6,6 +6,7 @@ import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialog_entry.dart';
 
 class AddPokemonController extends ChangeNotifier {
   AddPokemonController({required SpriteService spriteService})
@@ -167,93 +168,95 @@ class _AddPokemonView extends StatelessWidget {
     final controller = context.watch<AddPokemonController>();
     final colors = Theme.of(context).colorScheme;
 
-    return AlertDialog(
-      backgroundColor: Theme.of(context).cardColor,
-      surfaceTintColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.lg,
-      ),
-      contentPadding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.sm,
-        AppSpacing.lg,
-        AppSpacing.md,
-      ),
-      title: Text(
-        l10n.addDialogTitle,
-        textAlign: TextAlign.center,
-        style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
-      ),
-      content: Builder(
-        builder: (context) {
-          final media = MediaQuery.of(context);
-          final viewInsets = media.viewInsets.bottom;
-          final maxContentHeight =
-              (media.size.height * AppSizes.dialogHeightFactor - viewInsets)
-                  .clamp(AppSizes.dialogMinHeight, media.size.height)
-                  .toDouble();
-          return SizedBox(
-            width: AppSizes.dialogMaxWidth,
-            height: maxContentHeight,
-            child: _SpritePicker(
-              colors: colors,
-              availableHeight: maxContentHeight,
-            ),
-          );
-        },
-      ),
-      actionsAlignment: MainAxisAlignment.center,
-      actionsPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.sm,
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: colors.primary,
-            side: BorderSide(color: colors.primary, width: 1.4),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xl,
-              vertical: AppSpacing.xs,
-            ),
-          ),
-          child: Text(l10n.cancel, style: AppTypography.button),
+    return DialogEntry(
+      child: AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
+        surfaceTintColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.lg,
         ),
-        const SizedBox(width: AppSpacing.sm),
-        ElevatedButton(
-          onPressed: controller.selected == null
-              ? null
-              : () {
-                  final sprite = controller.selected!;
-                  final name = controller.displayName(sprite);
-                  Navigator.of(context).pop<Pokemon?>(
-                    Pokemon(
-                      id: _generateId(sprite.dex),
-                      name: name,
-                      imagePath: sprite.path,
-                      isLocalFile: false,
-                    ),
-                  );
-                },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colors.primary,
-            foregroundColor: colors.onPrimary,
-            disabledBackgroundColor: colors.onSurfaceVariant.withValues(
-              alpha: 0.2,
-            ),
-            disabledForegroundColor: colors.onSurfaceVariant.withValues(
-              alpha: 0.6,
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xl,
-              vertical: AppSpacing.xs,
-            ),
-          ),
-          child: Text(l10n.choose, style: AppTypography.button),
+        contentPadding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.sm,
+          AppSpacing.lg,
+          AppSpacing.md,
         ),
-      ],
+        title: Text(
+          l10n.addDialogTitle,
+          textAlign: TextAlign.center,
+          style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
+        ),
+        content: Builder(
+          builder: (context) {
+            final media = MediaQuery.of(context);
+            final viewInsets = media.viewInsets.bottom;
+            final maxContentHeight =
+                (media.size.height * AppSizes.dialogHeightFactor - viewInsets)
+                    .clamp(AppSizes.dialogMinHeight, media.size.height)
+                    .toDouble();
+            return SizedBox(
+              width: AppSizes.dialogMaxWidth,
+              height: maxContentHeight,
+              child: _SpritePicker(
+                colors: colors,
+                availableHeight: maxContentHeight,
+              ),
+            );
+          },
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actionsPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.sm,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: colors.primary,
+              side: BorderSide(color: colors.primary, width: 1.4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.xs,
+              ),
+            ),
+            child: Text(l10n.cancel, style: AppTypography.button),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          ElevatedButton(
+            onPressed: controller.selected == null
+                ? null
+                : () {
+                    final sprite = controller.selected!;
+                    final name = controller.displayName(sprite);
+                    Navigator.of(context).pop<Pokemon?>(
+                      Pokemon(
+                        id: _generateId(sprite.dex),
+                        name: name,
+                        imagePath: sprite.path,
+                        isLocalFile: false,
+                      ),
+                    );
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colors.primary,
+              foregroundColor: colors.onPrimary,
+              disabledBackgroundColor: colors.onSurfaceVariant.withValues(
+                alpha: 0.2,
+              ),
+              disabledForegroundColor: colors.onSurfaceVariant.withValues(
+                alpha: 0.6,
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.xs,
+              ),
+            ),
+            child: Text(l10n.choose, style: AppTypography.button),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -454,8 +457,29 @@ String _generateId(String dex) =>
     'custom_${dex}_${DateTime.now().microsecondsSinceEpoch}';
 
 Future<Pokemon?> showAddPokemonDialog(BuildContext context) {
-  return showDialog<Pokemon?>(
+  return showGeneralDialog<Pokemon?>(
     context: context,
-    builder: (_) => const AddPokemonDialog(),
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    barrierColor: Colors.black54,
+    transitionDuration: AppAnim.fast,
+    pageBuilder: (_, __, ___) => const AddPokemonDialog(),
+    transitionBuilder: (context, animation, _, child) {
+      final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+      final scale =
+          Tween<double>(begin: AppAnim.dialogStartScale, end: 1).animate(curved);
+      return DialogEntry(
+        duration: AppAnim.fast,
+        curve: Curves.easeOutCubic,
+        startScale: AppAnim.dialogStartScale,
+        child: FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: scale,
+            child: child,
+          ),
+        ),
+      );
+    },
   );
 }
