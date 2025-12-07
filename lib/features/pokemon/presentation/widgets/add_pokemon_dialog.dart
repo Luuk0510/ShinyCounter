@@ -345,14 +345,41 @@ class _SpritePicker extends StatelessWidget {
             child: controller.loading
                 ? const Center(child: CircularProgressIndicator())
                 : controller.filteredSprites.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Text(
-                      'No sprites found',
-                      style: TextStyle(color: colors.onSurfaceVariant),
-                    ),
-                  )
-                : Scrollbar(
+                    ? Padding(
+                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.search_off,
+                                color: colors.onSurfaceVariant,
+                                size: AppSizes.spriteThumb,
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(
+                                context.l10n.noPokemonFound,
+                                style: AppTypography.button.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                context.l10n.tryAnotherFilter,
+                                textAlign: TextAlign.center,
+                                style: AppTypography.button.copyWith(
+                                  color: colors.onSurfaceVariant.withValues(
+                                    alpha: 0.9,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : Scrollbar(
                     thumbVisibility: true,
                     child: ListView.builder(
                       itemCount: controller.filteredSprites.length,
