@@ -427,6 +427,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try another name, dex, or generation filter.'**
   String get tryAnotherFilter;
+
+  /// No description provided for @filterAllGens.
+  ///
+  /// In en, this message translates to:
+  /// **'All gens'**
+  String get filterAllGens;
 }
 
 class _AppLocalizationsDelegate

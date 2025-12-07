@@ -304,6 +304,7 @@ class _SpritePicker extends StatelessWidget {
               child: DropdownButtonFormField<int?>(
                 value: controller.selectedGen,
                 isDense: true,
+                alignment: Alignment.centerLeft,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(
@@ -316,17 +317,28 @@ class _SpritePicker extends StatelessWidget {
                   ),
                 ),
                 onChanged: controller.setGen,
-                items: const [
-                  DropdownMenuItem<int?>(value: null, child: Text('All')),
-                  DropdownMenuItem<int?>(value: 1, child: Text('Gen 1')),
-                  DropdownMenuItem<int?>(value: 2, child: Text('Gen 2')),
-                  DropdownMenuItem<int?>(value: 3, child: Text('Gen 3')),
-                  DropdownMenuItem<int?>(value: 4, child: Text('Gen 4')),
-                  DropdownMenuItem<int?>(value: 5, child: Text('Gen 5')),
-                  DropdownMenuItem<int?>(value: 6, child: Text('Gen 6')),
-                  DropdownMenuItem<int?>(value: 7, child: Text('Gen 7')),
-                  DropdownMenuItem<int?>(value: 8, child: Text('Gen 8')),
-                  DropdownMenuItem<int?>(value: 9, child: Text('Gen 9')),
+                items: [
+                  DropdownMenuItem<int?>(
+                    value: null,
+                    child: SizedBox(
+                      width: AppSizes.dropdownWidth - AppSpacing.lg,
+                      child: Text(
+                        context.l10n.filterAllGens,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                  for (final gen in List.generate(9, (i) => i + 1))
+                    DropdownMenuItem<int?>(
+                      value: gen,
+                      child: SizedBox(
+                        width: AppSizes.dropdownWidth - AppSpacing.lg,
+                        child: Text(
+                          'Gen $gen',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

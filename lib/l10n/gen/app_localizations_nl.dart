@@ -177,4 +177,7 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get tryAnotherFilter =>
       'Probeer een andere naam, Pokédex of generatie filter.';
+
+  @override
+  String get filterAllGens => 'Alle generaties';
 }

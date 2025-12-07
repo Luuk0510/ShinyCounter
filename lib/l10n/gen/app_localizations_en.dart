@@ -176,4 +176,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tryAnotherFilter => 'Try another name, dex, or generation filter.';
+
+  @override
+  String get filterAllGens => 'All gens';
 }

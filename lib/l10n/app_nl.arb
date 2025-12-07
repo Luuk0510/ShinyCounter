@@ -64,5 +64,6 @@
   "gameNone": "Geen",
   "searchByNameOrDex": "Zoek op naam of Pok\u00e9dex",
   "noPokemonFound": "Geen Pok\u00e9mon gevonden",
-  "tryAnotherFilter": "Probeer een andere naam, Pok\u00e9dex of generatie filter."
+  "tryAnotherFilter": "Probeer een andere naam, Pok\u00e9dex of generatie filter.",
+  "filterAllGens": "Alle generaties"
 }
