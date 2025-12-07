@@ -1,17 +1,16 @@
 import 'dart:convert';
 
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shiny_counter/core/storage/key_value_store.dart';
 
 import '../../domain/entities/pokemon.dart';
 
 class PokemonStorage {
-  PokemonStorage() : _prefs = SharedPreferences.getInstance();
+  PokemonStorage({KeyValueStore? store}) : _store = store ?? SharedPrefsStore();
 
-  final Future<SharedPreferences> _prefs;
+  final KeyValueStore _store;
 
   Future<List<Pokemon>> loadCustomPokemon() async {
-    final prefs = await _prefs;
-    final raw = prefs.getString(_customKey);
+    final raw = await _store.getString(_customKey);
     if (raw == null) return [];
 
     try {
@@ -34,7 +33,6 @@ class PokemonStorage {
   }
 
   Future<void> saveCustomPokemon(List<Pokemon> custom) async {
-    final prefs = await _prefs;
     final encoded = jsonEncode(
       custom
           .map(
@@ -47,14 +45,13 @@ class PokemonStorage {
           )
           .toList(),
     );
-    await prefs.setString(_customKey, encoded);
+    await _store.setString(_customKey, encoded);
   }
 
   Future<Set<String>> loadCaught(List<Pokemon> allPokemon) async {
-    final prefs = await _prefs;
     final caught = <String>{};
     for (final p in allPokemon) {
-      if (prefs.getBool(_caughtKey(p.id)) ?? false) {
+      if (await _store.getBool(_caughtKey(p.id)) ?? false) {
         caught.add(p.id);
       }
     }

@@ -72,7 +72,7 @@ class AppSizes {
   static const settingsActionPaddingV = AppSpacing.sm;
   static const overlayControlPad = 14.0;
   static const overlayControlSize = 30.0;
-  static const overlayControlGap = 4.0;
+  static const overlayControlGap = 1.0;
   static const overlayBlur = 14.0;
   static const overlayCorner = 150.0;
   static const overlayPadH = 12.0;

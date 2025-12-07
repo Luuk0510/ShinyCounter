@@ -209,12 +209,6 @@ class _OverlayAppState extends State<_OverlayApp> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppSizes.overlaySpacer),
-                      _HuntDatesTable(
-                        startedAt: _startedAt,
-                        caughtAt: _caughtAt,
-                        formatter: formatDate,
-                      ),
                     ],
                   ),
                 ),
