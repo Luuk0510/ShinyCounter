@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 import 'package:shiny_counter/features/pokemon/overlay/widgets/round_control.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 
 @pragma('vm:entry-point')
 void overlayMain() {
@@ -194,24 +193,24 @@ class _OverlayAppState extends State<_OverlayApp> {
                               ],
                             ),
                           ),
-                        RoundControl(
-                          icon: Icons.add,
-                          onTap: _enabled ? () => _bump(1) : null,
-                        ),
-                        IconButton(
-                          constraints: const BoxConstraints.tightFor(
-                            width: AppSizes.overlayIconButtonSize,
-                            height: AppSizes.overlayIconButtonSize,
+                          RoundControl(
+                            icon: Icons.add,
+                            onTap: _enabled ? () => _bump(1) : null,
                           ),
-                          padding: const EdgeInsets.all(AppSpacing.xs),
-                          icon: const Icon(Icons.close),
-                          color: Colors.white70,
-                          iconSize: AppSizes.overlayCloseSize,
-                          onPressed: () async {
-                            await FlutterOverlayWindow.closeOverlay();
-                            await FlutterOverlayWindow.shareData('closed');
-                          },
-                        ),
+                          IconButton(
+                            constraints: const BoxConstraints.tightFor(
+                              width: AppSizes.overlayIconButtonSize,
+                              height: AppSizes.overlayIconButtonSize,
+                            ),
+                            padding: const EdgeInsets.all(AppSpacing.xs),
+                            icon: const Icon(Icons.close),
+                            color: Colors.white70,
+                            iconSize: AppSizes.overlayCloseSize,
+                            onPressed: () async {
+                              await FlutterOverlayWindow.closeOverlay();
+                              await FlutterOverlayWindow.shareData('closed');
+                            },
+                          ),
                         ],
                       ),
                     ],
@@ -222,88 +221,6 @@ class _OverlayAppState extends State<_OverlayApp> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _HuntDatesTable extends StatelessWidget {
-  const _HuntDatesTable({
-    required this.startedAt,
-    required this.caughtAt,
-    required this.formatter,
-  });
-
-  final DateTime? startedAt;
-  final DateTime? caughtAt;
-  final String Function(DateTime?) formatter;
-
-  @override
-  Widget build(BuildContext context) {
-    const labelStyle = TextStyle(
-      color: Colors.white70,
-      fontSize: AppSizes.overlayLabelSize,
-      fontWeight: FontWeight.w600,
-    );
-    const valueStyle = TextStyle(
-      color: Colors.white,
-      fontSize: AppSizes.overlayValueSize,
-      fontWeight: FontWeight.w700,
-    );
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSizes.overlayTablePadH,
-        vertical: AppSizes.overlayTablePadV,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(AppSizes.overlayTableCorner),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _HuntCell(
-            label: 'Start',
-            value: formatter(startedAt),
-            labelStyle: labelStyle,
-            valueStyle: valueStyle,
-          ),
-          const SizedBox(width: AppSizes.overlayCellGap),
-          _HuntCell(
-            label: 'Catch',
-            value: formatter(caughtAt),
-            labelStyle: labelStyle,
-            valueStyle: valueStyle,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HuntCell extends StatelessWidget {
-  const _HuntCell({
-    required this.label,
-    required this.value,
-    required this.labelStyle,
-    required this.valueStyle,
-  });
-
-  final String label;
-  final String value;
-  final TextStyle labelStyle;
-  final TextStyle valueStyle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(label, style: labelStyle),
-        const SizedBox(height: AppSizes.overlayLabelSpace),
-        Text(value, style: valueStyle),
-      ],
     );
   }
 }
