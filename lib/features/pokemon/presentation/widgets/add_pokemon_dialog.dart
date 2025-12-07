@@ -462,16 +462,14 @@ Future<Pokemon?> showAddPokemonDialog(BuildContext context) {
     barrierDismissible: true,
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     barrierColor: Colors.black54,
-    transitionDuration: AppAnim.fast,
+    transitionDuration: AppAnim.dialogDuration,
     pageBuilder: (_, __, ___) => const AddPokemonDialog(),
     transitionBuilder: (context, animation, _, child) {
-      final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+      final curved =
+          CurvedAnimation(parent: animation, curve: AppAnim.dialogCurve);
       final scale =
           Tween<double>(begin: AppAnim.dialogStartScale, end: 1).animate(curved);
       return DialogEntry(
-        duration: AppAnim.fast,
-        curve: Curves.easeOutCubic,
-        startScale: AppAnim.dialogStartScale,
         child: FadeTransition(
           opacity: animation,
           child: ScaleTransition(

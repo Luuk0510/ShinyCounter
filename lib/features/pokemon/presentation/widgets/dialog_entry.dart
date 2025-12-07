@@ -7,8 +7,8 @@ class DialogEntry extends StatelessWidget {
   const DialogEntry({
     super.key,
     required this.child,
-    this.duration = AppAnim.fast,
-    this.curve = AppAnim.easeOut,
+    this.duration = AppAnim.dialogDuration,
+    this.curve = AppAnim.dialogCurve,
     this.startScale = AppAnim.dialogStartScale,
     this.reverse = false,
   });

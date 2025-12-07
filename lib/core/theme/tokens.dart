@@ -104,9 +104,11 @@ class AppAnim {
   static const fast = Duration(milliseconds: 120);
   static const normal = Duration(milliseconds: 200);
   static const switcher = Duration(milliseconds: 220);
+  static const dialogDuration = fast;
 
   static const easeOut = Curves.easeOut;
   static const easeOutCubic = Curves.easeOutCubic;
+  static const dialogCurve = easeOutCubic;
 
   static const buttonPressScale = 0.9;
   static const dialogStartScale = 0.8;

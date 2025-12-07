@@ -73,11 +73,11 @@ class _PokemonListPageState extends State<PokemonListPage> {
       barrierDismissible: true,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
       barrierColor: Colors.black54,
-      transitionDuration: AppAnim.fast,
+      transitionDuration: AppAnim.dialogDuration,
       pageBuilder: (_, __, ___) => dialog,
       transitionBuilder: (context, animation, _, child) {
         final curved =
-            CurvedAnimation(parent: animation, curve: AppAnim.easeOutCubic);
+            CurvedAnimation(parent: animation, curve: AppAnim.dialogCurve);
         final scale = Tween<double>(
           begin: AppAnim.dialogStartScale,
           end: 1,
