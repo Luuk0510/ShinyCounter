@@ -26,7 +26,7 @@ class PokemonDetailPage extends StatefulWidget {
 }
 
 class _PokemonDetailPageState extends State<PokemonDetailPage>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   late final CounterController _controller;
   late final PageController _spritePager;
   int _currentSpriteIndex = 0;

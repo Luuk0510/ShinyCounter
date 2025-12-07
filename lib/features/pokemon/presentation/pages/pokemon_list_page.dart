@@ -24,13 +24,15 @@ class PokemonListPage extends StatefulWidget {
   State<PokemonListPage> createState() => _PokemonListPageState();
 }
 
-class _PokemonListPageState extends State<PokemonListPage> {
+class _PokemonListPageState extends State<PokemonListPage>
+    with TickerProviderStateMixin {
   late final LoadCustomPokemonUseCase _loadCustomPokemon;
   late final SaveCustomPokemonUseCase _saveCustomPokemon;
   late final LoadCaughtUseCase _loadCaught;
   final List<Pokemon> _customPokemon = [];
   Set<String> _caught = {};
   bool _loading = true;
+  AnimationController? _sheetController;
 
   List<Pokemon> get _allPokemon {
     final combined = [..._basePokemon, ..._customPokemon];
@@ -44,6 +46,11 @@ class _PokemonListPageState extends State<PokemonListPage> {
     _loadCustomPokemon = context.read<LoadCustomPokemonUseCase>();
     _saveCustomPokemon = context.read<SaveCustomPokemonUseCase>();
     _loadCaught = context.read<LoadCaughtUseCase>();
+    _sheetController = AnimationController(
+      vsync: this,
+      duration: AppAnim.sheetDuration,
+      reverseDuration: AppAnim.sheetDuration,
+    );
     _loadData();
   }
 
@@ -216,6 +223,12 @@ class _PokemonListPageState extends State<PokemonListPage> {
     }
   }
 
+  @override
+  void dispose() {
+    _sheetController?.dispose();
+    super.dispose();
+  }
+
   Future<void> _openManagePokemonList() async {
     final pokemonSorted = [..._customPokemon]..sort(pokemonDexComparator);
     if (pokemonSorted.isEmpty) {
@@ -230,6 +243,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
     final action = await showModalBottomSheet<_ManageAction>(
       context: context,
       showDragHandle: false,
+      transitionAnimationController: _sheetController,
       backgroundColor: Theme.of(context).cardColor,
       barrierColor: Colors.black.withValues(alpha: 0.35),
       shape: const RoundedRectangleBorder(
