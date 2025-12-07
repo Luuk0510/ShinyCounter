@@ -117,6 +117,37 @@ class AppAnim {
   static const dialogStartScale = 0.8;
 }
 
+/// Intent-based tokens to avoid sprinkling raw numbers in widgets.
+class AppInsets {
+  static const card = EdgeInsets.symmetric(
+    horizontal: AppSizes.cardPaddingH,
+    vertical: AppSizes.cardPaddingV,
+  );
+  static const dialog = EdgeInsets.symmetric(
+    horizontal: AppSpacing.lg,
+    vertical: AppSpacing.md,
+  );
+  static const sheet = EdgeInsets.symmetric(
+    horizontal: AppSpacing.lg,
+    vertical: AppSpacing.md,
+  );
+  static const overlay = EdgeInsets.symmetric(
+    horizontal: AppSizes.overlayPadH,
+    vertical: AppSizes.overlayPadV,
+  );
+  static const chip = EdgeInsets.symmetric(
+    horizontal: AppSpacing.sm,
+    vertical: AppSpacing.xs,
+  );
+}
+
+/// Semantic heights/widths to describe intent, not pixels.
+class AppSemanticSize {
+  static const chipHeight = 32.0;
+  static const dialogMaxWidth = AppSizes.dialogMaxWidth;
+  static const dialogMinHeight = AppSizes.dialogMinHeight;
+}
+
 class AppTypography {
   static const title = TextStyle(
     fontSize: 26,

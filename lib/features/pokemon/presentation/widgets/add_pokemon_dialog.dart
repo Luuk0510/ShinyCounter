@@ -171,14 +171,11 @@ class _AddPokemonView extends StatelessWidget {
     return AlertDialog(
       backgroundColor: Theme.of(context).cardColor,
       surfaceTintColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.lg,
-      ),
-      contentPadding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
+      insetPadding: AppInsets.dialog,
+      contentPadding: EdgeInsets.fromLTRB(
+        AppInsets.dialog.horizontal / 2,
         AppSpacing.sm,
-        AppSpacing.lg,
+        AppInsets.dialog.horizontal / 2,
         AppSpacing.md,
       ),
       title: Text(
