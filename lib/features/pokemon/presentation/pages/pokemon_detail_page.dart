@@ -12,6 +12,7 @@ import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_c
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_daily_counts_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/shimmer_box.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
@@ -34,6 +35,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   bool _buttonPressed = false;
   List<String> _shinySprites = [];
   final Map<String, String?> _normalMap = {};
+  bool _spritesLoading = true;
 
   @override
   void initState() {
@@ -67,6 +69,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   Future<void> _loadSprites() async {
     final parsed = SpriteParser.parse(widget.pokemon.imagePath.split('/').last);
     if (parsed == null) return;
+    setState(() => _spritesLoading = true);
     final service = context.read<SpriteService>();
     final assets = await service.spritesForDex(parsed.dex);
     final shiny = assets.where((p) => p.shiny).toList()
@@ -84,6 +87,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       _shinySprites = shiny.map((e) => e.path).toList();
       _currentSpriteIndex = 0;
       _showNormal = false;
+      _spritesLoading = false;
     });
   }
 
@@ -355,51 +359,59 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
           },
           child: SizedBox(
             height: AppSizes.detailImageSize,
-            child: PageView.builder(
-              controller: _spritePager,
-              allowImplicitScrolling: true,
-              itemCount: sprites.length,
-              onPageChanged: (idx) => setState(() {
-                _currentSpriteIndex = idx;
-                _showNormal = false;
-              }),
-              itemBuilder: (context, index) {
-                final shinyPath = sprites[index];
-                final normalPath = _normalMap[shinyPath];
-                final showNormal = _showNormal && normalPath != null;
-                final path = showNormal ? normalPath! : shinyPath;
-                final image = widget.pokemon.isLocalFile && !path.startsWith('assets/')
-                    ? Image.file(
-                        File(path),
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stack) => const Icon(
-                          Icons.catching_pokemon,
-                          size: AppSizes.detailImageFallback,
-                        ),
-                      )
-                    : Image.asset(
-                        path,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stack) => const Icon(
-                          Icons.catching_pokemon, 
-                          size: AppSizes.detailImageFallback,
+            child: _spritesLoading
+                ? const ShimmerBox(size: AppSizes.detailImageSize)
+                : PageView.builder(
+                    controller: _spritePager,
+                    allowImplicitScrolling: true,
+                    itemCount: sprites.length,
+                    onPageChanged: (idx) => setState(() {
+                      _currentSpriteIndex = idx;
+                      _showNormal = false;
+                    }),
+                    itemBuilder: (context, index) {
+                      final shinyPath = sprites[index];
+                      final normalPath = _normalMap[shinyPath];
+                      final showNormal = _showNormal && normalPath != null;
+                      final path = showNormal ? normalPath! : shinyPath;
+                      final image = widget.pokemon.isLocalFile &&
+                              !path.startsWith('assets/')
+                          ? Image.file(
+                              File(path),
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stack) =>
+                                  const Icon(
+                                Icons.catching_pokemon,
+                                size: AppSizes.detailImageFallback,
+                              ),
+                            )
+                          : Image.asset(
+                              path,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stack) =>
+                                  const Icon(
+                                Icons.catching_pokemon,
+                                size: AppSizes.detailImageFallback,
+                              ),
+                            );
+                      return Center(
+                        child: AnimatedSwitcher(
+                          duration: AppAnim.switcher,
+                          transitionBuilder: (child, animation) =>
+                              FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          ),
+                          child: SizedBox(
+                            key: ValueKey(path),
+                            width: AppSizes.detailImageSize,
+                            height: AppSizes.detailImageSize,
+                            child: image,
+                          ),
                         ),
                       );
-                return Center(
-                  child: AnimatedSwitcher(
-                    duration: AppAnim.switcher,
-                    transitionBuilder: (child, animation) =>
-                        FadeTransition(opacity: animation, child: child),
-                    child: SizedBox(
-                      key: ValueKey(path),
-                      width: AppSizes.detailImageSize,
-                      height: AppSizes.detailImageSize,
-                      child: image,
-                    ),
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ),
         if (canSwipe) ...[

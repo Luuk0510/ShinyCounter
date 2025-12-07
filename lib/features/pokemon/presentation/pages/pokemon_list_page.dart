@@ -64,6 +64,7 @@ class _PokemonListPageState extends State<PokemonListPage>
     await _reloadCaught();
     if (mounted) {
       setState(() => _loading = false);
+      _precacheListSprites();
     }
   }
 
@@ -98,6 +99,14 @@ class _PokemonListPageState extends State<PokemonListPage>
   }
 
   bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.id);
+
+  Future<void> _precacheListSprites() async {
+    final toPrecache = _allPokemon.where((p) => !p.isLocalFile).take(8);
+    for (final p in toPrecache) {
+      // Only precache asset sprites to avoid IO cost on user files.
+      precacheImage(AssetImage(p.imagePath), context);
+    }
+  }
 
   Future<void> _onAddPokemon() async {
     final newPokemon = await showAddPokemonDialog(context);
