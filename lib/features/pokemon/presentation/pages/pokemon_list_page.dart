@@ -12,6 +12,8 @@ import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 
@@ -102,9 +104,15 @@ class _PokemonListPageState extends State<PokemonListPage>
 
   Future<void> _precacheListSprites() async {
     final toPrecache = _allPokemon.where((p) => !p.isLocalFile).take(8);
+    final dexes = <String>[];
     for (final p in toPrecache) {
       // Only precache asset sprites to avoid IO cost on user files.
       precacheImage(AssetImage(p.imagePath), context);
+      final parsed = SpriteParser.parse(p.imagePath.split('/').last);
+      if (parsed != null) dexes.add(parsed.dex);
+    }
+    if (dexes.isNotEmpty) {
+      await context.read<SpriteService>().warmupForDexes(dexes);
     }
   }
 
