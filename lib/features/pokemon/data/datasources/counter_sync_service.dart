@@ -59,6 +59,7 @@ class CounterSyncService implements CounterSync {
     );
   }
 
+  @override
   Future<void> saveState(
     String counterKey,
     String caughtKey,
@@ -71,7 +72,7 @@ class CounterSyncService implements CounterSync {
     await setCaughtGame(counterKey, state.caughtGame);
     await setDailyCounts(counterKey, state.dailyCounts);
   }
-
+  @override
   Future<void> setCounter(String counterKey, int count) async {
     await _prefs.setInt(counterKey, count);
   }
@@ -91,6 +92,7 @@ class CounterSyncService implements CounterSync {
     await _prefs.setString(key, startedAt.toIso8601String());
   }
 
+  @override
   Future<void> setCaughtAt(String counterKey, DateTime? caughtAt) async {
     final key = _caughtAtKey(counterKey);
     if (caughtAt == null) {
@@ -100,6 +102,7 @@ class CounterSyncService implements CounterSync {
     await _prefs.setString(key, caughtAt.toIso8601String());
   }
 
+  @override
   Future<void> setCaughtGame(String counterKey, String? game) async {
     final key = _caughtGameKey(counterKey);
     if (game == null || game.isEmpty) {
@@ -109,12 +112,14 @@ class CounterSyncService implements CounterSync {
     await _prefs.setString(key, game);
   }
 
+  @override
   Future<void> clearHuntDates(String counterKey) async {
     await _prefs.remove(_startedAtKey(counterKey));
     await _prefs.remove(_caughtAtKey(counterKey));
     await _prefs.remove(_caughtGameKey(counterKey));
   }
 
+  @override
   Future<void> setDailyCounts(
     String counterKey,
     Map<String, int> counts,
@@ -127,6 +132,7 @@ class CounterSyncService implements CounterSync {
     await _prefs.setString(key, jsonEncode(counts));
   }
 
+  @override
   Future<void> showOverlay(
     CounterOverlayMessage message, {
     int width = 360,

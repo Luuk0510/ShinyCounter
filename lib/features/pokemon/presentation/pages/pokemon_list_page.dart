@@ -84,7 +84,7 @@ class _PokemonListPageState extends State<PokemonListPage>
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
       barrierColor: Colors.black54,
       transitionDuration: AppAnim.dialogDuration,
-      pageBuilder: (_, __, ___) => dialog,
+      pageBuilder: (context, animation, secondaryAnimation) => dialog,
       transitionBuilder: (context, animation, _, child) {
         final curved = CurvedAnimation(
           parent: animation,

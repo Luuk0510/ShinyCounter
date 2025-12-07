@@ -12,7 +12,6 @@ import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_c
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_daily_counts_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/shimmer_box.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
@@ -373,7 +372,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                       final shinyPath = sprites[index];
                       final normalPath = _normalMap[shinyPath];
                       final showNormal = _showNormal && normalPath != null;
-                      final path = showNormal ? normalPath! : shinyPath;
+                      final path = showNormal ? normalPath : shinyPath;
                       final image =
                           widget.pokemon.isLocalFile &&
                               !path.startsWith('assets/')

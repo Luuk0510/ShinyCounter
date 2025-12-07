@@ -5,7 +5,6 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialog_entry.dart';
 
 class AddPokemonController extends ChangeNotifier {
@@ -16,15 +15,15 @@ class AddPokemonController extends ChangeNotifier {
 
   final SpriteService _spriteService;
 
-  final List<_SpriteOption> _sprites = [];
-  _SpriteOption? _selectedSprite;
+  final List<SpriteOption> _sprites = [];
+  SpriteOption? _selectedSprite;
   String _search = '';
   bool _loading = true;
   PokemonNames? _names;
   int? _selectedGen; // null = all
 
-  List<_SpriteOption> get sprites => List.unmodifiable(_sprites);
-  _SpriteOption? get selected => _selectedSprite;
+  List<SpriteOption> get sprites => List.unmodifiable(_sprites);
+  SpriteOption? get selected => _selectedSprite;
   bool get loading => _loading;
   String get search => _search;
   int? get selectedGen => _selectedGen;
@@ -42,7 +41,7 @@ class AddPokemonController extends ChangeNotifier {
   Future<void> _loadSprites() async {
     try {
       final parsedSprites = await _spriteService.loadSprites(refresh: true);
-      final Map<String, _SpriteOption> chosen = {};
+      final Map<String, SpriteOption> chosen = {};
       for (final parsed in parsedSprites) {
         if (!parsed.shiny) continue; // only shiny choices
         final lowerForm = parsed.form.toLowerCase();
@@ -51,7 +50,7 @@ class AddPokemonController extends ChangeNotifier {
         final priority = _genderPriority(parsed.gender);
         if (priority == null) continue;
 
-        final option = _SpriteOption(
+        final option = SpriteOption(
           dex: parsed.dex,
           path: parsed.path,
           genderPriority: priority,
@@ -73,7 +72,7 @@ class AddPokemonController extends ChangeNotifier {
     }
   }
 
-  List<_SpriteOption> get filteredSprites {
+  List<SpriteOption> get filteredSprites {
     final source = _selectedGen == null
         ? _sprites
         : _sprites.where(_matchesSelectedGen).toList();
@@ -98,15 +97,15 @@ class AddPokemonController extends ChangeNotifier {
 
   void clearSearch() => setSearch('');
 
-  void select(_SpriteOption sprite) {
+  void select(SpriteOption sprite) {
     _selectedSprite = sprite;
     notifyListeners();
   }
 
-  String displayName(_SpriteOption sprite) =>
+  String displayName(SpriteOption sprite) =>
       _names?.nameFor(sprite.dex) ?? 'Pokémon #${sprite.dex}';
 
-  bool _matchesSelectedGen(_SpriteOption sprite) {
+  bool _matchesSelectedGen(SpriteOption sprite) {
     final gen = _selectedGen;
     if (gen == null) return true;
     final dexNum = int.tryParse(sprite.dex) ?? 0;
@@ -299,7 +298,7 @@ class _SpritePicker extends StatelessWidget {
             SizedBox(
               width: AppSizes.dropdownWidth,
               child: DropdownButtonFormField<int?>(
-                value: controller.selectedGen,
+                initialValue: controller.selectedGen,
                 isDense: true,
                 alignment: Alignment.centerLeft,
                 decoration: const InputDecoration(
@@ -473,8 +472,8 @@ class _SpritePicker extends StatelessWidget {
   }
 }
 
-class _SpriteOption {
-  _SpriteOption({
+class SpriteOption {
+  const SpriteOption({
     required this.dex,
     required this.path,
     required this.genderPriority,
@@ -497,8 +496,9 @@ Future<Pokemon?> showAddPokemonDialog(BuildContext context) {
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     barrierColor: Colors.black54,
     transitionDuration: AppAnim.dialogDuration,
-    pageBuilder: (_, __, ___) => const AddPokemonDialog(),
-    transitionBuilder: (context, animation, _, child) {
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        const AddPokemonDialog(),
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
       final curved = CurvedAnimation(
         parent: animation,
         curve: AppAnim.dialogCurve,

@@ -1,6 +1,3 @@
-import 'package:meta/meta.dart';
-
-@immutable
 class ParsedSprite {
   const ParsedSprite({
     required this.dex,
