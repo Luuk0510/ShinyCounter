@@ -194,19 +194,24 @@ class _OverlayAppState extends State<_OverlayApp> {
                               ],
                             ),
                           ),
-                          RoundControl(
-                            icon: Icons.add,
-                            onTap: _enabled ? () => _bump(1) : null,
+                        RoundControl(
+                          icon: Icons.add,
+                          onTap: _enabled ? () => _bump(1) : null,
+                        ),
+                        IconButton(
+                          constraints: const BoxConstraints.tightFor(
+                            width: AppSizes.overlayIconButtonSize,
+                            height: AppSizes.overlayIconButtonSize,
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            color: Colors.white70,
-                            iconSize: AppSizes.overlayCloseSize,
-                            onPressed: () async {
-                              await FlutterOverlayWindow.closeOverlay();
-                              await FlutterOverlayWindow.shareData('closed');
-                            },
-                          ),
+                          padding: const EdgeInsets.all(AppSpacing.xs),
+                          icon: const Icon(Icons.close),
+                          color: Colors.white70,
+                          iconSize: AppSizes.overlayCloseSize,
+                          onPressed: () async {
+                            await FlutterOverlayWindow.closeOverlay();
+                            await FlutterOverlayWindow.shareData('closed');
+                          },
+                        ),
                         ],
                       ),
                     ],

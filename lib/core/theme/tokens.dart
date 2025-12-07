@@ -80,6 +80,7 @@ class AppSizes {
   static const overlayNameSize = 14.0;
   static const overlayCountSize = 26.0;
   static const overlayCloseSize = 24.0;
+  static const overlayIconButtonSize = 36.0;
   static const overlaySpacer = 10.0;
   static const overlayTablePadH = 12.0;
   static const overlayTablePadV = 8.0;
