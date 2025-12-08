@@ -174,16 +174,23 @@ class _PokemonListPageState extends State<PokemonListPage>
   bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.id);
 
   Future<void> _precacheListSprites() async {
-    final toPrecache = _allPokemon.where((p) => !p.isLocalFile).take(8);
+    final toPrecache = _allPokemon
+        .where((p) => !p.isLocalFile)
+        .take(8)
+        .toList();
+    if (toPrecache.isEmpty) return;
+    final service = context.read<SpriteService>();
+    await service.precacheSpritePaths(
+      context,
+      toPrecache.map((p) => p.imagePath),
+    );
     final dexes = <String>[];
     for (final p in toPrecache) {
-      // Only precache asset sprites to avoid IO cost on user files.
-      precacheImage(AssetImage(p.imagePath), context);
       final parsed = SpriteParser.parse(p.imagePath.split('/').last);
       if (parsed != null) dexes.add(parsed.dex);
     }
     if (dexes.isNotEmpty) {
-      await context.read<SpriteService>().warmupForDexes(dexes);
+      await service.warmupForDexes(dexes);
     }
   }
 

@@ -1,12 +1,18 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 
 abstract class SpriteService {
   Future<List<ParsedSprite>> loadSprites({bool refresh = false});
   Future<List<ParsedSprite>> spritesForDex(String dex, {bool refresh = false});
   Future<void> warmupForDexes(Iterable<String> dexes, {bool refresh = false});
+  Future<void> precacheSpritePaths(
+    BuildContext context,
+    Iterable<String> assetPaths, {
+    bool dedupe = true,
+  });
 }
 
 class SpriteRepository implements SpriteService {
@@ -70,6 +76,23 @@ class SpriteRepository implements SpriteService {
       _byDex[dex] = filtered;
       for (final sprite in filtered) {
         _indexVariant(sprite);
+      }
+    }
+  }
+
+  @override
+  Future<void> precacheSpritePaths(
+    BuildContext context,
+    Iterable<String> assetPaths, {
+    bool dedupe = true,
+  }) async {
+    final paths = dedupe ? assetPaths.toSet() : assetPaths;
+    for (final path in paths) {
+      if (!path.startsWith('assets/')) continue;
+      try {
+        await precacheImage(AssetImage(path), context);
+      } catch (_) {
+        // Ignore precache failures to avoid breaking UI flow.
       }
     }
   }

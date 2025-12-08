@@ -333,16 +333,25 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     }
     final canSwipe = sprites.length > 1;
 
+    final assetPaths = <String>[];
     for (final path in sprites) {
       if (widget.pokemon.isLocalFile && !path.startsWith('assets/')) {
         precacheImage(FileImage(File(path)), context);
       } else {
-        precacheImage(AssetImage(path), context);
+        assetPaths.add(path);
       }
       final normal = _normalMap[path];
       if (normal != null) {
-        precacheImage(AssetImage(normal), context);
+        if (widget.pokemon.isLocalFile && !normal.startsWith('assets/')) {
+          precacheImage(FileImage(File(normal)), context);
+        } else {
+          assetPaths.add(normal);
+        }
       }
+    }
+    if (assetPaths.isNotEmpty) {
+      final service = context.read<SpriteService>();
+      unawaited(service.precacheSpritePaths(context, assetPaths));
     }
 
     return Column(
