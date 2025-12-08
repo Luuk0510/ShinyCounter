@@ -83,18 +83,11 @@ class CounterController extends ChangeNotifier {
   }
 
   Future<void> setCounter(int value) async {
-    await _applyCounterUpdate(
-      value,
-      forceUncaught: true,
-      clearGame: true,
-    );
+    await _applyCounterUpdate(value, forceUncaught: true, clearGame: true);
   }
 
   Future<void> setCounterManual(int value) async {
-    await _applyCounterUpdate(
-      value,
-      resetWhenZero: true,
-    );
+    await _applyCounterUpdate(value, resetWhenZero: true);
   }
 
   Future<void> toggleCaught() async {

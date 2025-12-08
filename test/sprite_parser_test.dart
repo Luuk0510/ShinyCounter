@@ -14,8 +14,9 @@ void main() {
     });
 
     test('parses legacy naming convention', () {
-      final parsed =
-          SpriteParser.parse('poke_capture_0006_000_mf_n_00000000_f_r.png');
+      final parsed = SpriteParser.parse(
+        'poke_capture_0006_000_mf_n_00000000_f_r.png',
+      );
       expect(parsed, isNotNull);
       expect(parsed!.dex, '0006');
       expect(parsed.form, '000');

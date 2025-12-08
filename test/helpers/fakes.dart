@@ -74,7 +74,10 @@ class FakeCounterSync implements CounterSync {
   }
 
   @override
-  Future<void> setDailyCounts(String counterKey, Map<String, int> counts) async {
+  Future<void> setDailyCounts(
+    String counterKey,
+    Map<String, int> counts,
+  ) async {
     daily[counterKey] = counts;
   }
 
@@ -104,12 +107,16 @@ class FakeSpriteService implements SpriteService {
       _sprites;
 
   @override
-  Future<List<ParsedSprite>> spritesForDex(String dex,
-      {bool refresh = false}) async {
+  Future<List<ParsedSprite>> spritesForDex(
+    String dex, {
+    bool refresh = false,
+  }) async {
     return _sprites.where((s) => s.dex == dex).toList();
   }
 
   @override
-  Future<void> warmupForDexes(Iterable<String> dexes,
-      {bool refresh = false}) async {}
+  Future<void> warmupForDexes(
+    Iterable<String> dexes, {
+    bool refresh = false,
+  }) async {}
 }

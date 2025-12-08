@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/storage/key_value_store.dart';
 
 class LocaleNotifier extends ChangeNotifier {
-  LocaleNotifier([KeyValueStore? store]) : _store = store ?? SharedPrefsStore() {
+  LocaleNotifier([KeyValueStore? store])
+    : _store = store ?? SharedPrefsStore() {
     _load();
   }
 

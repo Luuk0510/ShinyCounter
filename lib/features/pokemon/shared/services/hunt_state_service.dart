@@ -19,7 +19,8 @@ class HuntStateUpdate {
 
 /// Centralized logic for hunt start/end dates and daily count tracking.
 class HuntStateService {
-  HuntStateService({DateTime Function()? clock}) : _clock = clock ?? DateTime.now;
+  HuntStateService({DateTime Function()? clock})
+    : _clock = clock ?? DateTime.now;
 
   final DateTime Function() _clock;
 

@@ -89,8 +89,6 @@ class AppSizes {
   static const overlayValueSize = 14.0;
   static const overlayCellGap = 16.0;
   static const overlayLabelSpace = 2.0;
-  static const sheetHandleHeightPx = 5.0;
-  static const sheetHandleWidthPx = 44.0;
   static const sheetTitleTop = AppSpacing.lg;
   static const sheetFieldLabel = 20.0;
   static const sheetFieldHint = 17.0;

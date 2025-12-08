@@ -84,8 +84,8 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: AppSizes.sheetHandleWidthPx,
-            height: AppSizes.sheetHandleHeightPx,
+            width: AppSizes.sheetHandleWidth,
+            height: AppSizes.sheetHandleHeight,
             decoration: BoxDecoration(
               color: colors.outlineVariant,
               borderRadius: BorderRadius.circular(AppRadii.sm),

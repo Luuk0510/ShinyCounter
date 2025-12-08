@@ -65,8 +65,8 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           children: [
             Center(
               child: Container(
-                width: AppSizes.sheetHandleWidthPx,
-                height: AppSizes.sheetHandleHeightPx,
+                width: AppSizes.sheetHandleWidth,
+                height: AppSizes.sheetHandleHeight,
                 decoration: BoxDecoration(
                   color: colors.outlineVariant,
                   borderRadius: BorderRadius.circular(AppRadii.sm),

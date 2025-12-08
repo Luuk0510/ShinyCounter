@@ -71,6 +71,7 @@ class CounterSyncService implements CounterSync {
     await setCaughtGame(counterKey, state.caughtGame);
     await setDailyCounts(counterKey, state.dailyCounts);
   }
+
   @override
   Future<void> setCounter(String counterKey, int count) async {
     await _store.setInt(counterKey, count);
