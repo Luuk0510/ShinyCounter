@@ -79,116 +79,27 @@ class CounterController extends ChangeNotifier {
 
   Future<void> increment() async {
     if (_isCaught) return;
-    final previous = _counter;
-    _counter++;
-    final sync = await _getSync();
-    await _persist(sync: sync);
-    final update = await _huntState.applyCountChange(
-      keys: _keys,
-      sync: sync,
-      previousCount: previous,
-      nextCount: _counter,
-      isCaught: _isCaught,
-      startedAt: _startedAt,
-      caughtAt: _caughtAt,
-      caughtGame: _caughtGame,
-      dailyCounts: _dailyCounts,
-    );
-    _startedAt = update.startedAt;
-    _caughtAt = update.caughtAt;
-    _isCaught = update.isCaught;
-    _caughtGame = update.caughtGame;
-    _dailyCounts = update.dailyCounts;
-    notifyListeners();
-    await _updateOverlay();
+    await _applyCounterUpdate(_counter + 1);
   }
 
   Future<void> decrement() async {
     if (_isCaught || _counter == 0) return;
-    final previous = _counter;
-    _counter--;
-    final sync = await _getSync();
-    await _persist(sync: sync);
-    final update = await _huntState.applyCountChange(
-      keys: _keys,
-      sync: sync,
-      previousCount: previous,
-      nextCount: _counter,
-      isCaught: _isCaught,
-      startedAt: _startedAt,
-      caughtAt: _caughtAt,
-      caughtGame: _caughtGame,
-      dailyCounts: _dailyCounts,
-    );
-    _startedAt = update.startedAt;
-    _caughtAt = update.caughtAt;
-    _isCaught = update.isCaught;
-    _caughtGame = update.caughtGame;
-    _dailyCounts = update.dailyCounts;
-    notifyListeners();
-    await _updateOverlay();
+    await _applyCounterUpdate(_counter - 1);
   }
 
   Future<void> setCounter(int value) async {
-    final previous = _counter;
-    _counter = value;
-    _isCaught = false;
-    _caughtAt = null;
-    _caughtGame = null;
-    final sync = await _getSync();
-    await _persist(sync: sync);
-    await _setCaught(false, sync: sync);
-    await sync.setCaughtGame(_keys.counter, null);
-    final update = await _huntState.applyCountChange(
-      keys: _keys,
-      sync: sync,
-      previousCount: previous,
-      nextCount: _counter,
-      isCaught: _isCaught,
-      startedAt: _startedAt,
-      caughtAt: _caughtAt,
-      caughtGame: _caughtGame,
-      dailyCounts: _dailyCounts,
+    await _applyCounterUpdate(
+      value,
+      forceUncaught: true,
+      clearGame: true,
     );
-    _startedAt = update.startedAt;
-    _caughtAt = update.caughtAt;
-    _isCaught = update.isCaught;
-    _caughtGame = update.caughtGame;
-    _dailyCounts = update.dailyCounts;
-    notifyListeners();
-    await _updateOverlay();
   }
 
   Future<void> setCounterManual(int value) async {
-    final previous = _counter;
-    _counter = value;
-    if (_counter == 0) {
-      _isCaught = false;
-      _caughtAt = null;
-    }
-    final sync = await _getSync();
-    await _persist(sync: sync);
-    if (_counter == 0) {
-      await _setCaught(false, sync: sync);
-    }
-    final update = await _huntState.applyCountChange(
-      keys: _keys,
-      sync: sync,
-      previousCount: previous,
-      nextCount: _counter,
-      isCaught: _isCaught,
-      startedAt: _startedAt,
-      caughtAt: _caughtAt,
-      caughtGame: _caughtGame,
-      dailyCounts: _dailyCounts,
+    await _applyCounterUpdate(
+      value,
+      resetWhenZero: true,
     );
-    _startedAt = update.startedAt;
-    _caughtAt = update.caughtAt;
-    _isCaught = update.isCaught;
-    _caughtGame = update.caughtGame;
-    _dailyCounts = update.dailyCounts;
-    notifyListeners();
-    await _updateOverlay();
   }
 
   Future<void> toggleCaught() async {
@@ -239,6 +150,60 @@ class CounterController extends ChangeNotifier {
     final sync = await _getSync();
     await sync.setCaughtGame(_keys.counter, game);
     notifyListeners();
+  }
+
+  Future<void> _applyCounterUpdate(
+    int nextCount, {
+    bool forceUncaught = false,
+    bool clearGame = false,
+    bool resetWhenZero = false,
+  }) async {
+    final clamped = nextCount < 0 ? 0 : nextCount;
+    final previous = _counter;
+    final sync = await _getSync();
+
+    var nextCaught = _isCaught;
+    var nextCaughtAt = _caughtAt;
+    var nextCaughtGame = _caughtGame;
+
+    final shouldResetCaught = forceUncaught || (resetWhenZero && clamped == 0);
+    if (shouldResetCaught) {
+      nextCaught = false;
+      nextCaughtAt = null;
+      if (clearGame) {
+        nextCaughtGame = null;
+      }
+      await _setCaught(false, sync: sync);
+    }
+
+    _counter = clamped;
+    _isCaught = nextCaught;
+    _caughtAt = nextCaughtAt;
+    _caughtGame = nextCaughtGame;
+
+    await _persist(sync: sync);
+    if (clearGame) {
+      await sync.setCaughtGame(_keys.counter, null);
+    }
+
+    final update = await _huntState.applyCountChange(
+      keys: _keys,
+      sync: sync,
+      previousCount: previous,
+      nextCount: clamped,
+      isCaught: _isCaught,
+      startedAt: _startedAt,
+      caughtAt: _caughtAt,
+      caughtGame: _caughtGame,
+      dailyCounts: _dailyCounts,
+    );
+    _startedAt = update.startedAt;
+    _caughtAt = update.caughtAt;
+    _isCaught = update.isCaught;
+    _caughtGame = update.caughtGame;
+    _dailyCounts = update.dailyCounts;
+    notifyListeners();
+    await _updateOverlay();
   }
 
   Future<void> toggleOverlay() async {
