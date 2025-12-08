@@ -4,6 +4,7 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialog_entry.dart';
 
 class SettingsDialog extends StatefulWidget {
   const SettingsDialog({super.key});
@@ -38,85 +39,94 @@ class _SettingsDialogState extends State<SettingsDialog> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
-    return AlertDialog(
-      backgroundColor: Theme.of(context).cardColor,
-      surfaceTintColor: Colors.transparent,
-      title: Text(
-        l10n.tooltipSettings,
-        textAlign: TextAlign.center,
-        style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
-      ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.settingsLanguage,
-              style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _ThemeOption(
-              label: l10n.languageEnglish,
-              selected: _locale?.languageCode == 'en',
-              onTap: () => _setLocale(const Locale('en')),
-            ),
-            _ThemeOption(
-              label: l10n.languageDutch,
-              selected: _locale?.languageCode == 'nl',
-              onTap: () => _setLocale(const Locale('nl')),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              l10n.settingsTitle,
-              style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _ThemeOption(
-              label: l10n.settingsSystem,
-              selected: _mode == ThemeMode.system,
-              onTap: () => _setMode(ThemeMode.system),
-            ),
-            _ThemeOption(
-              label: l10n.settingsLight,
-              selected: _mode == ThemeMode.light,
-              onTap: () => _setMode(ThemeMode.light),
-            ),
-            _ThemeOption(
-              label: l10n.settingsDark,
-              selected:
-                  _mode == ThemeMode.dark &&
-                  !context.watch<ThemeNotifier>().useOledDark,
-              onTap: () => _setMode(ThemeMode.dark, useOled: false),
-            ),
-            _ThemeOption(
-              label: l10n.settingsOled,
-              selected:
-                  _mode == ThemeMode.dark &&
-                  context.watch<ThemeNotifier>().useOledDark,
-              onTap: () => _setMode(ThemeMode.dark, useOled: true),
-            ),
-          ],
+    return DialogEntry(
+      reverse: false,
+      child: AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
+        surfaceTintColor: Colors.transparent,
+        title: Text(
+          l10n.tooltipSettings,
+          textAlign: TextAlign.center,
+          style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
         ),
-      ),
-      actions: [
-        Center(
-          child: TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            style: TextButton.styleFrom(
-              foregroundColor: colors.primary,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-                vertical: AppSpacing.sm,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.settingsLanguage,
+                style: AppTypography.title.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-            ),
-            child: Text(
-              l10n.cancel,
-              style: AppTypography.button.copyWith(fontWeight: FontWeight.w700),
-            ),
+              const SizedBox(height: AppSpacing.md),
+              _ThemeOption(
+                label: l10n.languageEnglish,
+                selected: _locale?.languageCode == 'en',
+                onTap: () => _setLocale(const Locale('en')),
+              ),
+              _ThemeOption(
+                label: l10n.languageDutch,
+                selected: _locale?.languageCode == 'nl',
+                onTap: () => _setLocale(const Locale('nl')),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                l10n.settingsTitle,
+                style: AppTypography.title.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _ThemeOption(
+                label: l10n.settingsSystem,
+                selected: _mode == ThemeMode.system,
+                onTap: () => _setMode(ThemeMode.system),
+              ),
+              _ThemeOption(
+                label: l10n.settingsLight,
+                selected: _mode == ThemeMode.light,
+                onTap: () => _setMode(ThemeMode.light),
+              ),
+              _ThemeOption(
+                label: l10n.settingsDark,
+                selected:
+                    _mode == ThemeMode.dark &&
+                    !context.watch<ThemeNotifier>().useOledDark,
+                onTap: () => _setMode(ThemeMode.dark, useOled: false),
+              ),
+              _ThemeOption(
+                label: l10n.settingsOled,
+                selected:
+                    _mode == ThemeMode.dark &&
+                    context.watch<ThemeNotifier>().useOledDark,
+                onTap: () => _setMode(ThemeMode.dark, useOled: true),
+              ),
+            ],
           ),
         ),
-      ],
+        actions: [
+          Center(
+            child: TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: TextButton.styleFrom(
+                foregroundColor: colors.primary,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.settingsActionPaddingH,
+                  vertical: AppSizes.settingsActionPaddingV,
+                ),
+              ),
+              child: Text(
+                l10n.cancel,
+                style: AppTypography.button.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

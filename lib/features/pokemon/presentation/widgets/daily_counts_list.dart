@@ -22,7 +22,7 @@ class DailyCountsList extends StatelessWidget {
 
     if (entries.isEmpty) {
       return Container(
-        height: 210,
+        height: AppSizes.dailyListHeight,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
@@ -42,7 +42,7 @@ class DailyCountsList extends StatelessWidget {
     }
 
     return Container(
-      height: 210,
+      height: AppSizes.dailyListHeight,
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(AppRadii.md),
@@ -76,8 +76,8 @@ class DailyCountsList extends StatelessWidget {
             ),
           ),
           Divider(
-            height: 1,
-            thickness: 1,
+            height: AppSizes.dividerThickness,
+            thickness: AppSizes.dividerThickness,
             color: colors.outlineVariant.withValues(alpha: 0.35),
           ),
           Expanded(
@@ -110,7 +110,7 @@ class DailyCountsList extends StatelessWidget {
               },
               separatorBuilder: (context, _) => Divider(
                 height: AppSpacing.lg,
-                thickness: 1,
+                thickness: AppSizes.dividerThickness,
                 color: colors.outlineVariant.withValues(alpha: 0.25),
               ),
               itemCount: entries.length,

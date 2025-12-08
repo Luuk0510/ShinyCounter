@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:shiny_counter/core/storage/key_value_store.dart';
 import '../../overlay/counter_overlay_message.dart';
 import '../../domain/services/counter_sync.dart';
+import '../../shared/utils/counter_keys.dart';
 
 class CounterState {
   const CounterState({
@@ -26,9 +27,9 @@ class CounterState {
 }
 
 class CounterSyncService implements CounterSync {
-  CounterSyncService._(this._prefs);
+  CounterSyncService._(this._store);
 
-  final SharedPreferences _prefs;
+  final KeyValueStore _store;
   static CounterSyncService? _instance;
   static final Stream<dynamic> _overlayStream = FlutterOverlayWindow
       .overlayListener
@@ -37,96 +38,122 @@ class CounterSyncService implements CounterSync {
   @override
   Stream<dynamic> get overlayStream => _overlayStream;
 
-  static Future<CounterSyncService> instance() async {
+  static Future<CounterSyncService> instance({KeyValueStore? store}) async {
     if (_instance != null) return _instance!;
-    final prefs = await SharedPreferences.getInstance();
-    _instance = CounterSyncService._(prefs);
+    _instance = CounterSyncService._(store ?? SharedPrefsStore());
     return _instance!;
   }
 
   @override
   Future<CounterState> loadState(String counterKey, String caughtKey) async {
-    await _prefs.reload();
+    await _store.reload();
+    final keys = CounterKeys.fromCounterKey(counterKey);
     return CounterState(
-      count: _prefs.getInt(counterKey) ?? 0,
-      isCaught: _prefs.getBool(caughtKey) ?? false,
-      startedAt: _readDate(_prefs.getString(_startedAtKey(counterKey))),
-      caughtAt: _readDate(_prefs.getString(_caughtAtKey(counterKey))),
-      caughtGame: _prefs.getString(_caughtGameKey(counterKey)),
-      dailyCounts: _readDailyCounts(
-        _prefs.getString(_dailyCountsKey(counterKey)),
-      ),
+      count: await _store.getInt(counterKey) ?? 0,
+      isCaught: await _store.getBool(caughtKey) ?? false,
+      startedAt: _readDate(await _store.getString(keys.startedAt)),
+      caughtAt: _readDate(await _store.getString(keys.caughtAt)),
+      caughtGame: await _store.getString(keys.caughtGame),
+      dailyCounts: _readDailyCounts(await _store.getString(keys.dailyCounts)),
     );
   }
 
+  @override
   Future<void> saveState(
     String counterKey,
     String caughtKey,
     CounterState state,
   ) async {
-    await _prefs.setInt(counterKey, state.count);
-    await _prefs.setBool(caughtKey, state.isCaught);
+    await _store.setInt(counterKey, state.count);
+    await _store.setBool(caughtKey, state.isCaught);
     await setStartedAt(counterKey, state.startedAt);
     await setCaughtAt(counterKey, state.caughtAt);
     await setCaughtGame(counterKey, state.caughtGame);
     await setDailyCounts(counterKey, state.dailyCounts);
   }
 
+  @override
   Future<void> setCounter(String counterKey, int count) async {
-    await _prefs.setInt(counterKey, count);
+    await _store.setInt(counterKey, count);
   }
 
   @override
   Future<void> setCaught(String caughtKey, bool isCaught) async {
-    await _prefs.setBool(caughtKey, isCaught);
+    await _store.setBool(caughtKey, isCaught);
   }
 
   @override
   Future<void> setStartedAt(String counterKey, DateTime? startedAt) async {
-    final key = _startedAtKey(counterKey);
+    final key = CounterKeys.fromCounterKey(counterKey).startedAt;
     if (startedAt == null) {
-      await _prefs.remove(key);
+      await _store.remove(key);
       return;
     }
-    await _prefs.setString(key, startedAt.toIso8601String());
+    await _store.setString(key, startedAt.toIso8601String());
   }
 
+  @override
   Future<void> setCaughtAt(String counterKey, DateTime? caughtAt) async {
-    final key = _caughtAtKey(counterKey);
+    final key = CounterKeys.fromCounterKey(counterKey).caughtAt;
     if (caughtAt == null) {
-      await _prefs.remove(key);
+      await _store.remove(key);
       return;
     }
-    await _prefs.setString(key, caughtAt.toIso8601String());
+    await _store.setString(key, caughtAt.toIso8601String());
   }
 
+  @override
   Future<void> setCaughtGame(String counterKey, String? game) async {
-    final key = _caughtGameKey(counterKey);
+    final key = CounterKeys.fromCounterKey(counterKey).caughtGame;
     if (game == null || game.isEmpty) {
-      await _prefs.remove(key);
+      await _store.remove(key);
       return;
     }
-    await _prefs.setString(key, game);
+    await _store.setString(key, game);
   }
 
+  @override
   Future<void> clearHuntDates(String counterKey) async {
-    await _prefs.remove(_startedAtKey(counterKey));
-    await _prefs.remove(_caughtAtKey(counterKey));
-    await _prefs.remove(_caughtGameKey(counterKey));
+    final keys = CounterKeys.fromCounterKey(counterKey);
+    await _store.remove(keys.startedAt);
+    await _store.remove(keys.caughtAt);
+    await _store.remove(keys.caughtGame);
   }
 
+  @override
   Future<void> setDailyCounts(
     String counterKey,
     Map<String, int> counts,
   ) async {
-    final key = _dailyCountsKey(counterKey);
+    final key = CounterKeys.fromCounterKey(counterKey).dailyCounts;
     if (counts.isEmpty) {
-      await _prefs.remove(key);
+      await _store.remove(key);
       return;
     }
-    await _prefs.setString(key, jsonEncode(counts));
+    await _store.setString(key, jsonEncode(counts));
   }
 
+  @override
+  Future<bool> ensureOverlay(
+    CounterOverlayMessage message, {
+    int width = 360,
+    int height = 220,
+  }) async {
+    final hasPerm = await FlutterOverlayWindow.isPermissionGranted();
+    if (!hasPerm) {
+      final requested = await FlutterOverlayWindow.requestPermission();
+      if (requested != true) return false;
+    }
+    final active = await FlutterOverlayWindow.isActive();
+    if (active) {
+      await shareToOverlay(message);
+      return true;
+    }
+    await showOverlay(message, width: width, height: height);
+    return true;
+  }
+
+  @override
   Future<void> showOverlay(
     CounterOverlayMessage message, {
     int width = 360,
@@ -146,20 +173,15 @@ class CounterSyncService implements CounterSync {
   }
 
   @override
+  Future<bool> isOverlayActive() => FlutterOverlayWindow.isActive();
+
+  @override
   Future<void> shareToOverlay(CounterOverlayMessage message) async {
     await FlutterOverlayWindow.shareData(message.serialize());
   }
 
   @override
   Future<void> closeOverlay() => FlutterOverlayWindow.closeOverlay();
-
-  String _startedAtKey(String counterKey) => '${counterKey}_startedAt';
-
-  String _caughtAtKey(String counterKey) => '${counterKey}_caughtAt';
-
-  String _caughtGameKey(String counterKey) => '${counterKey}_caughtGame';
-
-  String _dailyCountsKey(String counterKey) => '${counterKey}_dailyCounts';
 
   DateTime? _readDate(String? raw) =>
       raw == null ? null : DateTime.tryParse(raw);

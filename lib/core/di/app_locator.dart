@@ -7,6 +7,8 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokem
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
+import 'package:shiny_counter/core/storage/key_value_store.dart';
+import 'package:shiny_counter/features/pokemon/data/datasources/pokemon_storage.dart';
 
 class AppLocator {
   AppLocator._();
@@ -20,10 +22,14 @@ class AppLocator {
   late final LoadCaughtUseCase loadCaught;
   late final ToggleCaughtUseCase toggleCaught;
   late final SpriteService spriteRepository;
+  late final KeyValueStore prefsStore;
 
   Future<void> init() async {
-    pokemonRepository = PrefsPokemonRepository();
-    counterSyncService = await CounterSyncService.instance();
+    prefsStore = SharedPrefsStore();
+    pokemonRepository = PrefsPokemonRepository(
+      storage: PokemonStorage(store: prefsStore),
+    );
+    counterSyncService = await CounterSyncService.instance(store: prefsStore);
     loadCustomPokemon = LoadCustomPokemonUseCase(pokemonRepository);
     saveCustomPokemon = SaveCustomPokemonUseCase(pokemonRepository);
     loadCaught = LoadCaughtUseCase(pokemonRepository);

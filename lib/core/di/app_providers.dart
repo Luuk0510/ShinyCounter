@@ -10,8 +10,12 @@ import '../di/app_locator.dart';
 
 List<SingleChildWidget> buildAppProviders() {
   return [
-    ChangeNotifierProvider<ThemeNotifier>(create: (_) => ThemeNotifier()),
-    ChangeNotifierProvider<LocaleNotifier>(create: (_) => LocaleNotifier()),
+    ChangeNotifierProvider<ThemeNotifier>(
+      create: (_) => ThemeNotifier(AppLocator.instance.prefsStore),
+    ),
+    ChangeNotifierProvider<LocaleNotifier>(
+      create: (_) => LocaleNotifier(AppLocator.instance.prefsStore),
+    ),
     Provider<PokemonRepository>.value(
       value: AppLocator.instance.pokemonRepository,
     ),

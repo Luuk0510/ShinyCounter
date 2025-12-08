@@ -62,5 +62,8 @@
   "invalidCounter": "Enter a valid counter",
   "gameLabel": "Game",
   "gameHint": "Scroll to pick a game",
-  "gameNone": "None"
+  "gameNone": "None",
+  "noPokemonFound": "No Pokémon found",
+  "tryAnotherFilter": "Try another name, dex, or generation filter.",
+  "filterAllGens": "All gens"
 }

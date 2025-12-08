@@ -35,7 +35,7 @@ class DateRow extends StatelessWidget {
                   label,
                   style: TextStyle(
                     color: colors.onSurfaceVariant,
-                    fontSize: 17,
+                    fontSize: AppSizes.dateLabelSize,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -44,7 +44,7 @@ class DateRow extends StatelessWidget {
                   formatted,
                   style: TextStyle(
                     color: colors.onSurface,
-                    fontSize: 18,
+                    fontSize: AppSizes.dateValueSize,
                     fontWeight: FontWeight.w800,
                   ),
                 ),

@@ -58,7 +58,8 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
         top: AppSpacing.md,
       ),
       child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.72,
+        height:
+            MediaQuery.of(context).size.height * AppSizes.sheetListHeightFactor,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -185,7 +186,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
         ),
         const SizedBox(width: AppSpacing.sm),
         SizedBox(
-          width: 110,
+          width: AppSizes.sheetDateWidth,
           child: TextField(
             controller: row.controller,
             keyboardType: TextInputType.number,

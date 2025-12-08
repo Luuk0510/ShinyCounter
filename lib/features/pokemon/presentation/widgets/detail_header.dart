@@ -36,25 +36,29 @@ class DetailHeader extends StatelessWidget {
           child: GestureDetector(
             onTap: normalPath == null ? null : onToggleSprite,
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
+              duration: AppAnim.switcher,
               child: pokemon.isLocalFile && !kIsWeb
                   ? Image.file(
                       File(pokemon.imagePath),
                       key: ValueKey(showShiny),
-                      width: 300,
-                      height: 300,
+                      width: AppSizes.detailImageSize,
+                      height: AppSizes.detailImageSize,
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stack) =>
-                          const Icon(Icons.catching_pokemon, size: 140),
+                      errorBuilder: (context, error, stack) => const Icon(
+                        Icons.catching_pokemon,
+                        size: AppSizes.detailImageFallback,
+                      ),
                     )
                   : Image.asset(
                       showShiny || normalPath == null ? shinyPath : normalPath!,
                       key: ValueKey(showShiny),
-                      width: 300,
-                      height: 300,
+                      width: AppSizes.detailImageSize,
+                      height: AppSizes.detailImageSize,
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stack) =>
-                          const Icon(Icons.catching_pokemon, size: 140),
+                      errorBuilder: (context, error, stack) => const Icon(
+                        Icons.catching_pokemon,
+                        size: AppSizes.detailImageFallback,
+                      ),
                     ),
             ),
           ),
