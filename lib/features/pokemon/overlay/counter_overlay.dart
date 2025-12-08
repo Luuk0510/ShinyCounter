@@ -68,7 +68,7 @@ class _OverlayAppState extends State<_OverlayApp> {
     final current = state.count;
     var next = current + delta;
     if (next < 0) next = 0;
-    final update = await _huntState.applyCountChange(
+    await _huntState.applyCountChange(
       keys: keys,
       sync: sync,
       previousCount: current,

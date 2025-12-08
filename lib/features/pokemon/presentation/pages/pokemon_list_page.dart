@@ -107,6 +107,7 @@ class _PokemonListPageState extends State<PokemonListPage>
     if (_basePokemon.isNotEmpty) return;
     try {
       final names = await PokemonNames.load();
+      if (!mounted) return;
       final sprites = await context.read<SpriteService>().loadSprites();
       final chosen = <String, ParsedSprite>{};
       for (final sprite in sprites) {
