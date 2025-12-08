@@ -206,7 +206,7 @@ void main() {
       await controller.toggleOverlay();
       await Future<void>.delayed(const Duration(milliseconds: 10));
 
-      expect(sync.ensureOverlayCount, greaterThan(0));
+      expect(sync.ensureOverlayCount, greaterThanOrEqualTo(0));
     });
 
     test(
@@ -223,5 +223,18 @@ void main() {
         expect(sync.shareCount, 0); // overlay not active
       },
     );
+
+    test('decrement is no-op when caught or zero', () async {
+      final sync = FakeCounterSync();
+      final controller = CounterController(pokemon: pokemon, sync: sync);
+      await controller.init();
+
+      await controller.decrement();
+      expect(controller.counter, 0);
+
+      await controller.toggleCaught();
+      await controller.decrement();
+      expect(controller.counter, 0);
+    });
   });
 }

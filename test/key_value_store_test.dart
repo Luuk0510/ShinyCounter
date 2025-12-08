@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shiny_counter/core/storage/key_value_store.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _MemoryStore implements KeyValueStore {
   final Map<String, String> _strings = {};
@@ -51,6 +52,22 @@ void main() {
     expect(await store.getString('s'), 'hello');
     expect(await store.getInt('i'), 42);
     expect(await store.getBool('b'), true);
+
+    await store.remove('s');
+    expect(await store.getString('s'), isNull);
+  });
+
+  test('SharedPrefsStore round trips values using mock prefs', () async {
+    SharedPreferences.setMockInitialValues({});
+    final store = SharedPrefsStore();
+
+    await store.setString('s', 'hello');
+    await store.setInt('i', 7);
+    await store.setBool('b', true);
+
+    expect(await store.getString('s'), 'hello');
+    expect(await store.getInt('i'), 7);
+    expect(await store.getBool('b'), isTrue);
 
     await store.remove('s');
     expect(await store.getString('s'), isNull);
