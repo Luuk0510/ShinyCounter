@@ -197,31 +197,16 @@ class CounterController extends ChangeNotifier {
   Future<void> toggleOverlay() async {
     if (!_overlaySupported) return;
 
-    final hasPerm = await FlutterOverlayWindow.isPermissionGranted();
-    if (!hasPerm) {
-      final requested = await FlutterOverlayWindow.requestPermission();
-      if (requested != true) return;
-    }
-
-    final isActive = await FlutterOverlayWindow.isActive();
-    if (!isActive && _pillActive) {
-      _pillActive = false;
-      notifyListeners();
-    } else if (isActive) {
-      _pillActive = true;
-      notifyListeners();
-      await _updateOverlay();
-      return;
-    }
-
     final sync = await _getSync();
-    await sync.showOverlay(
+    final isActive = await sync.ensureOverlay(
       _message,
       height: overlayHeight,
       width: overlayWidth,
     );
-    _pillActive = true;
-    _startOverlayPoller();
+    _pillActive = isActive;
+    if (_pillActive) {
+      _startOverlayPoller();
+    }
     notifyListeners();
   }
 

@@ -18,11 +18,17 @@ abstract class CounterSync {
   Future<void> setCaughtGame(String counterKey, String? game);
   Future<void> clearHuntDates(String counterKey);
   Future<void> setDailyCounts(String counterKey, Map<String, int> counts);
+  Future<bool> ensureOverlay(
+    CounterOverlayMessage message, {
+    int width = 360,
+    int height = 220,
+  });
   Future<void> showOverlay(
     CounterOverlayMessage message, {
     int width = 360,
     int height = 220,
   });
+  Future<bool> isOverlayActive();
   Future<void> shareToOverlay(CounterOverlayMessage message);
   Future<void> closeOverlay();
   Stream<dynamic> get overlayStream;

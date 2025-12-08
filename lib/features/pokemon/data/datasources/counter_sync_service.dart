@@ -134,6 +134,26 @@ class CounterSyncService implements CounterSync {
   }
 
   @override
+  Future<bool> ensureOverlay(
+    CounterOverlayMessage message, {
+    int width = 360,
+    int height = 220,
+  }) async {
+    final hasPerm = await FlutterOverlayWindow.isPermissionGranted();
+    if (!hasPerm) {
+      final requested = await FlutterOverlayWindow.requestPermission();
+      if (requested != true) return false;
+    }
+    final active = await FlutterOverlayWindow.isActive();
+    if (active) {
+      await shareToOverlay(message);
+      return true;
+    }
+    await showOverlay(message, width: width, height: height);
+    return true;
+  }
+
+  @override
   Future<void> showOverlay(
     CounterOverlayMessage message, {
     int width = 360,
@@ -151,6 +171,9 @@ class CounterSyncService implements CounterSync {
     );
     await shareToOverlay(message);
   }
+
+  @override
+  Future<bool> isOverlayActive() => FlutterOverlayWindow.isActive();
 
   @override
   Future<void> shareToOverlay(CounterOverlayMessage message) async {
