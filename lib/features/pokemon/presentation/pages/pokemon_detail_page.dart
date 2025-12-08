@@ -10,7 +10,7 @@ import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart
 import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_counters_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_daily_counts_sheet.dart';
-import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
+import 'package:shiny_counter/features/pokemon/shared/state/counter_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';

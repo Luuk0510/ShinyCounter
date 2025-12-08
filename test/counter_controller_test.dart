@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
-import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
+import 'package:shiny_counter/features/pokemon/shared/state/counter_controller.dart';
 
 import 'helpers/fakes.dart';
 
