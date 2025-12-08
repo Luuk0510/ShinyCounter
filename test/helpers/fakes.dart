@@ -109,6 +109,17 @@ class FakeCounterSync implements CounterSync {
 
   @override
   Future<bool> isOverlayActive() async => false;
+
+  void emitOverlay(String data) {
+    _overlayController.add(data);
+  }
+
+  int shareCount = 0;
+
+  @override
+  Future<void> shareToOverlay(CounterOverlayMessage message) async {
+    shareCount++;
+  }
 }
 
 class FakeSpriteService implements SpriteService {
