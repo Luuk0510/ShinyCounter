@@ -47,22 +47,27 @@ String pctClass(Node n) {
   return 'bad';
 }
 
-void renderTable(Node node, StringBuffer buffer, {String prefix = ''}) {
-  final name = node.name.isEmpty ? 'All Files' : node.name;
-  final path = prefix.isEmpty ? name : '$prefix/$name';
-  buffer.writeln(
-    '<tr>'
-    '<td>${htmlEscape.convert(path)}</td>'
-    '<td class="${pctClass(node)}">${node.pct.toStringAsFixed(1)}%</td>'
-    '<td>${node.hit}</td>'
-    '<td>${node.found}</td>'
-    '</tr>',
-  );
+void renderTree(Node node, StringBuffer buffer, {bool forceOpen = false}) {
   final children = node.children.values.toList()
     ..sort((a, b) => a.name.compareTo(b.name));
+  buffer.writeln('<ul>');
   for (final child in children) {
-    renderTable(child, buffer, prefix: path == 'All Files' ? child.name : path);
+    buffer.writeln('<li>');
+    final label = htmlEscape.convert(child.name);
+    final pct = child.pct.toStringAsFixed(1);
+    buffer.writeln(
+      '<details ${forceOpen || child.children.isEmpty ? 'open' : ''}>'
+      '<summary><span class="name">$label</span>'
+      '<span class="pct ${pctClass(child)}">$pct%</span>'
+      '<span class="counts">${child.hit}/${child.found}</span>'
+      '</summary>',
+    );
+    if (child.children.isNotEmpty) {
+      renderTree(child, buffer, forceOpen: forceOpen);
+    }
+    buffer.writeln('</details></li>');
   }
+  buffer.writeln('</ul>');
 }
 
 void main(List<String> args) async {
@@ -105,22 +110,31 @@ void main(List<String> args) async {
     ..writeln('<!doctype html><html><head><meta charset="utf-8">')
     ..writeln('<style>'
         'body{font-family:Arial,sans-serif;margin:16px;background:#f8f9fb;}'
-        'table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.1);}'
-        'th,td{padding:8px 10px;border-bottom:1px solid #e0e0e0;}'
-        'th{text-align:left;background:#f0f0f5;font-weight:700;}'
+        'details{margin:4px 0;}'
+        'summary{cursor:pointer;display:flex;gap:12px;align-items:center;}'
+        'ul{list-style:none;padding-left:18px;margin:6px 0;}'
+        'li{margin:2px 0;}'
+        '.name{flex:1;font-weight:600;}'
+        '.pct{min-width:70px;text-align:right;font-weight:700;}'
+        '.counts{min-width:80px;text-align:right;color:#666;}'
         '.good{color:#2e7d32;}'
         '.warn{color:#e67e22;}'
         '.bad{color:#c0392b;}'
+        'details>summary::-webkit-details-marker{display:none;}'
+        'details>summary:before{content:"\\25BC";display:inline-block;transform:rotate(-90deg);transition:transform .15s ease;margin-right:8px;color:#888;}'
+        'details[open]>summary:before{transform:rotate(0deg);}'
         '.header{background:#e6519a;color:white;padding:10px 12px;border-radius:8px;margin-bottom:12px;font-weight:700;}'
         '</style>')
     ..writeln('</head><body>')
     ..writeln(
       '<div class="header">Coverage: ${root.pct.toStringAsFixed(1)}% (${root.hit}/${root.found})</div>',
     )
-    ..writeln('<table><tr><th>Path</th><th>Line %</th><th>Covered</th><th>Total</th></tr>');
-  renderTable(root, buffer);
+    ..writeln('<details open><summary><span class="name">All Files</span>'
+        '<span class="pct ${pctClass(root)}">${root.pct.toStringAsFixed(1)}%</span>'
+        '<span class="counts">${root.hit}/${root.found}</span></summary>');
+  renderTree(root, buffer, forceOpen: true);
   buffer
-    ..writeln('</table>')
+    ..writeln('</details>')
     ..writeln('</body></html>');
 
   stdout.write(buffer.toString());
