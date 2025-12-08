@@ -122,48 +122,57 @@ void main() {
       expect(controller.pillActive, isFalse);
     });
 
-    test('setCaughtAtDate marks caught and persists game when present', () async {
-      final sync = FakeCounterSync();
-      final controller = CounterController(pokemon: pokemon, sync: sync);
-      await controller.init();
-      controller.setCaughtGame('violet');
+    test(
+      'setCaughtAtDate marks caught and persists game when present',
+      () async {
+        final sync = FakeCounterSync();
+        final controller = CounterController(pokemon: pokemon, sync: sync);
+        await controller.init();
+        controller.setCaughtGame('violet');
 
-      await controller.setCaughtAtDate(DateTime(2024, 1, 1));
+        await controller.setCaughtAtDate(DateTime(2024, 1, 1));
 
-      expect(controller.isCaught, isTrue);
-      expect(controller.caughtAt, isNotNull);
-      expect(sync.caughtAt['counter_001'], isNotNull);
-      expect(sync.caughtGame['counter_001'], 'violet');
-    });
+        expect(controller.isCaught, isTrue);
+        expect(controller.caughtAt, isNotNull);
+        expect(sync.caughtAt['counter_001'], isNotNull);
+        expect(sync.caughtGame['counter_001'], 'violet');
+      },
+    );
 
-    test('setStartedAtDate triggers overlay share only when pill active', () async {
-      final sync = FakeCounterSync();
-      final controller = CounterController(pokemon: pokemon, sync: sync);
-      await controller.init();
+    test(
+      'setStartedAtDate triggers overlay share only when pill active',
+      () async {
+        final sync = FakeCounterSync();
+        final controller = CounterController(pokemon: pokemon, sync: sync);
+        await controller.init();
 
-      await controller.setStartedAtDate(DateTime(2024, 1, 2));
-      expect(sync.shareCount, 0);
+        await controller.setStartedAtDate(DateTime(2024, 1, 2));
+        expect(sync.shareCount, 0);
 
-      sync.counters['counter_001'] = 1;
-      await controller.toggleOverlay();
-      await controller.setStartedAtDate(DateTime(2024, 1, 3));
-      expect(sync.shareCount, greaterThan(0));
-    });
+        sync.counters['counter_001'] = 1;
+        await controller.toggleOverlay();
+        await controller.setStartedAtDate(DateTime(2024, 1, 3));
+        expect(sync.shareCount, greaterThan(0));
+      },
+    );
 
-    test('setCounter with forceUncaught leaves startedAt when count > 0', () async {
-      final sync = FakeCounterSync();
-      final controller = CounterController(pokemon: pokemon, sync: sync);
-      await controller.init();
-      await controller.increment();
-      final startedBefore = controller.startedAt;
+    test(
+      'setCounter with forceUncaught leaves startedAt when count > 0',
+      () async {
+        final sync = FakeCounterSync();
+        final controller = CounterController(pokemon: pokemon, sync: sync);
+        await controller.init();
+        await controller.increment();
+        final startedBefore = controller.startedAt;
 
-      await controller.setCounter(5);
+        await controller.setCounter(5);
 
-      expect(controller.isCaught, isFalse);
-      expect(controller.counter, 5);
-      expect(controller.startedAt, startedBefore); // preserved
-      expect(sync.caught['caught_001'], isFalse);
-    });
+        expect(controller.isCaught, isFalse);
+        expect(controller.counter, 5);
+        expect(controller.startedAt, startedBefore); // preserved
+        expect(sync.caught['caught_001'], isFalse);
+      },
+    );
 
     test('toggleCaught at zero sets caughtAt but not startedAt', () async {
       final sync = FakeCounterSync();
@@ -200,16 +209,19 @@ void main() {
       expect(sync.ensureOverlayCount, greaterThan(0));
     });
 
-    test('setDailyCounts clears zeros and skips overlay when inactive', () async {
-      final sync = FakeCounterSync();
-      final controller = CounterController(pokemon: pokemon, sync: sync);
-      await controller.init();
+    test(
+      'setDailyCounts clears zeros and skips overlay when inactive',
+      () async {
+        final sync = FakeCounterSync();
+        final controller = CounterController(pokemon: pokemon, sync: sync);
+        await controller.init();
 
-      await controller.setDailyCounts({'2024-01-01': 0});
+        await controller.setDailyCounts({'2024-01-01': 0});
 
-      expect(sync.daily['counter_001'], isEmpty);
-      expect(sync.setDailyCalls, 1);
-      expect(sync.shareCount, 0); // overlay not active
-    });
+        expect(sync.daily['counter_001'], isEmpty);
+        expect(sync.setDailyCalls, 1);
+        expect(sync.shareCount, 0); // overlay not active
+      },
+    );
   });
 }

@@ -75,20 +75,9 @@ class FakeCounterSync implements CounterSync {
   }
 
   @override
-  Future<void> setDailyCounts(
-    String counterKey,
-    Map<String, int> counts,
-  ) async {
-    daily[counterKey] = counts;
-  }
-
-  @override
   Future<void> setStartedAt(String counterKey, DateTime? startedAt) async {
     started[counterKey] = startedAt;
   }
-
-  @override
-  Future<void> shareToOverlay(CounterOverlayMessage message) async {}
 
   @override
   Future<void> showOverlay(

@@ -78,7 +78,7 @@ void main() {
 
     test('loadCustomPokemon builds legacy id when missing', () async {
       final legacy = [
-        {'name': 'LegacyMon', 'imagePath': 'path/legacy.png'}
+        {'name': 'LegacyMon', 'imagePath': 'path/legacy.png'},
       ];
       await store.setString('custom_pokemon', jsonEncode(legacy));
 

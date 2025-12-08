@@ -12,7 +12,10 @@ void main() {
     final games = GameAssets.games;
     expect(games, isNotEmpty);
     expect(games.first, isEmpty); // default placeholder
-    expect(games, containsAll(['Scarlet', 'Violet', 'HeartGold', 'SoulSilver']));
+    expect(
+      games,
+      containsAll(['Scarlet', 'Violet', 'HeartGold', 'SoulSilver']),
+    );
   });
 
   test('falls back to default logo for unknown game', () {
