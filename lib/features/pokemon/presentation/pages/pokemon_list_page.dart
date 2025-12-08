@@ -530,97 +530,101 @@ class _PokemonListPageState extends State<PokemonListPage>
       );
     }
 
-    final entries = _buildEntries(context, uncaught, caught);
-
-    return ListView.builder(
-      padding: EdgeInsets.fromLTRB(0, 4, 0, bottomPadding),
-      itemCount: entries.length,
-      itemBuilder: (context, index) {
-        final entry = entries[index];
-        if (entry is _HeaderEntry) {
-          return InkWell(
-            onTap: entry.onToggle,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(entry.title, style: AppTypography.sectionTitle),
-                  ),
-                  Icon(entry.expanded ? Icons.expand_less : Icons.expand_more),
-                ],
-              ),
-            ),
-          );
-        }
-        final pokemon = (entry as _PokemonEntry).pokemon;
-        return PokemonCard(
-          pokemon: pokemon,
-          isCaught: _isCaught(pokemon),
-          onTap: () => _openDetail(pokemon),
-        );
-      },
-    );
-  }
-
-  List<_Entry> _buildEntries(
-    BuildContext context,
-    List<Pokemon> uncaught,
-    List<Pokemon> caught,
-  ) {
-    final entries = <_Entry>[];
+    final sections = <Widget>[];
     if (uncaught.isNotEmpty) {
-      entries.add(
-        _HeaderEntry(
+      sections.add(
+        _SectionWidget(
           title: context.l10n.sectionUncaught,
           expanded: _showUncaught,
-          onToggle: () {
-            setState(() => _showUncaught = !_showUncaught);
-          },
+          onToggle: () => setState(() => _showUncaught = !_showUncaught),
+          pokemons: uncaught,
+          isCaught: _isCaught,
+          onTap: _openDetail,
         ),
       );
-      if (_showUncaught) {
-        entries.addAll(uncaught.map(_PokemonEntry.new));
-      }
     }
     if (caught.isNotEmpty) {
-      entries.add(
-        _HeaderEntry(
+      sections.add(
+        _SectionWidget(
           title: context.l10n.sectionCaught,
           expanded: _showCaught,
-          onToggle: () {
-            setState(() => _showCaught = !_showCaught);
-          },
+          onToggle: () => setState(() => _showCaught = !_showCaught),
+          pokemons: caught,
+          isCaught: _isCaught,
+          onTap: _openDetail,
         ),
       );
-      if (_showCaught) {
-        entries.addAll(caught.map(_PokemonEntry.new));
-      }
     }
-    return entries;
+
+    return ListView(
+      padding: EdgeInsets.fromLTRB(0, 4, 0, bottomPadding),
+      children: sections,
+    );
   }
 }
 
-abstract class _Entry {
-  const _Entry();
-}
-
-class _HeaderEntry extends _Entry {
-  const _HeaderEntry({
+class _SectionWidget extends StatelessWidget {
+  const _SectionWidget({
     required this.title,
     required this.expanded,
     required this.onToggle,
+    required this.pokemons,
+    required this.isCaught,
+    required this.onTap,
   });
 
   final String title;
   final bool expanded;
   final VoidCallback onToggle;
-}
+  final List<Pokemon> pokemons;
+  final bool Function(Pokemon) isCaught;
+  final Future<void> Function(Pokemon) onTap;
 
-class _PokemonEntry extends _Entry {
-  const _PokemonEntry(this.pokemon);
-
-  final Pokemon pokemon;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: onToggle,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Row(
+              children: [
+                Expanded(child: Text(title, style: AppTypography.sectionTitle)),
+                AnimatedRotation(
+                  turns: expanded ? 0.5 : 0,
+                  duration: AppAnim.normal,
+                  curve: AppAnim.easeOut,
+                  child: const Icon(Icons.expand_more),
+                ),
+              ],
+            ),
+          ),
+        ),
+        AnimatedSize(
+          duration: AppAnim.normal,
+          curve: AppAnim.easeOut,
+          alignment: Alignment.topCenter,
+          child: ClipRect(
+            child: expanded
+                ? Column(
+                    children: [
+                      for (final p in pokemons)
+                        PokemonCard(
+                          key: ValueKey(p.id),
+                          pokemon: p,
+                          isCaught: isCaught(p),
+                          onTap: () => onTap(p),
+                        ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _ManageAction {
