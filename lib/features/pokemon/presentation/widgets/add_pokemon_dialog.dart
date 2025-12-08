@@ -281,7 +281,7 @@ class _SpritePickerState extends State<_SpritePicker> {
     final listHeight =
         (widget.availableHeight - headerHeightEstimate - AppSpacing.sm)
             .clamp(AppSizes.listMinHeight, widget.availableHeight)
-        .toDouble();
+            .toDouble();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -326,7 +326,14 @@ class _SpritePickerState extends State<_SpritePicker> {
                     vertical: AppSpacing.sm,
                   ),
                 ),
-                onChanged: controller.setGen,
+                onChanged: (gen) {
+                  controller.setGen(gen);
+                  _scrollController.animateTo(
+                    0,
+                    duration: AppAnim.normal,
+                    curve: AppAnim.easeOut,
+                  );
+                },
                 items: [
                   DropdownMenuItem<int?>(
                     value: null,
@@ -374,33 +381,33 @@ class _SpritePickerState extends State<_SpritePicker> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.search_off,
-                                color: widget.colors.onSurfaceVariant,
-                                size: AppSizes.spriteThumb,
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              Text(
-                                context.l10n.noPokemonFound,
-                                style: AppTypography.button.copyWith(
-                                  color: widget.colors.onSurfaceVariant,
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                context.l10n.tryAnotherFilter,
-                                textAlign: TextAlign.center,
-                                style: AppTypography.button.copyWith(
-                                  color: widget.colors.onSurfaceVariant.withValues(
-                                    alpha: 0.9,
-                                  ),
-                                ),
-                              ),
-                            ],
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            color: widget.colors.onSurfaceVariant,
+                            size: AppSizes.spriteThumb,
                           ),
-                        ),
-                      )
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            context.l10n.noPokemonFound,
+                            style: AppTypography.button.copyWith(
+                              color: widget.colors.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            context.l10n.tryAnotherFilter,
+                            textAlign: TextAlign.center,
+                            style: AppTypography.button.copyWith(
+                              color: widget.colors.onSurfaceVariant.withValues(
+                                alpha: 0.9,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
                 : Scrollbar(
                     controller: _scrollController,
                     thumbVisibility: true,
@@ -422,7 +429,9 @@ class _SpritePickerState extends State<_SpritePicker> {
                             ),
                             decoration: BoxDecoration(
                               color: selected
-                                  ? widget.colors.primary.withValues(alpha: 0.08)
+                                  ? widget.colors.primary.withValues(
+                                      alpha: 0.08,
+                                    )
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(AppRadii.md),
                             ),
