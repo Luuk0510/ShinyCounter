@@ -337,6 +337,25 @@ class _PokemonListPageState extends State<PokemonListPage>
       return;
     }
 
+    final searchController = TextEditingController();
+    var query = '';
+
+    String _dexOf(Pokemon p) {
+      final customMatch = RegExp(r'^custom_(\d{1,4})_').firstMatch(p.id);
+      if (customMatch != null) return customMatch.group(1)!.padLeft(4, '0');
+      final pathMatch = RegExp(r'(\d{3,4})').firstMatch(p.imagePath);
+      if (pathMatch != null) return pathMatch.group(1)!.padLeft(4, '0');
+      final numeric = RegExp(r'\d+').firstMatch(p.id);
+      if (numeric != null) return numeric.group(0)!.padLeft(4, '0');
+      return '';
+    }
+
+    String _dexLabel(Pokemon p) {
+      final dex = _dexOf(p);
+      if (dex.isEmpty) return 'Custom';
+      return '#$dex';
+    }
+
     final action = await showModalBottomSheet<_ManageAction>(
       context: context,
       showDragHandle: false,
@@ -348,77 +367,113 @@ class _PokemonListPageState extends State<PokemonListPage>
       ),
       builder: (context) {
         final colors = Theme.of(context).colorScheme;
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.md,
-              AppSpacing.lg,
-              AppSpacing.lg,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: AppSizes.sheetHandleWidth,
-                  height: AppSizes.sheetHandleHeight,
-                  decoration: BoxDecoration(
-                    color: colors.outlineVariant.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(AppRadii.sm),
-                  ),
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final filter = query.trim().toLowerCase();
+            final digitsOnly = filter.replaceAll(RegExp(r'[^0-9]'), '');
+            final filtered = filter.isEmpty && digitsOnly.isEmpty
+                ? pokemonSorted
+                : pokemonSorted.where((p) {
+                    final dex = _dexOf(p);
+                    return p.name.toLowerCase().contains(filter) ||
+                        dex.contains(filter.replaceAll('#', '')) ||
+                        (digitsOnly.isNotEmpty && dex.contains(digitsOnly));
+                  }).toList();
+
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.md,
+                  AppSpacing.lg,
+                  AppSpacing.lg,
                 ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  context.l10n.manageTitle,
-                  style: AppTypography.title.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Flexible(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: pokemonSorted.length,
-                    itemBuilder: (context, index) {
-                      final p = pokemonSorted[index];
-                      return ListTile(
-                        leading: _ManagePokemonImage(pokemon: p),
-                        title: Text(
-                          p.name,
-                          style: AppTypography.listTitle.copyWith(
-                            color: colors.onSurface,
-                            fontWeight: FontWeight.w700,
-                          ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: AppSizes.sheetHandleWidth,
+                      height: AppSizes.sheetHandleHeight,
+                      decoration: BoxDecoration(
+                        color: colors.outlineVariant.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(AppRadii.sm),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      context.l10n.manageTitle,
+                      style: AppTypography.title.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        setModalState(() => query = value);
+                      },
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.search),
+                        hintText: context.l10n.searchByNameOrDex,
+                        isDense: true,
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
                         ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              tooltip: context.l10n.manageEditTooltip,
-                              onPressed: () => Navigator.of(
-                                context,
-                              ).pop(_ManageAction(pokemon: p, delete: false)),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Flexible(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: filtered.length,
+                        itemBuilder: (context, index) {
+                          final p = filtered[index];
+                          return ListTile(
+                            leading: _ManagePokemonImage(pokemon: p),
+                            title: Text(
+                              p.name,
+                              style: AppTypography.listTitle.copyWith(
+                                color: colors.onSurface,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              tooltip: context.l10n.manageDeleteTooltip,
-                              color: colors.error,
-                              onPressed: () => Navigator.of(
-                                context,
-                              ).pop(_ManageAction(pokemon: p, delete: true)),
+                            subtitle: Text(
+                              _dexLabel(p),
+                              style: AppTypography.button.copyWith(
+                                color: colors.onSurfaceVariant,
+                              ),
                             ),
-                          ],
-                        ),
-                      );
-                    },
-                    separatorBuilder: (context, _) =>
-                        const Divider(height: AppSpacing.md),
-                  ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  tooltip: context.l10n.manageEditTooltip,
+                                  onPressed: () => Navigator.of(context).pop(
+                                    _ManageAction(pokemon: p, delete: false),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline),
+                                  tooltip: context.l10n.manageDeleteTooltip,
+                                  color: colors.error,
+                                  onPressed: () => Navigator.of(context).pop(
+                                    _ManageAction(pokemon: p, delete: true),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        separatorBuilder: (context, _) =>
+                            const Divider(height: AppSpacing.md),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
