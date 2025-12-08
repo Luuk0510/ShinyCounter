@@ -94,27 +94,27 @@ void main() {
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
-      calls.add(call);
-      switch (call.method) {
-        case 'isPermissionGranted':
-        case 'checkPermission':
-          return permGranted;
-        case 'requestPermission':
-          return requestGranted;
-        case 'isActive':
-          return isActive;
-        case 'showOverlay':
-          showCalled = true;
-          return true;
-        case 'shareData':
-          shared.add(call.arguments);
-          return true;
-        case 'closeOverlay':
-          return true;
-        default:
-          return null;
-      }
-    });
+          calls.add(call);
+          switch (call.method) {
+            case 'isPermissionGranted':
+            case 'checkPermission':
+              return permGranted;
+            case 'requestPermission':
+              return requestGranted;
+            case 'isActive':
+              return isActive;
+            case 'showOverlay':
+              showCalled = true;
+              return true;
+            case 'shareData':
+              shared.add(call.arguments);
+              return true;
+            case 'closeOverlay':
+              return true;
+            default:
+              return null;
+          }
+        });
   });
 
   tearDown(() {
@@ -151,8 +151,11 @@ void main() {
     store.strings[keys.startedAt] = DateTime(2024, 1, 1).toIso8601String();
     store.strings[keys.caughtAt] = DateTime(2024, 1, 2).toIso8601String();
     store.strings[keys.caughtGame] = 'violet';
-    store.strings[keys.dailyCounts] =
-        jsonEncode({'today': 2, 'zero': 0, 'text': '4'});
+    store.strings[keys.dailyCounts] = jsonEncode({
+      'today': 2,
+      'zero': 0,
+      'text': '4',
+    });
 
     final state = await sync.loadState(counterKey, caughtKey);
 
@@ -183,10 +186,7 @@ void main() {
 
     expect(result, isTrue);
     expect(showCalled, isFalse);
-    expect(
-      calls.where((c) => c.method == 'shareData').length,
-      greaterThan(0),
-    );
+    expect(calls.where((c) => c.method == 'shareData').length, greaterThan(0));
   });
 
   test('ensureOverlay shows and shares when overlay inactive', () async {
@@ -197,9 +197,6 @@ void main() {
 
     expect(result, isTrue);
     expect(showCalled, isTrue);
-    expect(
-      calls.where((c) => c.method == 'shareData').length,
-      greaterThan(0),
-    );
+    expect(calls.where((c) => c.method == 'shareData').length, greaterThan(0));
   });
 }
