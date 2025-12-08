@@ -7,4 +7,16 @@ void main() {
     expect(GameAssets.logoFor('Y'), contains('y.png'));
     expect(GameAssets.logoFor('Scarlet'), contains('scarlet'));
   });
+
+  test('exposes game list with empty default and known titles', () {
+    final games = GameAssets.games;
+    expect(games, isNotEmpty);
+    expect(games.first, isEmpty); // default placeholder
+    expect(games, containsAll(['Scarlet', 'Violet', 'HeartGold', 'SoulSilver']));
+  });
+
+  test('falls back to default logo for unknown game', () {
+    expect(GameAssets.logoFor('Unknown Title'), contains('pokeball_icon'));
+    expect(GameAssets.logoFor(null), contains('pokeball_icon'));
+  });
 }
