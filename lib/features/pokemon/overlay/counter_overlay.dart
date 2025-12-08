@@ -28,8 +28,6 @@ class _OverlayAppState extends State<_OverlayApp> {
   CounterKeys? _keys;
   int _count = 0;
   bool _enabled = true;
-  DateTime? _startedAt;
-  DateTime? _caughtAt;
   final HuntStateService _huntState = HuntStateService();
 
   @override
@@ -46,15 +44,12 @@ class _OverlayAppState extends State<_OverlayApp> {
     final message = CounterOverlayMessage.tryParse(content);
     if (message == null) return;
     final keys = CounterKeys.fromCounterKey(message.counterKey);
-    final dates = await _loadHuntDatesFor(keys);
     if (!mounted) return;
     setState(() {
       _name = message.name;
       _keys = keys;
       _count = message.count;
       _enabled = message.enabled;
-      _startedAt = dates.$1;
-      _caughtAt = dates.$2;
     });
   }
 
@@ -88,8 +83,6 @@ class _OverlayAppState extends State<_OverlayApp> {
     if (!mounted) return;
     setState(() {
       _count = next;
-      _startedAt = update.startedAt;
-      _caughtAt = update.caughtAt;
     });
     final message = CounterOverlayMessage(
       name: _name,
@@ -98,12 +91,6 @@ class _OverlayAppState extends State<_OverlayApp> {
       enabled: _enabled,
     );
     FlutterOverlayWindow.shareData(message.serialize());
-  }
-
-  Future<(DateTime?, DateTime?)> _loadHuntDatesFor(CounterKeys keys) async {
-    final sync = await CounterSyncService.instance();
-    final state = await sync.loadState(keys.counter, keys.caught);
-    return (state.startedAt, state.caughtAt);
   }
 
   @override

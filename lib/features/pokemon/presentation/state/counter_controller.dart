@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
