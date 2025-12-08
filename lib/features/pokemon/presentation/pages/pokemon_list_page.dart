@@ -39,6 +39,8 @@ class _PokemonListPageState extends State<PokemonListPage>
   final List<Pokemon> _basePokemon = [];
   Set<String> _caught = {};
   bool _loading = true;
+  bool _showUncaught = true;
+  bool _showCaught = true;
   AnimationController? _sheetController;
 
   List<Pokemon> get _allPokemon {
@@ -528,71 +530,97 @@ class _PokemonListPageState extends State<PokemonListPage>
       );
     }
 
+    final entries = _buildEntries(context, uncaught, caught);
+
     return ListView.builder(
       padding: EdgeInsets.fromLTRB(0, 4, 0, bottomPadding),
-      itemCount: _sectionedCount(uncaught, caught),
+      itemCount: entries.length,
       itemBuilder: (context, index) {
-        final entry = _sectionedItem(context, uncaught, caught, index);
-        if (entry is _SectionHeader) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(entry.title, style: AppTypography.sectionTitle),
-          );
-        } else if (entry is Pokemon) {
-          return PokemonCard(
-            pokemon: entry,
-            isCaught: _isCaught(entry),
-            onTap: () => _openDetail(entry),
+        final entry = entries[index];
+        if (entry is _HeaderEntry) {
+          return InkWell(
+            onTap: entry.onToggle,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(entry.title, style: AppTypography.sectionTitle),
+                  ),
+                  Icon(entry.expanded ? Icons.expand_less : Icons.expand_more),
+                ],
+              ),
+            ),
           );
         }
-        return const SizedBox.shrink();
+        final pokemon = (entry as _PokemonEntry).pokemon;
+        return PokemonCard(
+          pokemon: pokemon,
+          isCaught: _isCaught(pokemon),
+          onTap: () => _openDetail(pokemon),
+        );
       },
     );
   }
-}
 
-int _sectionedCount(List<Pokemon> uncaught, List<Pokemon> caught) {
-  var count = 0;
-  if (uncaught.isNotEmpty) {
-    count += 1 + uncaught.length;
-  }
-  if (caught.isNotEmpty) {
-    count += 1 + caught.length;
-  }
-  return count;
-}
-
-dynamic _sectionedItem(
-  BuildContext context,
-  List<Pokemon> uncaught,
-  List<Pokemon> caught,
-  int index,
-) {
-  var cursor = 0;
-
-  if (uncaught.isNotEmpty) {
-    if (index == cursor) return _SectionHeader(context.l10n.sectionUncaught);
-    cursor += 1;
-    if (index < cursor + uncaught.length) {
-      return uncaught[index - cursor];
+  List<_Entry> _buildEntries(
+    BuildContext context,
+    List<Pokemon> uncaught,
+    List<Pokemon> caught,
+  ) {
+    final entries = <_Entry>[];
+    if (uncaught.isNotEmpty) {
+      entries.add(
+        _HeaderEntry(
+          title: context.l10n.sectionUncaught,
+          expanded: _showUncaught,
+          onToggle: () {
+            setState(() => _showUncaught = !_showUncaught);
+          },
+        ),
+      );
+      if (_showUncaught) {
+        entries.addAll(uncaught.map(_PokemonEntry.new));
+      }
     }
-    cursor += uncaught.length;
-  }
-
-  if (caught.isNotEmpty) {
-    if (index == cursor) return _SectionHeader(context.l10n.sectionCaught);
-    cursor += 1;
-    if (index < cursor + caught.length) {
-      return caught[index - cursor];
+    if (caught.isNotEmpty) {
+      entries.add(
+        _HeaderEntry(
+          title: context.l10n.sectionCaught,
+          expanded: _showCaught,
+          onToggle: () {
+            setState(() => _showCaught = !_showCaught);
+          },
+        ),
+      );
+      if (_showCaught) {
+        entries.addAll(caught.map(_PokemonEntry.new));
+      }
     }
+    return entries;
   }
-
-  return null;
 }
 
-class _SectionHeader {
-  const _SectionHeader(this.title);
+abstract class _Entry {
+  const _Entry();
+}
+
+class _HeaderEntry extends _Entry {
+  const _HeaderEntry({
+    required this.title,
+    required this.expanded,
+    required this.onToggle,
+  });
+
   final String title;
+  final bool expanded;
+  final VoidCallback onToggle;
+}
+
+class _PokemonEntry extends _Entry {
+  const _PokemonEntry(this.pokemon);
+
+  final Pokemon pokemon;
 }
 
 class _ManageAction {
