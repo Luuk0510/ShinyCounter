@@ -95,6 +95,19 @@ class FakeCounterSync implements CounterSync {
     int width = 360,
     int height = 220,
   }) async {}
+
+  @override
+  Future<bool> ensureOverlay(
+    CounterOverlayMessage message, {
+    int width = 360,
+    int height = 220,
+  }) async {
+    await showOverlay(message, width: width, height: height);
+    return true;
+  }
+
+  @override
+  Future<bool> isOverlayActive() async => false;
 }
 
 class FakeSpriteService implements SpriteService {
@@ -118,5 +131,12 @@ class FakeSpriteService implements SpriteService {
   Future<void> warmupForDexes(
     Iterable<String> dexes, {
     bool refresh = false,
+  }) async {}
+
+  @override
+  Future<void> precacheSpritePaths(
+    BuildContext context,
+    Iterable<String> assetPaths, {
+    bool dedupe = true,
   }) async {}
 }
