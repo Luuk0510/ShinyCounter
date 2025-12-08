@@ -38,8 +38,7 @@ class CounterController extends ChangeNotifier {
   CounterSync? _sync;
   final ToggleCaughtUseCase? _toggleCaughtUseCase;
   StreamSubscription<dynamic>? _overlaySub;
-  Timer? _pollTimer;
-  bool _initialized = false;
+  Timer? _overlayPoller;
 
   int get counter => _counter;
   bool get isCaught => _isCaught;
@@ -64,16 +63,12 @@ class CounterController extends ChangeNotifier {
       _overlaySub ??= _sync?.overlayStream.listen(_onOverlayData);
     }
     await _loadState();
-    if (!_initialized) {
-      _startPeriodicSync();
-      _initialized = true;
-    }
   }
 
   @override
   void dispose() {
     _overlaySub?.cancel();
-    _pollTimer?.cancel();
+    _overlayPoller?.cancel();
     super.dispose();
   }
 
@@ -233,6 +228,7 @@ class CounterController extends ChangeNotifier {
       width: overlayWidth,
     );
     _pillActive = true;
+    _startOverlayPoller();
     notifyListeners();
   }
 
@@ -302,21 +298,21 @@ class CounterController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _startPeriodicSync() {
-    _pollTimer?.cancel();
-    // Poll shared prefs so the pill and detail page stay aligned if they change each other.
-    _pollTimer = Timer.periodic(const Duration(seconds: 1), (_) async {
+  void _startOverlayPoller() {
+    _overlayPoller?.cancel();
+    if (!_overlaySupported) return;
+    _overlayPoller = Timer.periodic(const Duration(seconds: 1), (_) async {
+      if (!_pillActive) return;
       final sync = await _getSync();
       final state = await sync.loadState(_keys.counter, _keys.caught);
       final changed =
           state.count != _counter ||
           state.isCaught != _isCaught ||
-          !_isSameMoment(state.startedAt, _startedAt) ||
-          !_isSameMoment(state.caughtAt, _caughtAt) ||
+          state.startedAt != _startedAt ||
+          state.caughtAt != _caughtAt ||
           state.caughtGame != _caughtGame ||
           !_sameDailyCounts(state.dailyCounts, _dailyCounts);
       if (!changed) return;
-
       _counter = state.count;
       _isCaught = state.isCaught;
       _startedAt = state.startedAt;
@@ -327,22 +323,16 @@ class CounterController extends ChangeNotifier {
     });
   }
 
-  bool _isSameMoment(DateTime? a, DateTime? b) {
-    if (a == null && b == null) return true;
-    if (a == null || b == null) return false;
-    return a.isAtSameMomentAs(b);
-  }
-
-  Future<CounterSync> _getSync() async {
-    _sync ??= await CounterSyncService.instance();
-    return _sync!;
-  }
-
   bool _sameDailyCounts(Map<String, int> a, Map<String, int> b) {
     if (a.length != b.length) return false;
     for (final entry in a.entries) {
       if (b[entry.key] != entry.value) return false;
     }
     return true;
+  }
+
+  Future<CounterSync> _getSync() async {
+    _sync ??= await CounterSyncService.instance();
+    return _sync!;
   }
 }

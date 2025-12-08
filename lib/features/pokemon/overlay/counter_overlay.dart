@@ -8,7 +8,6 @@ import 'package:shiny_counter/features/pokemon/overlay/widgets/round_control.dar
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/hunt_state_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 
 @pragma('vm:entry-point')
 void overlayMain() {

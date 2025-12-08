@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/core/di/app_locator.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
@@ -143,7 +143,7 @@ class _PokemonListPageState extends State<PokemonListPage>
   }
 
   Future<void> _clearPokemonState(Pokemon pokemon) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = AppLocator.instance.prefsStore;
     final keys = CounterKeys.fromId(pokemon.id);
     await prefs.remove(keys.counter);
     await prefs.remove(keys.caught);

@@ -29,7 +29,7 @@ class AppLocator {
     pokemonRepository = PrefsPokemonRepository(
       storage: PokemonStorage(store: prefsStore),
     );
-    counterSyncService = await CounterSyncService.instance();
+    counterSyncService = await CounterSyncService.instance(store: prefsStore);
     loadCustomPokemon = LoadCustomPokemonUseCase(pokemonRepository);
     saveCustomPokemon = SaveCustomPokemonUseCase(pokemonRepository);
     loadCaught = LoadCaughtUseCase(pokemonRepository);
