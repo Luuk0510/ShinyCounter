@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 import 'package:shiny_counter/features/pokemon/overlay/widgets/round_control.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 
 @pragma('vm:entry-point')
 void overlayMain() {
@@ -24,7 +25,7 @@ class _OverlayApp extends StatefulWidget {
 class _OverlayAppState extends State<_OverlayApp> {
   StreamSubscription<dynamic>? _sub;
   String _name = 'Pokémon';
-  String _counterKey = '';
+  CounterKeys? _keys;
   int _count = 0;
   bool _enabled = true;
   DateTime? _startedAt;
@@ -43,11 +44,12 @@ class _OverlayAppState extends State<_OverlayApp> {
   Future<void> _parseContent(String content) async {
     final message = CounterOverlayMessage.tryParse(content);
     if (message == null) return;
-    final dates = await _loadHuntDatesFor(message.counterKey);
+    final keys = CounterKeys.fromCounterKey(message.counterKey);
+    final dates = await _loadHuntDatesFor(keys);
     if (!mounted) return;
     setState(() {
       _name = message.name;
-      _counterKey = message.counterKey;
+      _keys = keys;
       _count = message.count;
       _enabled = message.enabled;
       _startedAt = dates.$1;
@@ -62,10 +64,12 @@ class _OverlayAppState extends State<_OverlayApp> {
   }
 
   Future<void> _bump(int delta) async {
-    if (!_enabled || _counterKey.isEmpty) return;
+    if (!_enabled) return;
+    final keys = _keys;
+    if (keys == null) return;
     final prefs = await SharedPreferences.getInstance();
     await prefs.reload();
-    final current = prefs.getInt(_counterKey) ?? _count;
+    final current = prefs.getInt(keys.counter) ?? _count;
     var next = current + delta;
     if (next < 0) next = 0;
     final appliedDelta = next - current;
@@ -77,18 +81,18 @@ class _OverlayAppState extends State<_OverlayApp> {
     if (wasZero && next > 0) {
       startedAt = DateTime.now();
       caughtAt = null;
-      await prefs.setString(_startedAtKey, startedAt.toIso8601String());
-      await prefs.remove(_caughtAtKey);
+      await prefs.setString(keys.startedAt, startedAt.toIso8601String());
+      await prefs.remove(keys.caughtAt);
     } else if (next == 0) {
       startedAt = null;
       caughtAt = null;
-      await prefs.remove(_startedAtKey);
-      await prefs.remove(_caughtAtKey);
+      await prefs.remove(keys.startedAt);
+      await prefs.remove(keys.caughtAt);
     }
 
-    await prefs.setInt(_counterKey, next);
+    await prefs.setInt(keys.counter, next);
     if (appliedDelta != 0) {
-      await _updateDailyCounts(prefs, appliedDelta);
+      await _updateDailyCounts(prefs, keys, appliedDelta);
     }
     if (!mounted) return;
     setState(() {
@@ -98,36 +102,36 @@ class _OverlayAppState extends State<_OverlayApp> {
     });
     final message = CounterOverlayMessage(
       name: _name,
-      counterKey: _counterKey,
+      counterKey: keys.counter,
       count: next,
       enabled: _enabled,
     );
     FlutterOverlayWindow.shareData(message.serialize());
   }
 
-  String get _startedAtKey => '${_counterKey}_startedAt';
-  String get _caughtAtKey => '${_counterKey}_caughtAt';
-
-  Future<(DateTime?, DateTime?)> _loadHuntDatesFor(String key) async {
+  Future<(DateTime?, DateTime?)> _loadHuntDatesFor(CounterKeys keys) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.reload();
-    final started = prefs.getString('${key}_startedAt');
-    final caught = prefs.getString('${key}_caughtAt');
+    final started = prefs.getString(keys.startedAt);
+    final caught = prefs.getString(keys.caughtAt);
     return (
       started != null ? DateTime.tryParse(started) : null,
       caught != null ? DateTime.tryParse(caught) : null,
     );
   }
 
-  Future<void> _updateDailyCounts(SharedPreferences prefs, int delta) async {
+  Future<void> _updateDailyCounts(
+    SharedPreferences prefs,
+    CounterKeys keys,
+    int delta,
+  ) async {
     final today = DateTime.now().toIso8601String().split('T').first;
-    final key = '${_counterKey}_dailyCounts';
-    final raw = prefs.getString(key);
+    final raw = prefs.getString(keys.dailyCounts);
     final map = raw == null
         ? <String, int>{}
         : Map<String, int>.from(jsonDecode(raw) as Map);
     map[today] = (map[today] ?? 0) + delta;
-    await prefs.setString(key, jsonEncode(map));
+    await prefs.setString(keys.dailyCounts, jsonEncode(map));
   }
 
   @override

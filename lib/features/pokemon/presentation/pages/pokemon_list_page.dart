@@ -13,6 +13,7 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart'
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
@@ -143,12 +144,13 @@ class _PokemonListPageState extends State<PokemonListPage>
 
   Future<void> _clearPokemonState(Pokemon pokemon) async {
     final prefs = await SharedPreferences.getInstance();
-    final counterKey = 'counter_${pokemon.id.toLowerCase()}';
-    await prefs.remove(counterKey);
-    await prefs.remove('caught_${pokemon.id.toLowerCase()}');
-    await prefs.remove('${counterKey}_startedAt');
-    await prefs.remove('${counterKey}_caughtAt');
-    await prefs.remove('${counterKey}_dailyCounts');
+    final keys = CounterKeys.fromId(pokemon.id);
+    await prefs.remove(keys.counter);
+    await prefs.remove(keys.caught);
+    await prefs.remove(keys.startedAt);
+    await prefs.remove(keys.caughtAt);
+    await prefs.remove(keys.caughtGame);
+    await prefs.remove(keys.dailyCounts);
   }
 
   Future<void> _confirmDelete(Pokemon pokemon) async {

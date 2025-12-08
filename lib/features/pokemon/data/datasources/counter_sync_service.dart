@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../overlay/counter_overlay_message.dart';
 import '../../domain/services/counter_sync.dart';
+import '../../shared/utils/counter_keys.dart';
 
 class CounterState {
   const CounterState({
@@ -47,15 +48,14 @@ class CounterSyncService implements CounterSync {
   @override
   Future<CounterState> loadState(String counterKey, String caughtKey) async {
     await _prefs.reload();
+    final keys = CounterKeys.fromCounterKey(counterKey);
     return CounterState(
       count: _prefs.getInt(counterKey) ?? 0,
       isCaught: _prefs.getBool(caughtKey) ?? false,
-      startedAt: _readDate(_prefs.getString(_startedAtKey(counterKey))),
-      caughtAt: _readDate(_prefs.getString(_caughtAtKey(counterKey))),
-      caughtGame: _prefs.getString(_caughtGameKey(counterKey)),
-      dailyCounts: _readDailyCounts(
-        _prefs.getString(_dailyCountsKey(counterKey)),
-      ),
+      startedAt: _readDate(_prefs.getString(keys.startedAt)),
+      caughtAt: _readDate(_prefs.getString(keys.caughtAt)),
+      caughtGame: _prefs.getString(keys.caughtGame),
+      dailyCounts: _readDailyCounts(_prefs.getString(keys.dailyCounts)),
     );
   }
 
@@ -84,7 +84,7 @@ class CounterSyncService implements CounterSync {
 
   @override
   Future<void> setStartedAt(String counterKey, DateTime? startedAt) async {
-    final key = _startedAtKey(counterKey);
+    final key = CounterKeys.fromCounterKey(counterKey).startedAt;
     if (startedAt == null) {
       await _prefs.remove(key);
       return;
@@ -94,7 +94,7 @@ class CounterSyncService implements CounterSync {
 
   @override
   Future<void> setCaughtAt(String counterKey, DateTime? caughtAt) async {
-    final key = _caughtAtKey(counterKey);
+    final key = CounterKeys.fromCounterKey(counterKey).caughtAt;
     if (caughtAt == null) {
       await _prefs.remove(key);
       return;
@@ -104,7 +104,7 @@ class CounterSyncService implements CounterSync {
 
   @override
   Future<void> setCaughtGame(String counterKey, String? game) async {
-    final key = _caughtGameKey(counterKey);
+    final key = CounterKeys.fromCounterKey(counterKey).caughtGame;
     if (game == null || game.isEmpty) {
       await _prefs.remove(key);
       return;
@@ -114,9 +114,10 @@ class CounterSyncService implements CounterSync {
 
   @override
   Future<void> clearHuntDates(String counterKey) async {
-    await _prefs.remove(_startedAtKey(counterKey));
-    await _prefs.remove(_caughtAtKey(counterKey));
-    await _prefs.remove(_caughtGameKey(counterKey));
+    final keys = CounterKeys.fromCounterKey(counterKey);
+    await _prefs.remove(keys.startedAt);
+    await _prefs.remove(keys.caughtAt);
+    await _prefs.remove(keys.caughtGame);
   }
 
   @override
@@ -124,7 +125,7 @@ class CounterSyncService implements CounterSync {
     String counterKey,
     Map<String, int> counts,
   ) async {
-    final key = _dailyCountsKey(counterKey);
+    final key = CounterKeys.fromCounterKey(counterKey).dailyCounts;
     if (counts.isEmpty) {
       await _prefs.remove(key);
       return;
@@ -158,14 +159,6 @@ class CounterSyncService implements CounterSync {
 
   @override
   Future<void> closeOverlay() => FlutterOverlayWindow.closeOverlay();
-
-  String _startedAtKey(String counterKey) => '${counterKey}_startedAt';
-
-  String _caughtAtKey(String counterKey) => '${counterKey}_caughtAt';
-
-  String _caughtGameKey(String counterKey) => '${counterKey}_caughtGame';
-
-  String _dailyCountsKey(String counterKey) => '${counterKey}_dailyCounts';
 
   DateTime? _readDate(String? raw) =>
       raw == null ? null : DateTime.tryParse(raw);
