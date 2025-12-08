@@ -1,12 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 import 'package:shiny_counter/features/pokemon/overlay/widgets/round_control.dart';
+import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/hunt_state_service.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 
 @pragma('vm:entry-point')
@@ -30,6 +31,7 @@ class _OverlayAppState extends State<_OverlayApp> {
   bool _enabled = true;
   DateTime? _startedAt;
   DateTime? _caughtAt;
+  final HuntStateService _huntState = HuntStateService();
 
   @override
   void initState() {
@@ -67,38 +69,28 @@ class _OverlayAppState extends State<_OverlayApp> {
     if (!_enabled) return;
     final keys = _keys;
     if (keys == null) return;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.reload();
-    final current = prefs.getInt(keys.counter) ?? _count;
+    final sync = await CounterSyncService.instance();
+    final state = await sync.loadState(keys.counter, keys.caught);
+    final current = state.count;
     var next = current + delta;
     if (next < 0) next = 0;
-    final appliedDelta = next - current;
-
-    final wasZero = current <= 0;
-    DateTime? startedAt = _startedAt;
-    DateTime? caughtAt = _caughtAt;
-
-    if (wasZero && next > 0) {
-      startedAt = DateTime.now();
-      caughtAt = null;
-      await prefs.setString(keys.startedAt, startedAt.toIso8601String());
-      await prefs.remove(keys.caughtAt);
-    } else if (next == 0) {
-      startedAt = null;
-      caughtAt = null;
-      await prefs.remove(keys.startedAt);
-      await prefs.remove(keys.caughtAt);
-    }
-
-    await prefs.setInt(keys.counter, next);
-    if (appliedDelta != 0) {
-      await _updateDailyCounts(prefs, keys, appliedDelta);
-    }
+    final update = await _huntState.applyCountChange(
+      keys: keys,
+      sync: sync,
+      previousCount: current,
+      nextCount: next,
+      isCaught: state.isCaught,
+      startedAt: state.startedAt,
+      caughtAt: state.caughtAt,
+      caughtGame: state.caughtGame,
+      dailyCounts: state.dailyCounts,
+    );
+    await sync.setCounter(keys.counter, next);
     if (!mounted) return;
     setState(() {
       _count = next;
-      _startedAt = startedAt;
-      _caughtAt = caughtAt;
+      _startedAt = update.startedAt;
+      _caughtAt = update.caughtAt;
     });
     final message = CounterOverlayMessage(
       name: _name,
@@ -110,28 +102,9 @@ class _OverlayAppState extends State<_OverlayApp> {
   }
 
   Future<(DateTime?, DateTime?)> _loadHuntDatesFor(CounterKeys keys) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.reload();
-    final started = prefs.getString(keys.startedAt);
-    final caught = prefs.getString(keys.caughtAt);
-    return (
-      started != null ? DateTime.tryParse(started) : null,
-      caught != null ? DateTime.tryParse(caught) : null,
-    );
-  }
-
-  Future<void> _updateDailyCounts(
-    SharedPreferences prefs,
-    CounterKeys keys,
-    int delta,
-  ) async {
-    final today = DateTime.now().toIso8601String().split('T').first;
-    final raw = prefs.getString(keys.dailyCounts);
-    final map = raw == null
-        ? <String, int>{}
-        : Map<String, int>.from(jsonDecode(raw) as Map);
-    map[today] = (map[today] ?? 0) + delta;
-    await prefs.setString(keys.dailyCounts, jsonEncode(map));
+    final sync = await CounterSyncService.instance();
+    final state = await sync.loadState(keys.counter, keys.caught);
+    return (state.startedAt, state.caughtAt);
   }
 
   @override
