@@ -257,6 +257,7 @@ class CounterController extends ChangeNotifier {
     if (data is! String) return;
     if (data == 'closed') {
       _pillActive = false;
+      _overlayPoller?.cancel();
       notifyListeners();
       return;
     }
