@@ -59,7 +59,7 @@ void renderTree(Node node, StringBuffer buffer, {bool forceOpen = false}) {
       '<details ${forceOpen || child.children.isEmpty ? 'open' : ''}>'
       '<summary><span class="name">$label</span>'
       '<span class="pct ${pctClass(child)}">$pct%</span>'
-      '<span class="counts">${child.hit}/${child.found}</span>'
+      '<span class="counts">${child.hit}/${child.found} lines</span>'
       '</summary>',
     );
     if (child.children.isNotEmpty) {
@@ -109,7 +109,8 @@ void main(List<String> args) async {
   final buffer = StringBuffer()
     ..writeln('<!doctype html><html><head><meta charset="utf-8">')
     ..writeln('<style>'
-        'body{font-family:Arial,sans-serif;margin:16px;background:#f8f9fb;}'
+        'body{font-family:Arial,sans-serif;margin:16px;background:#f8f9fb;display:flex;justify-content:center;}'
+        '.container{max-width:700px;width:100%;}'
         'details{margin:4px 0;}'
         'summary{cursor:pointer;display:flex;gap:12px;align-items:center;}'
         'ul{list-style:none;padding-left:18px;margin:6px 0;}'
@@ -125,7 +126,7 @@ void main(List<String> args) async {
         'details[open]>summary:before{transform:rotate(0deg);}'
         '.header{background:#e6519a;color:white;padding:10px 12px;border-radius:8px;margin-bottom:12px;font-weight:700;}'
         '</style>')
-    ..writeln('</head><body>')
+    ..writeln('</head><body><div class="container">')
     ..writeln(
       '<div class="header">Coverage: ${root.pct.toStringAsFixed(1)}% (${root.hit}/${root.found})</div>',
     )
@@ -135,7 +136,7 @@ void main(List<String> args) async {
   renderTree(root, buffer, forceOpen: true);
   buffer
     ..writeln('</details>')
-    ..writeln('</body></html>');
+    ..writeln('</div></body></html>');
 
   stdout.write(buffer.toString());
 }
