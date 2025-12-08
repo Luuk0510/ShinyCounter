@@ -103,6 +103,7 @@ class FakeCounterSync implements CounterSync {
     int width = 360,
     int height = 220,
   }) async {
+    ensureOverlayCount++;
     await showOverlay(message, width: width, height: height);
     return true;
   }
@@ -115,10 +116,21 @@ class FakeCounterSync implements CounterSync {
   }
 
   int shareCount = 0;
+  int ensureOverlayCount = 0;
+  int setDailyCalls = 0;
 
   @override
   Future<void> shareToOverlay(CounterOverlayMessage message) async {
     shareCount++;
+  }
+
+  @override
+  Future<void> setDailyCounts(
+    String counterKey,
+    Map<String, int> counts,
+  ) async {
+    setDailyCalls++;
+    daily[counterKey] = counts;
   }
 }
 

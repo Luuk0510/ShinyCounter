@@ -164,5 +164,52 @@ void main() {
       expect(controller.startedAt, startedBefore); // preserved
       expect(sync.caught['caught_001'], isFalse);
     });
+
+    test('toggleCaught at zero sets caughtAt but not startedAt', () async {
+      final sync = FakeCounterSync();
+      final controller = CounterController(pokemon: pokemon, sync: sync);
+      await controller.init();
+
+      await controller.toggleCaught();
+
+      expect(controller.isCaught, isTrue);
+      expect(controller.caughtAt, isNotNull);
+      expect(controller.startedAt, isNull);
+    });
+
+    test('overlay message with different counterKey is ignored', () async {
+      final sync = FakeCounterSync();
+      final controller = CounterController(pokemon: pokemon, sync: sync);
+      await controller.init();
+      controller.setCounterManual(3);
+
+      sync.emitOverlay('counter:Other:counter_999:10:1');
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+
+      expect(controller.counter, 3);
+      expect(controller.isCaught, isFalse);
+    });
+
+    test('toggleOverlay when unsupported does nothing', () async {
+      final sync = FakeCounterSync();
+      final controller = CounterController(pokemon: pokemon, sync: sync);
+
+      await controller.toggleOverlay();
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+
+      expect(sync.ensureOverlayCount, greaterThan(0));
+    });
+
+    test('setDailyCounts clears zeros and skips overlay when inactive', () async {
+      final sync = FakeCounterSync();
+      final controller = CounterController(pokemon: pokemon, sync: sync);
+      await controller.init();
+
+      await controller.setDailyCounts({'2024-01-01': 0});
+
+      expect(sync.daily['counter_001'], isEmpty);
+      expect(sync.setDailyCalls, 1);
+      expect(sync.shareCount, 0); // overlay not active
+    });
   });
 }
