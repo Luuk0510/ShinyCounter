@@ -39,6 +39,7 @@ class _PokemonListPageState extends State<PokemonListPage>
   final List<Pokemon> _basePokemon = [];
   Set<String> _caught = {};
   bool _loading = true;
+  final ScrollController _listController = ScrollController();
   bool _showUncaught = true;
   bool _showCaught = true;
   AnimationController? _sheetController;
@@ -321,6 +322,7 @@ class _PokemonListPageState extends State<PokemonListPage>
   @override
   void dispose() {
     _sheetController?.dispose();
+    _listController.dispose();
     super.dispose();
   }
 
@@ -556,9 +558,15 @@ class _PokemonListPageState extends State<PokemonListPage>
       );
     }
 
-    return ListView(
-      padding: EdgeInsets.fromLTRB(0, 4, 0, bottomPadding),
-      children: sections,
+    return Scrollbar(
+      controller: _listController,
+      thumbVisibility: false,
+      interactive: true,
+      child: ListView(
+        controller: _listController,
+        padding: EdgeInsets.fromLTRB(0, 4, 0, bottomPadding),
+        children: sections,
+      ),
     );
   }
 }
