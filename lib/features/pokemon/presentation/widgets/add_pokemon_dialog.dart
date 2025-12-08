@@ -255,18 +255,32 @@ class _AddPokemonView extends StatelessWidget {
   }
 }
 
-class _SpritePicker extends StatelessWidget {
+class _SpritePicker extends StatefulWidget {
   const _SpritePicker({required this.colors, required this.availableHeight});
 
   final ColorScheme colors;
   final double availableHeight;
 
   @override
+  State<_SpritePicker> createState() => _SpritePickerState();
+}
+
+class _SpritePickerState extends State<_SpritePicker> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final controller = context.watch<AddPokemonController>();
     final headerHeightEstimate = AppSizes.toolbarHeight + AppSpacing.lg;
-    final listHeight = (availableHeight - headerHeightEstimate - AppSpacing.sm)
-        .clamp(AppSizes.listMinHeight, availableHeight)
+    final listHeight =
+        (widget.availableHeight - headerHeightEstimate - AppSpacing.sm)
+            .clamp(AppSizes.listMinHeight, widget.availableHeight)
         .toDouble();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -344,7 +358,7 @@ class _SpritePicker extends StatelessWidget {
         DecoratedBox(
           decoration: BoxDecoration(
             border: Border.all(
-              color: colors.outlineVariant.withValues(alpha: 0.6),
+              color: widget.colors.outlineVariant.withValues(alpha: 0.6),
             ),
             borderRadius: BorderRadius.circular(AppRadii.md),
           ),
@@ -360,36 +374,39 @@ class _SpritePicker extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search_off,
-                            color: colors.onSurfaceVariant,
-                            size: AppSizes.spriteThumb,
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            context.l10n.noPokemonFound,
-                            style: AppTypography.button.copyWith(
-                              color: colors.onSurfaceVariant,
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            context.l10n.tryAnotherFilter,
-                            textAlign: TextAlign.center,
-                            style: AppTypography.button.copyWith(
-                              color: colors.onSurfaceVariant.withValues(
-                                alpha: 0.9,
+                            children: [
+                              Icon(
+                                Icons.search_off,
+                                color: widget.colors.onSurfaceVariant,
+                                size: AppSizes.spriteThumb,
                               ),
-                            ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(
+                                context.l10n.noPokemonFound,
+                                style: AppTypography.button.copyWith(
+                                  color: widget.colors.onSurfaceVariant,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                context.l10n.tryAnotherFilter,
+                                textAlign: TextAlign.center,
+                                style: AppTypography.button.copyWith(
+                                  color: widget.colors.onSurfaceVariant.withValues(
+                                    alpha: 0.9,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  )
+                        ),
+                      )
                 : Scrollbar(
+                    controller: _scrollController,
                     thumbVisibility: true,
+                    interactive: true,
                     child: ListView.builder(
+                      controller: _scrollController,
                       itemCount: controller.filteredSprites.length,
                       itemBuilder: (context, index) {
                         final sprite = controller.filteredSprites[index];
@@ -405,7 +422,7 @@ class _SpritePicker extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: selected
-                                  ? colors.primary.withValues(alpha: 0.08)
+                                  ? widget.colors.primary.withValues(alpha: 0.08)
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(AppRadii.md),
                             ),
@@ -422,8 +439,8 @@ class _SpritePicker extends StatelessWidget {
                                         '#${sprite.dex}',
                                         style: AppTypography.button.copyWith(
                                           color: selected
-                                              ? colors.primary
-                                              : colors.onSurfaceVariant,
+                                              ? widget.colors.primary
+                                              : widget.colors.onSurfaceVariant,
                                         ),
                                       ),
                                       const SizedBox(height: AppSpacing.xs),
@@ -432,8 +449,8 @@ class _SpritePicker extends StatelessWidget {
                                         style: AppTypography.sectionTitle
                                             .copyWith(
                                               color: selected
-                                                  ? colors.primary
-                                                  : colors.onSurface,
+                                                  ? widget.colors.primary
+                                                  : widget.colors.onSurface,
                                             ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -455,7 +472,7 @@ class _SpritePicker extends StatelessWidget {
                                   const SizedBox(width: AppSpacing.xs),
                                   Icon(
                                     Icons.check_circle,
-                                    color: colors.primary,
+                                    color: widget.colors.primary,
                                   ),
                                 ],
                               ],
