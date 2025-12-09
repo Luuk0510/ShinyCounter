@@ -5,6 +5,7 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialog_entry.dart';
 
 class AddPokemonController extends ChangeNotifier {
@@ -108,23 +109,10 @@ class AddPokemonController extends ChangeNotifier {
   bool _matchesSelectedGen(SpriteOption sprite) {
     final gen = _selectedGen;
     if (gen == null) return true;
-    final dexNum = int.tryParse(sprite.dex) ?? 0;
-    final range = _genRanges[gen];
-    if (range == null) return true;
-    return dexNum >= range.$1 && dexNum <= range.$2;
+    final dexNum = int.tryParse(sprite.dex);
+    if (dexNum == null) return true;
+    return isDexInGen(dexNum, gen);
   }
-
-  static const Map<int, (int, int)> _genRanges = {
-    1: (1, 151),
-    2: (152, 251),
-    3: (252, 386),
-    4: (387, 493),
-    5: (494, 649),
-    6: (650, 721),
-    7: (722, 809),
-    8: (810, 905),
-    9: (906, 1025),
-  };
 
   int? _genderPriority(String token) {
     switch (token) {

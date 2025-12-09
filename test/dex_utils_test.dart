@@ -46,6 +46,15 @@ void main() {
       expect(pokemonDexString(unknown), isEmpty);
     });
 
+    test('isDexInGen respects configured ranges', () {
+      expect(isDexInGen(1, 1), isTrue);
+      expect(isDexInGen(152, 1), isFalse);
+      expect(isDexInGen(905, 8), isTrue);
+      expect(isDexInGen(906, 8), isFalse);
+      expect(isDexInGen(906, 9), isTrue);
+      expect(isDexInGen(25, null), isTrue); // null = all
+    });
+
     test('dexValueFromPokemon prefers imagePath then id', () {
       expect(dexValueFromPokemon(bulba), 1);
       expect(dexValueFromPokemon(charizard), 6);

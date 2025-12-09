@@ -37,6 +37,27 @@ String pokemonDexLabel(Pokemon pokemon) {
   return '#$padded';
 }
 
+/// Generation ranges (start, end inclusive).
+const Map<int, (int, int)> genRanges = {
+  1: (1, 151),
+  2: (152, 251),
+  3: (252, 386),
+  4: (387, 493),
+  5: (494, 649),
+  6: (650, 721),
+  7: (722, 809),
+  8: (810, 905),
+  9: (906, 1025),
+};
+
+/// Returns true if the dex number is within the given generation.
+bool isDexInGen(int dex, int? gen) {
+  if (gen == null) return true;
+  final range = genRanges[gen];
+  if (range == null) return true;
+  return dex >= range.$1 && dex <= range.$2;
+}
+
 int dexValueFromPokemon(Pokemon pokemon) {
   final fromNumber = dexNumberFromPokemon(pokemon);
   if (fromNumber != null) return fromNumber;

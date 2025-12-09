@@ -511,11 +511,20 @@ class _ManageListView extends StatefulWidget {
 class _ManageListViewState extends State<_ManageListView> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
+  int? _selectedGen; // null = all
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  bool _matchesGen(Pokemon p) {
+    final gen = _selectedGen;
+    if (gen == null) return true;
+    final dexNum = dexNumberFromPokemon(p);
+    if (dexNum == null) return true;
+    return isDexInGen(dexNum, gen);
   }
 
   @override
@@ -528,9 +537,11 @@ class _ManageListViewState extends State<_ManageListView> {
         ? widget.pokemonSorted
         : widget.pokemonSorted.where((p) {
             final dex = pokemonDexString(p);
-            return p.name.toLowerCase().contains(filter) ||
-                dex.contains(filter.replaceAll('#', '')) ||
-                (digitsOnly.isNotEmpty && dex.contains(digitsOnly));
+            return (filter.isEmpty ||
+                    p.name.toLowerCase().contains(filter) ||
+                    dex.contains(filter.replaceAll('#', '')) ||
+                    (digitsOnly.isNotEmpty && dex.contains(digitsOnly))) &&
+                _matchesGen(p);
           }).toList();
 
     return SafeArea(
@@ -582,6 +593,48 @@ class _ManageListViewState extends State<_ManageListView> {
                             _searchController.clear();
                           }),
                         ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              SizedBox(
+                width: double.infinity,
+                child: DropdownButtonFormField<int?>(
+                  initialValue: _selectedGen,
+                  isDense: true,
+                  alignment: Alignment.centerLeft,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.sm,
+                    ),
+                  ),
+                  onChanged: (gen) => setState(() => _selectedGen = gen),
+                  items: [
+                    DropdownMenuItem<int?>(
+                      value: null,
+                      child: SizedBox(
+                        width: AppSizes.dropdownWidth - AppSpacing.lg,
+                        child: Text(
+                          context.l10n.filterAllGens,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    for (final gen in List.generate(9, (i) => i + 1))
+                      DropdownMenuItem<int?>(
+                        value: gen,
+                        child: SizedBox(
+                          width: AppSizes.dropdownWidth - AppSpacing.lg,
+                          child: Text(
+                            'Gen $gen',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
