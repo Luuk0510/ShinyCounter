@@ -26,11 +26,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get tooltipSettings => 'Instellingen';
 
-  @override
-  String get noPokemonFoundShort {
-    return 'Geen Pokémon gevonden';
-  }
-
   String get manageTitle => 'Beheer Pokémon';
 
   @override

@@ -26,11 +26,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tooltipSettings => 'Settings';
 
-  @override
-  String get noPokemonFoundShort {
-    return 'No Pokémon found';
-  }
-
   String get manageTitle => 'Manage Pokémon';
 
   @override
