@@ -586,51 +586,82 @@ class _ManageListViewState extends State<_ManageListView> {
               ),
               const SizedBox(height: AppSpacing.md),
               Flexible(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: filtered.length,
-                  itemBuilder: (context, index) {
-                    final p = filtered[index];
-                    return ListTile(
-                      leading: ManagePokemonImage(pokemon: p),
-                      title: Text(
-                        p.name,
-                        style: AppTypography.listTitle.copyWith(
-                          color: colors.onSurface,
-                          fontWeight: FontWeight.w700,
+                child: filtered.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.search_off,
+                              color: colors.onSurfaceVariant,
+                              size: AppSizes.spriteThumb,
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              context.l10n.noPokemonFound,
+                              style: AppTypography.button.copyWith(
+                                color: colors.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              context.l10n.tryAnotherFilter,
+                              textAlign: TextAlign.center,
+                              style: AppTypography.button.copyWith(
+                                color: colors.onSurfaceVariant.withValues(
+                                  alpha: 0.9,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
+                      )
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: filtered.length,
+                        itemBuilder: (context, index) {
+                          final p = filtered[index];
+                          return ListTile(
+                            leading: ManagePokemonImage(pokemon: p),
+                            title: Text(
+                              p.name,
+                              style: AppTypography.listTitle.copyWith(
+                                color: colors.onSurface,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            subtitle: Text(
+                              pokemonDexLabel(p),
+                              style: AppTypography.button.copyWith(
+                                color: colors.onSurfaceVariant,
+                              ),
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  tooltip: context.l10n.manageEditTooltip,
+                                  onPressed: () => Navigator.of(context).pop(
+                                    ManageAction(pokemon: p, delete: false),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline),
+                                  tooltip: context.l10n.manageDeleteTooltip,
+                                  color: colors.error,
+                                  onPressed: () => Navigator.of(
+                                    context,
+                                  ).pop(ManageAction(pokemon: p, delete: true)),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        separatorBuilder: (context, _) =>
+                            const Divider(height: AppSpacing.md),
                       ),
-                      subtitle: Text(
-                        pokemonDexLabel(p),
-                        style: AppTypography.button.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            tooltip: context.l10n.manageEditTooltip,
-                            onPressed: () => Navigator.of(
-                              context,
-                            ).pop(ManageAction(pokemon: p, delete: false)),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            tooltip: context.l10n.manageDeleteTooltip,
-                            color: colors.error,
-                            onPressed: () => Navigator.of(
-                              context,
-                            ).pop(ManageAction(pokemon: p, delete: true)),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, _) =>
-                      const Divider(height: AppSpacing.md),
-                ),
               ),
             ],
           ),
