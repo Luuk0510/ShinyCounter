@@ -20,6 +20,7 @@ import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
+import 'package:shiny_counter/core/theme/app_assets.dart';
 
 // Toggle to include the full dex by default. Off preserves the original
 // behavior (only custom/selected Pokémon).
@@ -465,7 +466,7 @@ class _PokemonListPageState extends State<PokemonListPage>
     if (_allPokemon.isEmpty) {
       return PokemonEmptyState(
         onAddPressed: _onAddPokemon,
-        imageAsset: 'assets/icon/pokeball_icon.png',
+        imageAsset: AppAssets.pokeballIcon,
         colors: colors,
         title: context.l10n.emptyTitle,
         actionLabel: context.l10n.emptyAction,
