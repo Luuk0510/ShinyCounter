@@ -573,69 +573,75 @@ class _ManageListViewState extends State<_ManageListView> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              TextField(
-                controller: _searchController,
-                onChanged: (value) => setState(() => _query = value),
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search),
-                  hintText: context.l10n.searchByNameOrDex,
-                  isDense: true,
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  suffixIcon: _query.isEmpty
-                      ? null
-                      : IconButton(
-                          icon: const Icon(Icons.close),
-                          tooltip: context.l10n.cancel,
-                          onPressed: () => setState(() {
-                            _query = '';
-                            _searchController.clear();
-                          }),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) => setState(() => _query = value),
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.search),
+                        hintText: context.l10n.searchByNameOrDex,
+                        isDense: true,
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
                         ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              SizedBox(
-                width: double.infinity,
-                child: DropdownButtonFormField<int?>(
-                  initialValue: _selectedGen,
-                  isDense: true,
-                  alignment: Alignment.centerLeft,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: AppSpacing.sm,
-                    ),
-                  ),
-                  onChanged: (gen) => setState(() => _selectedGen = gen),
-                  items: [
-                    DropdownMenuItem<int?>(
-                      value: null,
-                      child: SizedBox(
-                        width: AppSizes.dropdownWidth - AppSpacing.lg,
-                        child: Text(
-                          context.l10n.filterAllGens,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        suffixIcon: _query.isEmpty
+                            ? null
+                            : IconButton(
+                                icon: const Icon(Icons.close),
+                                tooltip: context.l10n.cancel,
+                                onPressed: () => setState(() {
+                                  _query = '';
+                                  _searchController.clear();
+                                }),
+                              ),
                       ),
                     ),
-                    for (final gen in List.generate(9, (i) => i + 1))
-                      DropdownMenuItem<int?>(
-                        value: gen,
-                        child: SizedBox(
-                          width: AppSizes.dropdownWidth - AppSpacing.lg,
-                          child: Text(
-                            'Gen $gen',
-                            overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  SizedBox(
+                    width: AppSizes.dropdownWidth,
+                    child: DropdownButtonFormField<int?>(
+                      initialValue: _selectedGen,
+                      isDense: true,
+                      alignment: Alignment.centerLeft,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: AppSpacing.sm,
+                        ),
+                      ),
+                      onChanged: (gen) => setState(() => _selectedGen = gen),
+                      items: [
+                        DropdownMenuItem<int?>(
+                          value: null,
+                          child: SizedBox(
+                            width: AppSizes.dropdownWidth - AppSpacing.lg,
+                            child: Text(
+                              context.l10n.filterAllGens,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
-                      ),
-                  ],
-                ),
+                        for (final gen in List.generate(9, (i) => i + 1))
+                          DropdownMenuItem<int?>(
+                            value: gen,
+                            child: SizedBox(
+                              width: AppSizes.dropdownWidth - AppSpacing.lg,
+                              child: Text(
+                                'Gen $gen',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: AppSpacing.md),
               Flexible(
