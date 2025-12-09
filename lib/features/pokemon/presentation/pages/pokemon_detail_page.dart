@@ -205,10 +205,22 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         centerTitle: true,
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(AppRadii.lg),
+          ),
+        ),
         flexibleSpace: Builder(
           builder: (context) {
             final scopedCard = Theme.of(context).cardColor;
-            return Container(color: scopedCard);
+            return Container(
+              decoration: BoxDecoration(
+                color: scopedCard,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(AppRadii.lg),
+                ),
+              ),
+            );
           },
         ),
         title: Text(

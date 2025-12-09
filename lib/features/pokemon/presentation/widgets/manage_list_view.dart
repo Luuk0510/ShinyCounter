@@ -109,7 +109,9 @@ class _ManageListViewState extends State<ManageListView> {
                         hintText: context.l10n.searchByNameOrDex,
                         isDense: true,
                         border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(AppRadii.sm),
+                          ),
                         ),
                         suffixIcon: _query.isEmpty
                             ? null
@@ -133,7 +135,9 @@ class _ManageListViewState extends State<ManageListView> {
                       alignment: Alignment.centerLeft,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(AppRadii.sm),
+                          ),
                         ),
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: AppSpacing.sm,
