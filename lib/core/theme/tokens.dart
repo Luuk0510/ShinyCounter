@@ -97,9 +97,12 @@ class AppSizes {
   static const sheetButtonFont = 16.0;
   static const sheetDateWidth = 110.0;
   static const sheetListHeightFactor = 0.72;
+  static const pageIndicatorDot = 8.0;
+  static const primaryButtonWidth = 150.0;
 }
 
 class AppAnim {
+  static const faster = Duration(milliseconds: 90);
   static const fast = Duration(milliseconds: 120);
   static const normal = Duration(milliseconds: 200);
   static const switcher = Duration(milliseconds: 220);

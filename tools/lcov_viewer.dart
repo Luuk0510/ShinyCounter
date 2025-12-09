@@ -82,12 +82,18 @@ void main(List<String> args) async {
   final records = <Record>[];
   String? file;
   int hit = 0, found = 0;
+  bool ignoreRecord = false;
   for (final line in lines) {
     if (line.startsWith('SF:')) {
       file = line.substring(3);
+      final normalized = file.replaceAll('\\', '/');
+      ignoreRecord =
+          normalized.contains('/lib/l10n/gen/') ||
+          normalized.endsWith('/lib/l10n/app_localizations.dart');
       hit = 0;
       found = 0;
     } else if (line.startsWith('DA:')) {
+      if (ignoreRecord || file == null) continue;
       final parts = line.substring(3).split(',');
       if (parts.length >= 2) {
         final hits = int.tryParse(parts[1]) ?? 0;
@@ -95,8 +101,11 @@ void main(List<String> args) async {
         found++;
       }
     } else if (line == 'end_of_record' && file != null) {
-      records.add(Record(file, hit, found));
+      if (!ignoreRecord) {
+        records.add(Record(file, hit, found));
+      }
       file = null;
+      ignoreRecord = false;
     }
   }
 

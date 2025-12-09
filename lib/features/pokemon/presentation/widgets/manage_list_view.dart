@@ -98,18 +98,20 @@ class _ManageListViewState extends State<ManageListView> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-      Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _searchController,
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
                       onChanged: (value) => setState(() => _query = value),
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.search),
                         hintText: context.l10n.searchByNameOrDex,
                         isDense: true,
                         border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(AppRadii.sm),
+                          ),
                         ),
                         suffixIcon: _query.isEmpty
                             ? null
@@ -124,46 +126,53 @@ class _ManageListViewState extends State<ManageListView> {
                       ),
                     ),
                   ),
-          const SizedBox(width: AppSpacing.sm),
-          Flexible(
-            child: DropdownButtonFormField<int?>(
-              initialValue: _selectedGen,
-              isDense: true,
-              isExpanded: true,
-              alignment: Alignment.centerLeft,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.sm,
-                        ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Flexible(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: AppSizes.dropdownWidth,
                       ),
-                      onChanged: (gen) => setState(() => _selectedGen = gen),
-                      items: [
-                        DropdownMenuItem<int?>(
-                          value: null,
-                          child: SizedBox(
-                            width: AppSizes.dropdownWidth - AppSpacing.lg,
-                            child: Text(
-                              context.l10n.filterAllGens,
-                              overflow: TextOverflow.ellipsis,
+                      child: DropdownButtonFormField<int?>(
+                        initialValue: _selectedGen,
+                        isDense: true,
+                        isExpanded: true,
+                        alignment: Alignment.centerLeft,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(AppRadii.sm),
                             ),
                           ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: AppSpacing.sm,
+                          ),
                         ),
-                        for (final gen in List.generate(9, (i) => i + 1))
+                        onChanged: (gen) => setState(() => _selectedGen = gen),
+                        items: [
                           DropdownMenuItem<int?>(
-                            value: gen,
+                            value: null,
                             child: SizedBox(
                               width: AppSizes.dropdownWidth - AppSpacing.lg,
                               child: Text(
-                                'Gen $gen',
+                                context.l10n.filterAllGens,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ),
-                      ],
+                          for (final gen in List.generate(9, (i) => i + 1))
+                            DropdownMenuItem<int?>(
+                              value: gen,
+                              child: SizedBox(
+                                width: AppSizes.dropdownWidth - AppSpacing.lg,
+                                child: Text(
+                                  'Gen $gen',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -193,8 +202,9 @@ class _ManageListViewState extends State<ManageListView> {
                               context.l10n.tryAnotherFilter,
                               textAlign: TextAlign.center,
                               style: AppTypography.button.copyWith(
-                                color: colors.onSurfaceVariant
-                                    .withValues(alpha: 0.9),
+                                color: colors.onSurfaceVariant.withValues(
+                                  alpha: 0.9,
+                                ),
                               ),
                             ),
                           ],
@@ -234,9 +244,9 @@ class _ManageListViewState extends State<ManageListView> {
                                   icon: const Icon(Icons.delete_outline),
                                   tooltip: context.l10n.manageDeleteTooltip,
                                   color: colors.error,
-                                  onPressed: () => Navigator.of(context).pop(
-                                    ManageAction(pokemon: p, delete: true),
-                                  ),
+                                  onPressed: () => Navigator.of(
+                                    context,
+                                  ).pop(ManageAction(pokemon: p, delete: true)),
                                 ),
                               ],
                             ),

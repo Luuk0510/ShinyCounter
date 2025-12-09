@@ -59,7 +59,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emptyAction => 'Add Pokémon';
 
   @override
-  String get addDialogTitle => 'New Pokémon';
+  String get addDialogTitle => 'Add new Pokémon';
 
   @override
   String get editDialogTitle => 'Edit Pokémon';

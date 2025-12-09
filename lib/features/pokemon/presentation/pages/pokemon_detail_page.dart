@@ -67,13 +67,18 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
   Future<void> _loadSprites() async {
     final parsed = SpriteParser.parse(widget.pokemon.imagePath.split('/').last);
-    if (parsed == null) return;
+    if (parsed == null) {
+      if (mounted) {
+        setState(() => _spritesLoading = false);
+      }
+      return;
+    }
     setState(() => _spritesLoading = true);
     final service = context.read<SpriteService>();
     final assets = await service.spritesForDex(parsed.dex);
-    final shiny = assets.where((p) => p.shiny).toList()
-      ..sort((a, b) => a.form.compareTo(b.form));
-    final normal = assets.where((p) => !p.shiny).toList();
+    final shiny = assets.where((p) => p.shiny).toList()..sort(_compareSprites);
+    final normal = assets.where((p) => !p.shiny).toList()
+      ..sort(_compareSprites);
     _normalMap.clear();
     for (final s in shiny) {
       final match = normal.firstWhere(
@@ -88,6 +93,20 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       _showNormal = false;
       _spritesLoading = false;
     });
+  }
+
+  int _compareSprites(ParsedSprite a, ParsedSprite b) {
+    final rankA = _formRank(a.form);
+    final rankB = _formRank(b.form);
+    if (rankA != rankB) return rankA.compareTo(rankB);
+    return a.form.compareTo(b.form);
+  }
+
+  int _formRank(String form) {
+    // Ensure mega variants appear before gmax in swipe order.
+    if (form.contains('mega')) return 1;
+    if (form.contains('gmax')) return 2;
+    return 0;
   }
 
   @override
@@ -122,7 +141,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
   Future<void> _handleCatchTap() async {
     setState(() => _buttonPressed = true);
-    await Future.delayed(AppAnim.fast);
+    await Future.delayed(AppAnim.faster);
     if (mounted) setState(() => _buttonPressed = false);
     await _toggleCaught();
   }
@@ -200,10 +219,22 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         centerTitle: true,
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(AppRadii.lg),
+          ),
+        ),
         flexibleSpace: Builder(
           builder: (context) {
             final scopedCard = Theme.of(context).cardColor;
-            return Container(color: scopedCard);
+            return Container(
+              decoration: BoxDecoration(
+                color: scopedCard,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(AppRadii.lg),
+                ),
+              ),
+            );
           },
         ),
         title: Text(
@@ -231,7 +262,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
           final bottomInset = mediaQuery.viewInsets.bottom;
           final isPortrait = mediaQuery.orientation == Orientation.portrait;
           final bottomPadding =
-              mediaQuery.padding.bottom + bottomInset + (isPortrait ? 60 : 16);
+              mediaQuery.padding.bottom +
+              bottomInset +
+              (isPortrait ? AppSizes.cardPaddingH * 3 : AppSpacing.md);
 
           return SingleChildScrollView(
             padding: EdgeInsets.zero,
@@ -335,15 +368,23 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
     final assetPaths = <String>[];
     for (final path in sprites) {
-      if (widget.pokemon.isLocalFile && !path.startsWith('assets/')) {
-        precacheImage(FileImage(File(path)), context);
+      final provider = _imageProviderFor(
+        path,
+        isLocal: widget.pokemon.isLocalFile,
+      );
+      if (provider is FileImage) {
+        precacheImage(provider, context);
       } else {
         assetPaths.add(path);
       }
       final normal = _normalMap[path];
       if (normal != null) {
-        if (widget.pokemon.isLocalFile && !normal.startsWith('assets/')) {
-          precacheImage(FileImage(File(normal)), context);
+        final normalProvider = _imageProviderFor(
+          normal,
+          isLocal: widget.pokemon.isLocalFile,
+        );
+        if (normalProvider is FileImage) {
+          precacheImage(normalProvider, context);
         } else {
           assetPaths.add(normal);
         }
@@ -382,27 +423,18 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                       final normalPath = _normalMap[shinyPath];
                       final showNormal = _showNormal && normalPath != null;
                       final path = showNormal ? normalPath : shinyPath;
-                      final image =
-                          widget.pokemon.isLocalFile &&
-                              !path.startsWith('assets/')
-                          ? Image.file(
-                              File(path),
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stack) =>
-                                  const Icon(
-                                    Icons.catching_pokemon,
-                                    size: AppSizes.detailImageFallback,
-                                  ),
-                            )
-                          : Image.asset(
-                              path,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stack) =>
-                                  const Icon(
-                                    Icons.catching_pokemon,
-                                    size: AppSizes.detailImageFallback,
-                                  ),
-                            );
+                      final provider = _imageProviderFor(
+                        path,
+                        isLocal: widget.pokemon.isLocalFile,
+                      );
+                      final image = Image(
+                        image: provider,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stack) => const Icon(
+                          Icons.catching_pokemon,
+                          size: AppSizes.detailImageFallback,
+                        ),
+                      );
                       return Center(
                         child: AnimatedSwitcher(
                           duration: AppAnim.switcher,
@@ -428,8 +460,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
               sprites.length,
               (i) => Container(
                 margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                width: 8,
-                height: 8,
+                width: AppSizes.pageIndicatorDot,
+                height: AppSizes.pageIndicatorDot,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: i == _currentSpriteIndex
@@ -454,17 +486,17 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       duration: AppAnim.fast,
       curve: AppAnim.easeOutCubic,
       child: AnimatedContainer(
-        duration: AppAnim.normal,
+        duration: AppAnim.fast,
         curve: AppAnim.easeOut,
-        width: 150,
+        width: AppSizes.primaryButtonWidth,
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadii.md),
         ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadii.md),
             onTap: _handleCatchTap,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
@@ -498,5 +530,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       return shinyPath.replaceFirst('_r.', '_n.');
     }
     return null;
+  }
+
+  ImageProvider _imageProviderFor(String path, {required bool isLocal}) {
+    if (isLocal && !path.startsWith('assets/')) {
+      return FileImage(File(path));
+    }
+    return AssetImage(path);
   }
 }

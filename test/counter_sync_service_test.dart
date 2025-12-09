@@ -102,6 +102,7 @@ void main() {
             case 'requestPermission':
               return requestGranted;
             case 'isActive':
+            case 'isOverlayActive':
               return isActive;
             case 'showOverlay':
               showCalled = true;
@@ -194,5 +195,45 @@ void main() {
     final result = await sync.ensureOverlay(message);
 
     expect(result, isTrue);
+  });
+
+  test('isOverlayActive returns channel value', () async {
+    isActive = true;
+
+    final result = await sync.isOverlayActive();
+
+    expect(result, isTrue);
+    expect(calls.map((c) => c.method), contains('isOverlayActive'));
+  });
+
+  test('closeOverlay delegates to channel', () async {
+    await sync.closeOverlay();
+
+    expect(calls.map((c) => c.method), contains('closeOverlay'));
+  });
+
+  test('loadState handles invalid dailyCounts json', () async {
+    final keys = CounterKeys.fromCounterKey(counterKey);
+    store.strings[keys.dailyCounts] = 'not-json';
+
+    final state = await sync.loadState(counterKey, caughtKey);
+
+    expect(state.dailyCounts, isEmpty);
+  });
+
+  test('setStartedAt/setCaughtAt remove values when null', () async {
+    final keys = CounterKeys.fromCounterKey(counterKey);
+    final now = DateTime(2024, 1, 1);
+
+    await sync.setStartedAt(counterKey, now);
+    await sync.setCaughtAt(counterKey, now);
+    expect(store.strings.containsKey(keys.startedAt), isTrue);
+    expect(store.strings.containsKey(keys.caughtAt), isTrue);
+
+    await sync.setStartedAt(counterKey, null);
+    await sync.setCaughtAt(counterKey, null);
+
+    expect(store.strings.containsKey(keys.startedAt), isFalse);
+    expect(store.strings.containsKey(keys.caughtAt), isFalse);
   });
 }

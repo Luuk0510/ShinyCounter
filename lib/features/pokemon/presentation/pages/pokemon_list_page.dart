@@ -395,7 +395,9 @@ class _PokemonListPageState extends State<PokemonListPage>
       centerTitle: true,
       toolbarHeight: AppSizes.toolbarHeight,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(AppRadii.lg),
+        ),
       ),
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
@@ -406,7 +408,7 @@ class _PokemonListPageState extends State<PokemonListPage>
             decoration: BoxDecoration(
               color: scopedCard,
               borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(30),
+                bottom: Radius.circular(AppRadii.lg),
               ),
             ),
           );
