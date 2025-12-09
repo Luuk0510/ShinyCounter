@@ -87,7 +87,8 @@ void main(List<String> args) async {
     if (line.startsWith('SF:')) {
       file = line.substring(3);
       final normalized = file.replaceAll('\\', '/');
-      ignoreRecord = normalized.contains('/lib/l10n/gen/') ||
+      ignoreRecord =
+          normalized.contains('/lib/l10n/gen/') ||
           normalized.endsWith('/lib/l10n/app_localizations.dart');
       hit = 0;
       found = 0;
