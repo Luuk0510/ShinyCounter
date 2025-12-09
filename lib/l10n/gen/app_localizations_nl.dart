@@ -9,7 +9,7 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
-  String get appTitle => 'Pokémon shiny counter';
+  String get appTitle => 'Shiny counter';
 
   @override
   String get sectionUncaught => 'Niet gevangen';

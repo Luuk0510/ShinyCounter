@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Pok\u00e9mon shiny counter",
+  "appTitle": "Shiny counter",
   "sectionUncaught": "Uncaught",
   "sectionCaught": "Caught",
   "tooltipAddPokemon": "New Pok\u00e9mon",
