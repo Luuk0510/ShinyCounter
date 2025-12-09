@@ -59,7 +59,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get emptyAction => 'Voeg Pokémon toe';
 
   @override
-  String get addDialogTitle => 'Nieuwe Pokémon';
+  String get addDialogTitle => 'Nieuwe Pokémon toevoegen';
 
   @override
   String get editDialogTitle => 'Pokémon bewerken';
