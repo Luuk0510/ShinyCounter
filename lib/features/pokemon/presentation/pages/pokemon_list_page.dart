@@ -350,127 +350,9 @@ class _PokemonListPageState extends State<PokemonListPage>
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
       ),
-      builder: (context) {
-        final colors = Theme.of(context).colorScheme;
-        final viewInsets = MediaQuery.of(context).viewInsets.bottom;
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            final filter = query.trim().toLowerCase();
-            final digitsOnly = filter.replaceAll(RegExp(r'[^0-9]'), '');
-            final filtered = filter.isEmpty && digitsOnly.isEmpty
-                ? pokemonSorted
-                : pokemonSorted.where((p) {
-                    final dex = pokemonDexString(p);
-                    return p.name.toLowerCase().contains(filter) ||
-                        dex.contains(filter.replaceAll('#', '')) ||
-                        (digitsOnly.isNotEmpty && dex.contains(digitsOnly));
-                  }).toList();
-
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.md,
-                  AppSpacing.lg,
-                  AppSpacing.lg,
-                ),
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: viewInsets),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: AppSizes.sheetHandleWidth,
-                        height: AppSizes.sheetHandleHeight,
-                        decoration: BoxDecoration(
-                          color: colors.outlineVariant.withValues(alpha: 0.9),
-                          borderRadius: BorderRadius.circular(AppRadii.sm),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(
-                        context.l10n.manageTitle,
-                        style: AppTypography.title.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      TextField(
-                        controller: searchController,
-                        onChanged: (value) {
-                          setModalState(() => query = value);
-                        },
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.search),
-                          hintText: context.l10n.searchByNameOrDex,
-                          isDense: true,
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Flexible(
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          itemCount: filtered.length,
-                          itemBuilder: (context, index) {
-                            final p = filtered[index];
-                            return ListTile(
-                              leading: _ManagePokemonImage(pokemon: p),
-                              title: Text(
-                                p.name,
-                                style: AppTypography.listTitle.copyWith(
-                                  color: colors.onSurface,
-                                  fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            subtitle: Text(
-                              pokemonDexLabel(p),
-                              style: AppTypography.button.copyWith(
-                                color: colors.onSurfaceVariant,
-                              ),
-                            ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    tooltip: context.l10n.manageEditTooltip,
-                                    onPressed: () => Navigator.of(context).pop(
-                                      _ManageAction(
-                                        pokemon: p,
-                                        delete: false,
-                                      ),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete_outline),
-                                    tooltip: context.l10n.manageDeleteTooltip,
-                                    color: colors.error,
-                                    onPressed: () => Navigator.of(context).pop(
-                                      _ManageAction(
-                                        pokemon: p,
-                                        delete: true,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                          separatorBuilder: (context, _) =>
-                              const Divider(height: AppSpacing.md),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
+      builder: (context) => _ManageListView(
+        pokemonSorted: pokemonSorted,
+      ),
     );
 
     if (action == null) return;
@@ -719,6 +601,137 @@ class _ManagePokemonImage extends StatelessWidget {
               errorBuilder: (context, error, stack) =>
                   Icon(Icons.catching_pokemon, size: size * 0.55),
             ),
+    );
+  }
+}
+
+class _ManageListView extends StatefulWidget {
+  const _ManageListView({required this.pokemonSorted});
+
+  final List<Pokemon> pokemonSorted;
+
+  @override
+  State<_ManageListView> createState() => _ManageListViewState();
+}
+
+class _ManageListViewState extends State<_ManageListView> {
+  final TextEditingController _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
+    final filter = _query.trim().toLowerCase();
+    final digitsOnly = filter.replaceAll(RegExp(r'[^0-9]'), '');
+    final filtered = filter.isEmpty && digitsOnly.isEmpty
+        ? widget.pokemonSorted
+        : widget.pokemonSorted.where((p) {
+            final dex = pokemonDexString(p);
+            return p.name.toLowerCase().contains(filter) ||
+                dex.contains(filter.replaceAll('#', '')) ||
+                (digitsOnly.isNotEmpty && dex.contains(digitsOnly));
+          }).toList();
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.md,
+          AppSpacing.lg,
+          AppSpacing.lg,
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(bottom: viewInsets),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: AppSizes.sheetHandleWidth,
+                height: AppSizes.sheetHandleHeight,
+                decoration: BoxDecoration(
+                  color: colors.outlineVariant.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(AppRadii.sm),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                context.l10n.manageTitle,
+                style: AppTypography.title.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              TextField(
+                controller: _searchController,
+                onChanged: (value) => setState(() => _query = value),
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.search),
+                  hintText: context.l10n.searchByNameOrDex,
+                  isDense: true,
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: filtered.length,
+                  itemBuilder: (context, index) {
+                    final p = filtered[index];
+                    return ListTile(
+                      leading: _ManagePokemonImage(pokemon: p),
+                      title: Text(
+                        p.name,
+                        style: AppTypography.listTitle.copyWith(
+                          color: colors.onSurface,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      subtitle: Text(
+                        pokemonDexLabel(p),
+                        style: AppTypography.button.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            tooltip: context.l10n.manageEditTooltip,
+                            onPressed: () => Navigator.of(context).pop(
+                              _ManageAction(pokemon: p, delete: false),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            tooltip: context.l10n.manageDeleteTooltip,
+                            color: colors.error,
+                            onPressed: () => Navigator.of(context).pop(
+                              _ManageAction(pokemon: p, delete: true),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, _) =>
+                      const Divider(height: AppSpacing.md),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
