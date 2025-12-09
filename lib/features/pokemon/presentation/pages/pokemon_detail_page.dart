@@ -67,7 +67,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
   Future<void> _loadSprites() async {
     final parsed = SpriteParser.parse(widget.pokemon.imagePath.split('/').last);
-    if (parsed == null) return;
+    if (parsed == null) {
+      if (mounted) {
+        setState(() => _spritesLoading = false);
+      }
+      return;
+    }
     setState(() => _spritesLoading = true);
     final service = context.read<SpriteService>();
     final assets = await service.spritesForDex(parsed.dex);
