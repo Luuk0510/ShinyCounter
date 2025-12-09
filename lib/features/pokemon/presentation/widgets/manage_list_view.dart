@@ -26,7 +26,7 @@ class ManagePokemonImage extends StatelessWidget {
         width: size,
         height: size,
         fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) =>
+        errorBuilder: (_, error, stack) =>
             Icon(Icons.catching_pokemon, size: size * 0.55),
       ),
     );

@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
@@ -20,7 +17,6 @@ import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
-import 'package:shiny_counter/core/theme/app_assets.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/manage_list_view.dart';
 
 // Toggle to include the full dex by default. Off preserves the original
