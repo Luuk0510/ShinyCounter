@@ -418,6 +418,19 @@ class _PokemonListPageState extends State<PokemonListPage>
         fit: BoxFit.scaleDown,
         child: Text(context.l10n.appTitle, style: AppTypography.title),
       ),
+      leadingWidth: AppSizes.toolbarHeight,
+      leading: Padding(
+        padding: const EdgeInsets.only(left: AppSpacing.sm),
+        child: Center(
+          child: Image.asset(
+            'assets/icon/app_icon.png',
+            width: 28,
+            height: 28,
+            errorBuilder: (_, error, stack) =>
+                const Icon(Icons.catching_pokemon, size: 24),
+          ),
+        ),
+      ),
       actions: [
         IconButton(
           iconSize: 26,
