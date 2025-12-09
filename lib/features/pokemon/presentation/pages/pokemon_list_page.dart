@@ -533,15 +533,14 @@ class _ManageListViewState extends State<_ManageListView> {
     final viewInsets = MediaQuery.of(context).viewInsets.bottom;
     final filter = _query.trim().toLowerCase();
     final digitsOnly = filter.replaceAll(RegExp(r'[^0-9]'), '');
+    final byGen = widget.pokemonSorted.where(_matchesGen).toList();
     final filtered = filter.isEmpty && digitsOnly.isEmpty
-        ? widget.pokemonSorted
-        : widget.pokemonSorted.where((p) {
+        ? byGen
+        : byGen.where((p) {
             final dex = pokemonDexString(p);
-            return (filter.isEmpty ||
-                    p.name.toLowerCase().contains(filter) ||
-                    dex.contains(filter.replaceAll('#', '')) ||
-                    (digitsOnly.isNotEmpty && dex.contains(digitsOnly))) &&
-                _matchesGen(p);
+            return p.name.toLowerCase().contains(filter) ||
+                dex.contains(filter.replaceAll('#', '')) ||
+                (digitsOnly.isNotEmpty && dex.contains(digitsOnly));
           }).toList();
 
     return SafeArea(
