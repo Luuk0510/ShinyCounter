@@ -7,6 +7,7 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/core/theme/app_assets.dart';
 import 'package:shiny_counter/core/di/app_locator.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
@@ -414,22 +415,20 @@ class _PokemonListPageState extends State<PokemonListPage>
         },
       ),
       foregroundColor: colors.onSurface,
-      title: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(context.l10n.appTitle, style: AppTypography.title),
-      ),
-      leadingWidth: AppSizes.toolbarHeight,
-      leading: Padding(
-        padding: const EdgeInsets.only(left: AppSpacing.sm),
-        child: Center(
-          child: Image.asset(
-            'assets/icon/app_icon.png',
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            AppAssets.appIcon,
             width: 28,
             height: 28,
             errorBuilder: (_, error, stack) =>
                 const Icon(Icons.catching_pokemon, size: 24),
           ),
-        ),
+          const SizedBox(width: AppSpacing.sm),
+          Text(context.l10n.appTitle, style: AppTypography.title),
+        ],
       ),
       actions: [
         IconButton(
