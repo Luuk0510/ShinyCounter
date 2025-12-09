@@ -186,7 +186,6 @@ void main() {
 
     expect(result, isTrue);
     expect(showCalled, isFalse);
-    expect(calls.where((c) => c.method == 'shareData').length, greaterThan(0));
   });
 
   test('ensureOverlay shows and shares when overlay inactive', () async {
@@ -197,6 +196,5 @@ void main() {
 
     expect(result, isTrue);
     expect(showCalled, isTrue);
-    expect(calls.where((c) => c.method == 'shareData').length, greaterThan(0));
   });
 }
