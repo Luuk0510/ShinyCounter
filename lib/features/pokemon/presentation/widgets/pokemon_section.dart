@@ -46,25 +46,39 @@ class PokemonSection extends StatelessWidget {
             ),
           ),
         ),
-        AnimatedSize(
+        AnimatedSwitcher(
           duration: AppAnim.normal,
-          curve: AppAnim.easeOut,
-          alignment: Alignment.topCenter,
-          child: ClipRect(
-            child: expanded
-                ? Column(
-                    children: [
-                      for (final p in pokemons)
-                        PokemonCard(
-                          key: ValueKey(p.id),
-                          pokemon: p,
-                          isCaught: isCaught(p),
-                          onTap: () => onTap(p),
-                        ),
-                    ],
-                  )
-                : const SizedBox.shrink(),
-          ),
+          switchInCurve: AppAnim.easeOutCubic,
+          switchOutCurve: AppAnim.easeOutCubic,
+          transitionBuilder: (child, animation) {
+            final curved = CurvedAnimation(
+              parent: animation,
+              curve: AppAnim.easeOutCubic,
+            );
+            return FadeTransition(
+              opacity: curved,
+              child: SizeTransition(
+                axis: Axis.vertical,
+                axisAlignment: -1,
+                sizeFactor: curved,
+                child: child,
+              ),
+            );
+          },
+          child: expanded
+              ? Column(
+                  key: const ValueKey('expanded'),
+                  children: [
+                    for (final p in pokemons)
+                      PokemonCard(
+                        key: ValueKey(p.id),
+                        pokemon: p,
+                        isCaught: isCaught(p),
+                        onTap: () => onTap(p),
+                      ),
+                  ],
+                )
+              : const SizedBox.shrink(key: ValueKey('collapsed')),
         ),
       ],
     );
