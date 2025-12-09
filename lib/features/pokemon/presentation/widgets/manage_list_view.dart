@@ -108,11 +108,11 @@ class _ManageListViewState extends State<ManageListView> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _searchController,
                       onChanged: (value) => setState(() => _query = value),
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.search),
@@ -134,17 +134,17 @@ class _ManageListViewState extends State<ManageListView> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                  SizedBox(
-                    width: AppSizes.dropdownWidth,
-                    child: DropdownButtonFormField<int?>(
-                      initialValue: _selectedGen,
-                      isDense: true,
-                      alignment: Alignment.centerLeft,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
-                        ),
+          const SizedBox(width: AppSpacing.sm),
+          Flexible(
+            child: DropdownButtonFormField<int?>(
+              initialValue: _selectedGen,
+              isDense: true,
+              isExpanded: true,
+              alignment: Alignment.centerLeft,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                ),
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: AppSpacing.sm,
                           vertical: AppSpacing.sm,
