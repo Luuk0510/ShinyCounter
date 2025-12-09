@@ -340,22 +340,6 @@ class _PokemonListPageState extends State<PokemonListPage>
     final searchController = TextEditingController();
     var query = '';
 
-    String dexOf(Pokemon p) {
-      final customMatch = RegExp(r'^custom_(\d{1,4})_').firstMatch(p.id);
-      if (customMatch != null) return customMatch.group(1)!.padLeft(4, '0');
-      final pathMatch = RegExp(r'(\d{3,4})').firstMatch(p.imagePath);
-      if (pathMatch != null) return pathMatch.group(1)!.padLeft(4, '0');
-      final numeric = RegExp(r'\d+').firstMatch(p.id);
-      if (numeric != null) return numeric.group(0)!.padLeft(4, '0');
-      return '';
-    }
-
-    String dexLabel(Pokemon p) {
-      final dex = dexOf(p);
-      if (dex.isEmpty) return 'Custom';
-      return '#$dex';
-    }
-
     final action = await showModalBottomSheet<_ManageAction>(
       context: context,
       isScrollControlled: true,
@@ -376,7 +360,7 @@ class _PokemonListPageState extends State<PokemonListPage>
             final filtered = filter.isEmpty && digitsOnly.isEmpty
                 ? pokemonSorted
                 : pokemonSorted.where((p) {
-                    final dex = dexOf(p);
+                    final dex = pokemonDexString(p);
                     return p.name.toLowerCase().contains(filter) ||
                         dex.contains(filter.replaceAll('#', '')) ||
                         (digitsOnly.isNotEmpty && dex.contains(digitsOnly));
@@ -439,14 +423,14 @@ class _PokemonListPageState extends State<PokemonListPage>
                                 style: AppTypography.listTitle.copyWith(
                                   color: colors.onSurface,
                                   fontWeight: FontWeight.w700,
-                                ),
                               ),
-                              subtitle: Text(
-                                dexLabel(p),
-                                style: AppTypography.button.copyWith(
-                                  color: colors.onSurfaceVariant,
-                                ),
+                            ),
+                            subtitle: Text(
+                              pokemonDexLabel(p),
+                              style: AppTypography.button.copyWith(
+                                color: colors.onSurfaceVariant,
                               ),
+                            ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
