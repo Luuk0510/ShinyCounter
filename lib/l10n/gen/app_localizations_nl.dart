@@ -9,7 +9,7 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
-  String get appTitle => 'Pokémon shiny counter';
+  String get appTitle => 'Shiny counter';
 
   @override
   String get sectionUncaught => 'Niet gevangen';
@@ -59,10 +59,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get emptyAction => 'Voeg Pokémon toe';
 
   @override
-  String get addDialogTitle => 'Nieuwe Pokémon';
+  String get addDialogTitle => 'Nieuwe Pokémon toevoegen';
 
   @override
   String get editDialogTitle => 'Pokémon bewerken';
+
+  @override
+  String get choose => 'Kies';
 
   @override
   String get nameLabel => 'Naam';
@@ -142,7 +145,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get addCountRow => 'Dag toevoegen';
 
   @override
-  String get editSheetTitle => 'Aanpassen';
+  String get editSheetTitle => 'Pokémon-gegevens aanpassen';
+
+  @override
+  String get huntHistoryTitle => 'Hunt-geschiedenis';
+
+  @override
+  String get searchByNameOrDex => 'Zoek op naam of Pokédex';
 
   @override
   String get counterLabel => 'Counter';
@@ -161,4 +170,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get gameNone => 'Geen';
+
+  @override
+  String get noPokemonFound => 'Geen Pokémon gevonden';
+
+  @override
+  String get tryAnotherFilter =>
+      'Probeer een andere naam, Pokédex of generatie filter.';
+
+  @override
+  String get filterAllGens => 'Alle generaties';
 }

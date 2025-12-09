@@ -1,81 +1,192 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-
+import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
-import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialog_entry.dart';
 
-class AddPokemonDialog extends StatefulWidget {
+class AddPokemonController extends ChangeNotifier {
+  AddPokemonController({required SpriteService spriteService})
+    : _spriteService = spriteService {
+    _init();
+  }
+
+  final SpriteService _spriteService;
+
+  final List<SpriteOption> _sprites = [];
+  SpriteOption? _selectedSprite;
+  String _search = '';
+  bool _loading = true;
+  PokemonNames? _names;
+  int? _selectedGen; // null = all
+
+  List<SpriteOption> get sprites => List.unmodifiable(_sprites);
+  SpriteOption? get selected => _selectedSprite;
+  bool get loading => _loading;
+  String get search => _search;
+  int? get selectedGen => _selectedGen;
+
+  Future<void> _init() async {
+    await Future.wait([_loadNames(), _loadSprites()]);
+    _loading = false;
+    notifyListeners();
+  }
+
+  Future<void> _loadNames() async {
+    _names = await PokemonNames.load();
+  }
+
+  Future<void> _loadSprites() async {
+    try {
+      final parsedSprites = await _spriteService.loadSprites(refresh: true);
+      final Map<String, SpriteOption> chosen = {};
+      for (final parsed in parsedSprites) {
+        if (!parsed.shiny) continue; // only shiny choices
+        final lowerForm = parsed.form.toLowerCase();
+        if (lowerForm.contains('mega') || lowerForm.contains('gmax')) continue;
+
+        final priority = _genderPriority(parsed.gender);
+        if (priority == null) continue;
+
+        final option = SpriteOption(
+          dex: parsed.dex,
+          path: parsed.path,
+          genderPriority: priority,
+        );
+
+        final current = chosen[option.dex];
+        if (current == null ||
+            option.genderPriority! < current.genderPriority!) {
+          chosen[option.dex] = option;
+        }
+      }
+      _sprites
+        ..clear()
+        ..addAll(
+          chosen.values.toList()..sort((a, b) => a.dex.compareTo(b.dex)),
+        );
+    } catch (_) {
+      _sprites.clear();
+    }
+  }
+
+  List<SpriteOption> get filteredSprites {
+    final source = _selectedGen == null
+        ? _sprites
+        : _sprites.where(_matchesSelectedGen).toList();
+    if (_search.isEmpty) return source;
+    final term = _search.toLowerCase();
+    return source.where((s) {
+      final name = _names?.nameFor(s.dex).toLowerCase() ?? '';
+      final combined = '${s.dex} $name';
+      return combined.contains(term);
+    }).toList();
+  }
+
+  void setSearch(String value) {
+    _search = value;
+    notifyListeners();
+  }
+
+  void setGen(int? gen) {
+    _selectedGen = gen;
+    notifyListeners();
+  }
+
+  void clearSearch() => setSearch('');
+
+  void select(SpriteOption sprite) {
+    _selectedSprite = sprite;
+    notifyListeners();
+  }
+
+  String displayName(SpriteOption sprite) =>
+      _names?.nameFor(sprite.dex) ?? 'Pokémon #${sprite.dex}';
+
+  bool _matchesSelectedGen(SpriteOption sprite) {
+    final gen = _selectedGen;
+    if (gen == null) return true;
+    final dexNum = int.tryParse(sprite.dex);
+    if (dexNum == null) return true;
+    return isDexInGen(dexNum, gen);
+  }
+
+  int? _genderPriority(String token) {
+    switch (token) {
+      case 'm':
+      case 'md':
+      case 'mo':
+        return 0;
+      case 'mf':
+      case 'uk':
+        return 1;
+      case 'f':
+      case 'fd':
+      case 'fo':
+        return 2;
+      default:
+        return null;
+    }
+  }
+}
+
+class AddPokemonDialog extends StatelessWidget {
   const AddPokemonDialog({super.key});
 
   @override
-  State<AddPokemonDialog> createState() => _AddPokemonDialogState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<AddPokemonController>(
+      create: (_) =>
+          AddPokemonController(spriteService: context.read<SpriteService>()),
+      child: const _AddPokemonView(),
+    );
+  }
 }
 
-class _AddPokemonDialogState extends State<AddPokemonDialog> {
-  final _nameController = TextEditingController();
-  final _picker = ImagePicker();
-  XFile? _pickedImage;
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
+class _AddPokemonView extends StatelessWidget {
+  const _AddPokemonView();
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final controller = context.watch<AddPokemonController>();
+    final colors = Theme.of(context).colorScheme;
+
     return AlertDialog(
       backgroundColor: Theme.of(context).cardColor,
       surfaceTintColor: Colors.transparent,
+      insetPadding: AppInsets.dialog,
+      contentPadding: EdgeInsets.fromLTRB(
+        AppInsets.dialog.horizontal / 2,
+        AppSpacing.sm,
+        AppInsets.dialog.horizontal / 2,
+        AppSpacing.md,
+      ),
       title: Text(
         l10n.addDialogTitle,
         textAlign: TextAlign.center,
-        style: Theme.of(
-          context,
-        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+        style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
       ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: l10n.nameLabel,
-                hintText: l10n.nameHint,
-              ),
-              textCapitalization: TextCapitalization.words,
+      content: Builder(
+        builder: (context) {
+          final media = MediaQuery.of(context);
+          final viewInsets = media.viewInsets.bottom;
+          final maxContentHeight =
+              (media.size.height * AppSizes.dialogHeightFactor - viewInsets)
+                  .clamp(AppSizes.dialogMinHeight, media.size.height)
+                  .toDouble();
+          return SizedBox(
+            width: AppSizes.dialogMaxWidth,
+            height: maxContentHeight,
+            child: _SpritePicker(
+              colors: colors,
+              availableHeight: maxContentHeight,
             ),
-            const SizedBox(height: AppSpacing.md),
-            Row(
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    final picked = await _picker.pickImage(
-                      source: ImageSource.gallery,
-                    );
-                    if (picked != null) {
-                      setState(() => _pickedImage = picked);
-                    }
-                  },
-                  icon: const Icon(Icons.photo_library),
-                  label: Text(l10n.choosePhoto),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                if (_pickedImage != null)
-                  Expanded(
-                    child: Text(
-                      _pickedImage!.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
+          );
+        },
       ),
       actionsAlignment: MainAxisAlignment.center,
       actionsPadding: const EdgeInsets.symmetric(
@@ -86,46 +197,289 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
         TextButton(
           onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
           style: OutlinedButton.styleFrom(
-            foregroundColor: Theme.of(context).colorScheme.primary,
-            side: BorderSide(
-              color: Theme.of(context).colorScheme.primary,
-              width: 1.4,
-            ),
+            foregroundColor: colors.primary,
+            side: BorderSide(color: colors.primary, width: 1.4),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
-              vertical: AppSpacing.sm,
+              vertical: AppSpacing.xs,
             ),
           ),
-          child: Text(
-            l10n.cancel,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-          ),
+          child: Text(l10n.cancel, style: AppTypography.button),
         ),
         const SizedBox(width: AppSpacing.sm),
         ElevatedButton(
-          onPressed: () {
-            final name = _nameController.text.trim();
-            if (name.isNotEmpty && _pickedImage != null) {
-              Navigator.of(context).pop<Pokemon?>(
-                Pokemon(
-                  name: name,
-                  imagePath: _pickedImage!.path,
-                  isLocalFile: true,
-                ),
-              );
-            }
-          },
+          onPressed: controller.selected == null
+              ? null
+              : () {
+                  final sprite = controller.selected!;
+                  final name = controller.displayName(sprite);
+                  Navigator.of(context).pop<Pokemon?>(
+                    Pokemon(
+                      id: _generateId(sprite.dex),
+                      name: name,
+                      imagePath: sprite.path,
+                      isLocalFile: false,
+                    ),
+                  );
+                },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: colors.primary,
+            foregroundColor: colors.onPrimary,
+            disabledBackgroundColor: colors.onSurfaceVariant.withValues(
+              alpha: 0.2,
+            ),
+            disabledForegroundColor: colors.onSurfaceVariant.withValues(
+              alpha: 0.6,
+            ),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
-              vertical: AppSpacing.sm,
+              vertical: AppSpacing.xs,
             ),
           ),
-          child: Text(
-            l10n.save,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          child: Text(l10n.choose, style: AppTypography.button),
+        ),
+      ],
+    );
+  }
+}
+
+class _SpritePicker extends StatefulWidget {
+  const _SpritePicker({required this.colors, required this.availableHeight});
+
+  final ColorScheme colors;
+  final double availableHeight;
+
+  @override
+  State<_SpritePicker> createState() => _SpritePickerState();
+}
+
+class _SpritePickerState extends State<_SpritePicker> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.watch<AddPokemonController>();
+    final headerHeightEstimate = AppSizes.toolbarHeight + AppSpacing.lg;
+    final listHeight =
+        (widget.availableHeight - headerHeightEstimate - AppSpacing.sm)
+            .clamp(AppSizes.listMinHeight, widget.availableHeight)
+            .toDouble();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                onChanged: controller.setSearch,
+                decoration: InputDecoration(
+                  hintText: context.l10n.searchByNameOrDex,
+                  prefixIcon: const Icon(Icons.search),
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(AppRadii.sm),
+                    ),
+                  ),
+                  isDense: true,
+                  suffixIcon: controller.search.isEmpty
+                      ? null
+                      : IconButton(
+                          icon: const Icon(Icons.close),
+                          tooltip: context.l10n.cancel,
+                          onPressed: controller.clearSearch,
+                        ),
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            SizedBox(
+              width: AppSizes.dropdownWidth,
+              child: DropdownButtonFormField<int?>(
+                initialValue: controller.selectedGen,
+                isDense: true,
+                alignment: Alignment.centerLeft,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(AppRadii.sm),
+                    ),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.sm,
+                  ),
+                ),
+                onChanged: (gen) {
+                  controller.setGen(gen);
+                  _scrollController.animateTo(
+                    0,
+                    duration: AppAnim.normal,
+                    curve: AppAnim.easeOut,
+                  );
+                },
+                items: [
+                  DropdownMenuItem<int?>(
+                    value: null,
+                    child: SizedBox(
+                      width: AppSizes.dropdownWidth - AppSpacing.lg,
+                      child: Text(
+                        context.l10n.filterAllGens,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                  for (final gen in List.generate(9, (i) => i + 1))
+                    DropdownMenuItem<int?>(
+                      value: gen,
+                      child: SizedBox(
+                        width: AppSizes.dropdownWidth - AppSpacing.lg,
+                        child: Text(
+                          'Gen $gen',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: widget.colors.outlineVariant.withValues(alpha: 0.6),
+            ),
+            borderRadius: BorderRadius.circular(AppRadii.md),
+          ),
+          child: SizedBox(
+            height: listHeight,
+            child: controller.loading
+                ? const Center(child: CircularProgressIndicator())
+                : controller.filteredSprites.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            color: widget.colors.onSurfaceVariant,
+                            size: AppSizes.spriteThumb,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            context.l10n.noPokemonFound,
+                            style: AppTypography.button.copyWith(
+                              color: widget.colors.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            context.l10n.tryAnotherFilter,
+                            textAlign: TextAlign.center,
+                            style: AppTypography.button.copyWith(
+                              color: widget.colors.onSurfaceVariant.withValues(
+                                alpha: 0.9,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Scrollbar(
+                    controller: _scrollController,
+                    thumbVisibility: true,
+                    interactive: true,
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      itemCount: controller.filteredSprites.length,
+                      itemBuilder: (context, index) {
+                        final sprite = controller.filteredSprites[index];
+                        final selected = sprite == controller.selected;
+                        final name = controller.displayName(sprite);
+                        return InkWell(
+                          onTap: () => controller.select(sprite),
+                          borderRadius: BorderRadius.circular(AppRadii.md),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                              vertical: AppSpacing.sm,
+                            ),
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? widget.colors.primary.withValues(
+                                      alpha: 0.08,
+                                    )
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(AppRadii.md),
+                            ),
+                            height: AppSizes.listItemMinHeight,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '#${sprite.dex}',
+                                        style: AppTypography.button.copyWith(
+                                          color: selected
+                                              ? widget.colors.primary
+                                              : widget.colors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      const SizedBox(height: AppSpacing.xs),
+                                      Text(
+                                        name,
+                                        style: AppTypography.sectionTitle
+                                            .copyWith(
+                                              color: selected
+                                                  ? widget.colors.primary
+                                                  : widget.colors.onSurface,
+                                            ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadii.sm,
+                                  ),
+                                  child: Image.asset(
+                                    sprite.path,
+                                    width: AppSizes.spriteThumb,
+                                    height: AppSizes.spriteThumb,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                                if (selected) ...[
+                                  const SizedBox(width: AppSpacing.xs),
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: widget.colors.primary,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
           ),
         ),
       ],
@@ -133,9 +487,44 @@ class _AddPokemonDialogState extends State<AddPokemonDialog> {
   }
 }
 
+class SpriteOption {
+  const SpriteOption({
+    required this.dex,
+    required this.path,
+    required this.genderPriority,
+  });
+
+  final String dex;
+  final String path;
+  final int? genderPriority; // lower is better
+
+  String get label => 'Pokédex #$dex';
+}
+
+String _generateId(String dex) =>
+    'custom_${dex}_${DateTime.now().microsecondsSinceEpoch}';
+
 Future<Pokemon?> showAddPokemonDialog(BuildContext context) {
-  return showDialog<Pokemon?>(
+  return showGeneralDialog<Pokemon?>(
     context: context,
-    builder: (_) => const AddPokemonDialog(),
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    barrierColor: Colors.black54,
+    transitionDuration: AppAnim.dialogDuration,
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        const AddPokemonDialog(),
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: AppAnim.dialogCurve,
+      );
+      final scale = Tween<double>(begin: 0.65, end: 1).animate(curved);
+      return DialogEntry(
+        child: FadeTransition(
+          opacity: animation,
+          child: Transform.scale(scale: scale.value, child: child),
+        ),
+      );
+    },
   );
 }

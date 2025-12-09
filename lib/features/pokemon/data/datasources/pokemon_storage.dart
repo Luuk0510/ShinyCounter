@@ -1,17 +1,16 @@
 import 'dart:convert';
 
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shiny_counter/core/storage/key_value_store.dart';
 
 import '../../domain/entities/pokemon.dart';
 
 class PokemonStorage {
-  PokemonStorage() : _prefs = SharedPreferences.getInstance();
+  PokemonStorage({KeyValueStore? store}) : _store = store ?? SharedPrefsStore();
 
-  final Future<SharedPreferences> _prefs;
+  final KeyValueStore _store;
 
   Future<List<Pokemon>> loadCustomPokemon() async {
-    final prefs = await _prefs;
-    final raw = prefs.getString(_customKey);
+    final raw = await _store.getString(_customKey);
     if (raw == null) return [];
 
     try {
@@ -19,6 +18,9 @@ class PokemonStorage {
       return decoded
           .map(
             (e) => Pokemon(
+              id:
+                  (e['id'] as String?) ??
+                  'legacy_${(e['name'] as String).toLowerCase()}',
               name: e['name'] as String,
               imagePath: e['imagePath'] as String,
               isLocalFile: e['isLocalFile'] as bool? ?? false,
@@ -31,11 +33,11 @@ class PokemonStorage {
   }
 
   Future<void> saveCustomPokemon(List<Pokemon> custom) async {
-    final prefs = await _prefs;
     final encoded = jsonEncode(
       custom
           .map(
             (p) => {
+              'id': p.id,
               'name': p.name,
               'imagePath': p.imagePath,
               'isLocalFile': p.isLocalFile,
@@ -43,20 +45,19 @@ class PokemonStorage {
           )
           .toList(),
     );
-    await prefs.setString(_customKey, encoded);
+    await _store.setString(_customKey, encoded);
   }
 
   Future<Set<String>> loadCaught(List<Pokemon> allPokemon) async {
-    final prefs = await _prefs;
     final caught = <String>{};
     for (final p in allPokemon) {
-      if (prefs.getBool(_caughtKey(p.name)) ?? false) {
-        caught.add(p.name);
+      if (await _store.getBool(_caughtKey(p.id)) ?? false) {
+        caught.add(p.id);
       }
     }
     return caught;
   }
 
-  String _caughtKey(String name) => 'caught_${name.toLowerCase()}';
+  String _caughtKey(String id) => 'caught_${id.toLowerCase()}';
   static const _customKey = 'custom_pokemon';
 }

@@ -98,67 +98,67 @@ abstract class AppLocalizations {
     Locale('nl'),
   ];
 
-  /// No description provided for @appTitle.
+  /// App title shown in the main app bar.
   ///
   /// In en, this message translates to:
-  /// **'Pokémon shiny counter'**
+  /// **'Shiny counter'**
   String get appTitle;
 
-  /// No description provided for @sectionUncaught.
+  /// Header label for uncaught Pokémon list.
   ///
   /// In en, this message translates to:
   /// **'Uncaught'**
   String get sectionUncaught;
 
-  /// No description provided for @sectionCaught.
+  /// Header label for caught Pokémon list.
   ///
   /// In en, this message translates to:
   /// **'Caught'**
   String get sectionCaught;
 
-  /// No description provided for @tooltipAddPokemon.
+  ///
   ///
   /// In en, this message translates to:
   /// **'New Pokémon'**
   String get tooltipAddPokemon;
 
-  /// No description provided for @tooltipManagePokemon.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Manage Pokémon'**
   String get tooltipManagePokemon;
 
-  /// No description provided for @tooltipSettings.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Settings'**
   String get tooltipSettings;
 
-  /// No description provided for @manageTitle.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Manage Pokémon'**
   String get manageTitle;
 
-  /// No description provided for @manageEditTooltip.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Edit'**
   String get manageEditTooltip;
 
-  /// No description provided for @manageDeleteTooltip.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Delete'**
   String get manageDeleteTooltip;
 
-  /// No description provided for @manageNoCustom.
+  ///
   ///
   /// In en, this message translates to:
   /// **'No custom Pokémon to manage.'**
   String get manageNoCustom;
 
-  /// No description provided for @confirmDeleteTitle.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Delete'**
@@ -170,151 +170,157 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to delete {name}?'**
   String confirmDeleteMessage(Object name);
 
-  /// No description provided for @confirmDeleteCancel.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Cancel'**
   String get confirmDeleteCancel;
 
-  /// No description provided for @confirmDeleteDelete.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Delete'**
   String get confirmDeleteDelete;
 
-  /// No description provided for @emptyTitle.
+  ///
   ///
   /// In en, this message translates to:
   /// **'No Pokémon added yet'**
   String get emptyTitle;
 
-  /// No description provided for @emptyAction.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Add Pokémon'**
   String get emptyAction;
 
-  /// No description provided for @addDialogTitle.
+  ///
   ///
   /// In en, this message translates to:
-  /// **'New Pokémon'**
+  /// **'Add new Pokémon'**
   String get addDialogTitle;
 
-  /// No description provided for @editDialogTitle.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Edit Pokémon'**
   String get editDialogTitle;
 
-  /// No description provided for @nameLabel.
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Choose'**
+  String get choose;
+
+  ///
   ///
   /// In en, this message translates to:
   /// **'Name'**
   String get nameLabel;
 
-  /// No description provided for @nameHint.
+  ///
   ///
   /// In en, this message translates to:
   /// **'e.g. Mewtwo'**
   String get nameHint;
 
-  /// No description provided for @choosePhoto.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Choose photo'**
   String get choosePhoto;
 
-  /// No description provided for @cancel.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel;
 
-  /// No description provided for @save.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Save'**
   String get save;
 
-  /// No description provided for @settingsTitle.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Theme'**
   String get settingsTitle;
 
-  /// No description provided for @settingsSystem.
+  ///
   ///
   /// In en, this message translates to:
   /// **'System'**
   String get settingsSystem;
 
-  /// No description provided for @settingsLight.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Light'**
   String get settingsLight;
 
-  /// No description provided for @settingsDark.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Dark'**
   String get settingsDark;
 
-  /// No description provided for @settingsOled.
+  ///
   ///
   /// In en, this message translates to:
   /// **'OLED'**
   String get settingsOled;
 
-  /// No description provided for @settingsLanguage.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Language'**
   String get settingsLanguage;
 
-  /// No description provided for @languageEnglish.
+  ///
   ///
   /// In en, this message translates to:
   /// **'English'**
   String get languageEnglish;
 
-  /// No description provided for @languageDutch.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Dutch'**
   String get languageDutch;
 
-  /// No description provided for @editCounterTooltip.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Edit counter'**
   String get editCounterTooltip;
 
-  /// No description provided for @openOverlayTooltip.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Open mini counter'**
   String get openOverlayTooltip;
 
-  /// No description provided for @buttonCatch.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Catch'**
   String get buttonCatch;
 
-  /// No description provided for @buttonCaught.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Caught'**
   String get buttonCaught;
 
-  /// No description provided for @huntStart.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Start'**
   String get huntStart;
 
-  /// No description provided for @huntCatch.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Catch'**
@@ -326,77 +332,107 @@ abstract class AppLocalizations {
   /// **'Pokemon {game}'**
   String huntGame(Object game);
 
-  /// No description provided for @selectGameHint.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Select game'**
   String get selectGameHint;
 
-  /// No description provided for @noCounts.
+  ///
   ///
   /// In en, this message translates to:
   /// **'No counts yet'**
   String get noCounts;
 
-  /// No description provided for @dateLabel.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Date'**
   String get dateLabel;
 
-  /// No description provided for @countLabel.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Count'**
   String get countLabel;
 
-  /// No description provided for @addCountRow.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Add day'**
   String get addCountRow;
 
-  /// No description provided for @editSheetTitle.
+  ///
   ///
   /// In en, this message translates to:
-  /// **'Edit'**
+  /// **'Edit Pokémon details'**
   String get editSheetTitle;
 
-  /// No description provided for @counterLabel.
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Hunt history'**
+  String get huntHistoryTitle;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name or dex'**
+  String get searchByNameOrDex;
+
+  ///
   ///
   /// In en, this message translates to:
   /// **'Counter'**
   String get counterLabel;
 
-  /// No description provided for @enterNumberHint.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Enter a number'**
   String get enterNumberHint;
 
-  /// No description provided for @invalidCounter.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Enter a valid counter'**
   String get invalidCounter;
 
-  /// No description provided for @gameLabel.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Game'**
   String get gameLabel;
 
-  /// No description provided for @gameHint.
+  ///
   ///
   /// In en, this message translates to:
   /// **'Scroll to pick a game'**
   String get gameHint;
 
-  /// No description provided for @gameNone.
+  ///
   ///
   /// In en, this message translates to:
   /// **'None'**
   String get gameNone;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'No Pokémon found'**
+  String get noPokemonFound;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Try another name, dex, or generation filter.'**
+  String get tryAnotherFilter;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'All gens'**
+  String get filterAllGens;
 }
 
 class _AppLocalizationsDelegate

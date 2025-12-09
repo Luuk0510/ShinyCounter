@@ -22,7 +22,7 @@ class DailyCountsList extends StatelessWidget {
 
     if (entries.isEmpty) {
       return Container(
-        height: 210,
+        height: AppSizes.dailyListHeight,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
@@ -42,7 +42,7 @@ class DailyCountsList extends StatelessWidget {
     }
 
     return Container(
-      height: 210,
+      height: AppSizes.dailyListHeight,
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(AppRadii.md),
@@ -51,37 +51,41 @@ class DailyCountsList extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.sm,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   l10n.dateLabel,
-                  style: TextStyle(
+                  style: AppTypography.button.copyWith(
                     color: colors.onSurfaceVariant,
                     fontWeight: FontWeight.w700,
-                    fontSize: 15,
                   ),
                 ),
                 Text(
                   l10n.countLabel,
-                  style: TextStyle(
+                  style: AppTypography.button.copyWith(
                     color: colors.onSurfaceVariant,
                     fontWeight: FontWeight.w700,
-                    fontSize: 15,
                   ),
                 ),
               ],
             ),
           ),
           Divider(
-            height: 1,
-            thickness: 1,
+            height: AppSizes.dividerThickness,
+            thickness: AppSizes.dividerThickness,
             color: colors.outlineVariant.withValues(alpha: 0.35),
           ),
           Expanded(
             child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
               itemBuilder: (context, index) {
                 final entry = entries[index];
                 return Row(
@@ -89,17 +93,15 @@ class DailyCountsList extends StatelessWidget {
                   children: [
                     Text(
                       dayFormatter(entry.key),
-                      style: TextStyle(
+                      style: AppTypography.sectionTitle.copyWith(
                         color: colors.onSurface,
-                        fontSize: 17,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
                       '${entry.value}',
-                      style: TextStyle(
+                      style: AppTypography.sectionTitle.copyWith(
                         color: colors.primary,
-                        fontSize: 17,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -107,8 +109,8 @@ class DailyCountsList extends StatelessWidget {
                 );
               },
               separatorBuilder: (context, _) => Divider(
-                height: 16,
-                thickness: 1,
+                height: AppSpacing.lg,
+                thickness: AppSizes.dividerThickness,
                 color: colors.outlineVariant.withValues(alpha: 0.25),
               ),
               itemCount: entries.length,

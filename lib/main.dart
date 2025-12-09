@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'core/di/app_locator.dart';
 import 'core/di/app_providers.dart';
 import 'core/routing/app_router.dart';
-import 'core/theme/tokens.dart';
+import 'core/theme/theme.dart';
 import 'core/theme/theme_notifier.dart';
 import 'features/pokemon/overlay/counter_overlay.dart' as counter_overlay;
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';

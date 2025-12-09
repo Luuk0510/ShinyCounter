@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Pokémon shiny counter';
+  String get appTitle => 'Shiny counter';
 
   @override
   String get sectionUncaught => 'Uncaught';
@@ -59,10 +59,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emptyAction => 'Add Pokémon';
 
   @override
-  String get addDialogTitle => 'New Pokémon';
+  String get addDialogTitle => 'Add new Pokémon';
 
   @override
   String get editDialogTitle => 'Edit Pokémon';
+
+  @override
+  String get choose => 'Choose';
 
   @override
   String get nameLabel => 'Name';
@@ -142,7 +145,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addCountRow => 'Add day';
 
   @override
-  String get editSheetTitle => 'Edit';
+  String get editSheetTitle => 'Edit Pokémon details';
+
+  @override
+  String get huntHistoryTitle => 'Hunt history';
+
+  @override
+  String get searchByNameOrDex => 'Search by name or dex';
 
   @override
   String get counterLabel => 'Counter';
@@ -161,4 +170,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gameNone => 'None';
+
+  @override
+  String get noPokemonFound => 'No Pokémon found';
+
+  @override
+  String get tryAnotherFilter => 'Try another name, dex, or generation filter.';
+
+  @override
+  String get filterAllGens => 'All gens';
 }

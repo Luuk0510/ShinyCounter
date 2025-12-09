@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shiny_counter/core/storage/key_value_store.dart';
 
 class ThemeNotifier extends ChangeNotifier {
-  ThemeNotifier() {
+  ThemeNotifier([KeyValueStore? store]) : _store = store ?? SharedPrefsStore() {
     _load();
   }
 
   ThemeMode _mode = ThemeMode.system;
   bool _useOledDark = true;
+  final KeyValueStore _store;
 
   ThemeMode get mode => _mode;
   bool get useOledDark => _useOledDark;
@@ -22,9 +23,8 @@ class ThemeNotifier extends ChangeNotifier {
   }
 
   Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final storedMode = prefs.getString(_modeKey);
-    final storedOled = prefs.getBool(_oledKey);
+    final storedMode = await _store.getString(_modeKey);
+    final storedOled = await _store.getBool(_oledKey);
     if (storedMode != null) {
       switch (storedMode) {
         case 'light':
@@ -44,9 +44,8 @@ class ThemeNotifier extends ChangeNotifier {
   }
 
   Future<void> _persist() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_modeKey, _mode.name);
-    await prefs.setBool(_oledKey, _useOledDark);
+    await _store.setString(_modeKey, _mode.name);
+    await _store.setBool(_oledKey, _useOledDark);
   }
 
   static const String _modeKey = 'theme_mode';

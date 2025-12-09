@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/core/theme/app_assets.dart';
+import 'package:shiny_counter/core/di/app_locator.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
-import 'package:provider/provider.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/add_pokemon_dialog.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/edit_pokemon_dialog.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_card.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_empty_state.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/settings_sheet.dart';
+import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_section.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/manage_list_view.dart';
 
-const _basePokemon = <Pokemon>[];
+// Toggle to include the full dex by default. Off preserves the original
+// behavior (only custom/selected Pokémon).
+const bool _includeBaseDex = false;
 
 class PokemonListPage extends StatefulWidget {
   const PokemonListPage({super.key});
@@ -25,15 +30,25 @@ class PokemonListPage extends StatefulWidget {
   State<PokemonListPage> createState() => _PokemonListPageState();
 }
 
-class _PokemonListPageState extends State<PokemonListPage> {
+class _PokemonListPageState extends State<PokemonListPage>
+    with TickerProviderStateMixin {
   late final LoadCustomPokemonUseCase _loadCustomPokemon;
   late final SaveCustomPokemonUseCase _saveCustomPokemon;
   late final LoadCaughtUseCase _loadCaught;
   final List<Pokemon> _customPokemon = [];
+  final List<Pokemon> _basePokemon = [];
   Set<String> _caught = {};
   bool _loading = true;
+  final ScrollController _listController = ScrollController();
+  bool _showUncaught = true;
+  bool _showCaught = true;
+  AnimationController? _sheetController;
 
-  List<Pokemon> get _allPokemon => [..._basePokemon, ..._customPokemon];
+  List<Pokemon> get _allPokemon {
+    final combined = [..._basePokemon, ..._customPokemon];
+    combined.sort(pokemonDexComparator);
+    return combined;
+  }
 
   @override
   void initState() {
@@ -41,10 +56,18 @@ class _PokemonListPageState extends State<PokemonListPage> {
     _loadCustomPokemon = context.read<LoadCustomPokemonUseCase>();
     _saveCustomPokemon = context.read<SaveCustomPokemonUseCase>();
     _loadCaught = context.read<LoadCaughtUseCase>();
+    _sheetController = AnimationController(
+      vsync: this,
+      duration: AppAnim.sheetDuration,
+      reverseDuration: AppAnim.sheetDuration,
+    );
     _loadData();
   }
 
   Future<void> _loadData() async {
+    if (_includeBaseDex) {
+      await _loadBasePokemon();
+    }
     final custom = await _loadCustomPokemon();
     setState(() {
       _customPokemon
@@ -54,6 +77,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
     await _reloadCaught();
     if (mounted) {
       setState(() => _loading = false);
+      _precacheListSprites();
     }
   }
 
@@ -64,7 +88,115 @@ class _PokemonListPageState extends State<PokemonListPage> {
     }
   }
 
-  bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.name);
+  int? _genderPriority(String token) {
+    switch (token) {
+      case 'm':
+      case 'md':
+      case 'mo':
+        return 0;
+      case 'mf':
+      case 'uk':
+        return 1;
+      case 'f':
+      case 'fd':
+      case 'fo':
+        return 2;
+      default:
+        return null;
+    }
+  }
+
+  Future<void> _loadBasePokemon() async {
+    if (_basePokemon.isNotEmpty) return;
+    try {
+      final names = await PokemonNames.load();
+      if (!mounted) return;
+      final sprites = await context.read<SpriteService>().loadSprites();
+      final chosen = <String, ParsedSprite>{};
+      for (final sprite in sprites) {
+        if (!sprite.shiny) continue;
+        final lowerForm = sprite.form.toLowerCase();
+        if (lowerForm.contains('mega') || lowerForm.contains('gmax')) continue;
+        final priority = _genderPriority(sprite.gender);
+        if (priority == null) continue;
+        final current = chosen[sprite.dex];
+        if (current == null ||
+            priority < _genderPriority(current.gender)! ||
+            (priority == _genderPriority(current.gender)! &&
+                sprite.form.compareTo(current.form) < 0)) {
+          chosen[sprite.dex] = sprite;
+        }
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _basePokemon
+          ..clear()
+          ..addAll(
+            chosen.values.map(
+              (sprite) => Pokemon(
+                id: sprite.dex,
+                name: names.nameFor(sprite.dex),
+                imagePath: sprite.path,
+                isLocalFile: false,
+              ),
+            ),
+          );
+        _basePokemon.sort(pokemonDexComparator);
+      });
+    } catch (_) {
+      // If assets fail to load we leave the base list empty; the UI still works
+      // with custom Pokémon.
+    }
+  }
+
+  Future<T?> _showScaledDialog<T>(Widget dialog) {
+    return showGeneralDialog<T>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black54,
+      transitionDuration: AppAnim.dialogDuration,
+      pageBuilder: (context, animation, secondaryAnimation) => dialog,
+      transitionBuilder: (context, animation, _, child) {
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: AppAnim.dialogCurve,
+        );
+        final scale = Tween<double>(
+          begin: AppAnim.dialogStartScale,
+          end: 1,
+        ).animate(curved);
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(scale: scale, child: child),
+        );
+      },
+    );
+  }
+
+  bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.id);
+
+  Future<void> _precacheListSprites() async {
+    final toPrecache = _allPokemon
+        .where((p) => !p.isLocalFile)
+        .take(8)
+        .toList();
+    if (toPrecache.isEmpty) return;
+    final service = context.read<SpriteService>();
+    await service.precacheSpritePaths(
+      context,
+      toPrecache.map((p) => p.imagePath),
+    );
+    final dexes = <String>[];
+    for (final p in toPrecache) {
+      final parsed = SpriteParser.parse(p.imagePath.split('/').last);
+      if (parsed != null) dexes.add(parsed.dex);
+    }
+    if (dexes.isNotEmpty) {
+      await service.warmupForDexes(dexes);
+    }
+  }
 
   Future<void> _onAddPokemon() async {
     final newPokemon = await showAddPokemonDialog(context);
@@ -78,9 +210,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
   }
 
   Future<void> _applyPokemonEdit(Pokemon original, Pokemon updated) async {
-    final index = _customPokemon.indexWhere(
-      (p) => p.name == original.name && p.imagePath == original.imagePath,
-    );
+    final index = _customPokemon.indexWhere((p) => p.id == original.id);
     if (index == -1) return;
 
     setState(() {
@@ -88,153 +218,100 @@ class _PokemonListPageState extends State<PokemonListPage> {
     });
 
     await _saveCustomPokemon(_customPokemon);
-    await _migratePokemonState(original, updated);
     await _reloadCaught();
   }
 
-  Future<void> _migratePokemonState(Pokemon original, Pokemon updated) async {
-    if (original.name.toLowerCase() == updated.name.toLowerCase()) return;
-
-    final prefs = await SharedPreferences.getInstance();
-    final oldCounterKey = 'counter_${original.name.toLowerCase()}';
-    final newCounterKey = 'counter_${updated.name.toLowerCase()}';
-    final oldCaughtKey = 'caught_${original.name.toLowerCase()}';
-    final newCaughtKey = 'caught_${updated.name.toLowerCase()}';
-    final oldStartedKey = '${oldCounterKey}_startedAt';
-    final newStartedKey = '${newCounterKey}_startedAt';
-    final oldCaughtAtKey = '${oldCounterKey}_caughtAt';
-    final newCaughtAtKey = '${newCounterKey}_caughtAt';
-    final oldDailyCountsKey = '${oldCounterKey}_dailyCounts';
-    final newDailyCountsKey = '${newCounterKey}_dailyCounts';
-
-    final oldCounter = prefs.getInt(oldCounterKey);
-    final oldCaught = prefs.getBool(oldCaughtKey);
-    final oldStartedAt = prefs.getString(oldStartedKey);
-    final oldCaughtAt = prefs.getString(oldCaughtAtKey);
-    final oldDailyCounts = prefs.getString(oldDailyCountsKey);
-
-    if (oldCounter != null) {
-      await prefs.setInt(newCounterKey, oldCounter);
-    }
-    if (oldCaught != null) {
-      await prefs.setBool(newCaughtKey, oldCaught);
-    }
-    if (oldStartedAt != null) {
-      await prefs.setString(newStartedKey, oldStartedAt);
-    }
-    if (oldCaughtAt != null) {
-      await prefs.setString(newCaughtAtKey, oldCaughtAt);
-    }
-    if (oldDailyCounts != null) {
-      await prefs.setString(newDailyCountsKey, oldDailyCounts);
-    }
-
-    await prefs.remove(oldCounterKey);
-    await prefs.remove(oldCaughtKey);
-    await prefs.remove(oldStartedKey);
-    await prefs.remove(oldCaughtAtKey);
-    await prefs.remove(oldDailyCountsKey);
-  }
-
   Future<void> _clearPokemonState(Pokemon pokemon) async {
-    final prefs = await SharedPreferences.getInstance();
-    final counterKey = 'counter_${pokemon.name.toLowerCase()}';
-    await prefs.remove(counterKey);
-    await prefs.remove('caught_${pokemon.name.toLowerCase()}');
-    await prefs.remove('${counterKey}_startedAt');
-    await prefs.remove('${counterKey}_caughtAt');
-    await prefs.remove('${counterKey}_dailyCounts');
+    final prefs = AppLocator.instance.prefsStore;
+    final keys = CounterKeys.fromId(pokemon.id);
+    await prefs.remove(keys.counter);
+    await prefs.remove(keys.caught);
+    await prefs.remove(keys.startedAt);
+    await prefs.remove(keys.caughtAt);
+    await prefs.remove(keys.caughtGame);
+    await prefs.remove(keys.dailyCounts);
   }
 
   Future<void> _confirmDelete(Pokemon pokemon) async {
     final colors = Theme.of(context).colorScheme;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Theme.of(context).cardColor,
-          surfaceTintColor: Colors.transparent,
-          title: Text(
-            context.l10n.confirmDeleteTitle,
-            textAlign: TextAlign.center,
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-          ),
-          content: Builder(
-            builder: (context) {
-              final message = context.l10n.confirmDeleteMessage(pokemon.name);
-              final parts = message.split(pokemon.name);
-              final after = parts.length > 1
-                  ? parts.sublist(1).join(pokemon.name)
-                  : '';
-              return RichText(
-                text: TextSpan(
-                  style: TextStyle(fontSize: 16, color: colors.onSurface),
-                  children: [
-                    TextSpan(text: parts.first),
-                    TextSpan(
-                      text: pokemon.name,
-                      style: const TextStyle(fontWeight: FontWeight.w800),
+    final confirmed = await _showScaledDialog<bool>(
+      AlertDialog(
+        backgroundColor: Theme.of(context).cardColor,
+        surfaceTintColor: Colors.transparent,
+        title: Text(
+          '${context.l10n.confirmDeleteTitle} ${pokemon.name}',
+          textAlign: TextAlign.center,
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+        ),
+        content: Builder(
+          builder: (context) {
+            final message = context.l10n.confirmDeleteMessage(pokemon.name);
+            final parts = message.split(pokemon.name);
+            final after = parts.length > 1
+                ? parts.sublist(1).join(pokemon.name)
+                : '';
+            return RichText(
+              text: TextSpan(
+                style: AppTypography.button.copyWith(color: colors.onSurface),
+                children: [
+                  TextSpan(text: parts.first),
+                  TextSpan(
+                    text: pokemon.name,
+                    style: AppTypography.button.copyWith(
+                      fontWeight: FontWeight.w800,
                     ),
-                    TextSpan(text: after),
-                  ],
-                ),
-              );
-            },
-          ),
-          actionsAlignment: MainAxisAlignment.center,
-          actionsPadding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.sm,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              style: TextButton.styleFrom(
-                foregroundColor: colors.primary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                  vertical: AppSpacing.sm,
-                ),
+                  ),
+                  TextSpan(text: after),
+                ],
               ),
-              child: Text(
-                context.l10n.confirmDeleteCancel,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
+            );
+          },
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actionsPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.sm,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            style: TextButton.styleFrom(
+              foregroundColor: colors.primary,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.sm,
               ),
             ),
-            const SizedBox(width: AppSpacing.sm),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colors.error,
-                foregroundColor: colors.onError,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                  vertical: AppSpacing.sm,
-                ),
-              ),
-              child: Text(
-                context.l10n.confirmDeleteDelete,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
+            child: Text(
+              context.l10n.confirmDeleteCancel,
+              style: AppTypography.button.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colors.error,
+              foregroundColor: colors.onError,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.sm,
               ),
             ),
-          ],
-        );
-      },
+            child: Text(
+              context.l10n.confirmDeleteDelete,
+              style: AppTypography.button.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
     );
 
     if (confirmed == true) {
       setState(() {
-        _customPokemon.removeWhere(
-          (p) => p.name == pokemon.name && p.imagePath == pokemon.imagePath,
-        );
+        _customPokemon.removeWhere((p) => p.id == pokemon.id);
       });
       await _saveCustomPokemon(_customPokemon);
       await _clearPokemonState(pokemon);
@@ -242,9 +319,15 @@ class _PokemonListPageState extends State<PokemonListPage> {
     }
   }
 
+  @override
+  void dispose() {
+    _sheetController?.dispose();
+    _listController.dispose();
+    super.dispose();
+  }
+
   Future<void> _openManagePokemonList() async {
-    final pokemonSorted = [..._customPokemon]
-      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    final pokemonSorted = [..._customPokemon]..sort(pokemonDexComparator);
     if (pokemonSorted.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -254,87 +337,17 @@ class _PokemonListPageState extends State<PokemonListPage> {
       return;
     }
 
-    final action = await showModalBottomSheet<_ManageAction>(
+    final action = await showModalBottomSheet<ManageAction>(
       context: context,
+      isScrollControlled: true,
       showDragHandle: false,
+      transitionAnimationController: _sheetController,
       backgroundColor: Theme.of(context).cardColor,
       barrierColor: Colors.black.withValues(alpha: 0.35),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
       ),
-      builder: (context) {
-        final colors = Theme.of(context).colorScheme;
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.md,
-              AppSpacing.lg,
-              AppSpacing.lg,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 44,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: colors.outlineVariant.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(AppRadii.sm),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  context.l10n.manageTitle,
-                  style: AppTypography.sectionTitle.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Flexible(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: pokemonSorted.length,
-                    itemBuilder: (context, index) {
-                      final p = pokemonSorted[index];
-                      return ListTile(
-                        title: Text(
-                          p.name,
-                          style: AppTypography.sectionTitle.copyWith(
-                            color: colors.onSurface,
-                          ),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              tooltip: context.l10n.manageEditTooltip,
-                              onPressed: () => Navigator.of(
-                                context,
-                              ).pop(_ManageAction(pokemon: p, delete: false)),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              tooltip: context.l10n.manageDeleteTooltip,
-                              color: colors.error,
-                              onPressed: () => Navigator.of(
-                                context,
-                              ).pop(_ManageAction(pokemon: p, delete: true)),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    separatorBuilder: (context, _) =>
-                        const Divider(height: AppSpacing.md),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (context) => ManageListView(pokemonSorted: pokemonSorted),
     );
 
     if (action == null) return;
@@ -356,10 +369,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
 
   Future<void> _openSettings() async {
     if (!mounted) return;
-    await showDialog<void>(
-      context: context,
-      builder: (context) => const SettingsDialog(),
-    );
+    await _showScaledDialog(const SettingsDialog());
     setState(() {});
   }
 
@@ -368,9 +378,9 @@ class _PokemonListPageState extends State<PokemonListPage> {
     final colors = Theme.of(context).colorScheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final uncaught = _allPokemon.where((p) => !_isCaught(p)).toList()
-      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      ..sort(pokemonDexComparator);
     final caught = _allPokemon.where((p) => _isCaught(p)).toList()
-      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      ..sort(pokemonDexComparator);
 
     return Scaffold(
       appBar: _buildAppBar(colors),
@@ -383,9 +393,11 @@ class _PokemonListPageState extends State<PokemonListPage> {
       scrolledUnderElevation: 0,
       elevation: 0,
       centerTitle: true,
-      toolbarHeight: 52,
+      toolbarHeight: AppSizes.toolbarHeight,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(AppRadii.lg),
+        ),
       ),
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
@@ -396,16 +408,27 @@ class _PokemonListPageState extends State<PokemonListPage> {
             decoration: BoxDecoration(
               color: scopedCard,
               borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(30),
+                bottom: Radius.circular(AppRadii.lg),
               ),
             ),
           );
         },
       ),
       foregroundColor: colors.onSurface,
-      title: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(context.l10n.appTitle, style: AppTypography.title),
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            AppAssets.appIcon,
+            width: 28,
+            height: 28,
+            errorBuilder: (_, error, stack) =>
+                const Icon(Icons.catching_pokemon, size: 24),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Text(context.l10n.appTitle, style: AppTypography.title),
+        ],
       ),
       actions: [
         IconButton(
@@ -442,83 +465,53 @@ class _PokemonListPageState extends State<PokemonListPage> {
     if (_allPokemon.isEmpty) {
       return PokemonEmptyState(
         onAddPressed: _onAddPokemon,
-        imageAsset: 'assets/icon/pokeball_icon.png',
+        imageAsset: AppAssets.pokeballIcon,
         colors: colors,
         title: context.l10n.emptyTitle,
         actionLabel: context.l10n.emptyAction,
       );
     }
 
-    return ListView.builder(
-      padding: EdgeInsets.fromLTRB(0, 4, 0, bottomPadding),
-      itemCount: _sectionedCount(uncaught, caught),
-      itemBuilder: (context, index) {
-        final entry = _sectionedItem(context, uncaught, caught, index);
-        if (entry is _SectionHeader) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(entry.title, style: AppTypography.sectionTitle),
-          );
-        } else if (entry is Pokemon) {
-          return PokemonCard(
-            pokemon: entry,
-            isCaught: _isCaught(entry),
-            onTap: () => _openDetail(entry),
-          );
-        }
-        return const SizedBox.shrink();
-      },
+    final sections = <Widget>[];
+    if (uncaught.isNotEmpty) {
+      sections.add(
+        PokemonSection(
+          title: context.l10n.sectionUncaught,
+          expanded: _showUncaught,
+          onToggle: () => setState(() => _showUncaught = !_showUncaught),
+          pokemons: uncaught,
+          isCaught: _isCaught,
+          onTap: _openDetail,
+        ),
+      );
+    }
+    if (caught.isNotEmpty) {
+      sections.add(
+        PokemonSection(
+          title: context.l10n.sectionCaught,
+          expanded: _showCaught,
+          onToggle: () => setState(() => _showCaught = !_showCaught),
+          pokemons: caught,
+          isCaught: _isCaught,
+          onTap: _openDetail,
+        ),
+      );
+    }
+
+    return Scrollbar(
+      controller: _listController,
+      thumbVisibility: false,
+      interactive: true,
+      child: ListView(
+        controller: _listController,
+        padding: EdgeInsets.fromLTRB(
+          AppSizes.cardPaddingH - AppSpacing.xs,
+          AppSpacing.xs,
+          AppSizes.cardPaddingH - AppSpacing.xs,
+          bottomPadding,
+        ),
+        children: sections,
+      ),
     );
   }
-}
-
-int _sectionedCount(List<Pokemon> uncaught, List<Pokemon> caught) {
-  var count = 0;
-  if (uncaught.isNotEmpty) {
-    count += 1 + uncaught.length;
-  }
-  if (caught.isNotEmpty) {
-    count += 1 + caught.length;
-  }
-  return count;
-}
-
-dynamic _sectionedItem(
-  BuildContext context,
-  List<Pokemon> uncaught,
-  List<Pokemon> caught,
-  int index,
-) {
-  var cursor = 0;
-
-  if (uncaught.isNotEmpty) {
-    if (index == cursor) return _SectionHeader(context.l10n.sectionUncaught);
-    cursor += 1;
-    if (index < cursor + uncaught.length) {
-      return uncaught[index - cursor];
-    }
-    cursor += uncaught.length;
-  }
-
-  if (caught.isNotEmpty) {
-    if (index == cursor) return _SectionHeader(context.l10n.sectionCaught);
-    cursor += 1;
-    if (index < cursor + caught.length) {
-      return caught[index - cursor];
-    }
-  }
-
-  return null;
-}
-
-class _SectionHeader {
-  const _SectionHeader(this.title);
-  final String title;
-}
-
-class _ManageAction {
-  const _ManageAction({required this.pokemon, required this.delete});
-
-  final Pokemon pokemon;
-  final bool delete;
 }
