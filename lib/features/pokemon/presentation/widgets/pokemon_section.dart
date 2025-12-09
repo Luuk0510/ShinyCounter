@@ -29,7 +29,10 @@ class PokemonSection extends StatelessWidget {
         InkWell(
           onTap: onToggle,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.cardPaddingH,
+              vertical: AppSizes.cardPaddingV,
+            ),
             child: Row(
               children: [
                 Expanded(child: Text(title, style: AppTypography.sectionTitle)),
