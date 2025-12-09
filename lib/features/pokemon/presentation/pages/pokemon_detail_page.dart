@@ -77,8 +77,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     final service = context.read<SpriteService>();
     final assets = await service.spritesForDex(parsed.dex);
     final shiny = assets.where((p) => p.shiny).toList()
-      ..sort((a, b) => a.form.compareTo(b.form));
-    final normal = assets.where((p) => !p.shiny).toList();
+      ..sort(_compareSprites);
+    final normal = assets.where((p) => !p.shiny).toList()..sort(_compareSprites);
     _normalMap.clear();
     for (final s in shiny) {
       final match = normal.firstWhere(
@@ -93,6 +93,20 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       _showNormal = false;
       _spritesLoading = false;
     });
+  }
+
+  int _compareSprites(ParsedSprite a, ParsedSprite b) {
+    final rankA = _formRank(a.form);
+    final rankB = _formRank(b.form);
+    if (rankA != rankB) return rankA.compareTo(rankB);
+    return a.form.compareTo(b.form);
+  }
+
+  int _formRank(String form) {
+    // Ensure mega variants appear before gmax in swipe order.
+    if (form.contains('mega')) return 1;
+    if (form.contains('gmax')) return 2;
+    return 0;
   }
 
   @override
