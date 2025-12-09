@@ -3,6 +3,7 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialog_entry.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/game_dropdown.dart';
 
 class EditPokemonDialog extends StatefulWidget {
   const EditPokemonDialog({super.key, required this.pokemon});
@@ -15,11 +16,13 @@ class EditPokemonDialog extends StatefulWidget {
 
 class _EditPokemonDialogState extends State<EditPokemonDialog> {
   late final TextEditingController _nameController;
+  String? _game;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.pokemon.name);
+    _game = null; // Game isn’t part of the core Pokemon model; keep selection local.
   }
 
   @override
@@ -51,6 +54,19 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
                   hintText: l10n.nameHint,
                 ),
                 textCapitalization: TextCapitalization.words,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: AppSizes.gameSelectWidth,
+                  ),
+                  child: GameDropdown(
+                    value: _game,
+                    onChanged: (game) => setState(() => _game = game),
+                  ),
+                ),
               ),
             ],
           ),

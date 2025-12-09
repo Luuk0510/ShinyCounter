@@ -76,9 +76,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     setState(() => _spritesLoading = true);
     final service = context.read<SpriteService>();
     final assets = await service.spritesForDex(parsed.dex);
-    final shiny = assets.where((p) => p.shiny).toList()
+    final shiny = assets.where((p) => p.shiny).toList()..sort(_compareSprites);
+    final normal = assets.where((p) => !p.shiny).toList()
       ..sort(_compareSprites);
-    final normal = assets.where((p) => !p.shiny).toList()..sort(_compareSprites);
     _normalMap.clear();
     for (final s in shiny) {
       final match = normal.firstWhere(
