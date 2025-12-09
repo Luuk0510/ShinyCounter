@@ -16,6 +16,7 @@ import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 
@@ -340,7 +341,7 @@ class _PokemonListPageState extends State<PokemonListPage>
     final searchController = TextEditingController();
     var query = '';
 
-    final action = await showModalBottomSheet<_ManageAction>(
+    final action = await showModalBottomSheet<ManageAction>(
       context: context,
       isScrollControlled: true,
       showDragHandle: false,
@@ -350,9 +351,7 @@ class _PokemonListPageState extends State<PokemonListPage>
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
       ),
-      builder: (context) => _ManageListView(
-        pokemonSorted: pokemonSorted,
-      ),
+      builder: (context) => _ManageListView(pokemonSorted: pokemonSorted),
     );
 
     if (action == null) return;
@@ -467,7 +466,7 @@ class _PokemonListPageState extends State<PokemonListPage>
     final sections = <Widget>[];
     if (uncaught.isNotEmpty) {
       sections.add(
-        _SectionWidget(
+        PokemonSection(
           title: context.l10n.sectionUncaught,
           expanded: _showUncaught,
           onToggle: () => setState(() => _showUncaught = !_showUncaught),
@@ -479,7 +478,7 @@ class _PokemonListPageState extends State<PokemonListPage>
     }
     if (caught.isNotEmpty) {
       sections.add(
-        _SectionWidget(
+        PokemonSection(
           title: context.l10n.sectionCaught,
           expanded: _showCaught,
           onToggle: () => setState(() => _showCaught = !_showCaught),
@@ -499,108 +498,6 @@ class _PokemonListPageState extends State<PokemonListPage>
         padding: EdgeInsets.fromLTRB(0, 4, 0, bottomPadding),
         children: sections,
       ),
-    );
-  }
-}
-
-class _SectionWidget extends StatelessWidget {
-  const _SectionWidget({
-    required this.title,
-    required this.expanded,
-    required this.onToggle,
-    required this.pokemons,
-    required this.isCaught,
-    required this.onTap,
-  });
-
-  final String title;
-  final bool expanded;
-  final VoidCallback onToggle;
-  final List<Pokemon> pokemons;
-  final bool Function(Pokemon) isCaught;
-  final Future<void> Function(Pokemon) onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        InkWell(
-          onTap: onToggle,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Row(
-              children: [
-                Expanded(child: Text(title, style: AppTypography.sectionTitle)),
-                AnimatedRotation(
-                  turns: expanded ? 0.5 : 0,
-                  duration: AppAnim.normal,
-                  curve: AppAnim.easeOut,
-                  child: const Icon(Icons.expand_more),
-                ),
-              ],
-            ),
-          ),
-        ),
-        AnimatedSize(
-          duration: AppAnim.normal,
-          curve: AppAnim.easeOut,
-          alignment: Alignment.topCenter,
-          child: ClipRect(
-            child: expanded
-                ? Column(
-                    children: [
-                      for (final p in pokemons)
-                        PokemonCard(
-                          key: ValueKey(p.id),
-                          pokemon: p,
-                          isCaught: isCaught(p),
-                          onTap: () => onTap(p),
-                        ),
-                    ],
-                  )
-                : const SizedBox.shrink(),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ManageAction {
-  const _ManageAction({required this.pokemon, required this.delete});
-
-  final Pokemon pokemon;
-  final bool delete;
-}
-
-class _ManagePokemonImage extends StatelessWidget {
-  const _ManagePokemonImage({required this.pokemon});
-
-  final Pokemon pokemon;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = AppSpacing.xxl + AppSpacing.md;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadii.sm),
-      child: pokemon.isLocalFile && !kIsWeb
-          ? Image.file(
-              File(pokemon.imagePath),
-              width: size,
-              height: size,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stack) =>
-                  Icon(Icons.catching_pokemon, size: size * 0.55),
-            )
-          : Image.asset(
-              pokemon.imagePath,
-              width: size,
-              height: size,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stack) =>
-                  Icon(Icons.catching_pokemon, size: size * 0.55),
-            ),
     );
   }
 }
@@ -688,7 +585,7 @@ class _ManageListViewState extends State<_ManageListView> {
                   itemBuilder: (context, index) {
                     final p = filtered[index];
                     return ListTile(
-                      leading: _ManagePokemonImage(pokemon: p),
+                      leading: ManagePokemonImage(pokemon: p),
                       title: Text(
                         p.name,
                         style: AppTypography.listTitle.copyWith(
@@ -708,17 +605,17 @@ class _ManageListViewState extends State<_ManageListView> {
                           IconButton(
                             icon: const Icon(Icons.edit),
                             tooltip: context.l10n.manageEditTooltip,
-                            onPressed: () => Navigator.of(context).pop(
-                              _ManageAction(pokemon: p, delete: false),
-                            ),
+                            onPressed: () => Navigator.of(
+                              context,
+                            ).pop(ManageAction(pokemon: p, delete: false)),
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete_outline),
                             tooltip: context.l10n.manageDeleteTooltip,
                             color: colors.error,
-                            onPressed: () => Navigator.of(context).pop(
-                              _ManageAction(pokemon: p, delete: true),
-                            ),
+                            onPressed: () => Navigator.of(
+                              context,
+                            ).pop(ManageAction(pokemon: p, delete: true)),
                           ),
                         ],
                       ),
@@ -732,6 +629,44 @@ class _ManageListViewState extends State<_ManageListView> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ManageAction {
+  const ManageAction({required this.pokemon, required this.delete});
+
+  final Pokemon pokemon;
+  final bool delete;
+}
+
+class ManagePokemonImage extends StatelessWidget {
+  const ManagePokemonImage({required this.pokemon});
+
+  final Pokemon pokemon;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = AppSpacing.xxl + AppSpacing.md;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppRadii.sm),
+      child: pokemon.isLocalFile && !kIsWeb
+          ? Image.file(
+              File(pokemon.imagePath),
+              width: size,
+              height: size,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stack) =>
+                  Icon(Icons.catching_pokemon, size: size * 0.55),
+            )
+          : Image.asset(
+              pokemon.imagePath,
+              width: size,
+              height: size,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stack) =>
+                  Icon(Icons.catching_pokemon, size: size * 0.55),
+            ),
     );
   }
 }
