@@ -68,8 +68,9 @@ void main() {
     expect(find.text('Pikachu'), findsNothing);
   });
 
-  testWidgets('shows empty state when filters remove all items',
-      (tester) async {
+  testWidgets('shows empty state when filters remove all items', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _wrap(ManageListView(pokemonSorted: const [bulba, pikachu, wooper])),
     );

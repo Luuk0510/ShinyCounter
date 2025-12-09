@@ -40,12 +40,73 @@ class _FakeBundle extends AssetBundle {
 class _CountingBundle extends AssetBundle {
   final Map<String, int> loads = {};
   static final Uint8List _pngBytes = Uint8List.fromList(<int>[
-    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
-    0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-    0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00,
-    0x0A, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x60, 0x00, 0x00, 0x00,
-    0x02, 0x00, 0x01, 0xE2, 0x21, 0xBC, 0x33, 0x00, 0x00, 0x00, 0x00, 0x49,
-    0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82
+    0x89,
+    0x50,
+    0x4E,
+    0x47,
+    0x0D,
+    0x0A,
+    0x1A,
+    0x0A,
+    0x00,
+    0x00,
+    0x00,
+    0x0D,
+    0x49,
+    0x48,
+    0x44,
+    0x52,
+    0x00,
+    0x00,
+    0x00,
+    0x01,
+    0x00,
+    0x00,
+    0x00,
+    0x01,
+    0x08,
+    0x06,
+    0x00,
+    0x00,
+    0x00,
+    0x1F,
+    0x15,
+    0xC4,
+    0x89,
+    0x00,
+    0x00,
+    0x00,
+    0x0A,
+    0x49,
+    0x44,
+    0x41,
+    0x54,
+    0x78,
+    0x9C,
+    0x63,
+    0x60,
+    0x00,
+    0x00,
+    0x00,
+    0x02,
+    0x00,
+    0x01,
+    0xE2,
+    0x21,
+    0xBC,
+    0x33,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x49,
+    0x45,
+    0x4E,
+    0x44,
+    0xAE,
+    0x42,
+    0x60,
+    0x82,
   ]);
 
   @override
@@ -61,6 +122,21 @@ class _CountingBundle extends AssetBundle {
       return jsonEncode({'assets/pokemons/0001_form_m_n.png': []});
     }
     return '';
+  }
+
+  @override
+  Future<T> loadStructuredBinaryData<T>(
+    String key,
+    Future<T> Function(ByteData data) parser,
+  ) async {
+    loads[key] = (loads[key] ?? 0) + 1;
+    if (key == 'AssetManifest.bin') {
+      final manifest = {'assets/pokemons/0001_form_m_n.png': <String>[]};
+      final codec = const StandardMessageCodec();
+      final bytes = codec.encodeMessage(manifest)!;
+      return parser(bytes);
+    }
+    return parser(ByteData(0));
   }
 }
 
@@ -103,8 +179,9 @@ void main() {
     expect(dex4.single.dex, '0004');
   });
 
-  testWidgets('precacheSpritePaths dedupes and ignores non-assets',
-      (tester) async {
+  testWidgets('precacheSpritePaths dedupes and ignores non-assets', (
+    tester,
+  ) async {
     final bundle = _CountingBundle();
     final repo = SpriteRepository(bundle: bundle);
 
@@ -114,15 +191,11 @@ void main() {
           bundle: bundle,
           child: Builder(
             builder: (context) {
-              repo.precacheSpritePaths(
-                context,
-                [
-                  'assets/pokemons/0001_form_m_n.png',
-                  'assets/pokemons/0001_form_m_n.png',
-                  'http://example.com/skip.png',
-                ],
-                dedupe: true,
-              );
+              repo.precacheSpritePaths(context, [
+                'assets/pokemons/0001_form_m_n.png',
+                'assets/pokemons/0001_form_m_n.png',
+                'http://example.com/skip.png',
+              ], dedupe: true);
               return const SizedBox.shrink();
             },
           ),
@@ -136,9 +209,7 @@ void main() {
   });
 
   test('warmupForDexes skips cached dexes unless refresh is true', () async {
-    final bundle = _FakeBundle([
-      'assets/pokemons/0005_form_m_n.png',
-    ]);
+    final bundle = _FakeBundle(['assets/pokemons/0005_form_m_n.png']);
     final repo = SpriteRepository(bundle: bundle);
 
     await repo.warmupForDexes(['0005']);

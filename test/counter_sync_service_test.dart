@@ -203,7 +203,7 @@ void main() {
     final result = await sync.isOverlayActive();
 
     expect(result, isTrue);
-    expect(calls.map((c) => c.method), contains('isActive'));
+    expect(calls.map((c) => c.method), contains('isOverlayActive'));
   });
 
   test('closeOverlay delegates to channel', () async {
