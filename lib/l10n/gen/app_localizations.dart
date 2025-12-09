@@ -197,7 +197,7 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
-  /// **'New Pokémon'**
+  /// **'Add new Pokémon'**
   String get addDialogTitle;
 
   ///
