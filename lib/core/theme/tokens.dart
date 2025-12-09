@@ -97,6 +97,8 @@ class AppSizes {
   static const sheetButtonFont = 16.0;
   static const sheetDateWidth = 110.0;
   static const sheetListHeightFactor = 0.72;
+  static const pageIndicatorDot = 8.0;
+  static const primaryButtonWidth = 150.0;
 }
 
 class AppAnim {

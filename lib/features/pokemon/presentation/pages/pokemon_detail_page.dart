@@ -236,7 +236,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
           final bottomInset = mediaQuery.viewInsets.bottom;
           final isPortrait = mediaQuery.orientation == Orientation.portrait;
           final bottomPadding =
-              mediaQuery.padding.bottom + bottomInset + (isPortrait ? 60 : 16);
+              mediaQuery.padding.bottom +
+              bottomInset +
+              (isPortrait ? AppSizes.cardPaddingH * 3 : AppSpacing.md);
 
           return SingleChildScrollView(
             padding: EdgeInsets.zero,
@@ -433,8 +435,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
               sprites.length,
               (i) => Container(
                 margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                width: 8,
-                height: 8,
+                width: AppSizes.pageIndicatorDot,
+                height: AppSizes.pageIndicatorDot,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: i == _currentSpriteIndex
@@ -461,15 +463,15 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       child: AnimatedContainer(
         duration: AppAnim.normal,
         curve: AppAnim.easeOut,
-        width: 150,
+        width: AppSizes.primaryButtonWidth,
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadii.md),
         ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadii.md),
             onTap: _handleCatchTap,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
