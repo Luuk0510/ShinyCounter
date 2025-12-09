@@ -127,11 +127,11 @@ class _ManageListViewState extends State<ManageListView> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  Flexible(
+                  SizedBox(
+                    width: AppSizes.dropdownWidth,
                     child: DropdownButtonFormField<int?>(
                       initialValue: _selectedGen,
                       isDense: true,
-                      isExpanded: true,
                       alignment: Alignment.centerLeft,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(
