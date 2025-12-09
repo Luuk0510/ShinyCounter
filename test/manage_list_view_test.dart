@@ -19,19 +19,35 @@ Widget _wrap(Widget child) {
 }
 
 void main() {
-  const bulba = Pokemon(id: '0001', name: 'Bulbasaur', imagePath: 'assets/0001.png');
-  const pikachu = Pokemon(id: '0025', name: 'Pikachu', imagePath: 'assets/0025.png');
-  const wooper = Pokemon(id: '0194', name: 'Wooper', imagePath: 'assets/0194.png');
+  const bulba = Pokemon(
+    id: '0001',
+    name: 'Bulbasaur',
+    imagePath: 'assets/0001.png',
+  );
+  const pikachu = Pokemon(
+    id: '0025',
+    name: 'Pikachu',
+    imagePath: 'assets/0025.png',
+  );
+  const wooper = Pokemon(
+    id: '0194',
+    name: 'Wooper',
+    imagePath: 'assets/0194.png',
+  );
 
   testWidgets('shows all items by default', (tester) async {
-    await tester.pumpWidget(_wrap(ManageListView(pokemonSorted: const [bulba, pikachu, wooper])));
+    await tester.pumpWidget(
+      _wrap(ManageListView(pokemonSorted: const [bulba, pikachu, wooper])),
+    );
     expect(find.text('Bulbasaur'), findsOneWidget);
     expect(find.text('Pikachu'), findsOneWidget);
     expect(find.text('Wooper'), findsOneWidget);
   });
 
   testWidgets('filters by search query', (tester) async {
-    await tester.pumpWidget(_wrap(ManageListView(pokemonSorted: const [bulba, pikachu, wooper])));
+    await tester.pumpWidget(
+      _wrap(ManageListView(pokemonSorted: const [bulba, pikachu, wooper])),
+    );
     await tester.enterText(find.byType(TextField).first, 'pika');
     await tester.pumpAndSettle();
     expect(find.text('Pikachu'), findsOneWidget);
@@ -40,7 +56,9 @@ void main() {
   });
 
   testWidgets('filters by generation', (tester) async {
-    await tester.pumpWidget(_wrap(ManageListView(pokemonSorted: const [bulba, pikachu, wooper])));
+    await tester.pumpWidget(
+      _wrap(ManageListView(pokemonSorted: const [bulba, pikachu, wooper])),
+    );
     await tester.tap(find.byType(DropdownButtonFormField<int?>));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Gen 2').last);

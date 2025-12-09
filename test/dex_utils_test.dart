@@ -55,11 +55,11 @@ void main() {
       expect(isDexInGen(25, null), isTrue); // null = all
     });
 
-  test('dexValueFromPokemon prefers imagePath then id', () {
-    expect(dexValueFromPokemon(bulba), 1);
-    expect(dexValueFromPokemon(charizard), 6);
-    expect(dexValueFromPokemon(custom), 123);
-  });
+    test('dexValueFromPokemon prefers imagePath then id', () {
+      expect(dexValueFromPokemon(bulba), 1);
+      expect(dexValueFromPokemon(charizard), 6);
+      expect(dexValueFromPokemon(custom), 123);
+    });
 
     test('pokemonDexComparator sorts by dex then name', () {
       final sorted = [charizard, custom, bulba]..sort(pokemonDexComparator);

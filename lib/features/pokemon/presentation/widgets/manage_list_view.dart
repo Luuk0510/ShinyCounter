@@ -98,11 +98,11 @@ class _ManageListViewState extends State<ManageListView> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-      Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _searchController,
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
                       onChanged: (value) => setState(() => _query = value),
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.search),
@@ -124,17 +124,17 @@ class _ManageListViewState extends State<ManageListView> {
                       ),
                     ),
                   ),
-          const SizedBox(width: AppSpacing.sm),
-          Flexible(
-            child: DropdownButtonFormField<int?>(
-              initialValue: _selectedGen,
-              isDense: true,
-              isExpanded: true,
-              alignment: Alignment.centerLeft,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Flexible(
+                    child: DropdownButtonFormField<int?>(
+                      initialValue: _selectedGen,
+                      isDense: true,
+                      isExpanded: true,
+                      alignment: Alignment.centerLeft,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: AppSpacing.sm,
                           vertical: AppSpacing.sm,
@@ -193,8 +193,9 @@ class _ManageListViewState extends State<ManageListView> {
                               context.l10n.tryAnotherFilter,
                               textAlign: TextAlign.center,
                               style: AppTypography.button.copyWith(
-                                color: colors.onSurfaceVariant
-                                    .withValues(alpha: 0.9),
+                                color: colors.onSurfaceVariant.withValues(
+                                  alpha: 0.9,
+                                ),
                               ),
                             ),
                           ],
@@ -234,9 +235,9 @@ class _ManageListViewState extends State<ManageListView> {
                                   icon: const Icon(Icons.delete_outline),
                                   tooltip: context.l10n.manageDeleteTooltip,
                                   color: colors.error,
-                                  onPressed: () => Navigator.of(context).pop(
-                                    ManageAction(pokemon: p, delete: true),
-                                  ),
+                                  onPressed: () => Navigator.of(
+                                    context,
+                                  ).pop(ManageAction(pokemon: p, delete: true)),
                                 ),
                               ],
                             ),
