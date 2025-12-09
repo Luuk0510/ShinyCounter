@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
-import 'package:shiny_counter/core/theme/app_assets.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
@@ -22,23 +21,14 @@ class ManagePokemonImage extends StatelessWidget {
     final size = AppSpacing.xxl + AppSpacing.md;
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppRadii.sm),
-      child: pokemon.isLocalFile
-          ? Image.asset(
-              AppAssets.pokeballIcon,
-              width: size,
-              height: size,
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) =>
-                  Icon(Icons.catching_pokemon, size: size * 0.55),
-            )
-          : Image.asset(
-              pokemon.imagePath,
-              width: size,
-              height: size,
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) =>
-                  Icon(Icons.catching_pokemon, size: size * 0.55),
-            ),
+      child: Image.asset(
+        pokemon.imagePath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) =>
+            Icon(Icons.catching_pokemon, size: size * 0.55),
+      ),
     );
   }
 }
