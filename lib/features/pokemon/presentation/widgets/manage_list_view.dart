@@ -127,47 +127,52 @@ class _ManageListViewState extends State<ManageListView> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  SizedBox(
-                    width: AppSizes.dropdownWidth,
-                    child: DropdownButtonFormField<int?>(
-                      initialValue: _selectedGen,
-                      isDense: true,
-                      alignment: Alignment.centerLeft,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(AppRadii.sm),
-                          ),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.sm,
-                        ),
+                  Flexible(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: AppSizes.dropdownWidth,
                       ),
-                      onChanged: (gen) => setState(() => _selectedGen = gen),
-                      items: [
-                        DropdownMenuItem<int?>(
-                          value: null,
-                          child: SizedBox(
-                            width: AppSizes.dropdownWidth - AppSpacing.lg,
-                            child: Text(
-                              context.l10n.filterAllGens,
-                              overflow: TextOverflow.ellipsis,
+                      child: DropdownButtonFormField<int?>(
+                        initialValue: _selectedGen,
+                        isDense: true,
+                        isExpanded: true,
+                        alignment: Alignment.centerLeft,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(AppRadii.sm),
                             ),
                           ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: AppSpacing.sm,
+                          ),
                         ),
-                        for (final gen in List.generate(9, (i) => i + 1))
+                        onChanged: (gen) => setState(() => _selectedGen = gen),
+                        items: [
                           DropdownMenuItem<int?>(
-                            value: gen,
+                            value: null,
                             child: SizedBox(
                               width: AppSizes.dropdownWidth - AppSpacing.lg,
                               child: Text(
-                                'Gen $gen',
+                                context.l10n.filterAllGens,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ),
-                      ],
+                          for (final gen in List.generate(9, (i) => i + 1))
+                            DropdownMenuItem<int?>(
+                              value: gen,
+                              child: SizedBox(
+                                width: AppSizes.dropdownWidth - AppSpacing.lg,
+                                child: Text(
+                                  'Gen $gen',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
