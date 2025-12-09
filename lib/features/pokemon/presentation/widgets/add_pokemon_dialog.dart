@@ -302,7 +302,8 @@ class _SpritePickerState extends State<_SpritePicker> {
                   suffixIcon: controller.search.isEmpty
                       ? null
                       : IconButton(
-                          icon: const Icon(Icons.clear),
+                          icon: const Icon(Icons.close),
+                          tooltip: context.l10n.cancel,
                           onPressed: controller.clearSearch,
                         ),
                 ),

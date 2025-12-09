@@ -338,9 +338,6 @@ class _PokemonListPageState extends State<PokemonListPage>
       return;
     }
 
-    final searchController = TextEditingController();
-    var query = '';
-
     final action = await showModalBottomSheet<ManageAction>(
       context: context,
       isScrollControlled: true,
@@ -575,6 +572,16 @@ class _ManageListViewState extends State<_ManageListView> {
                   border: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
+                  suffixIcon: _query.isEmpty
+                      ? null
+                      : IconButton(
+                          icon: const Icon(Icons.close),
+                          tooltip: context.l10n.cancel,
+                          onPressed: () => setState(() {
+                            _query = '';
+                            _searchController.clear();
+                          }),
+                        ),
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -641,7 +648,7 @@ class ManageAction {
 }
 
 class ManagePokemonImage extends StatelessWidget {
-  const ManagePokemonImage({required this.pokemon});
+  const ManagePokemonImage({super.key, required this.pokemon});
 
   final Pokemon pokemon;
 
