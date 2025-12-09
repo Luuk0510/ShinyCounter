@@ -22,7 +22,8 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.pokemon.name);
-    _game = null; // Game isn’t part of the core Pokemon model; keep selection local.
+    _game =
+        null; // Game isn’t part of the core Pokemon model; keep selection local.
   }
 
   @override
