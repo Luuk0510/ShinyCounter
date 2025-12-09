@@ -1,5 +1,7 @@
+import 'package:shiny_counter/core/theme/app_assets.dart';
+
 class GameAssets {
-  static const String _defaultLogo = 'assets/icon/pokeball_icon.png';
+  static const String _defaultLogo = AppAssets.pokeballIcon;
 
   static const Map<String, String> gameLogos = {
     'Legends: ZA': 'assets/games/legendsza.png',

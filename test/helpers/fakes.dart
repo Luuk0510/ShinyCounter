@@ -75,20 +75,9 @@ class FakeCounterSync implements CounterSync {
   }
 
   @override
-  Future<void> setDailyCounts(
-    String counterKey,
-    Map<String, int> counts,
-  ) async {
-    daily[counterKey] = counts;
-  }
-
-  @override
   Future<void> setStartedAt(String counterKey, DateTime? startedAt) async {
     started[counterKey] = startedAt;
   }
-
-  @override
-  Future<void> shareToOverlay(CounterOverlayMessage message) async {}
 
   @override
   Future<void> showOverlay(
@@ -103,12 +92,35 @@ class FakeCounterSync implements CounterSync {
     int width = 360,
     int height = 220,
   }) async {
+    ensureOverlayCount++;
     await showOverlay(message, width: width, height: height);
     return true;
   }
 
   @override
   Future<bool> isOverlayActive() async => false;
+
+  void emitOverlay(String data) {
+    _overlayController.add(data);
+  }
+
+  int shareCount = 0;
+  int ensureOverlayCount = 0;
+  int setDailyCalls = 0;
+
+  @override
+  Future<void> shareToOverlay(CounterOverlayMessage message) async {
+    shareCount++;
+  }
+
+  @override
+  Future<void> setDailyCounts(
+    String counterKey,
+    Map<String, int> counts,
+  ) async {
+    setDailyCalls++;
+    daily[counterKey] = counts;
+  }
 }
 
 class FakeSpriteService implements SpriteService {

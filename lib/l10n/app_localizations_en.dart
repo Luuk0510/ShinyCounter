@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Pokémon shiny counter';
+  String get appTitle => 'Shiny counter';
 
   @override
   String get sectionUncaught => 'Uncaught';
@@ -26,7 +26,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tooltipSettings => 'Settings';
 
-  @override
   String get manageTitle => 'Manage Pokémon';
 
   @override
@@ -59,7 +58,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emptyAction => 'Add Pokémon';
 
   @override
-  String get addDialogTitle => 'New Pokémon';
+  String get addDialogTitle => 'Add new Pokémon';
 
   @override
   String get editDialogTitle => 'Edit Pokémon';

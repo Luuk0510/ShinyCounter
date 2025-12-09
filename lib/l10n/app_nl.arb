@@ -1,16 +1,49 @@
 {
   "@@locale": "nl",
-  "appTitle": "Pok\u00e9mon shiny counter",
+  "appTitle": "Shiny counter",
+  "@appTitle": {
+    "description": "App titel in de bovenbalk."
+  },
   "sectionUncaught": "Niet gevangen",
+  "@sectionUncaught": {
+    "description": "Kop voor de lijst van nog niet gevangen Pokémon."
+  },
   "sectionCaught": "Gevangen",
-  "tooltipAddPokemon": "Nieuwe Pok\u00e9mon",
-  "tooltipManagePokemon": "Beheer Pok\u00e9mon",
+  "@sectionCaught": {
+    "description": "Kop voor de lijst van gevangen Pokémon."
+  },
+  "tooltipAddPokemon": "Nieuwe Pokémon",
+  "@tooltipAddPokemon": {
+    "description": ""
+  },
+  "tooltipManagePokemon": "Beheer Pokémon",
+  "@tooltipManagePokemon": {
+    "description": ""
+  },
   "tooltipSettings": "Instellingen",
-  "manageTitle": "Beheer Pok\u00e9mon",
+  "@tooltipSettings": {
+    "description": ""
+  },
+  "manageTitle": "Beheer Pokémon",
+  "@manageTitle": {
+    "description": ""
+  },
   "manageEditTooltip": "Bewerken",
+  "@manageEditTooltip": {
+    "description": ""
+  },
   "manageDeleteTooltip": "Verwijderen",
-  "manageNoCustom": "Geen custom Pok\u00e9mon om te bewerken.",
+  "@manageDeleteTooltip": {
+    "description": ""
+  },
+  "manageNoCustom": "Geen custom Pokémon om te bewerken.",
+  "@manageNoCustom": {
+    "description": ""
+  },
   "confirmDeleteTitle": "Verwijderen",
+  "@confirmDeleteTitle": {
+    "description": ""
+  },
   "confirmDeleteMessage": "Weet je zeker dat je {name} wilt verwijderen?",
   "@confirmDeleteMessage": {
     "placeholders": {
@@ -18,31 +51,109 @@
     }
   },
   "confirmDeleteCancel": "Annuleren",
+  "@confirmDeleteCancel": {
+    "description": ""
+  },
   "confirmDeleteDelete": "Verwijder",
-  "emptyTitle": "Nog geen Pok\u00e9mon toegevoegd",
-  "emptyAction": "Voeg Pok\u00e9mon toe",
-  "addDialogTitle": "Nieuwe Pok\u00e9mon",
-  "editDialogTitle": "Pok\u00e9mon bewerken",
+  "@confirmDeleteDelete": {
+    "description": ""
+  },
+  "emptyTitle": "Nog geen Pokémon toegevoegd",
+  "@emptyTitle": {
+    "description": ""
+  },
+  "emptyAction": "Voeg Pokémon toe",
+  "@emptyAction": {
+    "description": ""
+  },
+  "addDialogTitle": "Nieuwe Pokémon",
+  "@addDialogTitle": {
+    "description": ""
+  },
+  "editDialogTitle": "Pokémon bewerken",
+  "@editDialogTitle": {
+    "description": ""
+  },
   "choose": "Kies",
+  "@choose": {
+    "description": ""
+  },
   "nameLabel": "Naam",
+  "@nameLabel": {
+    "description": ""
+  },
   "nameHint": "Bijv. Mewtwo",
+  "@nameHint": {
+    "description": ""
+  },
   "choosePhoto": "Kies foto",
+  "@choosePhoto": {
+    "description": ""
+  },
   "cancel": "Annuleren",
+  "@cancel": {
+    "description": ""
+  },
   "save": "Opslaan",
+  "@save": {
+    "description": ""
+  },
   "settingsTitle": "Thema",
+  "@settingsTitle": {
+    "description": ""
+  },
   "settingsSystem": "Systeem",
+  "@settingsSystem": {
+    "description": ""
+  },
   "settingsLight": "Licht",
+  "@settingsLight": {
+    "description": ""
+  },
   "settingsDark": "Donker",
+  "@settingsDark": {
+    "description": ""
+  },
   "settingsOled": "OLED",
+  "@settingsOled": {
+    "description": ""
+  },
   "settingsLanguage": "Taal",
+  "@settingsLanguage": {
+    "description": ""
+  },
   "languageEnglish": "Engels",
+  "@languageEnglish": {
+    "description": ""
+  },
   "languageDutch": "Nederlands",
+  "@languageDutch": {
+    "description": ""
+  },
   "editCounterTooltip": "Counter bewerken",
+  "@editCounterTooltip": {
+    "description": ""
+  },
   "openOverlayTooltip": "Mini-counter openen",
+  "@openOverlayTooltip": {
+    "description": ""
+  },
   "buttonCatch": "Vang",
+  "@buttonCatch": {
+    "description": ""
+  },
   "buttonCaught": "Gevangen",
+  "@buttonCaught": {
+    "description": ""
+  },
   "huntStart": "Start",
+  "@huntStart": {
+    "description": ""
+  },
   "huntCatch": "Gevangen",
+  "@huntCatch": {
+    "description": ""
+  },
   "huntGame": "Pokemon {game}",
   "@huntGame": {
     "placeholders": {
@@ -50,20 +161,71 @@
     }
   },
   "selectGameHint": "Selecteer game",
+  "@selectGameHint": {
+    "description": ""
+  },
   "noCounts": "Nog geen tellingen",
+  "@noCounts": {
+    "description": ""
+  },
   "dateLabel": "Datum",
+  "@dateLabel": {
+    "description": ""
+  },
   "countLabel": "Aantal",
+  "@countLabel": {
+    "description": ""
+  },
   "addCountRow": "Dag toevoegen",
+  "@addCountRow": {
+    "description": ""
+  },
   "editSheetTitle": "Pokémon-gegevens aanpassen",
+  "@editSheetTitle": {
+    "description": ""
+  },
   "huntHistoryTitle": "Hunt-geschiedenis",
+  "@huntHistoryTitle": {
+    "description": ""
+  },
   "counterLabel": "Counter",
+  "@counterLabel": {
+    "description": ""
+  },
   "enterNumberHint": "Voer een getal in",
+  "@enterNumberHint": {
+    "description": ""
+  },
   "invalidCounter": "Voer een geldige counter in",
+  "@invalidCounter": {
+    "description": ""
+  },
   "gameLabel": "Game",
+  "@gameLabel": {
+    "description": ""
+  },
   "gameHint": "Scroll voor game",
+  "@gameHint": {
+    "description": ""
+  },
   "gameNone": "Geen",
-  "searchByNameOrDex": "Zoek op naam of Pok\u00e9dex",
-  "noPokemonFound": "Geen Pok\u00e9mon gevonden",
-  "tryAnotherFilter": "Probeer een andere naam, Pok\u00e9dex of generatie filter.",
-  "filterAllGens": "Alle generaties"
+  "@gameNone": {
+    "description": ""
+  },
+  "searchByNameOrDex": "Zoek op naam of Pokédex",
+  "@searchByNameOrDex": {
+    "description": ""
+  },
+  "noPokemonFound": "Geen Pokémon gevonden",
+  "@noPokemonFound": {
+    "description": ""
+  },
+  "tryAnotherFilter": "Probeer een andere naam, Pokédex of generatie filter.",
+  "@tryAnotherFilter": {
+    "description": ""
+  },
+  "filterAllGens": "Alle generaties",
+  "@filterAllGens": {
+    "description": ""
+  }
 }

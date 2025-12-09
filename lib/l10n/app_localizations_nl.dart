@@ -9,7 +9,7 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
-  String get appTitle => 'Pokémon shiny counter';
+  String get appTitle => 'Shiny counter';
 
   @override
   String get sectionUncaught => 'Niet gevangen';
@@ -26,7 +26,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get tooltipSettings => 'Instellingen';
 
-  @override
   String get manageTitle => 'Beheer Pokémon';
 
   @override
@@ -59,7 +58,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get emptyAction => 'Voeg Pokémon toe';
 
   @override
-  String get addDialogTitle => 'Nieuwe Pokémon';
+  String get addDialogTitle => 'Nieuwe Pokémon toevoegen';
 
   @override
   String get editDialogTitle => 'Pokémon bewerken';

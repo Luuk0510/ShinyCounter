@@ -1,12 +1,10 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/core/theme/app_assets.dart';
 import 'package:shiny_counter/core/di/app_locator.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
@@ -16,8 +14,10 @@ import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/manage_list_view.dart';
 
 // Toggle to include the full dex by default. Off preserves the original
 // behavior (only custom/selected Pokémon).
@@ -39,6 +39,9 @@ class _PokemonListPageState extends State<PokemonListPage>
   final List<Pokemon> _basePokemon = [];
   Set<String> _caught = {};
   bool _loading = true;
+  final ScrollController _listController = ScrollController();
+  bool _showUncaught = true;
+  bool _showCaught = true;
   AnimationController? _sheetController;
 
   List<Pokemon> get _allPokemon {
@@ -319,6 +322,7 @@ class _PokemonListPageState extends State<PokemonListPage>
   @override
   void dispose() {
     _sheetController?.dispose();
+    _listController.dispose();
     super.dispose();
   }
 
@@ -333,8 +337,9 @@ class _PokemonListPageState extends State<PokemonListPage>
       return;
     }
 
-    final action = await showModalBottomSheet<_ManageAction>(
+    final action = await showModalBottomSheet<ManageAction>(
       context: context,
+      isScrollControlled: true,
       showDragHandle: false,
       transitionAnimationController: _sheetController,
       backgroundColor: Theme.of(context).cardColor,
@@ -342,81 +347,7 @@ class _PokemonListPageState extends State<PokemonListPage>
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
       ),
-      builder: (context) {
-        final colors = Theme.of(context).colorScheme;
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.md,
-              AppSpacing.lg,
-              AppSpacing.lg,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: AppSizes.sheetHandleWidth,
-                  height: AppSizes.sheetHandleHeight,
-                  decoration: BoxDecoration(
-                    color: colors.outlineVariant.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(AppRadii.sm),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  context.l10n.manageTitle,
-                  style: AppTypography.title.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Flexible(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: pokemonSorted.length,
-                    itemBuilder: (context, index) {
-                      final p = pokemonSorted[index];
-                      return ListTile(
-                        leading: _ManagePokemonImage(pokemon: p),
-                        title: Text(
-                          p.name,
-                          style: AppTypography.listTitle.copyWith(
-                            color: colors.onSurface,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              tooltip: context.l10n.manageEditTooltip,
-                              onPressed: () => Navigator.of(
-                                context,
-                              ).pop(_ManageAction(pokemon: p, delete: false)),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              tooltip: context.l10n.manageDeleteTooltip,
-                              color: colors.error,
-                              onPressed: () => Navigator.of(
-                                context,
-                              ).pop(_ManageAction(pokemon: p, delete: true)),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    separatorBuilder: (context, _) =>
-                        const Divider(height: AppSpacing.md),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (context) => ManageListView(pokemonSorted: pokemonSorted),
     );
 
     if (action == null) return;
@@ -482,9 +413,20 @@ class _PokemonListPageState extends State<PokemonListPage>
         },
       ),
       foregroundColor: colors.onSurface,
-      title: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(context.l10n.appTitle, style: AppTypography.title),
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            AppAssets.appIcon,
+            width: 28,
+            height: 28,
+            errorBuilder: (_, error, stack) =>
+                const Icon(Icons.catching_pokemon, size: 24),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Text(context.l10n.appTitle, style: AppTypography.title),
+        ],
       ),
       actions: [
         IconButton(
@@ -521,114 +463,53 @@ class _PokemonListPageState extends State<PokemonListPage>
     if (_allPokemon.isEmpty) {
       return PokemonEmptyState(
         onAddPressed: _onAddPokemon,
-        imageAsset: 'assets/icon/pokeball_icon.png',
+        imageAsset: AppAssets.pokeballIcon,
         colors: colors,
         title: context.l10n.emptyTitle,
         actionLabel: context.l10n.emptyAction,
       );
     }
 
-    return ListView.builder(
-      padding: EdgeInsets.fromLTRB(0, 4, 0, bottomPadding),
-      itemCount: _sectionedCount(uncaught, caught),
-      itemBuilder: (context, index) {
-        final entry = _sectionedItem(context, uncaught, caught, index);
-        if (entry is _SectionHeader) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(entry.title, style: AppTypography.sectionTitle),
-          );
-        } else if (entry is Pokemon) {
-          return PokemonCard(
-            pokemon: entry,
-            isCaught: _isCaught(entry),
-            onTap: () => _openDetail(entry),
-          );
-        }
-        return const SizedBox.shrink();
-      },
-    );
-  }
-}
-
-int _sectionedCount(List<Pokemon> uncaught, List<Pokemon> caught) {
-  var count = 0;
-  if (uncaught.isNotEmpty) {
-    count += 1 + uncaught.length;
-  }
-  if (caught.isNotEmpty) {
-    count += 1 + caught.length;
-  }
-  return count;
-}
-
-dynamic _sectionedItem(
-  BuildContext context,
-  List<Pokemon> uncaught,
-  List<Pokemon> caught,
-  int index,
-) {
-  var cursor = 0;
-
-  if (uncaught.isNotEmpty) {
-    if (index == cursor) return _SectionHeader(context.l10n.sectionUncaught);
-    cursor += 1;
-    if (index < cursor + uncaught.length) {
-      return uncaught[index - cursor];
+    final sections = <Widget>[];
+    if (uncaught.isNotEmpty) {
+      sections.add(
+        PokemonSection(
+          title: context.l10n.sectionUncaught,
+          expanded: _showUncaught,
+          onToggle: () => setState(() => _showUncaught = !_showUncaught),
+          pokemons: uncaught,
+          isCaught: _isCaught,
+          onTap: _openDetail,
+        ),
+      );
     }
-    cursor += uncaught.length;
-  }
-
-  if (caught.isNotEmpty) {
-    if (index == cursor) return _SectionHeader(context.l10n.sectionCaught);
-    cursor += 1;
-    if (index < cursor + caught.length) {
-      return caught[index - cursor];
+    if (caught.isNotEmpty) {
+      sections.add(
+        PokemonSection(
+          title: context.l10n.sectionCaught,
+          expanded: _showCaught,
+          onToggle: () => setState(() => _showCaught = !_showCaught),
+          pokemons: caught,
+          isCaught: _isCaught,
+          onTap: _openDetail,
+        ),
+      );
     }
-  }
 
-  return null;
-}
-
-class _SectionHeader {
-  const _SectionHeader(this.title);
-  final String title;
-}
-
-class _ManageAction {
-  const _ManageAction({required this.pokemon, required this.delete});
-
-  final Pokemon pokemon;
-  final bool delete;
-}
-
-class _ManagePokemonImage extends StatelessWidget {
-  const _ManagePokemonImage({required this.pokemon});
-
-  final Pokemon pokemon;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = AppSpacing.xxl + AppSpacing.md;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadii.sm),
-      child: pokemon.isLocalFile && !kIsWeb
-          ? Image.file(
-              File(pokemon.imagePath),
-              width: size,
-              height: size,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stack) =>
-                  Icon(Icons.catching_pokemon, size: size * 0.55),
-            )
-          : Image.asset(
-              pokemon.imagePath,
-              width: size,
-              height: size,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stack) =>
-                  Icon(Icons.catching_pokemon, size: size * 0.55),
-            ),
+    return Scrollbar(
+      controller: _listController,
+      thumbVisibility: false,
+      interactive: true,
+      child: ListView(
+        controller: _listController,
+        padding: EdgeInsets.fromLTRB(
+          AppSizes.cardPaddingH - AppSpacing.xs,
+          AppSpacing.xs,
+          AppSizes.cardPaddingH - AppSpacing.xs,
+          bottomPadding,
+        ),
+        children: sections,
+      ),
     );
   }
 }

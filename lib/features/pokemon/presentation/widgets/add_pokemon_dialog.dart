@@ -5,6 +5,7 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialog_entry.dart';
 
 class AddPokemonController extends ChangeNotifier {
@@ -108,23 +109,10 @@ class AddPokemonController extends ChangeNotifier {
   bool _matchesSelectedGen(SpriteOption sprite) {
     final gen = _selectedGen;
     if (gen == null) return true;
-    final dexNum = int.tryParse(sprite.dex) ?? 0;
-    final range = _genRanges[gen];
-    if (range == null) return true;
-    return dexNum >= range.$1 && dexNum <= range.$2;
+    final dexNum = int.tryParse(sprite.dex);
+    if (dexNum == null) return true;
+    return isDexInGen(dexNum, gen);
   }
-
-  static const Map<int, (int, int)> _genRanges = {
-    1: (1, 151),
-    2: (152, 251),
-    3: (252, 386),
-    4: (387, 493),
-    5: (494, 649),
-    6: (650, 721),
-    7: (722, 809),
-    8: (810, 905),
-    9: (906, 1025),
-  };
 
   int? _genderPriority(String token) {
     switch (token) {
@@ -255,19 +243,33 @@ class _AddPokemonView extends StatelessWidget {
   }
 }
 
-class _SpritePicker extends StatelessWidget {
+class _SpritePicker extends StatefulWidget {
   const _SpritePicker({required this.colors, required this.availableHeight});
 
   final ColorScheme colors;
   final double availableHeight;
 
   @override
+  State<_SpritePicker> createState() => _SpritePickerState();
+}
+
+class _SpritePickerState extends State<_SpritePicker> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final controller = context.watch<AddPokemonController>();
     final headerHeightEstimate = AppSizes.toolbarHeight + AppSpacing.lg;
-    final listHeight = (availableHeight - headerHeightEstimate - AppSpacing.sm)
-        .clamp(AppSizes.listMinHeight, availableHeight)
-        .toDouble();
+    final listHeight =
+        (widget.availableHeight - headerHeightEstimate - AppSpacing.sm)
+            .clamp(AppSizes.listMinHeight, widget.availableHeight)
+            .toDouble();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -288,7 +290,8 @@ class _SpritePicker extends StatelessWidget {
                   suffixIcon: controller.search.isEmpty
                       ? null
                       : IconButton(
-                          icon: const Icon(Icons.clear),
+                          icon: const Icon(Icons.close),
+                          tooltip: context.l10n.cancel,
                           onPressed: controller.clearSearch,
                         ),
                 ),
@@ -312,7 +315,14 @@ class _SpritePicker extends StatelessWidget {
                     vertical: AppSpacing.sm,
                   ),
                 ),
-                onChanged: controller.setGen,
+                onChanged: (gen) {
+                  controller.setGen(gen);
+                  _scrollController.animateTo(
+                    0,
+                    duration: AppAnim.normal,
+                    curve: AppAnim.easeOut,
+                  );
+                },
                 items: [
                   DropdownMenuItem<int?>(
                     value: null,
@@ -344,7 +354,7 @@ class _SpritePicker extends StatelessWidget {
         DecoratedBox(
           decoration: BoxDecoration(
             border: Border.all(
-              color: colors.outlineVariant.withValues(alpha: 0.6),
+              color: widget.colors.outlineVariant.withValues(alpha: 0.6),
             ),
             borderRadius: BorderRadius.circular(AppRadii.md),
           ),
@@ -363,14 +373,14 @@ class _SpritePicker extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.search_off,
-                            color: colors.onSurfaceVariant,
+                            color: widget.colors.onSurfaceVariant,
                             size: AppSizes.spriteThumb,
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           Text(
                             context.l10n.noPokemonFound,
                             style: AppTypography.button.copyWith(
-                              color: colors.onSurfaceVariant,
+                              color: widget.colors.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: AppSpacing.xs),
@@ -378,7 +388,7 @@ class _SpritePicker extends StatelessWidget {
                             context.l10n.tryAnotherFilter,
                             textAlign: TextAlign.center,
                             style: AppTypography.button.copyWith(
-                              color: colors.onSurfaceVariant.withValues(
+                              color: widget.colors.onSurfaceVariant.withValues(
                                 alpha: 0.9,
                               ),
                             ),
@@ -388,8 +398,11 @@ class _SpritePicker extends StatelessWidget {
                     ),
                   )
                 : Scrollbar(
+                    controller: _scrollController,
                     thumbVisibility: true,
+                    interactive: true,
                     child: ListView.builder(
+                      controller: _scrollController,
                       itemCount: controller.filteredSprites.length,
                       itemBuilder: (context, index) {
                         final sprite = controller.filteredSprites[index];
@@ -405,7 +418,9 @@ class _SpritePicker extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: selected
-                                  ? colors.primary.withValues(alpha: 0.08)
+                                  ? widget.colors.primary.withValues(
+                                      alpha: 0.08,
+                                    )
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(AppRadii.md),
                             ),
@@ -422,8 +437,8 @@ class _SpritePicker extends StatelessWidget {
                                         '#${sprite.dex}',
                                         style: AppTypography.button.copyWith(
                                           color: selected
-                                              ? colors.primary
-                                              : colors.onSurfaceVariant,
+                                              ? widget.colors.primary
+                                              : widget.colors.onSurfaceVariant,
                                         ),
                                       ),
                                       const SizedBox(height: AppSpacing.xs),
@@ -432,8 +447,8 @@ class _SpritePicker extends StatelessWidget {
                                         style: AppTypography.sectionTitle
                                             .copyWith(
                                               color: selected
-                                                  ? colors.primary
-                                                  : colors.onSurface,
+                                                  ? widget.colors.primary
+                                                  : widget.colors.onSurface,
                                             ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -455,7 +470,7 @@ class _SpritePicker extends StatelessWidget {
                                   const SizedBox(width: AppSpacing.xs),
                                   Icon(
                                     Icons.check_circle,
-                                    color: colors.primary,
+                                    color: widget.colors.primary,
                                   ),
                                 ],
                               ],
