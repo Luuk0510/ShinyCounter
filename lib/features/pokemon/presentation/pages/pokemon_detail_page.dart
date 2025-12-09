@@ -127,7 +127,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
   Future<void> _handleCatchTap() async {
     setState(() => _buttonPressed = true);
-    await Future.delayed(AppAnim.fast);
+    await Future.delayed(AppAnim.faster);
     if (mounted) setState(() => _buttonPressed = false);
     await _toggleCaught();
   }
@@ -472,7 +472,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       duration: AppAnim.fast,
       curve: AppAnim.easeOutCubic,
       child: AnimatedContainer(
-        duration: AppAnim.normal,
+        duration: AppAnim.fast,
         curve: AppAnim.easeOut,
         width: AppSizes.primaryButtonWidth,
         decoration: BoxDecoration(

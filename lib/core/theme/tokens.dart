@@ -102,6 +102,7 @@ class AppSizes {
 }
 
 class AppAnim {
+  static const faster = Duration(milliseconds: 90);
   static const fast = Duration(milliseconds: 120);
   static const normal = Duration(milliseconds: 200);
   static const switcher = Duration(milliseconds: 220);
