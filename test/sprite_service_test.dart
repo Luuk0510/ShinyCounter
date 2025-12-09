@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -127,7 +128,7 @@ class _CountingBundle extends AssetBundle {
   @override
   Future<T> loadStructuredBinaryData<T>(
     String key,
-    Future<T> Function(ByteData data) parser,
+    FutureOr<T> Function(ByteData data) parser,
   ) async {
     loads[key] = (loads[key] ?? 0) + 1;
     if (key == 'AssetManifest.bin') {
