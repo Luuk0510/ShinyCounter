@@ -342,15 +342,23 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
     final assetPaths = <String>[];
     for (final path in sprites) {
-      if (widget.pokemon.isLocalFile && !path.startsWith('assets/')) {
-        precacheImage(FileImage(File(path)), context);
+      final provider = _imageProviderFor(
+        path,
+        isLocal: widget.pokemon.isLocalFile,
+      );
+      if (provider is FileImage) {
+        precacheImage(provider, context);
       } else {
         assetPaths.add(path);
       }
       final normal = _normalMap[path];
       if (normal != null) {
-        if (widget.pokemon.isLocalFile && !normal.startsWith('assets/')) {
-          precacheImage(FileImage(File(normal)), context);
+        final normalProvider = _imageProviderFor(
+          normal,
+          isLocal: widget.pokemon.isLocalFile,
+        );
+        if (normalProvider is FileImage) {
+          precacheImage(normalProvider, context);
         } else {
           assetPaths.add(normal);
         }
@@ -389,27 +397,18 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                       final normalPath = _normalMap[shinyPath];
                       final showNormal = _showNormal && normalPath != null;
                       final path = showNormal ? normalPath : shinyPath;
-                      final image =
-                          widget.pokemon.isLocalFile &&
-                              !path.startsWith('assets/')
-                          ? Image.file(
-                              File(path),
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stack) =>
-                                  const Icon(
-                                    Icons.catching_pokemon,
-                                    size: AppSizes.detailImageFallback,
-                                  ),
-                            )
-                          : Image.asset(
-                              path,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stack) =>
-                                  const Icon(
-                                    Icons.catching_pokemon,
-                                    size: AppSizes.detailImageFallback,
-                                  ),
-                            );
+                      final provider = _imageProviderFor(
+                        path,
+                        isLocal: widget.pokemon.isLocalFile,
+                      );
+                      final image = Image(
+                        image: provider,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stack) => const Icon(
+                          Icons.catching_pokemon,
+                          size: AppSizes.detailImageFallback,
+                        ),
+                      );
                       return Center(
                         child: AnimatedSwitcher(
                           duration: AppAnim.switcher,
@@ -505,5 +504,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       return shinyPath.replaceFirst('_r.', '_n.');
     }
     return null;
+  }
+
+  ImageProvider _imageProviderFor(String path, {required bool isLocal}) {
+    if (isLocal && !path.startsWith('assets/')) {
+      return FileImage(File(path));
+    }
+    return AssetImage(path);
   }
 }
