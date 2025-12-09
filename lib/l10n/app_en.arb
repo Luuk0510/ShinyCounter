@@ -1,16 +1,49 @@
 {
   "@@locale": "en",
   "appTitle": "Shiny counter",
+  "@appTitle": {
+    "description": "App title shown in the main app bar."
+  },
   "sectionUncaught": "Uncaught",
+  "@sectionUncaught": {
+    "description": "Header label for uncaught Pokémon list."
+  },
   "sectionCaught": "Caught",
-  "tooltipAddPokemon": "New Pok\u00e9mon",
-  "tooltipManagePokemon": "Manage Pok\u00e9mon",
+  "@sectionCaught": {
+    "description": "Header label for caught Pokémon list."
+  },
+  "tooltipAddPokemon": "New Pokémon",
+  "@tooltipAddPokemon": {
+    "description": ""
+  },
+  "tooltipManagePokemon": "Manage Pokémon",
+  "@tooltipManagePokemon": {
+    "description": ""
+  },
   "tooltipSettings": "Settings",
-  "manageTitle": "Manage Pok\u00e9mon",
+  "@tooltipSettings": {
+    "description": ""
+  },
+  "manageTitle": "Manage Pokémon",
+  "@manageTitle": {
+    "description": ""
+  },
   "manageEditTooltip": "Edit",
+  "@manageEditTooltip": {
+    "description": ""
+  },
   "manageDeleteTooltip": "Delete",
-  "manageNoCustom": "No custom Pok\u00e9mon to manage.",
+  "@manageDeleteTooltip": {
+    "description": ""
+  },
+  "manageNoCustom": "No custom Pokémon to manage.",
+  "@manageNoCustom": {
+    "description": ""
+  },
   "confirmDeleteTitle": "Delete",
+  "@confirmDeleteTitle": {
+    "description": ""
+  },
   "confirmDeleteMessage": "Are you sure you want to delete {name}?",
   "@confirmDeleteMessage": {
     "placeholders": {
@@ -18,31 +51,109 @@
     }
   },
   "confirmDeleteCancel": "Cancel",
+  "@confirmDeleteCancel": {
+    "description": ""
+  },
   "confirmDeleteDelete": "Delete",
-  "emptyTitle": "No Pok\u00e9mon added yet",
-  "emptyAction": "Add Pok\u00e9mon",
-  "addDialogTitle": "New Pok\u00e9mon",
-  "editDialogTitle": "Edit Pok\u00e9mon",
+  "@confirmDeleteDelete": {
+    "description": ""
+  },
+  "emptyTitle": "No Pokémon added yet",
+  "@emptyTitle": {
+    "description": ""
+  },
+  "emptyAction": "Add Pokémon",
+  "@emptyAction": {
+    "description": ""
+  },
+  "addDialogTitle": "New Pokémon",
+  "@addDialogTitle": {
+    "description": ""
+  },
+  "editDialogTitle": "Edit Pokémon",
+  "@editDialogTitle": {
+    "description": ""
+  },
   "choose": "Choose",
+  "@choose": {
+    "description": ""
+  },
   "nameLabel": "Name",
+  "@nameLabel": {
+    "description": ""
+  },
   "nameHint": "e.g. Mewtwo",
+  "@nameHint": {
+    "description": ""
+  },
   "choosePhoto": "Choose photo",
+  "@choosePhoto": {
+    "description": ""
+  },
   "cancel": "Cancel",
+  "@cancel": {
+    "description": ""
+  },
   "save": "Save",
+  "@save": {
+    "description": ""
+  },
   "settingsTitle": "Theme",
+  "@settingsTitle": {
+    "description": ""
+  },
   "settingsSystem": "System",
+  "@settingsSystem": {
+    "description": ""
+  },
   "settingsLight": "Light",
+  "@settingsLight": {
+    "description": ""
+  },
   "settingsDark": "Dark",
+  "@settingsDark": {
+    "description": ""
+  },
   "settingsOled": "OLED",
+  "@settingsOled": {
+    "description": ""
+  },
   "settingsLanguage": "Language",
+  "@settingsLanguage": {
+    "description": ""
+  },
   "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": ""
+  },
   "languageDutch": "Dutch",
+  "@languageDutch": {
+    "description": ""
+  },
   "editCounterTooltip": "Edit counter",
+  "@editCounterTooltip": {
+    "description": ""
+  },
   "openOverlayTooltip": "Open mini counter",
+  "@openOverlayTooltip": {
+    "description": ""
+  },
   "buttonCatch": "Catch",
+  "@buttonCatch": {
+    "description": ""
+  },
   "buttonCaught": "Caught",
+  "@buttonCaught": {
+    "description": ""
+  },
   "huntStart": "Start",
+  "@huntStart": {
+    "description": ""
+  },
   "huntCatch": "Catch",
+  "@huntCatch": {
+    "description": ""
+  },
   "huntGame": "Pokemon {game}",
   "@huntGame": {
     "placeholders": {
@@ -50,20 +161,71 @@
     }
   },
   "selectGameHint": "Select game",
+  "@selectGameHint": {
+    "description": ""
+  },
   "noCounts": "No counts yet",
+  "@noCounts": {
+    "description": ""
+  },
   "dateLabel": "Date",
+  "@dateLabel": {
+    "description": ""
+  },
   "countLabel": "Count",
+  "@countLabel": {
+    "description": ""
+  },
   "addCountRow": "Add day",
+  "@addCountRow": {
+    "description": ""
+  },
   "editSheetTitle": "Edit Pokémon details",
+  "@editSheetTitle": {
+    "description": ""
+  },
   "huntHistoryTitle": "Hunt history",
+  "@huntHistoryTitle": {
+    "description": ""
+  },
   "searchByNameOrDex": "Search by name or dex",
+  "@searchByNameOrDex": {
+    "description": ""
+  },
   "counterLabel": "Counter",
+  "@counterLabel": {
+    "description": ""
+  },
   "enterNumberHint": "Enter a number",
+  "@enterNumberHint": {
+    "description": ""
+  },
   "invalidCounter": "Enter a valid counter",
+  "@invalidCounter": {
+    "description": ""
+  },
   "gameLabel": "Game",
+  "@gameLabel": {
+    "description": ""
+  },
   "gameHint": "Scroll to pick a game",
+  "@gameHint": {
+    "description": ""
+  },
   "gameNone": "None",
+  "@gameNone": {
+    "description": ""
+  },
   "noPokemonFound": "No Pokémon found",
+  "@noPokemonFound": {
+    "description": ""
+  },
   "tryAnotherFilter": "Try another name, dex, or generation filter.",
-  "filterAllGens": "All gens"
+  "@tryAnotherFilter": {
+    "description": ""
+  },
+  "filterAllGens": "All gens",
+  "@filterAllGens": {
+    "description": ""
+  }
 }
