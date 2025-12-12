@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/manage_list_view.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/search_gen_filter_row.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 Widget _wrap(Widget child) {
@@ -48,7 +49,10 @@ void main() {
     await tester.pumpWidget(
       _wrap(ManageListView(pokemonSorted: const [bulba, pikachu, wooper])),
     );
-    await tester.enterText(find.byType(TextField).first, 'pika');
+    await tester.enterText(
+      find.byKey(SearchGenFilterRow.searchFieldKey),
+      'pika',
+    );
     await tester.pumpAndSettle();
     expect(find.text('Pikachu'), findsOneWidget);
     expect(find.text('Bulbasaur'), findsNothing);
@@ -59,9 +63,9 @@ void main() {
     await tester.pumpWidget(
       _wrap(ManageListView(pokemonSorted: const [bulba, pikachu, wooper])),
     );
-    await tester.tap(find.byType(DropdownButtonFormField<int?>));
+    await tester.tap(find.byKey(SearchGenFilterRow.genDropdownKey));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Gen 2').last);
+    await tester.tap(find.byKey(SearchGenFilterRow.genItemKey(2)));
     await tester.pumpAndSettle();
     expect(find.text('Wooper'), findsOneWidget);
     expect(find.text('Bulbasaur'), findsNothing);
@@ -74,10 +78,13 @@ void main() {
     await tester.pumpWidget(
       _wrap(ManageListView(pokemonSorted: const [bulba, pikachu, wooper])),
     );
-    await tester.enterText(find.byType(TextField).first, 'zapdos');
-    await tester.tap(find.byType(DropdownButtonFormField<int?>));
+    await tester.enterText(
+      find.byKey(SearchGenFilterRow.searchFieldKey),
+      'zapdos',
+    );
+    await tester.tap(find.byKey(SearchGenFilterRow.genDropdownKey));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Gen 3').last);
+    await tester.tap(find.byKey(SearchGenFilterRow.genItemKey(3)));
     await tester.pumpAndSettle();
 
     expect(find.text('No Pokémon found'), findsOneWidget);
@@ -94,13 +101,16 @@ void main() {
     await tester.pumpWidget(
       _wrap(ManageListView(pokemonSorted: const [bulba, pikachu, wooper])),
     );
-    await tester.enterText(find.byType(TextField).first, 'pika');
+    await tester.enterText(
+      find.byKey(SearchGenFilterRow.searchFieldKey),
+      'pika',
+    );
     await tester.pumpAndSettle();
     expect(find.text('Pikachu'), findsOneWidget);
     expect(find.text('Bulbasaur'), findsNothing);
     expect(find.text('Wooper'), findsNothing);
 
-    await tester.tap(find.byIcon(Icons.close));
+    await tester.tap(find.byKey(SearchGenFilterRow.clearButtonKey));
     await tester.pumpAndSettle();
 
     expect(find.text('Bulbasaur'), findsOneWidget);

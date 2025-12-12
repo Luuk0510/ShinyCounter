@@ -16,6 +16,12 @@ class SearchGenFilterRow extends StatelessWidget {
     this.genCount = 9,
   });
 
+  static const Key searchFieldKey = ValueKey('searchGenFilter.searchField');
+  static const Key clearButtonKey = ValueKey('searchGenFilter.clearButton');
+  static const Key genDropdownKey = ValueKey('searchGenFilter.genDropdown');
+  static Key genItemKey(int? gen) =>
+      ValueKey('searchGenFilter.genItem.${gen ?? 'all'}');
+
   final TextEditingController searchController;
   final String hintText;
   final String query;
@@ -34,6 +40,7 @@ class SearchGenFilterRow extends StatelessWidget {
       children: [
         Expanded(
           child: TextField(
+            key: searchFieldKey,
             controller: searchController,
             onChanged: onQueryChanged,
             decoration: InputDecoration(
@@ -46,6 +53,7 @@ class SearchGenFilterRow extends StatelessWidget {
               suffixIcon: query.isEmpty
                   ? null
                   : IconButton(
+                      key: clearButtonKey,
                       icon: const Icon(Icons.close),
                       tooltip: cancelTooltip,
                       onPressed: onClearQuery,
@@ -57,6 +65,7 @@ class SearchGenFilterRow extends StatelessWidget {
         SizedBox(
           width: AppSizes.dropdownWidth,
           child: DropdownButtonFormField<int?>(
+            key: genDropdownKey,
             initialValue: selectedGen,
             isDense: true,
             isExpanded: true,
@@ -73,11 +82,13 @@ class SearchGenFilterRow extends StatelessWidget {
             onChanged: onGenChanged,
             items: [
               DropdownMenuItem<int?>(
+                key: genItemKey(null),
                 value: null,
                 child: Text(allGensLabel, overflow: TextOverflow.ellipsis),
               ),
               for (final gen in List.generate(genCount, (i) => i + 1))
                 DropdownMenuItem<int?>(
+                  key: genItemKey(gen),
                   value: gen,
                   child: Text('Gen $gen', overflow: TextOverflow.ellipsis),
                 ),
