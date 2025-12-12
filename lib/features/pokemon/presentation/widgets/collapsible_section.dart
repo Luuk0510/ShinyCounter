@@ -62,4 +62,3 @@ class CollapsibleSection extends StatelessWidget {
     );
   }
 }
-

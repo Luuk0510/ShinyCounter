@@ -88,4 +88,3 @@ class SearchGenFilterRow extends StatelessWidget {
     );
   }
 }
-
