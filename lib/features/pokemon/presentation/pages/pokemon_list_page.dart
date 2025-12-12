@@ -415,20 +415,31 @@ class _PokemonListPageState extends State<PokemonListPage>
         },
       ),
       foregroundColor: colors.onSurface,
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            AppAssets.appIcon,
-            width: 28,
-            height: 28,
-            errorBuilder: (_, error, stack) =>
-                const Icon(Icons.catching_pokemon, size: 24),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Text(context.l10n.appTitle, style: AppTypography.title),
-        ],
+      title: LayoutBuilder(
+        builder: (context, constraints) {
+          return ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    AppAssets.appIcon,
+                    width: 28,
+                    height: 28,
+                    errorBuilder: (_, _, _) =>
+                        const Icon(Icons.catching_pokemon, size: 24),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(context.l10n.appTitle, style: AppTypography.title),
+                ],
+              ),
+            ),
+          );
+        },
       ),
       actions: [
         IconButton(
