@@ -7,6 +7,7 @@ import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialog_entry.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/search_gen_filter_row.dart';
 
 class AddPokemonController extends ChangeNotifier {
   AddPokemonController({required SpriteService spriteService})
@@ -255,10 +256,12 @@ class _SpritePicker extends StatefulWidget {
 
 class _SpritePickerState extends State<_SpritePicker> {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -273,82 +276,26 @@ class _SpritePickerState extends State<_SpritePicker> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                onChanged: controller.setSearch,
-                decoration: InputDecoration(
-                  hintText: context.l10n.searchByNameOrDex,
-                  prefixIcon: const Icon(Icons.search),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(AppRadii.sm),
-                    ),
-                  ),
-                  isDense: true,
-                  suffixIcon: controller.search.isEmpty
-                      ? null
-                      : IconButton(
-                          icon: const Icon(Icons.close),
-                          tooltip: context.l10n.cancel,
-                          onPressed: controller.clearSearch,
-                        ),
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            SizedBox(
-              width: AppSizes.dropdownWidth,
-              child: DropdownButtonFormField<int?>(
-                initialValue: controller.selectedGen,
-                isDense: true,
-                alignment: Alignment.centerLeft,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(AppRadii.sm),
-                    ),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: AppSpacing.sm,
-                  ),
-                ),
-                onChanged: (gen) {
-                  controller.setGen(gen);
-                  _scrollController.animateTo(
-                    0,
-                    duration: AppAnim.normal,
-                    curve: AppAnim.easeOut,
-                  );
-                },
-                items: [
-                  DropdownMenuItem<int?>(
-                    value: null,
-                    child: SizedBox(
-                      width: AppSizes.dropdownWidth - AppSpacing.lg,
-                      child: Text(
-                        context.l10n.filterAllGens,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                  for (final gen in List.generate(9, (i) => i + 1))
-                    DropdownMenuItem<int?>(
-                      value: gen,
-                      child: SizedBox(
-                        width: AppSizes.dropdownWidth - AppSpacing.lg,
-                        child: Text(
-                          'Gen $gen',
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
+        SearchGenFilterRow(
+          searchController: _searchController,
+          hintText: context.l10n.searchByNameOrDex,
+          query: controller.search,
+          cancelTooltip: context.l10n.cancel,
+          onQueryChanged: controller.setSearch,
+          onClearQuery: () {
+            controller.clearSearch();
+            _searchController.clear();
+          },
+          allGensLabel: context.l10n.filterAllGens,
+          selectedGen: controller.selectedGen,
+          onGenChanged: (gen) {
+            controller.setGen(gen);
+            _scrollController.animateTo(
+              0,
+              duration: AppAnim.normal,
+              curve: AppAnim.easeOut,
+            );
+          },
         ),
         const SizedBox(height: AppSpacing.sm),
         DecoratedBox(

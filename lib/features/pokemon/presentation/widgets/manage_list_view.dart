@@ -3,6 +3,7 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/search_gen_filter_row.dart';
 
 class ManageAction {
   const ManageAction({required this.pokemon, required this.delete});
@@ -98,80 +99,19 @@ class _ManageListViewState extends State<ManageListView> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (value) => setState(() => _query = value),
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.search),
-                        hintText: context.l10n.searchByNameOrDex,
-                        isDense: true,
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(AppRadii.sm),
-                          ),
-                        ),
-                        suffixIcon: _query.isEmpty
-                            ? null
-                            : IconButton(
-                                icon: const Icon(Icons.close),
-                                tooltip: context.l10n.cancel,
-                                onPressed: () => setState(() {
-                                  _query = '';
-                                  _searchController.clear();
-                                }),
-                              ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  SizedBox(
-                    width: AppSizes.dropdownWidth,
-                    child: DropdownButtonFormField<int?>(
-                      initialValue: _selectedGen,
-                      isDense: true,
-                      isExpanded: true,
-                      alignment: Alignment.centerLeft,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(AppRadii.sm),
-                          ),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.sm,
-                        ),
-                      ),
-                      onChanged: (gen) => setState(() => _selectedGen = gen),
-                      items: [
-                        DropdownMenuItem<int?>(
-                          value: null,
-                          child: SizedBox(
-                            width: AppSizes.dropdownWidth - AppSpacing.lg,
-                            child: Text(
-                              context.l10n.filterAllGens,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                        for (final gen in List.generate(9, (i) => i + 1))
-                          DropdownMenuItem<int?>(
-                            value: gen,
-                            child: SizedBox(
-                              width: AppSizes.dropdownWidth - AppSpacing.lg,
-                              child: Text(
-                                'Gen $gen',
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
+              SearchGenFilterRow(
+                searchController: _searchController,
+                hintText: context.l10n.searchByNameOrDex,
+                query: _query,
+                cancelTooltip: context.l10n.cancel,
+                onQueryChanged: (value) => setState(() => _query = value),
+                onClearQuery: () => setState(() {
+                  _query = '';
+                  _searchController.clear();
+                }),
+                allGensLabel: context.l10n.filterAllGens,
+                selectedGen: _selectedGen,
+                onGenChanged: (gen) => setState(() => _selectedGen = gen),
               ),
               const SizedBox(height: AppSpacing.md),
               Flexible(
