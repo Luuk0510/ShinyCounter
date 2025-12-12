@@ -49,18 +49,13 @@ class PokemonSection extends StatelessWidget {
         AnimatedSwitcher(
           duration: AppAnim.normal,
           switchInCurve: AppAnim.easeOutCubic,
-          switchOutCurve: AppAnim.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
           transitionBuilder: (child, animation) {
-            final curved = CurvedAnimation(
-              parent: animation,
-              curve: AppAnim.easeOutCubic,
-            );
-            return FadeTransition(
-              opacity: curved,
+            return ClipRect(
               child: SizeTransition(
                 axis: Axis.vertical,
                 axisAlignment: -1,
-                sizeFactor: curved,
+                sizeFactor: animation,
                 child: child,
               ),
             );
