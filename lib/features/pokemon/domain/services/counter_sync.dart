@@ -11,6 +11,7 @@ abstract class CounterSync {
     String caughtKey,
     CounterState state,
   );
+  Future<void> clearPokemonState(String pokemonId);
   Future<void> setCounter(String counterKey, int count);
   Future<void> setCaught(String caughtKey, bool isCaught);
   Future<void> setStartedAt(String counterKey, DateTime? startedAt);

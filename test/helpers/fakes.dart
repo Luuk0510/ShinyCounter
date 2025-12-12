@@ -29,6 +29,19 @@ class FakeCounterSync implements CounterSync {
   Future<void> closeOverlay() async {}
 
   @override
+  Future<void> clearPokemonState(String pokemonId) async {
+    final id = pokemonId.toLowerCase();
+    final counterKey = 'counter_$id';
+    final caughtKey = 'caught_$id';
+    counters.remove(counterKey);
+    caught.remove(caughtKey);
+    started.remove(counterKey);
+    caughtAt.remove(counterKey);
+    caughtGame.remove(counterKey);
+    daily.remove(counterKey);
+  }
+
+  @override
   Future<CounterState> loadState(String counterKey, String caughtKey) async {
     return CounterState(
       count: counters[counterKey] ?? 0,

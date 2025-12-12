@@ -5,14 +5,13 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/core/theme/app_assets.dart';
-import 'package:shiny_counter/core/di/app_locator.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
@@ -222,14 +221,7 @@ class _PokemonListPageState extends State<PokemonListPage>
   }
 
   Future<void> _clearPokemonState(Pokemon pokemon) async {
-    final prefs = AppLocator.instance.prefsStore;
-    final keys = CounterKeys.fromId(pokemon.id);
-    await prefs.remove(keys.counter);
-    await prefs.remove(keys.caught);
-    await prefs.remove(keys.startedAt);
-    await prefs.remove(keys.caughtAt);
-    await prefs.remove(keys.caughtGame);
-    await prefs.remove(keys.dailyCounts);
+    await context.read<CounterSync>().clearPokemonState(pokemon.id);
   }
 
   Future<void> _confirmDelete(Pokemon pokemon) async {
