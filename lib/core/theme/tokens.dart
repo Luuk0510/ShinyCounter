@@ -99,6 +99,7 @@ class AppSizes {
   static const sheetListHeightFactor = 0.72;
   static const pageIndicatorDot = 8.0;
   static const primaryButtonWidth = 150.0;
+  static const buttonTextSize = 18.0;
 }
 
 class AppAnim {

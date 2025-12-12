@@ -152,7 +152,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       isScrollControlled: true,
       useSafeArea: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
       ),
       backgroundColor: Theme.of(context).cardColor,
       barrierColor: Colors.black.withValues(alpha: 0.4),
@@ -507,7 +507,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                   key: ValueKey(caught),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: AppSizes.buttonTextSize,
                     fontWeight: FontWeight.w700,
                     color: fg,
                   ),
