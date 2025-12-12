@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shiny_counter/core/storage/key_value_store.dart';
+import 'package:shiny_counter/core/storage/app_prefs_keys.dart';
 import 'package:shiny_counter/features/pokemon/data/datasources/pokemon_storage.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 
 class _MemoryStore implements KeyValueStore {
   final Map<String, String> _strings = {};
@@ -80,7 +82,7 @@ void main() {
       final legacy = [
         {'name': 'LegacyMon', 'imagePath': 'path/legacy.png'},
       ];
-      await store.setString('custom_pokemon', jsonEncode(legacy));
+      await store.setString(AppPrefsKeys.customPokemon, jsonEncode(legacy));
 
       final loaded = await storage.loadCustomPokemon();
       expect(loaded.single.id, 'legacy_legacymon');
@@ -92,8 +94,8 @@ void main() {
         const Pokemon(id: '001', name: 'Bulbasaur', imagePath: '001.png'),
         const Pokemon(id: '002', name: 'Ivysaur', imagePath: '002.png'),
       ];
-      await store.setBool('caught_001', true);
-      await store.setBool('caught_002', false);
+      await store.setBool(CounterKeys.fromId('001').caught, true);
+      await store.setBool(CounterKeys.fromId('002').caught, false);
 
       final caught = await storage.loadCaught(mons);
 

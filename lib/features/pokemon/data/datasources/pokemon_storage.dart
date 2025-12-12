@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:shiny_counter/core/storage/app_prefs_keys.dart';
 import 'package:shiny_counter/core/storage/key_value_store.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 
 import '../../domain/entities/pokemon.dart';
 
@@ -10,7 +12,7 @@ class PokemonStorage {
   final KeyValueStore _store;
 
   Future<List<Pokemon>> loadCustomPokemon() async {
-    final raw = await _store.getString(_customKey);
+    final raw = await _store.getString(AppPrefsKeys.customPokemon);
     if (raw == null) return [];
 
     try {
@@ -45,19 +47,17 @@ class PokemonStorage {
           )
           .toList(),
     );
-    await _store.setString(_customKey, encoded);
+    await _store.setString(AppPrefsKeys.customPokemon, encoded);
   }
 
   Future<Set<String>> loadCaught(List<Pokemon> allPokemon) async {
     final caught = <String>{};
     for (final p in allPokemon) {
-      if (await _store.getBool(_caughtKey(p.id)) ?? false) {
+      final caughtKey = CounterKeys.fromId(p.id).caught;
+      if (await _store.getBool(caughtKey) ?? false) {
         caught.add(p.id);
       }
     }
     return caught;
   }
-
-  String _caughtKey(String id) => 'caught_${id.toLowerCase()}';
-  static const _customKey = 'custom_pokemon';
 }

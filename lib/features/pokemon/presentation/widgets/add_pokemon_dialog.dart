@@ -8,6 +8,7 @@ import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.da
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialog_entry.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/search_gen_filter_row.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
 
 class AddPokemonController extends ChangeNotifier {
   AddPokemonController({required SpriteService spriteService})
@@ -46,8 +47,7 @@ class AddPokemonController extends ChangeNotifier {
       final Map<String, SpriteOption> chosen = {};
       for (final parsed in parsedSprites) {
         if (!parsed.shiny) continue; // only shiny choices
-        final lowerForm = parsed.form.toLowerCase();
-        if (lowerForm.contains('mega') || lowerForm.contains('gmax')) continue;
+        if (isMegaOrGmaxForm(parsed.form)) continue;
 
         final priority = _genderPriority(parsed.gender);
         if (priority == null) continue;

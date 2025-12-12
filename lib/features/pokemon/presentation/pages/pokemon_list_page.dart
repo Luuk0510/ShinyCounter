@@ -17,6 +17,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_sect
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/manage_list_view.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
 
 // Toggle to include the full dex by default. Off preserves the original
 // behavior (only custom/selected Pokémon).
@@ -114,8 +115,7 @@ class _PokemonListPageState extends State<PokemonListPage>
       final chosen = <String, ParsedSprite>{};
       for (final sprite in sprites) {
         if (!sprite.shiny) continue;
-        final lowerForm = sprite.form.toLowerCase();
-        if (lowerForm.contains('mega') || lowerForm.contains('gmax')) continue;
+        if (isMegaOrGmaxForm(sprite.form)) continue;
         final priority = _genderPriority(sprite.gender);
         if (priority == null) continue;
         final current = chosen[sprite.dex];
