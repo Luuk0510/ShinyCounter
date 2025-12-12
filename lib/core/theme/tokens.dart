@@ -34,7 +34,7 @@ class AppSizes {
   static const listMinHeight = 160.0;
   static const spriteThumb = 96.0;
   static const listItemMinHeight = 104.0;
-  static const dropdownWidth = 105.0;
+  static const dropdownWidth = 115.0;
   static const counterButtonSize = 72.0;
   static const counterButtonPadding = 18.0;
   static const counterIconSize = 32.0;
