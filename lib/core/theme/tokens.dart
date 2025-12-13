@@ -26,6 +26,8 @@ class AppRadii {
 
 class AppSizes {
   static const toolbarHeight = 52.0;
+  static const appBarTitleIcon = 36.0;
+  static const appBarActionIcon = 26.0;
   static const sheetHandleWidth = 44.0;
   static const sheetHandleHeight = 5.0;
   static const dialogMaxWidth = 420.0;
@@ -100,6 +102,14 @@ class AppSizes {
   static const pageIndicatorDot = 8.0;
   static const primaryButtonWidth = 150.0;
   static const buttonTextSize = 18.0;
+}
+
+class AppLimits {
+  static const listSpritePrecacheCount = 8;
+}
+
+class AppOpacity {
+  static const modalBarrier = 0.35;
 }
 
 class AppAnim {

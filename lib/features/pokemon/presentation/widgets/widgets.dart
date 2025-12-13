@@ -13,3 +13,4 @@ export 'search_gen_filter_row.dart';
 export 'settings_sheet.dart';
 export 'edit_pokemon_dialog.dart';
 export 'shimmer_box.dart';
+export 'animated_app_icon.dart';
