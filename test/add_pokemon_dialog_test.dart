@@ -11,7 +11,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/add_pokemon_
 import 'package:shiny_counter/features/pokemon/presentation/widgets/search_gen_filter_row.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
-import 'package:shiny_counter/l10n/gen/app_localizations.dart';
+import 'package:shiny_counter/l10n/app_localizations.dart';
 
 import 'helpers/fakes.dart';
 import 'helpers/test_asset_bundle.dart';

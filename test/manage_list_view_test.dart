@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/manage_list_view.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/search_gen_filter_row.dart';
-import 'package:shiny_counter/l10n/gen/app_localizations.dart';
+import 'package:shiny_counter/l10n/app_localizations.dart';
 
 Widget _wrap(Widget child) {
   return MaterialApp(

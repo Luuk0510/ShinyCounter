@@ -26,6 +26,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tooltipSettings => 'Settings';
 
+  @override
   String get manageTitle => 'Manage Pokémon';
 
   @override
@@ -64,6 +65,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editDialogTitle => 'Edit Pokémon';
 
   @override
+  String get choose => 'Choose';
+
+  @override
   String get nameLabel => 'Name';
 
   @override
@@ -94,6 +98,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsOled => 'OLED';
 
   @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageDutch => 'Dutch';
+
+  @override
   String get editCounterTooltip => 'Edit counter';
 
   @override
@@ -117,6 +130,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get selectGameHint => 'Select game';
+
+  @override
   String get noCounts => 'No counts yet';
 
   @override
@@ -126,7 +142,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get countLabel => 'Count';
 
   @override
-  String get editSheetTitle => 'Edit';
+  String get addCountRow => 'Add day';
+
+  @override
+  String get editSheetTitle => 'Edit Pokémon details';
+
+  @override
+  String get huntHistoryTitle => 'Hunt history';
+
+  @override
+  String get searchByNameOrDex => 'Search by name or dex';
 
   @override
   String get counterLabel => 'Counter';
@@ -145,4 +170,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gameNone => 'None';
+
+  @override
+  String get noPokemonFound => 'No Pokémon found';
+
+  @override
+  String get tryAnotherFilter => 'Try another name, dex, or generation filter.';
+
+  @override
+  String get filterAllGens => 'All gens';
 }

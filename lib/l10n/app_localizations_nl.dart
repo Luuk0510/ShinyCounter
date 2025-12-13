@@ -26,6 +26,7 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get tooltipSettings => 'Instellingen';
 
+  @override
   String get manageTitle => 'Beheer Pokémon';
 
   @override
@@ -64,6 +65,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get editDialogTitle => 'Pokémon bewerken';
 
   @override
+  String get choose => 'Kies';
+
+  @override
   String get nameLabel => 'Naam';
 
   @override
@@ -94,6 +98,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsOled => 'OLED';
 
   @override
+  String get settingsLanguage => 'Taal';
+
+  @override
+  String get languageEnglish => 'Engels';
+
+  @override
+  String get languageDutch => 'Nederlands';
+
+  @override
   String get editCounterTooltip => 'Counter bewerken';
 
   @override
@@ -117,6 +130,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get selectGameHint => 'Selecteer game';
+
+  @override
   String get noCounts => 'Nog geen tellingen';
 
   @override
@@ -126,7 +142,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get countLabel => 'Aantal';
 
   @override
-  String get editSheetTitle => 'Aanpassen';
+  String get addCountRow => 'Dag toevoegen';
+
+  @override
+  String get editSheetTitle => 'Pokémon-gegevens aanpassen';
+
+  @override
+  String get huntHistoryTitle => 'Hunt-geschiedenis';
+
+  @override
+  String get searchByNameOrDex => 'Zoek op naam of Pokédex';
 
   @override
   String get counterLabel => 'Counter';
@@ -145,4 +170,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get gameNone => 'Geen';
+
+  @override
+  String get noPokemonFound => 'Geen Pokémon gevonden';
+
+  @override
+  String get tryAnotherFilter =>
+      'Probeer een andere naam, Pokédex of generatie filter.';
+
+  @override
+  String get filterAllGens => 'Alle generaties';
 }

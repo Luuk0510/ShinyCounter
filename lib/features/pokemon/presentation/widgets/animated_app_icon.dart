@@ -5,6 +5,9 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 class AnimatedAppIcon extends StatefulWidget {
   const AnimatedAppIcon({super.key, required this.assetPath, this.size = 28});
 
+  static const tapTargetKey = Key('animatedAppIcon.tapTarget');
+  static const transformKey = Key('animatedAppIcon.transform');
+
   final String assetPath;
   final double size;
 
@@ -108,6 +111,7 @@ class _AnimatedAppIconState extends State<AnimatedAppIcon>
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _play,
+      key: AnimatedAppIcon.tapTargetKey,
       child: AnimatedBuilder(
         animation: _controller,
         child: Image.asset(
@@ -119,6 +123,7 @@ class _AnimatedAppIconState extends State<AnimatedAppIcon>
         ),
         builder: (context, child) {
           return Transform.rotate(
+            key: AnimatedAppIcon.transformKey,
             angle: _angle.value,
             child: Transform.scale(scale: _scale.value, child: child),
           );
