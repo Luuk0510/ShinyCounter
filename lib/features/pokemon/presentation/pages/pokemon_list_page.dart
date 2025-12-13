@@ -5,19 +5,19 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/core/theme/app_assets.dart';
-import 'package:shiny_counter/core/di/app_locator.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/manage_list_view.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
 
 // Toggle to include the full dex by default. Off preserves the original
 // behavior (only custom/selected Pokémon).
@@ -115,8 +115,7 @@ class _PokemonListPageState extends State<PokemonListPage>
       final chosen = <String, ParsedSprite>{};
       for (final sprite in sprites) {
         if (!sprite.shiny) continue;
-        final lowerForm = sprite.form.toLowerCase();
-        if (lowerForm.contains('mega') || lowerForm.contains('gmax')) continue;
+        if (isMegaOrGmaxForm(sprite.form)) continue;
         final priority = _genderPriority(sprite.gender);
         if (priority == null) continue;
         final current = chosen[sprite.dex];
@@ -222,14 +221,7 @@ class _PokemonListPageState extends State<PokemonListPage>
   }
 
   Future<void> _clearPokemonState(Pokemon pokemon) async {
-    final prefs = AppLocator.instance.prefsStore;
-    final keys = CounterKeys.fromId(pokemon.id);
-    await prefs.remove(keys.counter);
-    await prefs.remove(keys.caught);
-    await prefs.remove(keys.startedAt);
-    await prefs.remove(keys.caughtAt);
-    await prefs.remove(keys.caughtGame);
-    await prefs.remove(keys.dailyCounts);
+    await context.read<CounterSync>().clearPokemonState(pokemon.id);
   }
 
   Future<void> _confirmDelete(Pokemon pokemon) async {
@@ -415,20 +407,31 @@ class _PokemonListPageState extends State<PokemonListPage>
         },
       ),
       foregroundColor: colors.onSurface,
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            AppAssets.appIcon,
-            width: 28,
-            height: 28,
-            errorBuilder: (_, error, stack) =>
-                const Icon(Icons.catching_pokemon, size: 24),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Text(context.l10n.appTitle, style: AppTypography.title),
-        ],
+      title: LayoutBuilder(
+        builder: (context, constraints) {
+          return ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    AppAssets.appIcon,
+                    width: 28,
+                    height: 28,
+                    errorBuilder: (_, _, _) =>
+                        const Icon(Icons.catching_pokemon, size: 24),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(context.l10n.appTitle, style: AppTypography.title),
+                ],
+              ),
+            ),
+          );
+        },
       ),
       actions: [
         IconButton(

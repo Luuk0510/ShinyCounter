@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shiny_counter/core/storage/app_prefs_keys.dart';
 import 'package:shiny_counter/core/storage/key_value_store.dart';
 
 class ThemeNotifier extends ChangeNotifier {
@@ -23,8 +24,8 @@ class ThemeNotifier extends ChangeNotifier {
   }
 
   Future<void> _load() async {
-    final storedMode = await _store.getString(_modeKey);
-    final storedOled = await _store.getBool(_oledKey);
+    final storedMode = await _store.getString(AppPrefsKeys.themeMode);
+    final storedOled = await _store.getBool(AppPrefsKeys.themeOled);
     if (storedMode != null) {
       switch (storedMode) {
         case 'light':
@@ -44,10 +45,7 @@ class ThemeNotifier extends ChangeNotifier {
   }
 
   Future<void> _persist() async {
-    await _store.setString(_modeKey, _mode.name);
-    await _store.setBool(_oledKey, _useOledDark);
+    await _store.setString(AppPrefsKeys.themeMode, _mode.name);
+    await _store.setBool(AppPrefsKeys.themeOled, _useOledDark);
   }
-
-  static const String _modeKey = 'theme_mode';
-  static const String _oledKey = 'theme_oled';
 }

@@ -8,6 +8,8 @@ export 'game_dropdown.dart';
 export 'hunt_info_card.dart';
 export 'pokemon_card.dart';
 export 'pokemon_empty_state.dart';
+export 'collapsible_section.dart';
+export 'search_gen_filter_row.dart';
 export 'settings_sheet.dart';
 export 'edit_pokemon_dialog.dart';
 export 'shimmer_box.dart';
