@@ -3,7 +3,8 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/search_gen_filter_row.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/filters/search_gen_filter_row.dart';
 
 class ManageAction {
   const ManageAction({required this.pokemon, required this.delete});
@@ -20,16 +21,12 @@ class ManagePokemonImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = AppSpacing.xxl + AppSpacing.md;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadii.sm),
-      child: Image.asset(
-        pokemon.imagePath,
-        width: size,
-        height: size,
-        fit: BoxFit.contain,
-        errorBuilder: (_, error, stack) =>
-            Icon(Icons.catching_pokemon, size: size * 0.55),
-      ),
+    return PokemonImage(
+      path: pokemon.imagePath,
+      isLocalFile: pokemon.isLocalFile,
+      width: size,
+      height: size,
+      fallbackIconSize: size * 0.55,
     );
   }
 }

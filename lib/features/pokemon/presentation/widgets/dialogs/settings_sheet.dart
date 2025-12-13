@@ -4,7 +4,7 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialog_entry.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_entry.dart';
 
 class SettingsDialog extends StatefulWidget {
   const SettingsDialog({super.key});

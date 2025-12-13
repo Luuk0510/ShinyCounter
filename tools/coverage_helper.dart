@@ -9,8 +9,8 @@ void main() {
         (line) =>
             // Skip generated l10n
             !line.startsWith('SF:lib/l10n/gen/') &&
-            // Skip generated localization facade
-            !line.startsWith('SF:lib/l10n/app_localizations.dart'),
+            // Skip generated localization files
+            !line.startsWith('SF:lib/l10n/app_localizations'),
       )
       .toList();
   lcov.writeAsStringSync(filtered.join('\n'));

@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 class TestAssetBundle extends AssetBundle {
   TestAssetBundle(Iterable<String> assetKeys)
-      : _assetKeys = Set<String>.from(assetKeys);
+    : _assetKeys = Set<String>.from(assetKeys);
 
   final Set<String> _assetKeys;
 
@@ -93,11 +93,13 @@ class TestAssetBundle extends AssetBundle {
       return ByteData.view(Uint8List.fromList(data).buffer);
     }
     if (key == 'assets/data/pokemon_names_en.json') {
-      final data = utf8.encode(jsonEncode(<String, String>{
-        '0001': 'Bulbasaur',
-        '0152': 'Chikorita',
-        '0252': 'Treecko',
-      }));
+      final data = utf8.encode(
+        jsonEncode(<String, String>{
+          '0001': 'Bulbasaur',
+          '0152': 'Chikorita',
+          '0252': 'Treecko',
+        }),
+      );
       return ByteData.view(Uint8List.fromList(data).buffer);
     }
     return ByteData.view(_pngBytes.buffer);

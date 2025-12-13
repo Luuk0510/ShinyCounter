@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_card.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/collapsible_section.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/list/collapsible_section.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/list/pokemon_card.dart';
 
 class PokemonSection extends StatelessWidget {
   const PokemonSection({

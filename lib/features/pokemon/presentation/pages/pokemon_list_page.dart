@@ -13,10 +13,8 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokem
 import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/manage_list_view.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
 
 // Toggle to include the full dex by default. Off preserves the original
@@ -179,7 +177,7 @@ class _PokemonListPageState extends State<PokemonListPage>
   Future<void> _precacheListSprites() async {
     final toPrecache = _allPokemon
         .where((p) => !p.isLocalFile)
-        .take(8)
+        .take(AppLimits.listSpritePrecacheCount)
         .toList();
     if (toPrecache.isEmpty) return;
     final service = context.read<SpriteService>();
@@ -335,7 +333,7 @@ class _PokemonListPageState extends State<PokemonListPage>
       showDragHandle: false,
       transitionAnimationController: _sheetController,
       backgroundColor: Theme.of(context).cardColor,
-      barrierColor: Colors.black.withValues(alpha: 0.35),
+      barrierColor: Colors.black.withValues(alpha: AppOpacity.modalBarrier),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
       ),
@@ -418,14 +416,11 @@ class _PokemonListPageState extends State<PokemonListPage>
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    AppAssets.appIcon,
-                    width: 28,
-                    height: 28,
-                    errorBuilder: (_, _, _) =>
-                        const Icon(Icons.catching_pokemon, size: 24),
+                  AnimatedAppIcon(
+                    assetPath: AppAssets.appIcon,
+                    size: AppSizes.appBarTitleIcon,
                   ),
-                  const SizedBox(width: AppSpacing.sm),
+                  const SizedBox(width: AppSpacing.xs),
                   Text(context.l10n.appTitle, style: AppTypography.title),
                 ],
               ),
@@ -435,19 +430,19 @@ class _PokemonListPageState extends State<PokemonListPage>
       ),
       actions: [
         IconButton(
-          iconSize: 26,
+          iconSize: AppSizes.appBarActionIcon,
           icon: const Icon(Icons.add_circle),
           tooltip: context.l10n.tooltipAddPokemon,
           onPressed: _onAddPokemon,
         ),
         IconButton(
-          iconSize: 26,
+          iconSize: AppSizes.appBarActionIcon,
           icon: const Icon(Icons.edit_note),
           tooltip: context.l10n.tooltipManagePokemon,
           onPressed: _openManagePokemonList,
         ),
         IconButton(
-          iconSize: 26,
+          iconSize: AppSizes.appBarActionIcon,
           icon: const Icon(Icons.settings),
           tooltip: context.l10n.tooltipSettings,
           onPressed: _openSettings,
