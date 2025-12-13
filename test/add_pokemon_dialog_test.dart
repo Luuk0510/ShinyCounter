@@ -16,6 +16,17 @@ import 'package:shiny_counter/l10n/app_localizations.dart';
 import 'helpers/fakes.dart';
 import 'helpers/test_asset_bundle.dart';
 
+Future<void> _waitForCondition(
+  WidgetTester tester,
+  bool Function() condition, {
+  Duration step = const Duration(milliseconds: 50),
+  int maxSteps = 120,
+}) async {
+  for (var i = 0; i < maxSteps && !condition(); i++) {
+    await tester.pump(step);
+  }
+}
+
 Future<void> _waitForText(
   WidgetTester tester,
   String text, {
@@ -149,47 +160,71 @@ void main() {
       ]);
 
       Pokemon? result;
+      late BuildContext rootContext;
       await tester.pumpWidget(
         _wrap(
           Builder(
             builder: (context) {
-              return TextButton(
-                onPressed: () async {
-                  result = await showAddPokemonDialog(context);
-                },
-                child: const Text('open'),
-              );
+              rootContext = context;
+              return const SizedBox.shrink();
             },
           ),
           spriteService: spriteService,
         ),
       );
 
-      await tester.tap(find.text('open'));
-      await tester.pump(const Duration(milliseconds: 300));
-      await _waitForText(tester, '#0001');
+      showGeneralDialog<Pokemon?>(
+        context: rootContext,
+        barrierDismissible: true,
+        barrierLabel: MaterialLocalizations.of(
+          rootContext,
+        ).modalBarrierDismissLabel,
+        barrierColor: Colors.black54,
+        transitionDuration: Duration.zero,
+        pageBuilder: (context, _, __) => const AddPokemonDialog(),
+        transitionBuilder: (context, _, __, child) => child,
+      ).then((value) => result = value);
+      await tester.pump(); // show dialog
+
+      await _waitForCondition(
+        tester,
+        () => find.byType(AddPokemonDialog).evaluate().isNotEmpty,
+      );
+      expect(find.byType(AddPokemonDialog), findsOneWidget);
+
+      AddPokemonController controller() {
+        final ctx = tester.element(find.byType(AlertDialog));
+        return Provider.of<AddPokemonController>(ctx, listen: false);
+      }
+      await _waitForCondition(
+        tester,
+        () => !controller().loading && controller().filteredSprites.isNotEmpty,
+      );
+      await tester.pump();
+
+      final spriteTiles = find.byType(InkWell);
       expect(
-        find.text('#0001'),
-        findsOneWidget,
-        reason: 'sprite list should load',
+        spriteTiles,
+        findsWidgets,
+        reason: 'sprite list should render at least one selectable tile',
       );
 
       final chooseButton = find.widgetWithText(ElevatedButton, 'Choose');
       expect(tester.widget<ElevatedButton>(chooseButton).onPressed, isNull);
 
-      await tester.tap(find.text('#0001'));
+      await tester.tap(spriteTiles.first);
       await tester.pump(const Duration(milliseconds: 100));
       expect(tester.widget<ElevatedButton>(chooseButton).onPressed, isNotNull);
 
       await tester.tap(chooseButton);
-      await tester.pump(const Duration(milliseconds: 300));
-      await tester.pump();
+      await _waitForCondition(
+        tester,
+        () => find.byType(AddPokemonDialog).evaluate().isEmpty,
+      );
 
       expect(result, isA<Pokemon>());
       expect(result!.id, startsWith('custom_0001_'));
       expect(result!.imagePath, 'assets/pokemons/0001_base_m_s.png');
     },
-    // TODO: flaky until rootBundle asset loading is stabilized in tests.
-    skip: true,
   );
 }
