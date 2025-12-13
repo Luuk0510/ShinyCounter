@@ -166,9 +166,9 @@ class _AddPokemonView extends StatelessWidget {
       ),
       contentPadding: EdgeInsets.fromLTRB(
         AppInsets.dialog.horizontal / 2,
-        AppSpacing.sm,
+        AppSpacing.none,
         AppInsets.dialog.horizontal / 2,
-        AppSpacing.sm,
+        AppSpacing.none,
       ),
       title: Text(
         l10n.addDialogTitle,
@@ -299,7 +299,9 @@ class _SpritePickerState extends State<_SpritePicker> {
         const SizedBox(height: AppSpacing.sm),
         Expanded(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: AppSizes.listMinHeight),
+            constraints: const BoxConstraints(
+              minHeight: AppSizes.listMinHeight,
+            ),
             child: DecoratedBox(
               decoration: BoxDecoration(
                 border: Border.all(
@@ -335,9 +337,8 @@ class _SpritePickerState extends State<_SpritePicker> {
                               context.l10n.tryAnotherFilter,
                               textAlign: TextAlign.center,
                               style: AppTypography.button.copyWith(
-                                color: widget.colors.onSurfaceVariant.withValues(
-                                  alpha: 0.9,
-                                ),
+                                color: widget.colors.onSurfaceVariant
+                                    .withValues(alpha: 0.9),
                               ),
                             ),
                           ],
@@ -369,7 +370,9 @@ class _SpritePickerState extends State<_SpritePicker> {
                                         alpha: 0.08,
                                       )
                                     : Colors.transparent,
-                                borderRadius: BorderRadius.circular(AppRadii.md),
+                                borderRadius: BorderRadius.circular(
+                                  AppRadii.md,
+                                ),
                               ),
                               height: AppSizes.listItemMinHeight,
                               child: Row(
