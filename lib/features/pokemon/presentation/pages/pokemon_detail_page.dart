@@ -138,7 +138,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     final result = await showModalBottomSheet<EditSheetResult>(
       context: context,
       isScrollControlled: true,
-      useSafeArea: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
       ),
@@ -178,7 +177,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     final result = await showModalBottomSheet<Map<String, int>>(
       context: context,
       isScrollControlled: true,
-      useSafeArea: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
       ),
