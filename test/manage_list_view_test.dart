@@ -8,6 +8,7 @@ import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 Widget _wrap(Widget child) {
   return MaterialApp(
+    locale: const Locale('en'),
     localizationsDelegates: const [
       AppLocalizations.delegate,
       GlobalMaterialLocalizations.delegate,

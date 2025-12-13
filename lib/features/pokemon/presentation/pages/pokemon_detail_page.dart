@@ -484,6 +484,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         child: Material(
           color: Colors.transparent,
           child: InkWell(
+            key: const Key('detail.catchButton'),
             borderRadius: BorderRadius.circular(AppRadii.md),
             onTap: _handleCatchTap,
             child: Padding(
