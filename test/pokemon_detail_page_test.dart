@@ -116,132 +116,123 @@ void main() {
     );
   });
 
-  testWidgets(
-    'Catch toggles to Caught and disables increment',
-    (tester) async {
-      final sync = FakeCounterSync();
-      sync.counters['counter_0001'] = 0;
-      sync.caught['caught_0001'] = false;
+  testWidgets('Catch toggles to Caught and disables increment', (tester) async {
+    final sync = FakeCounterSync();
+    sync.counters['counter_0001'] = 0;
+    sync.caught['caught_0001'] = false;
 
-      final spriteService = FakeSpriteService(const [
-        ParsedSprite(
-          dex: '0001',
-          form: 'base',
-          gender: 'm',
-          shiny: true,
-          path: 'assets/pokemons/0001_base_m_s.png',
-        ),
-        ParsedSprite(
-          dex: '0001',
-          form: 'mega-x',
-          gender: 'm',
-          shiny: true,
-          path: 'assets/pokemons/0001_mega-x_m_s.png',
-        ),
-        ParsedSprite(
-          dex: '0001',
-          form: '001-gmax',
-          gender: 'm',
-          shiny: true,
-          path: 'assets/pokemons/0001_001-gmax_m_s.png',
-        ),
-        ParsedSprite(
-          dex: '0001',
-          form: 'base',
-          gender: 'm',
-          shiny: false,
-          path: 'assets/pokemons/0001_base_m_n.png',
-        ),
-        ParsedSprite(
-          dex: '0001',
-          form: 'mega-x',
-          gender: 'm',
-          shiny: false,
-          path: 'assets/pokemons/0001_mega-x_m_n.png',
-        ),
-        ParsedSprite(
-          dex: '0001',
-          form: '001-gmax',
-          gender: 'm',
-          shiny: false,
-          path: 'assets/pokemons/0001_001-gmax_m_n.png',
-        ),
-      ]);
+    final spriteService = FakeSpriteService(const [
+      ParsedSprite(
+        dex: '0001',
+        form: 'base',
+        gender: 'm',
+        shiny: true,
+        path: 'assets/pokemons/0001_base_m_s.png',
+      ),
+      ParsedSprite(
+        dex: '0001',
+        form: 'mega-x',
+        gender: 'm',
+        shiny: true,
+        path: 'assets/pokemons/0001_mega-x_m_s.png',
+      ),
+      ParsedSprite(
+        dex: '0001',
+        form: '001-gmax',
+        gender: 'm',
+        shiny: true,
+        path: 'assets/pokemons/0001_001-gmax_m_s.png',
+      ),
+      ParsedSprite(
+        dex: '0001',
+        form: 'base',
+        gender: 'm',
+        shiny: false,
+        path: 'assets/pokemons/0001_base_m_n.png',
+      ),
+      ParsedSprite(
+        dex: '0001',
+        form: 'mega-x',
+        gender: 'm',
+        shiny: false,
+        path: 'assets/pokemons/0001_mega-x_m_n.png',
+      ),
+      ParsedSprite(
+        dex: '0001',
+        form: '001-gmax',
+        gender: 'm',
+        shiny: false,
+        path: 'assets/pokemons/0001_001-gmax_m_n.png',
+      ),
+    ]);
 
-      const pokemon = Pokemon(
-        id: '0001',
-        name: 'Bulbasaur',
-        imagePath: 'assets/pokemons/0001_base_m_s.png',
-      );
+    const pokemon = Pokemon(
+      id: '0001',
+      name: 'Bulbasaur',
+      imagePath: 'assets/pokemons/0001_base_m_s.png',
+    );
 
-      await tester.pumpWidget(
-        _wrap(
-          PokemonDetailPage(pokemon: pokemon),
-          sync: sync,
-          spriteService: spriteService,
-        ),
-      );
-      await tester.pump(const Duration(milliseconds: 300));
-      for (
-        var i = 0;
-        i < 80 &&
-            find.byKey(const Key('detail.catchButton')).evaluate().isEmpty;
-        i++
-      ) {
-        await tester.pump(const Duration(milliseconds: 50));
-      }
+    await tester.pumpWidget(
+      _wrap(
+        PokemonDetailPage(pokemon: pokemon),
+        sync: sync,
+        spriteService: spriteService,
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 300));
+    for (
+      var i = 0;
+      i < 80 && find.byKey(const Key('detail.catchButton')).evaluate().isEmpty;
+      i++
+    ) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
 
-      // Ordering: base should be first rendered.
-      expect(
-        find.byKey(const ValueKey('assets/pokemons/0001_base_m_s.png')),
-        findsOneWidget,
-      );
+    // Ordering: base should be first rendered.
+    expect(
+      find.byKey(const ValueKey('assets/pokemons/0001_base_m_s.png')),
+      findsOneWidget,
+    );
 
-      // Swipe to mega then gmax.
-      await tester.drag(find.byType(PageView), const Offset(-400, 0));
-      await tester.pumpAndSettle();
-      expect(
-        find.byKey(const ValueKey('assets/pokemons/0001_mega-x_m_s.png')),
-        findsOneWidget,
-      );
+    // Swipe to mega then gmax.
+    await tester.drag(find.byType(PageView), const Offset(-400, 0));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('assets/pokemons/0001_mega-x_m_s.png')),
+      findsOneWidget,
+    );
 
-      await tester.drag(find.byType(PageView), const Offset(-400, 0));
-      await tester.pumpAndSettle();
-      expect(
-        find.byKey(const ValueKey('assets/pokemons/0001_001-gmax_m_s.png')),
-        findsOneWidget,
-      );
+    await tester.drag(find.byType(PageView), const Offset(-400, 0));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('assets/pokemons/0001_001-gmax_m_s.png')),
+      findsOneWidget,
+    );
 
-      // Catch toggle updates text and disables increment.
-      final catchButton = find.byKey(const Key('detail.catchButton'));
-      expect(
-        find.descendant(of: catchButton, matching: find.text('Catch')),
-        findsOneWidget,
-      );
-      await tester.tap(catchButton);
-      await tester.pump(); // process tap -> schedules delayed toggle
-      await tester.pump(const Duration(milliseconds: 200)); // press+toggle delay
-      await tester.pumpAndSettle();
-      for (
-        var i = 0;
-        i < 80 &&
-            sync.caught['caught_0001'] != true;
-        i++
-      ) {
-        await tester.pump(const Duration(milliseconds: 50));
-      }
-      expect(sync.caught['caught_0001'], isTrue);
-      await tester.pump();
-      expect(
-        find.descendant(
-          of: catchButton,
-          matching: find.byKey(const ValueKey(true)),
-        ),
-        findsOneWidget,
-      );
+    // Catch toggle updates text and disables increment.
+    final catchButton = find.byKey(const Key('detail.catchButton'));
+    expect(
+      find.descendant(of: catchButton, matching: find.text('Catch')),
+      findsOneWidget,
+    );
+    await tester.tap(catchButton);
+    await tester.pump(); // process tap -> schedules delayed toggle
+    await tester.pump(const Duration(milliseconds: 200)); // press+toggle delay
+    await tester.pumpAndSettle();
+    for (var i = 0; i < 80 && sync.caught['caught_0001'] != true; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(sync.caught['caught_0001'], isTrue);
+    await tester.pump();
+    expect(
+      find.descendant(
+        of: catchButton,
+        matching: find.byKey(const ValueKey(true)),
+      ),
+      findsOneWidget,
+    );
 
-      final addButton = find.widgetWithIcon(ElevatedButton, Icons.add);
-      expect(tester.widget<ElevatedButton>(addButton).onPressed, isNull);
-    },
-  );
+    final addButton = find.widgetWithIcon(ElevatedButton, Icons.add);
+    expect(tester.widget<ElevatedButton>(addButton).onPressed, isNull);
+  });
 }
