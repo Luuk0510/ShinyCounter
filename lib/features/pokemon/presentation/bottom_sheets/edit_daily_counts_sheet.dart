@@ -124,7 +124,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: colors.primary,
                           side: BorderSide(color: colors.primary, width: 1.4),
-                          backgroundColor: colors.primary.withValues(alpha: 0.08),
+                          backgroundColor: colors.primary.withValues(
+                            alpha: 0.08,
+                          ),
                         ),
                         child: Text(
                           l10n.cancel,

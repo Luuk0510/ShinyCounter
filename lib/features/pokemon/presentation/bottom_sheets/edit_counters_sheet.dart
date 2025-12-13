@@ -98,7 +98,9 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
               const SizedBox(height: AppSpacing.lg),
               Text(
                 l10n.editSheetTitle,
-                style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
+                style: AppTypography.title.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               const SizedBox(height: AppSpacing.lg),
               TextField(
