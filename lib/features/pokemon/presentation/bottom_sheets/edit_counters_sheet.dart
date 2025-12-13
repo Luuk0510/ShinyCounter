@@ -3,6 +3,7 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/date_row.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/game_dropdown.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/safe_area_sheet.dart';
 
 class EditSheetResult {
   const EditSheetResult({
@@ -73,146 +74,138 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
-    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.xl,
-          AppSpacing.md,
-          AppSpacing.xl,
-          AppSpacing.lg,
-        ),
-        child: Padding(
-          padding: EdgeInsets.only(bottom: viewInsets),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+    return SafeAreaSheet(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        AppSpacing.md,
+        AppSpacing.xl,
+        AppSpacing.lg,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: AppSizes.sheetHandleWidth,
+            height: AppSizes.sheetHandleHeight,
+            decoration: BoxDecoration(
+              color: colors.outlineVariant,
+              borderRadius: BorderRadius.circular(AppRadii.sm),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            l10n.editSheetTitle,
+            style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          TextField(
+            controller: _counterCtrl,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: l10n.counterLabel,
+              hintText: l10n.enterNumberHint,
+              labelStyle: const TextStyle(
+                fontSize: AppSizes.sheetFieldLabel,
+                fontWeight: FontWeight.w700,
+              ),
+              hintStyle: const TextStyle(fontSize: AppSizes.sheetFieldHint),
+            ),
+            style: const TextStyle(
+              fontSize: AppSizes.sheetFieldText,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          DateRow(
+            label: l10n.huntStart,
+            value: _start,
+            onPick: () => _pickDate(_start).then((value) {
+              if (value != null) {
+                setState(() {
+                  _start = value;
+                  _startChanged = true;
+                });
+              }
+            }),
+            onClear: () {
+              setState(() {
+                _start = null;
+                _startChanged = true;
+              });
+            },
+          ),
+          const SizedBox(height: AppSpacing.md),
+          DateRow(
+            label: l10n.huntCatch,
+            value: _catch,
+            onPick: () => _pickDate(_catch).then((value) {
+              if (value != null) {
+                setState(() {
+                  _catch = value;
+                  _catchChanged = true;
+                });
+              }
+            }),
+            onClear: () {
+              setState(() {
+                _catch = null;
+                _catchChanged = true;
+              });
+            },
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          GameDropdown(
+            value: _game,
+            onChanged: (value) {
+              setState(() {
+                _game = value;
+                _gameChanged = true;
+              });
+            },
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          Row(
             children: [
-              Container(
-                width: AppSizes.sheetHandleWidth,
-                height: AppSizes.sheetHandleHeight,
-                decoration: BoxDecoration(
-                  color: colors.outlineVariant,
-                  borderRadius: BorderRadius.circular(AppRadii.sm),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                l10n.editSheetTitle,
-                style: AppTypography.title.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              TextField(
-                controller: _counterCtrl,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: l10n.counterLabel,
-                  hintText: l10n.enterNumberHint,
-                  labelStyle: const TextStyle(
-                    fontSize: AppSizes.sheetFieldLabel,
-                    fontWeight: FontWeight.w700,
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: colors.primary,
+                    side: BorderSide(
+                      color: colors.primary,
+                      width: AppSizes.sheetActionWidth,
+                    ),
+                    backgroundColor: colors.primary.withValues(alpha: 0.08),
                   ),
-                  hintStyle: const TextStyle(fontSize: AppSizes.sheetFieldHint),
-                ),
-                style: const TextStyle(
-                  fontSize: AppSizes.sheetFieldText,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              DateRow(
-                label: l10n.huntStart,
-                value: _start,
-                onPick: () => _pickDate(_start).then((value) {
-                  if (value != null) {
-                    setState(() {
-                      _start = value;
-                      _startChanged = true;
-                    });
-                  }
-                }),
-                onClear: () {
-                  setState(() {
-                    _start = null;
-                    _startChanged = true;
-                  });
-                },
-              ),
-              const SizedBox(height: AppSpacing.md),
-              DateRow(
-                label: l10n.huntCatch,
-                value: _catch,
-                onPick: () => _pickDate(_catch).then((value) {
-                  if (value != null) {
-                    setState(() {
-                      _catch = value;
-                      _catchChanged = true;
-                    });
-                  }
-                }),
-                onClear: () {
-                  setState(() {
-                    _catch = null;
-                    _catchChanged = true;
-                  });
-                },
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              GameDropdown(
-                value: _game,
-                onChanged: (value) {
-                  setState(() {
-                    _game = value;
-                    _gameChanged = true;
-                  });
-                },
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: colors.primary,
-                        side: BorderSide(
-                          color: colors.primary,
-                          width: AppSizes.sheetActionWidth,
-                        ),
-                        backgroundColor: colors.primary.withValues(alpha: 0.08),
-                      ),
-                      child: Text(
-                        l10n.cancel,
-                        style: const TextStyle(
-                          fontSize: AppSizes.sheetButtonFont,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                  child: Text(
+                    l10n.cancel,
+                    style: const TextStyle(
+                      fontSize: AppSizes.sheetButtonFont,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colors.primary,
-                        foregroundColor: colors.onPrimary,
-                      ),
-                      child: Text(
-                        l10n.save,
-                        style: const TextStyle(
-                          fontSize: AppSizes.sheetButtonFont,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colors.primary,
+                    foregroundColor: colors.onPrimary,
+                  ),
+                  child: Text(
+                    l10n.save,
+                    style: const TextStyle(
+                      fontSize: AppSizes.sheetButtonFont,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                ],
+                ),
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }

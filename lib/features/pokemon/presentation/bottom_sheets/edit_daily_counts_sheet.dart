@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/safe_area_sheet.dart';
 
 class EditDailyCountsSheet extends StatefulWidget {
   const EditDailyCountsSheet({
@@ -50,113 +51,104 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
-    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.xl,
-          AppSpacing.md,
-          AppSpacing.xl,
-          AppSpacing.lg,
-        ),
-        child: Padding(
-          padding: EdgeInsets.only(bottom: viewInsets),
-          child: SizedBox(
-            height:
-                MediaQuery.of(context).size.height *
-                AppSizes.sheetListHeightFactor,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return SafeAreaSheet(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        AppSpacing.md,
+        AppSpacing.xl,
+        AppSpacing.lg,
+      ),
+      child: SizedBox(
+        height:
+            MediaQuery.of(context).size.height * AppSizes.sheetListHeightFactor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: AppSizes.sheetHandleWidth,
+                height: AppSizes.sheetHandleHeight,
+                decoration: BoxDecoration(
+                  color: colors.outlineVariant,
+                  borderRadius: BorderRadius.circular(AppRadii.sm),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Center(
+              child: Text(
+                l10n.huntHistoryTitle,
+                style: AppTypography.title.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Expanded(
+              child: ListView.separated(
+                itemBuilder: (context, index) => _buildRow(context, index),
+                separatorBuilder: (_, __) =>
+                    const SizedBox(height: AppSpacing.md),
+                itemCount: _rows.length,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.add),
+                onPressed: _addRow,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: colors.primary,
+                  side: BorderSide(color: colors.primary, width: 1.3),
+                  backgroundColor: colors.primary.withValues(alpha: 0.08),
+                ),
+                label: Text(
+                  l10n.addCountRow,
+                  style: AppTypography.button.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Row(
               children: [
-                Center(
-                  child: Container(
-                    width: AppSizes.sheetHandleWidth,
-                    height: AppSizes.sheetHandleHeight,
-                    decoration: BoxDecoration(
-                      color: colors.outlineVariant,
-                      borderRadius: BorderRadius.circular(AppRadii.sm),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                Center(
-                  child: Text(
-                    l10n.huntHistoryTitle,
-                    style: AppTypography.title.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
                 Expanded(
-                  child: ListView.separated(
-                    itemBuilder: (context, index) => _buildRow(context, index),
-                    separatorBuilder: (_, idx) =>
-                        const SizedBox(height: AppSpacing.md),
-                    itemCount: _rows.length,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.add),
-                    onPressed: _addRow,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: colors.primary,
-                      side: BorderSide(color: colors.primary, width: 1.3),
+                      side: BorderSide(color: colors.primary, width: 1.4),
                       backgroundColor: colors.primary.withValues(alpha: 0.08),
                     ),
-                    label: Text(
-                      l10n.addCountRow,
+                    child: Text(
+                      l10n.cancel,
+                      style: AppTypography.button.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _save,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colors.primary,
+                      foregroundColor: colors.onPrimary,
+                    ),
+                    child: Text(
+                      l10n.save,
                       style: AppTypography.button.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: colors.primary,
-                          side: BorderSide(color: colors.primary, width: 1.4),
-                          backgroundColor: colors.primary.withValues(
-                            alpha: 0.08,
-                          ),
-                        ),
-                        child: Text(
-                          l10n.cancel,
-                          style: AppTypography.button.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _save,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colors.primary,
-                          foregroundColor: colors.onPrimary,
-                        ),
-                        child: Text(
-                          l10n.save,
-                          style: AppTypography.button.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );

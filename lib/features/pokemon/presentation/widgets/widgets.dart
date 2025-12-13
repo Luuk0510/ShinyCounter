@@ -16,3 +16,4 @@ export 'shimmer_box.dart';
 export 'animated_app_icon.dart';
 export 'pokemon_image.dart';
 export 'pokemon_image_provider.dart';
+export 'safe_area_sheet.dart';

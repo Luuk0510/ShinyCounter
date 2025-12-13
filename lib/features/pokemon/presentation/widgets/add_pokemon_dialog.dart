@@ -157,14 +157,14 @@ class _AddPokemonView extends StatelessWidget {
     final controller = context.watch<AddPokemonController>();
     final colors = Theme.of(context).colorScheme;
     final media = MediaQuery.of(context);
-    final safeBottom = media.viewPadding.bottom;
+    final keyboardOpen = media.viewInsets.bottom > 0;
+    final insetBottom =
+        AppInsets.dialog.bottom + (keyboardOpen ? 0 : media.viewPadding.bottom);
 
     return AlertDialog(
       backgroundColor: Theme.of(context).cardColor,
       surfaceTintColor: Colors.transparent,
-      insetPadding: AppInsets.dialog.copyWith(
-        bottom: AppInsets.dialog.bottom + safeBottom,
-      ),
+      insetPadding: AppInsets.dialog.copyWith(bottom: insetBottom),
       contentPadding: EdgeInsets.fromLTRB(
         AppInsets.dialog.horizontal / 2,
         AppSpacing.none,
@@ -180,9 +180,13 @@ class _AddPokemonView extends StatelessWidget {
         builder: (context) {
           final media = MediaQuery.of(context);
           final viewInsets = media.viewInsets.bottom;
+          final availableHeight = (media.size.height - viewInsets).clamp(
+            0,
+            media.size.height,
+          );
           final maxContentHeight =
-              (media.size.height * AppSizes.dialogHeightFactor - viewInsets)
-                  .clamp(AppSizes.dialogMinHeight, media.size.height)
+              (availableHeight * AppSizes.dialogHeightFactor)
+                  .clamp(AppSizes.dialogMinHeight, availableHeight)
                   .toDouble();
           return SizedBox(
             width: AppSizes.dialogMaxWidth,
@@ -352,6 +356,8 @@ class _SpritePickerState extends State<_SpritePicker> {
                       interactive: true,
                       child: ListView.builder(
                         controller: _scrollController,
+                        padding: EdgeInsets.zero,
+                        primary: false,
                         itemCount: controller.filteredSprites.length,
                         itemBuilder: (context, index) {
                           final sprite = controller.filteredSprites[index];
