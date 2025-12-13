@@ -98,6 +98,9 @@ class PokemonCard extends StatelessWidget {
                 Icon(Icons.catching_pokemon, size: size * 0.45),
           );
 
-    return ClipRRect(borderRadius: BorderRadius.circular(12), child: image);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppRadii.sm),
+      child: image,
+    );
   }
 }

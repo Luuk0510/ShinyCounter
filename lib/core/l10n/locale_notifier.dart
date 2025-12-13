@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shiny_counter/core/storage/app_prefs_keys.dart';
 import 'package:shiny_counter/core/storage/key_value_store.dart';
 
 class LocaleNotifier extends ChangeNotifier {
@@ -18,7 +19,7 @@ class LocaleNotifier extends ChangeNotifier {
   }
 
   Future<void> _load() async {
-    final code = await _store.getString(_localeKey);
+    final code = await _store.getString(AppPrefsKeys.appLocale);
     if (code != null && code.isNotEmpty) {
       _locale = Locale(code);
     } else {
@@ -34,8 +35,9 @@ class LocaleNotifier extends ChangeNotifier {
   }
 
   Future<void> _persist() async {
-    await _store.setString(_localeKey, _locale?.languageCode ?? 'en');
+    await _store.setString(
+      AppPrefsKeys.appLocale,
+      _locale?.languageCode ?? 'en',
+    );
   }
-
-  static const _localeKey = 'app_locale';
 }

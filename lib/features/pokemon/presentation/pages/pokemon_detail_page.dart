@@ -15,6 +15,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
 
 class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({super.key, required this.pokemon});
@@ -76,9 +77,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     setState(() => _spritesLoading = true);
     final service = context.read<SpriteService>();
     final assets = await service.spritesForDex(parsed.dex);
-    final shiny = assets.where((p) => p.shiny).toList()..sort(_compareSprites);
+    final shiny = assets.where((p) => p.shiny).toList()
+      ..sort(compareSpritesForDetail);
     final normal = assets.where((p) => !p.shiny).toList()
-      ..sort(_compareSprites);
+      ..sort(compareSpritesForDetail);
     _normalMap.clear();
     for (final s in shiny) {
       final match = normal.firstWhere(
@@ -93,20 +95,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       _showNormal = false;
       _spritesLoading = false;
     });
-  }
-
-  int _compareSprites(ParsedSprite a, ParsedSprite b) {
-    final rankA = _formRank(a.form);
-    final rankB = _formRank(b.form);
-    if (rankA != rankB) return rankA.compareTo(rankB);
-    return a.form.compareTo(b.form);
-  }
-
-  int _formRank(String form) {
-    // Ensure mega variants appear before gmax in swipe order.
-    if (form.contains('mega')) return 1;
-    if (form.contains('gmax')) return 2;
-    return 0;
   }
 
   @override
@@ -152,7 +140,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       isScrollControlled: true,
       useSafeArea: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
       ),
       backgroundColor: Theme.of(context).cardColor,
       barrierColor: Colors.black.withValues(alpha: 0.4),
@@ -496,6 +484,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         child: Material(
           color: Colors.transparent,
           child: InkWell(
+            key: const Key('detail.catchButton'),
             borderRadius: BorderRadius.circular(AppRadii.md),
             onTap: _handleCatchTap,
             child: Padding(
@@ -507,7 +496,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                   key: ValueKey(caught),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: AppSizes.buttonTextSize,
                     fontWeight: FontWeight.w700,
                     color: fg,
                   ),

@@ -73,6 +73,15 @@ class CounterSyncService implements CounterSync {
   }
 
   @override
+  Future<void> clearPokemonState(String pokemonId) async {
+    final keys = CounterKeys.fromId(pokemonId);
+    await _store.remove(keys.counter);
+    await _store.remove(keys.caught);
+    await clearHuntDates(keys.counter);
+    await setDailyCounts(keys.counter, {});
+  }
+
+  @override
   Future<void> setCounter(String counterKey, int count) async {
     await _store.setInt(counterKey, count);
   }

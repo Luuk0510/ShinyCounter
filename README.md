@@ -18,7 +18,6 @@ Pokémon shiny counter app in Flutter.
 3. Tests: `flutter test`  
 4. Coverage:  
    - `flutter test --coverage`  
-   - `dart run tools/coverage_helper.dart`
    - `dart run tools/lcov_viewer.dart coverage/lcov.info > coverage/coverage.html`
 
 ## Notes
