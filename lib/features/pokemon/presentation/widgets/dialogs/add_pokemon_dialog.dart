@@ -6,10 +6,10 @@ import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialog_entry.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/search_gen_filter_row.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_entry.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/filters/search_gen_filter_row.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_image.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
 
 class AddPokemonController extends ChangeNotifier {
   AddPokemonController({required SpriteService spriteService})

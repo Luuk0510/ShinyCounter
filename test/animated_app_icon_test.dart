@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shiny_counter/core/theme/app_assets.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/animated_app_icon.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/animated_app_icon.dart';
 
 import 'helpers/test_asset_bundle.dart';
 

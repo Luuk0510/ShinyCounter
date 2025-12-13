@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_image_provider.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image_provider.dart';
 
 class PokemonImage extends StatelessWidget {
   const PokemonImage({

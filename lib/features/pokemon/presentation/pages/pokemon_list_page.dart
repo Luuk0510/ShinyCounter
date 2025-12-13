@@ -13,10 +13,8 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokem
 import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/manage_list_view.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
 
 // Toggle to include the full dex by default. Off preserves the original

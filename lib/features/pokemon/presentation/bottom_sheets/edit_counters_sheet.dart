@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/date_row.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/game_dropdown.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/safe_area_sheet.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/detail/date_row.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
 
 class EditSheetResult {
   const EditSheetResult({

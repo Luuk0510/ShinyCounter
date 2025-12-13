@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_image.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
 
 class DetailHeader extends StatelessWidget {
   const DetailHeader({
