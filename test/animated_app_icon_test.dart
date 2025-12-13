@@ -35,11 +35,12 @@ void main() {
     expect(_matrixIsIdentity(transform().transform), isTrue);
 
     await tester.tap(find.byKey(AnimatedAppIcon.tapTargetKey));
-    // Pump a frame so the animation advances past t=0.
-    await tester.pump(const Duration(milliseconds: 20));
+    // Pump once to deliver the tap and start the controller, then advance time.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 60));
     expect(_matrixIsIdentity(transform().transform), isFalse);
 
-    await tester.pump(const Duration(milliseconds: 260));
+    await tester.pumpAndSettle();
     expect(_matrixIsIdentity(transform().transform), isTrue);
   });
 }
