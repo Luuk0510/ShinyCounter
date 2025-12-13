@@ -9,6 +9,7 @@ import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialog_entry.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/search_gen_filter_row.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_image.dart';
 
 class AddPokemonController extends ChangeNotifier {
   AddPokemonController({required SpriteService spriteService})
@@ -412,11 +413,13 @@ class _SpritePickerState extends State<_SpritePicker> {
                                     borderRadius: BorderRadius.circular(
                                       AppRadii.sm,
                                     ),
-                                    child: Image.asset(
-                                      sprite.path,
+                                    child: PokemonImage(
+                                      path: sprite.path,
+                                      isLocalFile: false,
                                       width: AppSizes.spriteThumb,
                                       height: AppSizes.spriteThumb,
-                                      fit: BoxFit.contain,
+                                      borderRadius: AppRadii.sm,
+                                      fallbackIconSize: AppSizes.spriteThumb * 0.55,
                                     ),
                                   ),
                                   if (selected) ...[

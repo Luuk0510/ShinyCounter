@@ -14,3 +14,5 @@ export 'settings_sheet.dart';
 export 'edit_pokemon_dialog.dart';
 export 'shimmer_box.dart';
 export 'animated_app_icon.dart';
+export 'pokemon_image.dart';
+export 'pokemon_image_provider.dart';

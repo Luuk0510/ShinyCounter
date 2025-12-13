@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -354,23 +353,21 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
 
     final assetPaths = <String>[];
     for (final path in sprites) {
-      final provider = _imageProviderFor(
-        path,
-        isLocal: widget.pokemon.isLocalFile,
-      );
-      if (provider is FileImage) {
-        precacheImage(provider, context);
+      if (widget.pokemon.isLocalFile && !path.startsWith('assets/')) {
+        precacheImage(
+          pokemonImageProvider(path, isLocalFile: true),
+          context,
+        );
       } else {
         assetPaths.add(path);
       }
       final normal = _normalMap[path];
       if (normal != null) {
-        final normalProvider = _imageProviderFor(
-          normal,
-          isLocal: widget.pokemon.isLocalFile,
-        );
-        if (normalProvider is FileImage) {
-          precacheImage(normalProvider, context);
+        if (widget.pokemon.isLocalFile && !normal.startsWith('assets/')) {
+          precacheImage(
+            pokemonImageProvider(normal, isLocalFile: true),
+            context,
+          );
         } else {
           assetPaths.add(normal);
         }
@@ -409,18 +406,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                       final normalPath = _normalMap[shinyPath];
                       final showNormal = _showNormal && normalPath != null;
                       final path = showNormal ? normalPath : shinyPath;
-                      final provider = _imageProviderFor(
-                        path,
-                        isLocal: widget.pokemon.isLocalFile,
-                      );
-                      final image = Image(
-                        image: provider,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stack) => const Icon(
-                          Icons.catching_pokemon,
-                          size: AppSizes.detailImageFallback,
-                        ),
-                      );
                       return Center(
                         child: AnimatedSwitcher(
                           duration: AppAnim.switcher,
@@ -430,7 +415,13 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                             key: ValueKey(path),
                             width: AppSizes.detailImageSize,
                             height: AppSizes.detailImageSize,
-                            child: image,
+                            child: PokemonImage(
+                              path: path,
+                              isLocalFile: widget.pokemon.isLocalFile,
+                              borderRadius: 0,
+                              fallbackIcon: Icons.catching_pokemon,
+                              fallbackIconSize: AppSizes.detailImageFallback,
+                            ),
                           ),
                         ),
                       );
@@ -519,10 +510,5 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     return null;
   }
 
-  ImageProvider _imageProviderFor(String path, {required bool isLocal}) {
-    if (isLocal && !path.startsWith('assets/')) {
-      return FileImage(File(path));
-    }
-    return AssetImage(path);
-  }
+
 }

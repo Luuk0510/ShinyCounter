@@ -1,9 +1,7 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_image.dart';
 
 class DetailHeader extends StatelessWidget {
   const DetailHeader({
@@ -37,29 +35,17 @@ class DetailHeader extends StatelessWidget {
             onTap: normalPath == null ? null : onToggleSprite,
             child: AnimatedSwitcher(
               duration: AppAnim.switcher,
-              child: pokemon.isLocalFile && !kIsWeb
-                  ? Image.file(
-                      File(pokemon.imagePath),
-                      key: ValueKey(showShiny),
-                      width: AppSizes.detailImageSize,
-                      height: AppSizes.detailImageSize,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stack) => const Icon(
-                        Icons.catching_pokemon,
-                        size: AppSizes.detailImageFallback,
-                      ),
-                    )
-                  : Image.asset(
-                      showShiny || normalPath == null ? shinyPath : normalPath!,
-                      key: ValueKey(showShiny),
-                      width: AppSizes.detailImageSize,
-                      height: AppSizes.detailImageSize,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stack) => const Icon(
-                        Icons.catching_pokemon,
-                        size: AppSizes.detailImageFallback,
-                      ),
-                    ),
+              child: PokemonImage(
+                key: ValueKey(showShiny),
+                path: pokemon.isLocalFile
+                    ? pokemon.imagePath
+                    : (showShiny || normalPath == null ? shinyPath : normalPath!),
+                isLocalFile: pokemon.isLocalFile,
+                width: AppSizes.detailImageSize,
+                height: AppSizes.detailImageSize,
+                borderRadius: 0,
+                fallbackIconSize: AppSizes.detailImageFallback,
+              ),
             ),
           ),
         ),

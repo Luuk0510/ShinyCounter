@@ -1,10 +1,8 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/pokemon_image.dart';
 
 class PokemonCard extends StatelessWidget {
   const PokemonCard({
@@ -80,27 +78,12 @@ class PokemonCard extends StatelessWidget {
   }
 
   Widget _buildImage(double size) {
-    final image = pokemon.isLocalFile && !kIsWeb
-        ? Image.file(
-            File(pokemon.imagePath),
-            width: size,
-            height: size,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stack) =>
-                Icon(Icons.catching_pokemon, size: size * 0.45),
-          )
-        : Image.asset(
-            pokemon.imagePath,
-            width: size,
-            height: size,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stack) =>
-                Icon(Icons.catching_pokemon, size: size * 0.45),
-          );
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadii.sm),
-      child: image,
+    return PokemonImage(
+      path: pokemon.imagePath,
+      isLocalFile: pokemon.isLocalFile,
+      width: size,
+      height: size,
+      fallbackIconSize: size * 0.45,
     );
   }
 }
