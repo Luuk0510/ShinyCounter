@@ -155,16 +155,20 @@ class _AddPokemonView extends StatelessWidget {
     final l10n = context.l10n;
     final controller = context.watch<AddPokemonController>();
     final colors = Theme.of(context).colorScheme;
+    final media = MediaQuery.of(context);
+    final safeBottom = media.viewPadding.bottom;
 
     return AlertDialog(
       backgroundColor: Theme.of(context).cardColor,
       surfaceTintColor: Colors.transparent,
-      insetPadding: AppInsets.dialog,
+      insetPadding: AppInsets.dialog.copyWith(
+        bottom: AppInsets.dialog.bottom + safeBottom,
+      ),
       contentPadding: EdgeInsets.fromLTRB(
         AppInsets.dialog.horizontal / 2,
         AppSpacing.sm,
         AppInsets.dialog.horizontal / 2,
-        AppSpacing.md,
+        AppSpacing.sm,
       ),
       title: Text(
         l10n.addDialogTitle,
@@ -268,11 +272,6 @@ class _SpritePickerState extends State<_SpritePicker> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AddPokemonController>();
-    final headerHeightEstimate = AppSizes.toolbarHeight + AppSpacing.lg;
-    final listHeight =
-        (widget.availableHeight - headerHeightEstimate - AppSpacing.sm)
-            .clamp(AppSizes.listMinHeight, widget.availableHeight)
-            .toDouble();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -298,135 +297,140 @@ class _SpritePickerState extends State<_SpritePicker> {
           },
         ),
         const SizedBox(height: AppSpacing.sm),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: widget.colors.outlineVariant.withValues(alpha: 0.6),
-            ),
-            borderRadius: BorderRadius.circular(AppRadii.md),
-          ),
-          child: SizedBox(
-            height: listHeight,
-            child: controller.loading
-                ? const Center(child: CircularProgressIndicator())
-                : controller.filteredSprites.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search_off,
-                            color: widget.colors.onSurfaceVariant,
-                            size: AppSizes.spriteThumb,
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            context.l10n.noPokemonFound,
-                            style: AppTypography.button.copyWith(
+        Expanded(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: AppSizes.listMinHeight),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: widget.colors.outlineVariant.withValues(alpha: 0.6),
+                ),
+                borderRadius: BorderRadius.circular(AppRadii.md),
+              ),
+              child: controller.loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : controller.filteredSprites.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.search_off,
                               color: widget.colors.onSurfaceVariant,
+                              size: AppSizes.spriteThumb,
                             ),
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            context.l10n.tryAnotherFilter,
-                            textAlign: TextAlign.center,
-                            style: AppTypography.button.copyWith(
-                              color: widget.colors.onSurfaceVariant.withValues(
-                                alpha: 0.9,
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              context.l10n.noPokemonFound,
+                              style: AppTypography.button.copyWith(
+                                color: widget.colors.onSurfaceVariant,
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              context.l10n.tryAnotherFilter,
+                              textAlign: TextAlign.center,
+                              style: AppTypography.button.copyWith(
+                                color: widget.colors.onSurfaceVariant.withValues(
+                                  alpha: 0.9,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : Scrollbar(
+                      controller: _scrollController,
+                      thumbVisibility: true,
+                      interactive: true,
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: controller.filteredSprites.length,
+                        itemBuilder: (context, index) {
+                          final sprite = controller.filteredSprites[index];
+                          final selected = sprite == controller.selected;
+                          final name = controller.displayName(sprite);
+                          return InkWell(
+                            onTap: () => controller.select(sprite),
+                            borderRadius: BorderRadius.circular(AppRadii.md),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.md,
+                                vertical: AppSpacing.sm,
+                              ),
+                              decoration: BoxDecoration(
+                                color: selected
+                                    ? widget.colors.primary.withValues(
+                                        alpha: 0.08,
+                                      )
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(AppRadii.md),
+                              ),
+                              height: AppSizes.listItemMinHeight,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '#${sprite.dex}',
+                                          style: AppTypography.button.copyWith(
+                                            color: selected
+                                                ? widget.colors.primary
+                                                : widget
+                                                      .colors
+                                                      .onSurfaceVariant,
+                                          ),
+                                        ),
+                                        const SizedBox(height: AppSpacing.xs),
+                                        Text(
+                                          name,
+                                          style: AppTypography.sectionTitle
+                                              .copyWith(
+                                                color: selected
+                                                    ? widget.colors.primary
+                                                    : widget.colors.onSurface,
+                                              ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(
+                                      AppRadii.sm,
+                                    ),
+                                    child: Image.asset(
+                                      sprite.path,
+                                      width: AppSizes.spriteThumb,
+                                      height: AppSizes.spriteThumb,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                  if (selected) ...[
+                                    const SizedBox(width: AppSpacing.xs),
+                                    Icon(
+                                      Icons.check_circle,
+                                      color: widget.colors.primary,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                  )
-                : Scrollbar(
-                    controller: _scrollController,
-                    thumbVisibility: true,
-                    interactive: true,
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: controller.filteredSprites.length,
-                      itemBuilder: (context, index) {
-                        final sprite = controller.filteredSprites[index];
-                        final selected = sprite == controller.selected;
-                        final name = controller.displayName(sprite);
-                        return InkWell(
-                          onTap: () => controller.select(sprite),
-                          borderRadius: BorderRadius.circular(AppRadii.md),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md,
-                              vertical: AppSpacing.sm,
-                            ),
-                            decoration: BoxDecoration(
-                              color: selected
-                                  ? widget.colors.primary.withValues(
-                                      alpha: 0.08,
-                                    )
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(AppRadii.md),
-                            ),
-                            height: AppSizes.listItemMinHeight,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '#${sprite.dex}',
-                                        style: AppTypography.button.copyWith(
-                                          color: selected
-                                              ? widget.colors.primary
-                                              : widget.colors.onSurfaceVariant,
-                                        ),
-                                      ),
-                                      const SizedBox(height: AppSpacing.xs),
-                                      Text(
-                                        name,
-                                        style: AppTypography.sectionTitle
-                                            .copyWith(
-                                              color: selected
-                                                  ? widget.colors.primary
-                                                  : widget.colors.onSurface,
-                                            ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(
-                                    AppRadii.sm,
-                                  ),
-                                  child: Image.asset(
-                                    sprite.path,
-                                    width: AppSizes.spriteThumb,
-                                    height: AppSizes.spriteThumb,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                                if (selected) ...[
-                                  const SizedBox(width: AppSpacing.xs),
-                                  Icon(
-                                    Icons.check_circle,
-                                    color: widget.colors.primary,
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+            ),
           ),
         ),
       ],

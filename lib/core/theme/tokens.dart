@@ -49,8 +49,8 @@ class AppSizes {
   static const gameLogoSize = 32.0;
   static const gameLogoLarge = 40.0;
   static const gameSelectWidth = 240.0;
-  static const cardPaddingH = 16.0;
-  static const cardPaddingV = 8.0;
+  static const cardPaddingH = 10.0;
+  static const cardPaddingV = 4.0;
   static const cardBorderRadius = 30.0;
   static const cardElevation = 2.0;
   static const pokemonImageLarge = 150.0;
