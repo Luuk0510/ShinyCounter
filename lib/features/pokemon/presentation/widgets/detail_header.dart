@@ -39,7 +39,9 @@ class DetailHeader extends StatelessWidget {
                 key: ValueKey(showShiny),
                 path: pokemon.isLocalFile
                     ? pokemon.imagePath
-                    : (showShiny || normalPath == null ? shinyPath : normalPath!),
+                    : (showShiny || normalPath == null
+                          ? shinyPath
+                          : normalPath!),
                 isLocalFile: pokemon.isLocalFile,
                 width: AppSizes.detailImageSize,
                 height: AppSizes.detailImageSize,

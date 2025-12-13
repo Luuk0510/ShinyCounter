@@ -419,7 +419,8 @@ class _SpritePickerState extends State<_SpritePicker> {
                                       width: AppSizes.spriteThumb,
                                       height: AppSizes.spriteThumb,
                                       borderRadius: AppRadii.sm,
-                                      fallbackIconSize: AppSizes.spriteThumb * 0.55,
+                                      fallbackIconSize:
+                                          AppSizes.spriteThumb * 0.55,
                                     ),
                                   ),
                                   if (selected) ...[

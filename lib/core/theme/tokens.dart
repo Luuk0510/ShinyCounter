@@ -40,22 +40,22 @@ class AppSizes {
   static const dialogHeightFactor = 0.75;
   static const dialogMinHeight = 240.0; // edit_pokemon_dialog.dart
 
-  // `add_pokemon_dialog.dart 
+  // `add_pokemon_dialog.dart
   static const listMinHeight = 160.0; // manage_list_view.dart
   static const spriteThumb = 96.0; // pokemon_card.dart
   static const listItemMinHeight = 104.0;
-  
+
   // search_gen_filter_row.dart
   static const dropdownWidth = 115.0;
 
-  // counter_controls.dart 
+  // counter_controls.dart
   static const counterButtonSize = 72.0; // pokemon_detail_page.dart
   static const counterButtonPadding = 18.0;
   static const counterIconSize = 32.0;
 
   // edit_daily_counts_sheet.dart
   static const dailyListHeight = 210.0; // daily_counts_list.dart
-  
+
   // pokemon_list_page
   static const dividerThickness = 1.0;
 
@@ -72,7 +72,7 @@ class AppSizes {
   static const gameLogoLarge = 40.0;
   static const gameSelectWidth = 240.0; // edit_counters_sheet.dart
 
-  // pokemon_card.dart 
+  // pokemon_card.dart
   static const pokemonImageLarge = 150.0;
   static const pokemonImageSmall = 110.0;
   static const pokemonNameLarge = 37.0;

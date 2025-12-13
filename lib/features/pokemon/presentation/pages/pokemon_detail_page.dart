@@ -354,10 +354,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     final assetPaths = <String>[];
     for (final path in sprites) {
       if (widget.pokemon.isLocalFile && !path.startsWith('assets/')) {
-        precacheImage(
-          pokemonImageProvider(path, isLocalFile: true),
-          context,
-        );
+        precacheImage(pokemonImageProvider(path, isLocalFile: true), context);
       } else {
         assetPaths.add(path);
       }
@@ -509,6 +506,4 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     }
     return null;
   }
-
-
 }

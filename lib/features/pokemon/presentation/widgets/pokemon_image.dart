@@ -31,7 +31,7 @@ class PokemonImage extends StatelessWidget {
       width: width,
       height: height,
       fit: fit,
-      errorBuilder: (context, _, __) {
+      errorBuilder: (context, _, _) {
         final size = fallbackIconSize ?? (width ?? height);
         return Icon(fallbackIcon, size: size);
       },
@@ -44,4 +44,3 @@ class PokemonImage extends StatelessWidget {
     );
   }
 }
-

@@ -181,8 +181,8 @@ void main() {
         ).modalBarrierDismissLabel,
         barrierColor: Colors.black54,
         transitionDuration: Duration.zero,
-        pageBuilder: (context, _, __) => const AddPokemonDialog(),
-        transitionBuilder: (context, _, __, child) => child,
+        pageBuilder: (context, _, _) => const AddPokemonDialog(),
+        transitionBuilder: (context, _, _, child) => child,
       ).then((value) => result = value);
       await tester.pump(); // show dialog
 
