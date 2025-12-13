@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
 
 class EditDailyCountsSheet extends StatefulWidget {
   const EditDailyCountsSheet({
@@ -50,12 +51,12 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
-    return Padding(
-      padding: EdgeInsets.only(
-        left: AppSpacing.xl,
-        right: AppSpacing.xl,
-        bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.lg,
-        top: AppSpacing.md,
+    return SafeAreaSheet(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        AppSpacing.md,
+        AppSpacing.xl,
+        AppSpacing.lg,
       ),
       child: SizedBox(
         height:
@@ -86,7 +87,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
             Expanded(
               child: ListView.separated(
                 itemBuilder: (context, index) => _buildRow(context, index),
-                separatorBuilder: (_, idx) =>
+                separatorBuilder: (_, _) =>
                     const SizedBox(height: AppSpacing.md),
                 itemCount: _rows.length,
               ),

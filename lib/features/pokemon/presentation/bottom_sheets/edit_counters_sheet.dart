@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/date_row.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/game_dropdown.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/detail/date_row.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
 
 class EditSheetResult {
   const EditSheetResult({
@@ -73,12 +74,12 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
-    return Padding(
-      padding: EdgeInsets.only(
-        left: AppSpacing.xl,
-        right: AppSpacing.xl,
-        bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.lg,
-        top: AppSpacing.md,
+    return SafeAreaSheet(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        AppSpacing.md,
+        AppSpacing.xl,
+        AppSpacing.lg,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
