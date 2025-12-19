@@ -163,6 +163,7 @@ class AppAnim {
 
   static const buttonPressScale = 0.9;
   static const dialogStartScale = 0.8;
+  static const listItemPopStartScale = 0.96;
 }
 
 /// Intent-based tokens to avoid sprinkling raw numbers in widgets.
