@@ -138,6 +138,10 @@ class AddPokemonController extends ChangeNotifier {
 class AddPokemonDialog extends StatelessWidget {
   const AddPokemonDialog({super.key});
 
+  static const Key cancelButtonKey = Key('addPokemon.cancelButton');
+  static const Key chooseButtonKey = Key('addPokemon.chooseButton');
+  static Key optionKey(String dex) => ValueKey('addPokemon.option.$dex');
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<AddPokemonController>(
@@ -199,16 +203,17 @@ class _AddPokemonView extends StatelessWidget {
         },
       ),
       actionsAlignment: MainAxisAlignment.center,
-      actionsPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.sm,
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: colors.primary,
-            side: BorderSide(color: colors.primary, width: 1.4),
+        actionsPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.sm,
+        ),
+        actions: [
+          TextButton(
+            key: AddPokemonDialog.cancelButtonKey,
+            onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: colors.primary,
+              side: BorderSide(color: colors.primary, width: 1.4),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.xs,
@@ -216,12 +221,13 @@ class _AddPokemonView extends StatelessWidget {
           ),
           child: Text(l10n.cancel, style: AppTypography.button),
         ),
-        const SizedBox(width: AppSpacing.sm),
-        ElevatedButton(
-          onPressed: controller.selected == null
-              ? null
-              : () {
-                  final sprite = controller.selected!;
+          const SizedBox(width: AppSpacing.sm),
+          ElevatedButton(
+            key: AddPokemonDialog.chooseButtonKey,
+            onPressed: controller.selected == null
+                ? null
+                : () {
+                    final sprite = controller.selected!;
                   final name = controller.displayName(sprite);
                   Navigator.of(context).pop<Pokemon?>(
                     Pokemon(
@@ -366,6 +372,7 @@ class _SpritePickerState extends State<_SpritePicker> {
                           final selected = sprite == controller.selected;
                           final name = controller.displayName(sprite);
                           return InkWell(
+                            key: AddPokemonDialog.optionKey(sprite.dex),
                             onTap: () => controller.select(sprite),
                             borderRadius: BorderRadius.circular(AppRadii.md),
                             child: Container(

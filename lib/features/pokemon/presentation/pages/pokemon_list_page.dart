@@ -24,6 +24,10 @@ const bool _includeBaseDex = false;
 class PokemonListPage extends StatefulWidget {
   const PokemonListPage({super.key});
 
+  static const Key addPokemonKey = Key('list.addPokemon');
+  static const Key managePokemonKey = Key('list.managePokemon');
+  static const Key settingsKey = Key('list.settings');
+
   @override
   State<PokemonListPage> createState() => _PokemonListPageState();
 }
@@ -430,18 +434,21 @@ class _PokemonListPageState extends State<PokemonListPage>
       ),
       actions: [
         IconButton(
+          key: PokemonListPage.addPokemonKey,
           iconSize: AppSizes.appBarActionIcon,
           icon: const Icon(Icons.add_circle),
           tooltip: context.l10n.tooltipAddPokemon,
           onPressed: _onAddPokemon,
         ),
         IconButton(
+          key: PokemonListPage.managePokemonKey,
           iconSize: AppSizes.appBarActionIcon,
           icon: const Icon(Icons.edit_note),
           tooltip: context.l10n.tooltipManagePokemon,
           onPressed: _openManagePokemonList,
         ),
         IconButton(
+          key: PokemonListPage.settingsKey,
           iconSize: AppSizes.appBarActionIcon,
           icon: const Icon(Icons.settings),
           tooltip: context.l10n.tooltipSettings,

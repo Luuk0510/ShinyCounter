@@ -36,6 +36,10 @@ class ManageListView extends StatefulWidget {
 
   final List<Pokemon> pokemonSorted;
 
+  static Key rowKey(String id) => ValueKey('manage.row.$id');
+  static Key editKey(String id) => ValueKey('manage.edit.$id');
+  static Key deleteKey(String id) => ValueKey('manage.delete.$id');
+
   @override
   State<ManageListView> createState() => _ManageListViewState();
 }
@@ -149,6 +153,7 @@ class _ManageListViewState extends State<ManageListView> {
                         itemBuilder: (context, index) {
                           final p = filtered[index];
                           return ListTile(
+                            key: ManageListView.rowKey(p.id),
                             leading: ManagePokemonImage(pokemon: p),
                             title: Text(
                               p.name,
@@ -167,6 +172,7 @@ class _ManageListViewState extends State<ManageListView> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
+                                  key: ManageListView.editKey(p.id),
                                   icon: const Icon(Icons.edit),
                                   tooltip: context.l10n.manageEditTooltip,
                                   onPressed: () => Navigator.of(context).pop(
@@ -174,6 +180,7 @@ class _ManageListViewState extends State<ManageListView> {
                                   ),
                                 ),
                                 IconButton(
+                                  key: ManageListView.deleteKey(p.id),
                                   icon: const Icon(Icons.delete_outline),
                                   tooltip: context.l10n.manageDeleteTooltip,
                                   color: colors.error,
