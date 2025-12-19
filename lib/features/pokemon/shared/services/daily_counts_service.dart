@@ -13,9 +13,7 @@ class DailyCountsService {
     DateTime? now,
   }) {
     if (dailyCounts.isEmpty) {
-      return [
-        DailyCountSeed(date: now ?? DateTime.now(), count: 0),
-      ];
+      return [DailyCountSeed(date: now ?? DateTime.now(), count: 0)];
     }
 
     final entries = dailyCounts.entries.toList()

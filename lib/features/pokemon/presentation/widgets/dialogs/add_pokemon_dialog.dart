@@ -203,17 +203,17 @@ class _AddPokemonView extends StatelessWidget {
         },
       ),
       actionsAlignment: MainAxisAlignment.center,
-        actionsPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.sm,
-        ),
-        actions: [
-          TextButton(
-            key: AddPokemonDialog.cancelButtonKey,
-            onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: colors.primary,
-              side: BorderSide(color: colors.primary, width: 1.4),
+      actionsPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
+      actions: [
+        TextButton(
+          key: AddPokemonDialog.cancelButtonKey,
+          onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: colors.primary,
+            side: BorderSide(color: colors.primary, width: 1.4),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.xs,
@@ -221,13 +221,13 @@ class _AddPokemonView extends StatelessWidget {
           ),
           child: Text(l10n.cancel, style: AppTypography.button),
         ),
-          const SizedBox(width: AppSpacing.sm),
-          ElevatedButton(
-            key: AddPokemonDialog.chooseButtonKey,
-            onPressed: controller.selected == null
-                ? null
-                : () {
-                    final sprite = controller.selected!;
+        const SizedBox(width: AppSpacing.sm),
+        ElevatedButton(
+          key: AddPokemonDialog.chooseButtonKey,
+          onPressed: controller.selected == null
+              ? null
+              : () {
+                  final sprite = controller.selected!;
                   final name = controller.displayName(sprite);
                   Navigator.of(context).pop<Pokemon?>(
                     Pokemon(

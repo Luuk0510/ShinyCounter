@@ -28,10 +28,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
     final seeds = service.buildSeeds(widget.dailyCounts);
     for (final seed in seeds) {
       _rows.add(
-        _RowData(
-          seed.date,
-          TextEditingController(text: '${seed.count}'),
-        ),
+        _RowData(seed.date, TextEditingController(text: '${seed.count}')),
       );
     }
   }
