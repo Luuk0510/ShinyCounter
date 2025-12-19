@@ -368,94 +368,99 @@ class _SpritePickerState extends State<_SpritePicker> {
                           );
                           final checkWidth =
                               AppSizes.cardActionIcon + AppSpacing.xs;
-                          return InkWell(
-                            key: AddPokemonDialog.optionKey(sprite.dex),
-                            onTap: () => controller.select(sprite),
-                            borderRadius: BorderRadius.circular(AppRadii.md),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.md,
-                                vertical: AppSpacing.sm,
-                              ),
-                              decoration: BoxDecoration(
-                                color: selected
-                                    ? selectedColor.withValues(alpha: 0.08)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(
-                                  AppRadii.md,
+                          final radius = BorderRadius.circular(AppRadii.md);
+                          return Material(
+                            color: Colors.transparent,
+                            borderRadius: radius,
+                            clipBehavior: Clip.antiAlias,
+                            child: InkWell(
+                              key: AddPokemonDialog.optionKey(sprite.dex),
+                              onTap: () => controller.select(sprite),
+                              borderRadius: radius,
+                              child: Ink(
+                                height: AppSizes.listItemMinHeight,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
+                                  vertical: AppSpacing.sm,
                                 ),
-                              ),
-                              height: AppSizes.listItemMinHeight,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '#${sprite.dex}',
-                                          style: AppTypography.button.copyWith(
-                                            color: selected
-                                                ? selectedColor
-                                                : widget
-                                                      .colors
-                                                      .onSurfaceVariant,
+                                decoration: BoxDecoration(
+                                  color: selected
+                                      ? selectedColor.withValues(alpha: 0.08)
+                                      : Colors.transparent,
+                                  borderRadius: radius,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '#${sprite.dex}',
+                                            style: AppTypography.button
+                                                .copyWith(
+                                                  color: selected
+                                                      ? selectedColor
+                                                      : widget
+                                                            .colors
+                                                            .onSurfaceVariant,
+                                                ),
                                           ),
-                                        ),
-                                        const SizedBox(height: AppSpacing.xs),
-                                        Text(
-                                          name,
-                                          style: AppTypography.sectionTitle
-                                              .copyWith(
-                                                color: selected
-                                                    ? selectedColor
-                                                    : widget.colors.onSurface,
-                                              ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
+                                          const SizedBox(height: AppSpacing.xs),
+                                          Text(
+                                            name,
+                                            style: AppTypography.sectionTitle
+                                                .copyWith(
+                                                  color: selected
+                                                      ? selectedColor
+                                                      : widget.colors.onSurface,
+                                                ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                      AppRadii.sm,
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                        AppRadii.sm,
+                                      ),
+                                      child: PokemonImage(
+                                        path: sprite.path,
+                                        isLocalFile: false,
+                                        width: AppSizes.spriteThumb,
+                                        height: AppSizes.spriteThumb,
+                                        borderRadius: AppRadii.sm,
+                                        fallbackIconSize:
+                                            AppSizes.spriteThumb * 0.55,
+                                      ),
                                     ),
-                                    child: PokemonImage(
-                                      path: sprite.path,
-                                      isLocalFile: false,
-                                      width: AppSizes.spriteThumb,
-                                      height: AppSizes.spriteThumb,
-                                      borderRadius: AppRadii.sm,
-                                      fallbackIconSize:
-                                          AppSizes.spriteThumb * 0.55,
-                                    ),
-                                  ),
-                                  AnimatedSize(
-                                    duration: AppAnim.fast,
-                                    curve: AppAnim.easeOutCubic,
-                                    alignment: Alignment.centerRight,
-                                    clipBehavior: Clip.hardEdge,
-                                    child: SizedBox(
-                                      width: selected ? checkWidth : 0,
-                                      child: Align(
-                                        alignment: Alignment.centerRight,
-                                        child: AnimatedOpacity(
-                                          duration: AppAnim.fast,
-                                          curve: AppAnim.easeOutCubic,
-                                          opacity: selected ? 1 : 0,
-                                          child: Icon(
-                                            Icons.check_circle,
-                                            color: selectedColor,
-                                            size: AppSizes.cardActionIcon,
+                                    AnimatedSize(
+                                      duration: AppAnim.fast,
+                                      curve: AppAnim.easeOutCubic,
+                                      alignment: Alignment.centerRight,
+                                      clipBehavior: Clip.hardEdge,
+                                      child: SizedBox(
+                                        width: selected ? checkWidth : 0,
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: AnimatedOpacity(
+                                            duration: AppAnim.fast,
+                                            curve: AppAnim.easeOutCubic,
+                                            opacity: selected ? 1 : 0,
+                                            child: Icon(
+                                              Icons.check_circle,
+                                              color: selectedColor,
+                                              size: AppSizes.cardActionIcon,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           );
