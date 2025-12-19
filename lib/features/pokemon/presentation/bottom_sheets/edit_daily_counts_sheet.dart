@@ -92,10 +92,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
               child: OutlinedButton.icon(
                 icon: const Icon(Icons.add),
                 onPressed: _addRow,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: colors.primary,
-                  side: BorderSide(color: colors.primary, width: 1.3),
-                  backgroundColor: colors.primary.withValues(alpha: 0.08),
+                style: AppButtonStyles.primaryOutline(
+                  colors,
+                  borderWidth: 1.3,
                 ),
                 label: Text(
                   l10n.addCountRow,
