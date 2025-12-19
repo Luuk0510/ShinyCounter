@@ -193,8 +193,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,
+        toolbarHeight: AppSizes.toolbarHeight,
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
+        iconTheme: const IconThemeData(size: AppSizes.appBarActionIcon),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             bottom: Radius.circular(AppRadii.lg),
@@ -221,11 +223,13 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         ),
         actions: [
           IconButton(
+            iconSize: AppSizes.appBarActionIcon,
             icon: const Icon(Icons.edit),
             tooltip: context.l10n.editCounterTooltip,
             onPressed: _showEditDialog,
           ),
           IconButton(
+            iconSize: AppSizes.appBarActionIcon,
             icon: const Icon(Icons.open_in_new_rounded),
             tooltip: context.l10n.openOverlayTooltip,
             onPressed: _togglePill,

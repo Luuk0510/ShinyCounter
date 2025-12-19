@@ -82,7 +82,7 @@ class AppSizes {
   static const pokemonGapSmall = 12.0;
   static const pokemonContentLarge = 14.0;
   static const pokemonContentSmall = 12.0;
-  static const pokemonChevronLarge = 28.0;
+  static const pokemonChevronLarge = AppSizes.appBarActionIcon;
   static const pokemonChevronSmall = 24.0;
   static const cardPaddingH = 10.0; // count_info_card.dart
   static const cardPaddingV = 4.0; // count_info_card.dart

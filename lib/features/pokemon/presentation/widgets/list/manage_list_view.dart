@@ -59,6 +59,7 @@ class _ManageListViewState extends State<ManageListView> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final editIconColor = _actionIconColor(colors.primary);
+    final deleteIconColor = _actionIconColor(colors.error);
     final viewInsets = MediaQuery.of(context).viewInsets.bottom;
     final filter = _query.trim().toLowerCase();
     final digitsOnly = filter.replaceAll(RegExp(r'[^0-9]'), '');
@@ -174,6 +175,7 @@ class _ManageListViewState extends State<ManageListView> {
                               children: [
                                 IconButton(
                                   key: ManageListView.editKey(p.id),
+                                  iconSize: AppSizes.cardActionIcon,
                                   icon: const Icon(Icons.edit),
                                   color: editIconColor,
                                   tooltip: context.l10n.manageEditTooltip,
@@ -183,9 +185,10 @@ class _ManageListViewState extends State<ManageListView> {
                                 ),
                                 IconButton(
                                   key: ManageListView.deleteKey(p.id),
+                                  iconSize: AppSizes.cardActionIcon,
                                   icon: const Icon(Icons.delete_outline),
                                   tooltip: context.l10n.manageDeleteTooltip,
-                                  color: colors.error,
+                                  color: deleteIconColor,
                                   onPressed: () => Navigator.of(
                                     context,
                                   ).pop(ManageAction(pokemon: p, delete: true)),
