@@ -49,6 +49,15 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
                 decoration: InputDecoration(
                   labelText: l10n.nameLabel,
                   hintText: l10n.nameHint,
+                  labelStyle: const TextStyle(
+                    fontSize: AppSizes.sheetFieldLabel,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  hintStyle: const TextStyle(fontSize: AppSizes.sheetFieldHint),
+                ),
+                style: const TextStyle(
+                  fontSize: AppSizes.sheetFieldText,
+                  fontWeight: FontWeight.w800,
                 ),
                 textCapitalization: TextCapitalization.words,
               ),
