@@ -31,89 +31,106 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return DialogEntry(
-      child: AlertDialog(
-        backgroundColor: Theme.of(context).cardColor,
-        surfaceTintColor: Colors.transparent,
-        title: Text(
-          l10n.editDialogTitle,
-          textAlign: TextAlign.center,
-          style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: l10n.nameLabel,
-                  hintText: l10n.nameHint,
-                  labelStyle: const TextStyle(
-                    fontSize: AppSizes.sheetFieldLabel,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  hintStyle: const TextStyle(fontSize: AppSizes.sheetFieldHint),
-                ),
-                style: const TextStyle(
-                  fontSize: AppSizes.sheetFieldText,
-                  fontWeight: FontWeight.w800,
-                ),
-                textCapitalization: TextCapitalization.words,
-              ),
-            ],
-          ),
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actionsPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.sm,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
-            style: AppButtonStyles.primaryOutline(
-              Theme.of(context).colorScheme,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-                vertical: AppSpacing.sm,
-              ),
-            ),
-            child: Text(l10n.cancel, style: AppTypography.button),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          ElevatedButton(
-            onPressed: () {
-              final name = _nameController.text.trim();
-              if (name.isEmpty) return;
-
-              Navigator.of(context).pop<Pokemon?>(
-                Pokemon(
-                  id: widget.pokemon.id,
-                  name: name,
-                  imagePath: widget.pokemon.imagePath,
-                  isLocalFile: widget.pokemon.isLocalFile,
-                ),
-              );
-            },
-            style: AppButtonStyles.primaryFilled(
-              Theme.of(context).colorScheme,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-                vertical: AppSpacing.sm,
-              ),
-            ),
-            child: Text(l10n.save, style: AppTypography.button),
-          ),
-        ],
+    return AlertDialog(
+      backgroundColor: Theme.of(context).cardColor,
+      surfaceTintColor: Colors.transparent,
+      title: Text(
+        l10n.editDialogTitle,
+        textAlign: TextAlign.center,
+        style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
       ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: l10n.nameLabel,
+                hintText: l10n.nameHint,
+                labelStyle: const TextStyle(
+                  fontSize: AppSizes.sheetFieldLabel,
+                  fontWeight: FontWeight.w700,
+                ),
+                hintStyle: const TextStyle(fontSize: AppSizes.sheetFieldHint),
+              ),
+              style: const TextStyle(
+                fontSize: AppSizes.sheetFieldText,
+                fontWeight: FontWeight.w800,
+              ),
+              textCapitalization: TextCapitalization.words,
+            ),
+          ],
+        ),
+      ),
+      actionsAlignment: MainAxisAlignment.center,
+      actionsPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
+          style: AppButtonStyles.primaryOutline(
+            Theme.of(context).colorScheme,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.xl,
+              vertical: AppSpacing.sm,
+            ),
+          ),
+          child: Text(l10n.cancel, style: AppTypography.button),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        ElevatedButton(
+          onPressed: () {
+            final name = _nameController.text.trim();
+            if (name.isEmpty) return;
+
+            Navigator.of(context).pop<Pokemon?>(
+              Pokemon(
+                id: widget.pokemon.id,
+                name: name,
+                imagePath: widget.pokemon.imagePath,
+                isLocalFile: widget.pokemon.isLocalFile,
+              ),
+            );
+          },
+          style: AppButtonStyles.primaryFilled(
+            Theme.of(context).colorScheme,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.xl,
+              vertical: AppSpacing.sm,
+            ),
+          ),
+          child: Text(l10n.save, style: AppTypography.button),
+        ),
+      ],
     );
   }
 }
 
 Future<Pokemon?> showEditPokemonDialog(BuildContext context, Pokemon pokemon) {
-  return showDialog<Pokemon?>(
+  return showGeneralDialog<Pokemon?>(
     context: context,
-    builder: (_) => EditPokemonDialog(pokemon: pokemon),
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    barrierColor: Colors.black54,
+    transitionDuration: AppAnim.dialogDuration,
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        EditPokemonDialog(pokemon: pokemon),
+    transitionBuilder: (context, animation, _, child) {
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: AppAnim.dialogCurve,
+      );
+      final scale = Tween<double>(
+        begin: AppAnim.dialogStartScale,
+        end: 1,
+      ).animate(curved);
+      return FadeTransition(
+        opacity: animation,
+        child: ScaleTransition(scale: scale, child: child),
+      );
+    },
   );
 }
