@@ -148,7 +148,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editSheetTitle => 'Edit Pokémon details';
 
   @override
-  String get huntHistoryTitle => 'Hunt history';
+  String get huntHistoryTitle => 'Count history';
 
   @override
   String get searchByNameOrDex => 'Search by name or dex';

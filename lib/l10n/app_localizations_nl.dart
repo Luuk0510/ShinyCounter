@@ -148,7 +148,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get editSheetTitle => 'Pokémon-gegevens aanpassen';
 
   @override
-  String get huntHistoryTitle => 'Hunt-geschiedenis';
+  String get huntHistoryTitle => 'Telgeschiedenis';
 
   @override
   String get searchByNameOrDex => 'Zoek op naam of Pokédex';
