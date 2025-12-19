@@ -44,6 +44,7 @@ class AppSizes {
   static const listMinHeight = 160.0; // manage_list_view.dart
   static const spriteThumb = 96.0; // pokemon_card.dart
   static const listItemMinHeight = 104.0;
+  static const listScrollbarThickness = 7.0;
 
   // search_gen_filter_row.dart
   static const dropdownWidth = 115.0;

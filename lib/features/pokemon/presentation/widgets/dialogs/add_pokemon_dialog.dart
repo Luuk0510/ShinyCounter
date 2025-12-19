@@ -354,6 +354,8 @@ class _SpritePickerState extends State<_SpritePicker> {
                       controller: _scrollController,
                       thumbVisibility: true,
                       interactive: true,
+                      thickness: AppSizes.listScrollbarThickness,
+                      radius: const Radius.circular(AppRadii.sm),
                       child: ListView.builder(
                         controller: _scrollController,
                         padding: EdgeInsets.zero,
