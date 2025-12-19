@@ -12,6 +12,7 @@ export 'detail/detail_header.dart';
 export 'detail/count_info_card.dart';
 export 'dialogs/add_pokemon_dialog.dart';
 export 'dialogs/dialog_entry.dart';
+export 'dialogs/dialog_field_group.dart';
 export 'dialogs/edit_pokemon_dialog.dart';
 export 'dialogs/safe_area_sheet.dart';
 export 'dialogs/settings_sheet.dart';
