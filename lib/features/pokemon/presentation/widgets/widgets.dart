@@ -1,4 +1,5 @@
 export 'common/animated_app_icon.dart';
+export 'common/app_image.dart';
 export 'common/game_dropdown.dart';
 export 'common/pokemon_empty_state.dart';
 export 'common/pokemon_image.dart';

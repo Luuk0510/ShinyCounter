@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/app_image.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image_provider.dart';
 
 class PokemonImage extends StatelessWidget {
@@ -26,21 +27,14 @@ class PokemonImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final image = Image(
+    return AppImage(
       image: pokemonImageProvider(path, isLocalFile: isLocalFile),
       width: width,
       height: height,
       fit: fit,
-      errorBuilder: (context, _, _) {
-        final size = fallbackIconSize ?? (width ?? height);
-        return Icon(fallbackIcon, size: size);
-      },
-    );
-
-    if (borderRadius <= 0) return image;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: image,
+      borderRadius: borderRadius,
+      fallbackIcon: fallbackIcon,
+      fallbackIconSize: fallbackIconSize,
     );
   }
 }

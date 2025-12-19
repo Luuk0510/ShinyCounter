@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/game_assets.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/app_image.dart';
 
 class GameDropdown extends StatelessWidget {
   const GameDropdown({super.key, required this.value, required this.onChanged});
@@ -129,15 +130,18 @@ class GameLogo extends StatelessWidget {
         border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Image.asset(
-        GameDropdown.logoFor(game),
+      child: AppImage(
+        image: AssetImage(GameDropdown.logoFor(game)),
+        width: size,
+        height: size,
         fit: BoxFit.cover,
-        errorBuilder: (_, error, stackTrace) => Center(
+        borderRadius: 0,
+        fallbackBuilder: (context, fallbackSize) => Center(
           child: Text(
             label,
             style: TextStyle(
               fontWeight: FontWeight.w800,
-              fontSize: size * 0.45,
+              fontSize: (fallbackSize ?? size) * 0.45,
               color: colors.onPrimaryContainer,
             ),
           ),
