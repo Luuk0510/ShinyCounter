@@ -150,7 +150,6 @@ class AppOpacity {
   static const detailSheetBarrier = 0.4;
   static const cardActionScrim = 0.1;
   static const cardActionButton = 0.5;
-  static const appIconStroke = 0.35;
 }
 
 class AppAnim {

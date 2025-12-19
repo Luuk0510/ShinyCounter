@@ -109,36 +109,20 @@ class _AnimatedAppIconState extends State<AnimatedAppIcon>
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final iconBorderRadius = BorderRadius.circular(AppRadii.sm);
-    final icon = Container(
-      decoration: BoxDecoration(
-        color: colors.surfaceContainerHighest,
-        borderRadius: iconBorderRadius,
-      ),
-      foregroundDecoration: BoxDecoration(
-        borderRadius: iconBorderRadius,
-        border: Border.all(
-          color: colors.outline.withValues(alpha: AppOpacity.appIconStroke),
-        ),
-      ),
-      child: AppImage(
-        image: AssetImage(widget.assetPath),
-        width: widget.size,
-        height: widget.size,
-        borderRadius: AppRadii.sm,
-        fallbackIcon: Icons.catching_pokemon,
-        fallbackIconSize: 24,
-      ),
-    );
-
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _play,
       key: AnimatedAppIcon.tapTargetKey,
       child: AnimatedBuilder(
         animation: _controller,
-        child: icon,
+        child: AppImage(
+          image: AssetImage(widget.assetPath),
+          width: widget.size,
+          height: widget.size,
+          borderRadius: 0,
+          fallbackIcon: Icons.catching_pokemon,
+          fallbackIconSize: 24,
+        ),
         builder: (context, child) {
           return Transform.rotate(
             key: AnimatedAppIcon.transformKey,
