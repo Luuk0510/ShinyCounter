@@ -58,6 +58,7 @@ class _ManageListViewState extends State<ManageListView> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final editIconColor = _actionIconColor(colors.primary);
     final viewInsets = MediaQuery.of(context).viewInsets.bottom;
     final filter = _query.trim().toLowerCase();
     final digitsOnly = filter.replaceAll(RegExp(r'[^0-9]'), '');
@@ -174,6 +175,7 @@ class _ManageListViewState extends State<ManageListView> {
                                 IconButton(
                                   key: ManageListView.editKey(p.id),
                                   icon: const Icon(Icons.edit),
+                                  color: editIconColor,
                                   tooltip: context.l10n.manageEditTooltip,
                                   onPressed: () => Navigator.of(context).pop(
                                     ManageAction(pokemon: p, delete: false),
@@ -209,5 +211,10 @@ class _ManageListViewState extends State<ManageListView> {
     final dexNum = dexNumberFromPokemon(p);
     if (dexNum == null) return true;
     return isDexInGen(dexNum, gen);
+  }
+
+  Color _actionIconColor(Color color) {
+    final hsl = HSLColor.fromColor(color);
+    return hsl.withLightness((hsl.lightness * 0.9).clamp(0.0, 1.0)).toColor();
   }
 }
