@@ -363,6 +363,9 @@ class _SpritePickerState extends State<_SpritePicker> {
                           final sprite = controller.filteredSprites[index];
                           final selected = sprite == controller.selected;
                           final name = controller.displayName(sprite);
+                          final selectedColor = AppButtonPalette.primaryAccent(
+                            widget.colors,
+                          );
                           return InkWell(
                             key: AddPokemonDialog.optionKey(sprite.dex),
                             onTap: () => controller.select(sprite),
@@ -374,7 +377,7 @@ class _SpritePickerState extends State<_SpritePicker> {
                               ),
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? widget.colors.primary.withValues(
+                                    ? selectedColor.withValues(
                                         alpha: 0.08,
                                       )
                                     : Colors.transparent,
@@ -396,7 +399,7 @@ class _SpritePickerState extends State<_SpritePicker> {
                                           '#${sprite.dex}',
                                           style: AppTypography.button.copyWith(
                                             color: selected
-                                                ? widget.colors.primary
+                                                ? selectedColor
                                                 : widget
                                                       .colors
                                                       .onSurfaceVariant,
@@ -408,7 +411,7 @@ class _SpritePickerState extends State<_SpritePicker> {
                                           style: AppTypography.sectionTitle
                                               .copyWith(
                                                 color: selected
-                                                    ? widget.colors.primary
+                                                    ? selectedColor
                                                     : widget.colors.onSurface,
                                               ),
                                           overflow: TextOverflow.ellipsis,
@@ -434,7 +437,7 @@ class _SpritePickerState extends State<_SpritePicker> {
                                     const SizedBox(width: AppSpacing.xs),
                                     Icon(
                                       Icons.check_circle,
-                                      color: widget.colors.primary,
+                                      color: selectedColor,
                                     ),
                                   ],
                                 ],

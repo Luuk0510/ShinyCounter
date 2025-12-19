@@ -95,6 +95,8 @@ class _RoundIconButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: effectiveBg,
         foregroundColor: effectiveFg,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(AppSizes.counterButtonPadding),
         minimumSize: const Size(

@@ -110,7 +110,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
           Center(
             child: TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              style: AppButtonStyles.primaryText(
+              style: AppButtonStyles.primaryOutline(
                 colors,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSizes.settingsActionPaddingH,
@@ -145,20 +145,41 @@ class _ThemeOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final selectedColor = AppButtonPalette.text(colors);
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      title: Text(
-        label,
-        style: AppTypography.sectionTitle.copyWith(
-          fontWeight: FontWeight.w700,
-          color: selected ? selectedColor : colors.onSurface,
+    final selectedColor = AppButtonPalette.primaryAccent(colors);
+    final radius = BorderRadius.circular(AppRadii.md);
+    return Material(
+      color: Colors.transparent,
+      borderRadius: radius,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: AppTypography.sectionTitle.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: selected ? selectedColor : colors.onSurface,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Icon(
+                selected ? Icons.check_circle : Icons.circle_outlined,
+                color:
+                    selected ? selectedColor : colors.onSurfaceVariant,
+              ),
+            ],
+          ),
         ),
       ),
-      trailing: selected
-          ? Icon(Icons.check_circle, color: selectedColor)
-          : Icon(Icons.circle_outlined, color: colors.onSurfaceVariant),
-      onTap: onTap,
     );
   }
 }

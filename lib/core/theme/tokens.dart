@@ -165,6 +165,14 @@ class AppButtonPalette {
         : Colors.black;
   }
 
+  static Color primaryAccent(ColorScheme colors) {
+    return _brighten(primaryFill(colors));
+  }
+
+  static Color primaryHighlight(ColorScheme colors) {
+    return Color.lerp(primaryFill(colors), Colors.white, 0.25)!;
+  }
+
   static Color outline(ColorScheme colors) {
     return AppColors.seed;
   }
@@ -187,6 +195,13 @@ class AppButtonPalette {
     return AppColors.seed;
   }
 
+  static Color _brighten(Color color) {
+    final hsl = HSLColor.fromColor(color);
+    return hsl
+        .withLightness((hsl.lightness * 1.20).clamp(0.0, 1.0))
+        .toColor();
+  }
+
   static Color _darken(Color color) {
     final hsl = HSLColor.fromColor(color);
     return hsl.withLightness((hsl.lightness * 0.85).clamp(0.0, 1.0)).toColor();
@@ -203,6 +218,8 @@ class AppButtonStyles {
       foregroundColor: AppButtonPalette.primaryOnFill(colors),
       disabledBackgroundColor: colors.onSurfaceVariant.withValues(alpha: 0.2),
       disabledForegroundColor: colors.onSurfaceVariant.withValues(alpha: 0.6),
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
       padding: padding,
     );
   }
