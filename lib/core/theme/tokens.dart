@@ -88,6 +88,8 @@ class AppSizes {
   static const cardPaddingV = 4.0; // count_info_card.dart
   static const cardBorderRadius = 30.0; // count_info_card.dart
   static const cardElevation = 2.0; // count_info_card.dart
+  static const cardActionBlur = 5.0;
+  static const cardActionIcon = 28.0;
 
   // pokemon_empty_state.dart
   static const emptyStateImage = 96.0;
@@ -146,6 +148,9 @@ class AppLimits {
 class AppOpacity {
   static const modalBarrier = 0.35;
   static const detailSheetBarrier = 0.4;
+  static const cardActionScrim = 0.1;
+  static const cardActionButton = 0.5;
+  static const appIconStroke = 0.35;
 }
 
 class AppAnim {
@@ -155,6 +160,7 @@ class AppAnim {
   static const switcher = Duration(milliseconds: 220);
   static const dialogDuration = fast;
   static const sheetDuration = Duration(milliseconds: 200);
+  static const longPressDelay = Duration(milliseconds: 500);
 
   static const easeOut = Curves.easeOut;
   static const easeOutCubic = Curves.easeOutCubic;

@@ -47,6 +47,10 @@ class _PokemonListPageState extends State<PokemonListPage>
   bool _showCaught = true;
   AnimationController? _sheetController;
 
+  bool _isCustomPokemon(Pokemon pokemon) {
+    return _customPokemon.any((p) => p.id == pokemon.id);
+  }
+
   List<Pokemon> get _allPokemon {
     final combined = [..._basePokemon, ..._customPokemon];
     combined.sort(pokemonDexComparator);
@@ -482,6 +486,18 @@ class _PokemonListPageState extends State<PokemonListPage>
           pokemons: uncaught,
           isCaught: _isCaught,
           onTap: _openDetail,
+          canManage: _isCustomPokemon,
+          onEdit: (pokemon) async {
+            if (!_isCustomPokemon(pokemon)) return;
+            final updated = await showEditPokemonDialog(context, pokemon);
+            if (updated != null) {
+              await _applyPokemonEdit(pokemon, updated);
+            }
+          },
+          onDelete: (pokemon) async {
+            if (!_isCustomPokemon(pokemon)) return;
+            await _confirmDelete(pokemon);
+          },
         ),
       );
     }
@@ -494,6 +510,18 @@ class _PokemonListPageState extends State<PokemonListPage>
           pokemons: caught,
           isCaught: _isCaught,
           onTap: _openDetail,
+          canManage: _isCustomPokemon,
+          onEdit: (pokemon) async {
+            if (!_isCustomPokemon(pokemon)) return;
+            final updated = await showEditPokemonDialog(context, pokemon);
+            if (updated != null) {
+              await _applyPokemonEdit(pokemon, updated);
+            }
+          },
+          onDelete: (pokemon) async {
+            if (!_isCustomPokemon(pokemon)) return;
+            await _confirmDelete(pokemon);
+          },
         ),
       );
     }

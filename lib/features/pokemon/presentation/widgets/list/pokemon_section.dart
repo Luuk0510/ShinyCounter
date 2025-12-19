@@ -13,6 +13,9 @@ class PokemonSection extends StatefulWidget {
     required this.pokemons,
     required this.isCaught,
     required this.onTap,
+    this.onEdit,
+    this.onDelete,
+    this.canManage,
   });
 
   final String title;
@@ -21,6 +24,9 @@ class PokemonSection extends StatefulWidget {
   final List<Pokemon> pokemons;
   final bool Function(Pokemon) isCaught;
   final Future<void> Function(Pokemon) onTap;
+  final ValueChanged<Pokemon>? onEdit;
+  final ValueChanged<Pokemon>? onDelete;
+  final bool Function(Pokemon)? canManage;
 
   @override
   State<PokemonSection> createState() => _PokemonSectionState();
@@ -78,6 +84,7 @@ class _PokemonSectionState extends State<PokemonSection> {
   }
 
   Widget _buildAnimatedItem(Pokemon pokemon, Animation<double> animation) {
+    final canManage = widget.canManage?.call(pokemon) ?? false;
     final curve = CurvedAnimation(
       parent: animation,
       curve: AppAnim.easeOutCubic,
@@ -98,6 +105,12 @@ class _PokemonSectionState extends State<PokemonSection> {
             pokemon: pokemon,
             isCaught: widget.isCaught(pokemon),
             onTap: () => widget.onTap(pokemon),
+            onEdit: canManage && widget.onEdit != null
+                ? () => widget.onEdit!(pokemon)
+                : null,
+            onDelete: canManage && widget.onDelete != null
+                ? () => widget.onDelete!(pokemon)
+                : null,
           ),
         ),
       ),
