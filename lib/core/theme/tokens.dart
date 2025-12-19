@@ -155,22 +155,37 @@ class AppOpacity {
 
 class AppButtonPalette {
   static Color primaryFill(ColorScheme colors) {
-    return colors.primary.withValues(alpha: 0.18);
+    return AppColors.seed;
   }
 
   static Color primaryOnFill(ColorScheme colors) {
-    return _darken(colors.primary);
+    return ThemeData.estimateBrightnessForColor(AppColors.seed) ==
+            Brightness.dark
+        ? Colors.white
+        : Colors.black;
   }
 
   static Color outline(ColorScheme colors) {
-    return colors.primary;
+    return AppColors.seed;
   }
 
   static Color outlineBackground(ColorScheme colors) {
-    return colors.primary.withValues(alpha: 0.08);
+    return AppColors.seed.withValues(alpha: 0.08);
   }
 
-  static Color text(ColorScheme colors) => _darken(colors.primary);
+  static Color text(ColorScheme colors) => AppColors.seed;
+
+  static Color outlineMuted(ColorScheme colors) {
+    return AppColors.seed;
+  }
+
+  static Color outlineBackgroundMuted(ColorScheme colors) {
+    return AppColors.seed.withValues(alpha: 0.08);
+  }
+
+  static Color textMuted(ColorScheme colors) {
+    return AppColors.seed;
+  }
 
   static Color _darken(Color color) {
     final hsl = HSLColor.fromColor(color);

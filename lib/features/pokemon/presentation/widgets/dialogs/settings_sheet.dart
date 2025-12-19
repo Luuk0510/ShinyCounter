@@ -145,17 +145,18 @@ class _ThemeOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final selectedColor = AppButtonPalette.text(colors);
     return ListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(
         label,
         style: AppTypography.sectionTitle.copyWith(
           fontWeight: FontWeight.w700,
-          color: selected ? colors.primary : colors.onSurface,
+          color: selected ? selectedColor : colors.onSurface,
         ),
       ),
       trailing: selected
-          ? Icon(Icons.check_circle, color: colors.primary)
+          ? Icon(Icons.check_circle, color: selectedColor)
           : Icon(Icons.circle_outlined, color: colors.onSurfaceVariant),
       onTap: onTap,
     );
