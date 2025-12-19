@@ -110,8 +110,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
           Center(
             child: TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              style: TextButton.styleFrom(
-                foregroundColor: colors.primary,
+              style: AppButtonStyles.primaryText(
+                colors,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSizes.settingsActionPaddingH,
                   vertical: AppSizes.settingsActionPaddingV,

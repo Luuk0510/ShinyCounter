@@ -111,10 +111,8 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: colors.primary,
-                      side: BorderSide(color: colors.primary, width: 1.4),
-                      backgroundColor: colors.primary.withValues(alpha: 0.08),
+                    style: AppButtonStyles.primaryOutline(
+                      colors,
                     ),
                     child: Text(
                       l10n.cancel,
@@ -128,10 +126,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: _save,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colors.primary,
-                      foregroundColor: colors.onPrimary,
-                    ),
+                    style: AppButtonStyles.primaryFilled(colors),
                     child: Text(
                       l10n.save,
                       style: AppTypography.button.copyWith(
@@ -258,7 +253,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              style: TextButton.styleFrom(foregroundColor: colors.primary),
+              style: AppButtonStyles.primaryText(colors),
               child: Text(context.l10n.cancel),
             ),
             TextButton(
@@ -272,7 +267,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                 }
                 Navigator.of(context).pop(parsed);
               },
-              style: TextButton.styleFrom(foregroundColor: colors.primary),
+              style: AppButtonStyles.primaryText(colors),
               child: Text(context.l10n.save),
             ),
           ],

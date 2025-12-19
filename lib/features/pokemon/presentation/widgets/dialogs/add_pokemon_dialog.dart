@@ -211,9 +211,8 @@ class _AddPokemonView extends StatelessWidget {
         TextButton(
           key: AddPokemonDialog.cancelButtonKey,
           onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: colors.primary,
-            side: BorderSide(color: colors.primary, width: 1.4),
+          style: AppButtonStyles.primaryOutline(
+            colors,
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.xs,
@@ -238,15 +237,8 @@ class _AddPokemonView extends StatelessWidget {
                     ),
                   );
                 },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colors.primary,
-            foregroundColor: colors.onPrimary,
-            disabledBackgroundColor: colors.onSurfaceVariant.withValues(
-              alpha: 0.2,
-            ),
-            disabledForegroundColor: colors.onSurfaceVariant.withValues(
-              alpha: 0.6,
-            ),
+          style: AppButtonStyles.primaryFilled(
+            colors,
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.xs,

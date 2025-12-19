@@ -159,13 +159,9 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: colors.primary,
-                    side: BorderSide(
-                      color: colors.primary,
-                      width: AppSizes.sheetActionWidth,
-                    ),
-                    backgroundColor: colors.primary.withValues(alpha: 0.08),
+                  style: AppButtonStyles.primaryOutline(
+                    colors,
+                    borderWidth: AppSizes.sheetActionWidth,
                   ),
                   child: Text(
                     l10n.cancel,
@@ -180,10 +176,7 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: _submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colors.primary,
-                    foregroundColor: colors.onPrimary,
-                  ),
+                  style: AppButtonStyles.primaryFilled(colors),
                   child: Text(
                     l10n.save,
                     style: const TextStyle(

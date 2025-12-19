@@ -153,6 +153,74 @@ class AppOpacity {
   static const cardActionButton = 0.3;
 }
 
+class AppButtonPalette {
+  static Color primaryFill(ColorScheme colors) {
+    return colors.primary.withValues(alpha: 0.18);
+  }
+
+  static Color primaryOnFill(ColorScheme colors) {
+    return _darken(colors.primary);
+  }
+
+  static Color outline(ColorScheme colors) {
+    return colors.primary;
+  }
+
+  static Color outlineBackground(ColorScheme colors) {
+    return colors.primary.withValues(alpha: 0.08);
+  }
+
+  static Color text(ColorScheme colors) => _darken(colors.primary);
+
+  static Color _darken(Color color) {
+    final hsl = HSLColor.fromColor(color);
+    return hsl.withLightness((hsl.lightness * 0.85).clamp(0.0, 1.0)).toColor();
+  }
+}
+
+class AppButtonStyles {
+  static ButtonStyle primaryFilled(
+    ColorScheme colors, {
+    EdgeInsets? padding,
+  }) {
+    return ElevatedButton.styleFrom(
+      backgroundColor: AppButtonPalette.primaryFill(colors),
+      foregroundColor: AppButtonPalette.primaryOnFill(colors),
+      disabledBackgroundColor: colors.onSurfaceVariant.withValues(alpha: 0.2),
+      disabledForegroundColor: colors.onSurfaceVariant.withValues(alpha: 0.6),
+      padding: padding,
+    );
+  }
+
+  static ButtonStyle primaryOutline(
+    ColorScheme colors, {
+    EdgeInsets? padding,
+    double borderWidth = 1.4,
+    Color? backgroundColor,
+  }) {
+    return OutlinedButton.styleFrom(
+      foregroundColor: AppButtonPalette.textMuted(colors),
+      side: BorderSide(
+        color: AppButtonPalette.outlineMuted(colors),
+        width: borderWidth,
+      ),
+      backgroundColor:
+          backgroundColor ?? AppButtonPalette.outlineBackgroundMuted(colors),
+      padding: padding,
+    );
+  }
+
+  static ButtonStyle primaryText(
+    ColorScheme colors, {
+    EdgeInsets? padding,
+  }) {
+    return TextButton.styleFrom(
+      foregroundColor: AppButtonPalette.text(colors),
+      padding: padding,
+    );
+  }
+}
+
 class AppAnim {
   static const faster = Duration(milliseconds: 90);
   static const fast = Duration(milliseconds: 120);
