@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/daily_counts_service.dart';
 
 class EditDailyCountsSheet extends StatefulWidget {
   const EditDailyCountsSheet({
@@ -23,19 +24,15 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
   @override
   void initState() {
     super.initState();
-    final entries = widget.dailyCounts.entries.toList()
-      ..sort((a, b) => b.key.compareTo(a.key));
-    if (entries.isEmpty) {
-      _rows.add(_RowData(DateTime.now(), TextEditingController(text: '0')));
-    } else {
-      for (final entry in entries) {
-        _rows.add(
-          _RowData(
-            DateTime.tryParse(entry.key) ?? DateTime.now(),
-            TextEditingController(text: '${entry.value}'),
-          ),
-        );
-      }
+    const service = DailyCountsService();
+    final seeds = service.buildSeeds(widget.dailyCounts);
+    for (final seed in seeds) {
+      _rows.add(
+        _RowData(
+          seed.date,
+          TextEditingController(text: '${seed.count}'),
+        ),
+      );
     }
   }
 
