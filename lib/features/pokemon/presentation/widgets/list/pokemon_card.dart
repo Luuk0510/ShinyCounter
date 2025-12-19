@@ -279,15 +279,19 @@ class _ActionIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hsl = HSLColor.fromColor(color);
+    final iconColor =
+        hsl.withLightness((hsl.lightness * 0.9).clamp(0.0, 1.0)).toColor();
+    final iconSize = size * AppSizes.cardActionIconScale;
     return Material(
       color: color.withValues(alpha: AppOpacity.cardActionButton),
       shape: const CircleBorder(),
       child: IconButton(
-        icon: Icon(icon, color: color, size: size),
+        icon: Icon(icon, color: iconColor, size: iconSize),
         onPressed: onPressed,
         constraints: BoxConstraints.tightFor(
-          width: size * 2.2,
-          height: size * 2.2,
+          width: size * 3,
+          height: size * 2.5,
         ),
         padding: EdgeInsets.zero,
       ),

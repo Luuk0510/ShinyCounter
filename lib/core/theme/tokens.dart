@@ -90,6 +90,7 @@ class AppSizes {
   static const cardElevation = 2.0; // count_info_card.dart
   static const cardActionBlur = 5.0;
   static const cardActionIcon = 28.0;
+  static const cardActionIconScale = 1.3;
 
   // pokemon_empty_state.dart
   static const emptyStateImage = 96.0;
@@ -149,7 +150,7 @@ class AppOpacity {
   static const modalBarrier = 0.35;
   static const detailSheetBarrier = 0.4;
   static const cardActionScrim = 0.1;
-  static const cardActionButton = 0.5;
+  static const cardActionButton = 0.3;
 }
 
 class AppAnim {
