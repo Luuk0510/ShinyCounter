@@ -6,10 +6,10 @@ import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_entry.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/filters/search_gen_filter_row.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 
 class AddPokemonController extends ChangeNotifier {
   AddPokemonController({required SpriteService spriteService})
@@ -499,26 +499,8 @@ String _generateId(String dex) =>
     'custom_${dex}_${DateTime.now().microsecondsSinceEpoch}';
 
 Future<Pokemon?> showAddPokemonDialog(BuildContext context) {
-  return showGeneralDialog<Pokemon?>(
+  return showScaledDialog<Pokemon?>(
     context: context,
-    barrierDismissible: true,
-    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-    barrierColor: Colors.black54,
-    transitionDuration: AppAnim.dialogDuration,
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        const AddPokemonDialog(),
-    transitionBuilder: (context, animation, secondaryAnimation, child) {
-      final curved = CurvedAnimation(
-        parent: animation,
-        curve: AppAnim.dialogCurve,
-      );
-      final scale = Tween<double>(begin: 0.65, end: 1).animate(curved);
-      return DialogEntry(
-        child: FadeTransition(
-          opacity: animation,
-          child: Transform.scale(scale: scale.value, child: child),
-        ),
-      );
-    },
+    builder: (_) => const AddPokemonDialog(),
   );
 }

@@ -14,6 +14,7 @@ import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
@@ -156,31 +157,6 @@ class _PokemonListPageState extends State<PokemonListPage>
     }
   }
 
-  Future<T?> _showScaledDialog<T>(Widget dialog) {
-    return showGeneralDialog<T>(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: Colors.black54,
-      transitionDuration: AppAnim.dialogDuration,
-      pageBuilder: (context, animation, secondaryAnimation) => dialog,
-      transitionBuilder: (context, animation, _, child) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: AppAnim.dialogCurve,
-        );
-        final scale = Tween<double>(
-          begin: AppAnim.dialogStartScale,
-          end: 1,
-        ).animate(curved);
-        return FadeTransition(
-          opacity: animation,
-          child: ScaleTransition(scale: scale, child: child),
-        );
-      },
-    );
-  }
-
   bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.id);
 
   Future<void> _precacheListSprites() async {
@@ -233,8 +209,9 @@ class _PokemonListPageState extends State<PokemonListPage>
 
   Future<void> _confirmDelete(Pokemon pokemon) async {
     final colors = Theme.of(context).colorScheme;
-    final confirmed = await _showScaledDialog<bool>(
-      AlertDialog(
+    final confirmed = await showScaledDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
         backgroundColor: Theme.of(context).cardColor,
         surfaceTintColor: Colors.transparent,
         title: Text(
@@ -362,7 +339,10 @@ class _PokemonListPageState extends State<PokemonListPage>
 
   Future<void> _openSettings() async {
     if (!mounted) return;
-    await _showScaledDialog(const SettingsDialog());
+    await showScaledDialog(
+      context: context,
+      builder: (_) => const SettingsDialog(),
+    );
     setState(() {});
   }
 

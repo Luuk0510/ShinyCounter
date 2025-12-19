@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_entry.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 
 class EditPokemonDialog extends StatefulWidget {
   const EditPokemonDialog({super.key, required this.pokemon});
@@ -110,27 +110,8 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
 }
 
 Future<Pokemon?> showEditPokemonDialog(BuildContext context, Pokemon pokemon) {
-  return showGeneralDialog<Pokemon?>(
+  return showScaledDialog<Pokemon?>(
     context: context,
-    barrierDismissible: true,
-    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-    barrierColor: Colors.black54,
-    transitionDuration: AppAnim.dialogDuration,
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        EditPokemonDialog(pokemon: pokemon),
-    transitionBuilder: (context, animation, _, child) {
-      final curved = CurvedAnimation(
-        parent: animation,
-        curve: AppAnim.dialogCurve,
-      );
-      final scale = Tween<double>(
-        begin: AppAnim.dialogStartScale,
-        end: 1,
-      ).animate(curved);
-      return FadeTransition(
-        opacity: animation,
-        child: ScaleTransition(scale: scale, child: child),
-      );
-    },
+    builder: (_) => EditPokemonDialog(pokemon: pokemon),
   );
 }
