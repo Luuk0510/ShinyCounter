@@ -14,6 +14,7 @@ import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
 
@@ -331,16 +332,10 @@ class _PokemonListPageState extends State<PokemonListPage>
       return;
     }
 
-    final action = await showModalBottomSheet<ManageAction>(
-      context: context,
-      isScrollControlled: true,
+    final action = await showPokemonBottomSheet<ManageAction>(
+      context,
       showDragHandle: false,
-      transitionAnimationController: _sheetController,
-      backgroundColor: Theme.of(context).cardColor,
-      barrierColor: Colors.black.withValues(alpha: AppOpacity.modalBarrier),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
-      ),
+      transitionController: _sheetController,
       builder: (context) => ManageListView(pokemonSorted: pokemonSorted),
     );
 

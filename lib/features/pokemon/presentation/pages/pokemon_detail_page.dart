@@ -11,6 +11,7 @@ import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_c
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_daily_counts_sheet.dart';
 import 'package:shiny_counter/features/pokemon/shared/state/counter_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
@@ -134,14 +135,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   }
 
   Future<void> _showEditDialog() async {
-    final result = await showModalBottomSheet<EditSheetResult>(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
-      ),
-      backgroundColor: Theme.of(context).cardColor,
-      barrierColor: Colors.black.withValues(alpha: 0.4),
+    final result = await showPokemonBottomSheet<EditSheetResult>(
+      context,
+      barrierOpacity: AppOpacity.detailSheetBarrier,
       builder: (context) {
         return EditCountersSheet(
           pokemonName: widget.pokemon.name,
@@ -173,14 +169,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   }
 
   Future<void> _showDailyCountsEditor() async {
-    final result = await showModalBottomSheet<Map<String, int>>(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
-      ),
-      backgroundColor: Theme.of(context).cardColor,
-      barrierColor: Colors.black.withValues(alpha: 0.4),
+    final result = await showPokemonBottomSheet<Map<String, int>>(
+      context,
+      barrierOpacity: AppOpacity.detailSheetBarrier,
       builder: (context) {
         return EditDailyCountsSheet(
           dailyCounts: _controller.dailyCounts,

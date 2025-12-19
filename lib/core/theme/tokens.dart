@@ -145,6 +145,7 @@ class AppLimits {
 
 class AppOpacity {
   static const modalBarrier = 0.35;
+  static const detailSheetBarrier = 0.4;
 }
 
 class AppAnim {
