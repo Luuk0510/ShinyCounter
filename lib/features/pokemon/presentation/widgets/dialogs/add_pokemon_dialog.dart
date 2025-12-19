@@ -366,6 +366,8 @@ class _SpritePickerState extends State<_SpritePicker> {
                           final selectedColor = AppButtonPalette.primaryAccent(
                             widget.colors,
                           );
+                          final checkWidth =
+                              AppSizes.cardActionIcon + AppSpacing.xs;
                           return InkWell(
                             key: AddPokemonDialog.optionKey(sprite.dex),
                             onTap: () => controller.select(sprite),
@@ -431,13 +433,28 @@ class _SpritePickerState extends State<_SpritePicker> {
                                           AppSizes.spriteThumb * 0.55,
                                     ),
                                   ),
-                                  if (selected) ...[
-                                    const SizedBox(width: AppSpacing.xs),
-                                    Icon(
-                                      Icons.check_circle,
-                                      color: selectedColor,
+                                  AnimatedSize(
+                                    duration: AppAnim.fast,
+                                    curve: AppAnim.easeOutCubic,
+                                    alignment: Alignment.centerRight,
+                                    clipBehavior: Clip.hardEdge,
+                                    child: SizedBox(
+                                      width: selected ? checkWidth : 0,
+                                      child: Align(
+                                        alignment: Alignment.centerRight,
+                                        child: AnimatedOpacity(
+                                          duration: AppAnim.fast,
+                                          curve: AppAnim.easeOutCubic,
+                                          opacity: selected ? 1 : 0,
+                                          child: Icon(
+                                            Icons.check_circle,
+                                            color: selectedColor,
+                                            size: AppSizes.cardActionIcon,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ],
+                                  ),
                                 ],
                               ),
                             ),

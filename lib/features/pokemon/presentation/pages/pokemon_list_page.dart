@@ -276,7 +276,7 @@ class _PokemonListPageState extends State<PokemonListPage>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            style: AppButtonStyles.primaryText(
+            style: AppButtonStyles.primaryOutline(
               colors,
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.xl,
