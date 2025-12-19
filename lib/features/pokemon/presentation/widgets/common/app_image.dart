@@ -33,7 +33,7 @@ class AppImage extends StatelessWidget {
       width: width,
       height: height,
       fit: fit,
-      errorBuilder: (context, _, __) {
+      errorBuilder: (context, _, _) {
         final size = fallbackIconSize ?? width ?? height;
         if (fallbackBuilder != null) {
           return fallbackBuilder!(context, size);
