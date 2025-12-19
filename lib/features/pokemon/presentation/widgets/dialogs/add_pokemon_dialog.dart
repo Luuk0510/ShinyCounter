@@ -180,6 +180,12 @@ class _AddPokemonView extends StatelessWidget {
         textAlign: TextAlign.center,
         style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
       ),
+      titlePadding: const EdgeInsets.only(
+        left: AppSpacing.lg,
+        right: AppSpacing.lg,
+        top: AppSpacing.lg,
+        bottom: AppSpacing.md,
+      ),
       content: Builder(
         builder: (context) {
           final media = MediaQuery.of(context);
