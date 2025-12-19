@@ -40,11 +40,11 @@ class AppSizes {
   static const dialogHeightFactor = 0.75;
   static const dialogMinHeight = 240.0; // edit_pokemon_dialog.dart
 
-  // `add_pokemon_dialog.dart
+  // add_pokemon_dialog.dart
   static const listMinHeight = 160.0; // manage_list_view.dart
   static const spriteThumb = 96.0; // pokemon_card.dart
   static const listItemMinHeight = 104.0;
-  static const listScrollbarThickness = 7.0;
+  static const listScrollbarThickness = 7.0; // pokemon_list_page.dart
 
   // search_gen_filter_row.dart
   static const dropdownWidth = 115.0;

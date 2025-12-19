@@ -500,6 +500,8 @@ class _PokemonListPageState extends State<PokemonListPage>
       controller: _listController,
       thumbVisibility: false,
       interactive: true,
+      radius: const Radius.circular(AppRadii.sm),
+      thickness: AppSizes.listScrollbarThickness,
       child: ListView(
         controller: _listController,
         padding: EdgeInsets.fromLTRB(
