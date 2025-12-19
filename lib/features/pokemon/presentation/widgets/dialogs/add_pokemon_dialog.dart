@@ -377,9 +377,7 @@ class _SpritePickerState extends State<_SpritePicker> {
                               ),
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? selectedColor.withValues(
-                                        alpha: 0.08,
-                                      )
+                                    ? selectedColor.withValues(alpha: 0.08)
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(
                                   AppRadii.md,

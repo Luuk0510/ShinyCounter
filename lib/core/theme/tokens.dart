@@ -197,9 +197,7 @@ class AppButtonPalette {
 
   static Color _brighten(Color color) {
     final hsl = HSLColor.fromColor(color);
-    return hsl
-        .withLightness((hsl.lightness * 1.20).clamp(0.0, 1.0))
-        .toColor();
+    return hsl.withLightness((hsl.lightness * 1.20).clamp(0.0, 1.0)).toColor();
   }
 
   static Color _darken(Color color) {
@@ -209,10 +207,7 @@ class AppButtonPalette {
 }
 
 class AppButtonStyles {
-  static ButtonStyle primaryFilled(
-    ColorScheme colors, {
-    EdgeInsets? padding,
-  }) {
+  static ButtonStyle primaryFilled(ColorScheme colors, {EdgeInsets? padding}) {
     return ElevatedButton.styleFrom(
       backgroundColor: AppButtonPalette.primaryFill(colors),
       foregroundColor: AppButtonPalette.primaryOnFill(colors),
@@ -242,10 +237,7 @@ class AppButtonStyles {
     );
   }
 
-  static ButtonStyle primaryText(
-    ColorScheme colors, {
-    EdgeInsets? padding,
-  }) {
+  static ButtonStyle primaryText(ColorScheme colors, {EdgeInsets? padding}) {
     return TextButton.styleFrom(
       foregroundColor: AppButtonPalette.text(colors),
       padding: padding,

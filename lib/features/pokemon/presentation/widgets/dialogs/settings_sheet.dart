@@ -173,8 +173,7 @@ class _ThemeOption extends StatelessWidget {
               const SizedBox(width: AppSpacing.sm),
               Icon(
                 selected ? Icons.check_circle : Icons.circle_outlined,
-                color:
-                    selected ? selectedColor : colors.onSurfaceVariant,
+                color: selected ? selectedColor : colors.onSurfaceVariant,
               ),
             ],
           ),

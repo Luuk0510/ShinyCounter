@@ -280,8 +280,9 @@ class _ActionIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hsl = HSLColor.fromColor(color);
-    final iconColor =
-        hsl.withLightness((hsl.lightness * 0.9).clamp(0.0, 1.0)).toColor();
+    final iconColor = hsl
+        .withLightness((hsl.lightness * 0.9).clamp(0.0, 1.0))
+        .toColor();
     final iconSize = size * AppSizes.cardActionIconScale;
     return Material(
       color: color.withValues(alpha: AppOpacity.cardActionButton),

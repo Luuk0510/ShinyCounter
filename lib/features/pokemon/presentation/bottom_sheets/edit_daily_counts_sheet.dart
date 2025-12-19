@@ -92,10 +92,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
               child: OutlinedButton.icon(
                 icon: const Icon(Icons.add),
                 onPressed: _addRow,
-                style: AppButtonStyles.primaryOutline(
-                  colors,
-                  borderWidth: 1.3,
-                ),
+                style: AppButtonStyles.primaryOutline(colors, borderWidth: 1.3),
                 label: Text(
                   l10n.addCountRow,
                   style: AppTypography.button.copyWith(
@@ -110,9 +107,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    style: AppButtonStyles.primaryOutline(
-                      colors,
-                    ),
+                    style: AppButtonStyles.primaryOutline(colors),
                     child: Text(
                       l10n.cancel,
                       style: AppTypography.button.copyWith(
