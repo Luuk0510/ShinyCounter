@@ -292,7 +292,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                                   child: GestureDetector(
                                     behavior: HitTestBehavior.opaque,
                                     onTap: _showEditDialog,
-                                    child: HuntInfoCard(
+                                    child: CountInfoCard(
                                       colors: colors,
                                       startedAt: _controller.startedAt,
                                       caughtAt: _controller.caughtAt,

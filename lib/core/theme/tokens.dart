@@ -60,7 +60,7 @@ class AppSizes {
   // pokemon_list_page
   static const dividerThickness = 1.0;
 
-  // hunt_info_card dart date_row.dart
+  // count_info_card.dart date_row.dart
   static const dateLabelSize = 17.0;
   static const dateValueSize = 18.0;
 
@@ -69,7 +69,7 @@ class AppSizes {
   static const detailImageFallback = 140.0;
 
   // game_dropdown.dart
-  static const gameLogoSize = 32.0; // hunt_info_card.dart
+  static const gameLogoSize = 32.0; // count_info_card.dart
   static const gameLogoLarge = 40.0;
   static const gameSelectWidth = 240.0; // edit_counters_sheet.dart
 
@@ -84,10 +84,10 @@ class AppSizes {
   static const pokemonContentSmall = 12.0;
   static const pokemonChevronLarge = 28.0;
   static const pokemonChevronSmall = 24.0;
-  static const cardPaddingH = 10.0; // hunt_info_card.dart
-  static const cardPaddingV = 4.0; // hunt_info_card.dart
-  static const cardBorderRadius = 30.0; // hunt_info_card.dart
-  static const cardElevation = 2.0; // hunt_info_card.dart
+  static const cardPaddingH = 10.0; // count_info_card.dart
+  static const cardPaddingV = 4.0; // count_info_card.dart
+  static const cardBorderRadius = 30.0; // count_info_card.dart
+  static const cardElevation = 2.0; // count_info_card.dart
 
   // pokemon_empty_state.dart
   static const emptyStateImage = 96.0;

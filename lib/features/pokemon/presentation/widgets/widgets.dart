@@ -8,7 +8,7 @@ export 'detail/counter_controls.dart';
 export 'detail/daily_counts_list.dart';
 export 'detail/date_row.dart';
 export 'detail/detail_header.dart';
-export 'detail/hunt_info_card.dart';
+export 'detail/count_info_card.dart';
 export 'dialogs/add_pokemon_dialog.dart';
 export 'dialogs/dialog_entry.dart';
 export 'dialogs/edit_pokemon_dialog.dart';
