@@ -36,4 +36,27 @@ void main() {
     expect(hasOuter, isTrue);
     expect(hasInsets, isTrue);
   });
+
+  testWidgets('can disable safe area edges', (tester) async {
+    await tester.pumpWidget(
+      const MediaQuery(
+        data: MediaQueryData(),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: SafeAreaSheet(
+            safeAreaTop: false,
+            safeAreaBottom: false,
+            safeAreaSides: false,
+            child: SizedBox(height: 1),
+          ),
+        ),
+      ),
+    );
+
+    final safeArea = tester.widget<SafeArea>(find.byType(SafeArea));
+    expect(safeArea.top, isFalse);
+    expect(safeArea.bottom, isFalse);
+    expect(safeArea.left, isFalse);
+    expect(safeArea.right, isFalse);
+  });
 }

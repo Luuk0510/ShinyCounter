@@ -41,6 +41,60 @@ void main() {
     expect(toggled, isTrue);
   });
 
+  testWidgets('selects normal path when showShiny is false', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        Builder(
+          builder: (context) => DetailHeader(
+            pokemon: const Pokemon(
+              id: '0001',
+              name: 'Bulbasaur',
+              imagePath: 'assets/0001.png',
+            ),
+            shinyPath: 'assets/shiny.png',
+            normalPath: 'assets/normal.png',
+            showShiny: false,
+            onToggleSprite: () {},
+            colors: Theme.of(context).colorScheme,
+            isCaught: false,
+            onToggleCaught: () {},
+          ),
+        ),
+      ),
+    );
+
+    final image = tester.widget<Image>(find.byType(Image));
+    final provider = image.image as AssetImage;
+    expect(provider.assetName, 'assets/normal.png');
+  });
+
+  testWidgets('selects shiny path when showShiny is true', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        Builder(
+          builder: (context) => DetailHeader(
+            pokemon: const Pokemon(
+              id: '0001',
+              name: 'Bulbasaur',
+              imagePath: 'assets/0001.png',
+            ),
+            shinyPath: 'assets/shiny.png',
+            normalPath: 'assets/normal.png',
+            showShiny: true,
+            onToggleSprite: () {},
+            colors: Theme.of(context).colorScheme,
+            isCaught: false,
+            onToggleCaught: () {},
+          ),
+        ),
+      ),
+    );
+
+    final image = tester.widget<Image>(find.byType(Image));
+    final provider = image.image as AssetImage;
+    expect(provider.assetName, 'assets/shiny.png');
+  });
+
   testWidgets('tap is disabled when normal path is null', (tester) async {
     var toggled = false;
     await tester.pumpWidget(
