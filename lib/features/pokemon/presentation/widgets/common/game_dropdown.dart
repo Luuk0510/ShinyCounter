@@ -121,28 +121,34 @@ class GameLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final label = game.isEmpty ? '?' : game.characters.first.toUpperCase();
+    final logoSize = size * AppSizes.gameLogoInnerScale;
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: colors.primaryContainer.withValues(alpha: 0.8),
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(AppRadii.sm),
         border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
       ),
       clipBehavior: Clip.antiAlias,
-      child: AppImage(
-        image: AssetImage(GameDropdown.logoFor(game)),
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        borderRadius: 0,
-        fallbackBuilder: (context, fallbackSize) => Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: (fallbackSize ?? size) * 0.45,
-              color: colors.onPrimaryContainer,
+      child: Center(
+        child: SizedBox.square(
+          dimension: logoSize,
+          child: AppImage(
+            image: AssetImage(GameDropdown.logoFor(game)),
+            width: logoSize,
+            height: logoSize,
+            fit: BoxFit.contain,
+            borderRadius: AppRadii.sm,
+            fallbackBuilder: (context, fallbackSize) => Center(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: (fallbackSize ?? size) * 0.45,
+                  color: colors.onPrimaryContainer,
+                ),
+              ),
             ),
           ),
         ),

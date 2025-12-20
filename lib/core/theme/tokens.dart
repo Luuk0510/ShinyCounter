@@ -71,6 +71,7 @@ class AppSizes {
   // game_dropdown.dart
   static const gameLogoSize = 32.0; // count_info_card.dart
   static const gameLogoLarge = 40.0;
+  static const gameLogoInnerScale = 1;
   static const gameSelectWidth = 240.0; // edit_counters_sheet.dart
 
   // pokemon_card.dart

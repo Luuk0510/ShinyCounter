@@ -187,6 +187,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final editColor = AppButtonPalette.primaryHighlight(colors);
 
     return Scaffold(
       appBar: AppBar(
@@ -225,6 +226,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
           IconButton(
             iconSize: AppSizes.appBarActionIcon,
             icon: const Icon(Icons.edit),
+            color: editColor,
             tooltip: context.l10n.editCounterTooltip,
             onPressed: _showEditDialog,
           ),
