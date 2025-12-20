@@ -268,7 +268,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
         );
       },
     );
-    controller.dispose();
+    Future<void>.delayed(
+      AppAnim.dialogDuration,
+    ).whenComplete(controller.dispose);
     return result;
   }
 
