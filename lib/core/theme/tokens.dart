@@ -28,7 +28,7 @@ class AppRadii {
 class AppSizes {
   // pokemon_list_page.dart
   static const toolbarHeight = 52.0;
-  static const appBarActionIcon = 26.0;
+  static const appBarActionIcon = 28.0;
   static const appBarTitleIcon = 36.0; // animated_app_icon.dart
 
   // settings_sheet.dart
@@ -40,10 +40,11 @@ class AppSizes {
   static const dialogHeightFactor = 0.75;
   static const dialogMinHeight = 240.0; // edit_pokemon_dialog.dart
 
-  // `add_pokemon_dialog.dart
+  // add_pokemon_dialog.dart
   static const listMinHeight = 160.0; // manage_list_view.dart
   static const spriteThumb = 96.0; // pokemon_card.dart
   static const listItemMinHeight = 104.0;
+  static const listScrollbarThickness = 7.0; // pokemon_list_page.dart
 
   // search_gen_filter_row.dart
   static const dropdownWidth = 115.0;
@@ -59,7 +60,7 @@ class AppSizes {
   // pokemon_list_page
   static const dividerThickness = 1.0;
 
-  // hunt_info_card dart date_row.dart
+  // count_info_card.dart date_row.dart
   static const dateLabelSize = 17.0;
   static const dateValueSize = 18.0;
 
@@ -68,8 +69,9 @@ class AppSizes {
   static const detailImageFallback = 140.0;
 
   // game_dropdown.dart
-  static const gameLogoSize = 32.0; // hunt_info_card.dart
+  static const gameLogoSize = 32.0; // count_info_card.dart
   static const gameLogoLarge = 40.0;
+  static const gameLogoInnerScale = 1;
   static const gameSelectWidth = 240.0; // edit_counters_sheet.dart
 
   // pokemon_card.dart
@@ -81,12 +83,15 @@ class AppSizes {
   static const pokemonGapSmall = 12.0;
   static const pokemonContentLarge = 14.0;
   static const pokemonContentSmall = 12.0;
-  static const pokemonChevronLarge = 28.0;
+  static const pokemonChevronLarge = AppSizes.appBarActionIcon;
   static const pokemonChevronSmall = 24.0;
-  static const cardPaddingH = 10.0; // hunt_info_card.dart
-  static const cardPaddingV = 4.0; // hunt_info_card.dart
-  static const cardBorderRadius = 30.0; // hunt_info_card.dart
-  static const cardElevation = 2.0; // hunt_info_card.dart
+  static const cardPaddingH = 10.0; // count_info_card.dart
+  static const cardPaddingV = 4.0; // count_info_card.dart
+  static const cardBorderRadius = 30.0; // count_info_card.dart
+  static const cardElevation = 2.0; // count_info_card.dart
+  static const cardActionBlur = 5.0;
+  static const cardActionIcon = 28.0;
+  static const cardActionIconScale = 1.3;
 
   // pokemon_empty_state.dart
   static const emptyStateImage = 96.0;
@@ -144,6 +149,134 @@ class AppLimits {
 
 class AppOpacity {
   static const modalBarrier = 0.35;
+  static const detailSheetBarrier = 0.4;
+  static const cardActionScrim = 0.1;
+  static const cardActionButton = 0.3;
+}
+
+class AppButtonPalette {
+  static Color primaryFill(ColorScheme colors) {
+    return AppColors.seed;
+  }
+
+  static Color primaryOnFill(ColorScheme colors) {
+    return ThemeData.estimateBrightnessForColor(AppColors.seed) ==
+            Brightness.dark
+        ? Colors.white
+        : Colors.black;
+  }
+
+  static Color primaryAccent(ColorScheme colors) {
+    return _brighten(primaryFill(colors));
+  }
+
+  static Color primaryHighlight(ColorScheme colors) {
+    return Color.lerp(primaryFill(colors), Colors.white, 0.25)!;
+  }
+
+  static Color outline(ColorScheme colors) {
+    return AppColors.seed;
+  }
+
+  static Color outlineBackground(ColorScheme colors) {
+    return AppColors.seed.withValues(alpha: 0.08);
+  }
+
+  static Color text(ColorScheme colors) => AppColors.seed;
+
+  static Color outlineMuted(ColorScheme colors) {
+    return AppColors.seed;
+  }
+
+  static Color outlineBackgroundMuted(ColorScheme colors) {
+    return AppColors.seed.withValues(alpha: 0.08);
+  }
+
+  static Color textMuted(ColorScheme colors) {
+    return AppColors.seed;
+  }
+
+  static Color outlineMutedLight(ColorScheme colors) {
+    return primaryHighlight(colors);
+  }
+
+  static Color outlineBackgroundMutedLight(ColorScheme colors) {
+    return primaryHighlight(colors).withValues(alpha: 0.12);
+  }
+
+  static Color textMutedLight(ColorScheme colors) {
+    return primaryHighlight(colors);
+  }
+
+  static Color _brighten(Color color) {
+    final hsl = HSLColor.fromColor(color);
+    return hsl.withLightness((hsl.lightness * 1.20).clamp(0.0, 1.0)).toColor();
+  }
+
+  static Color _darken(Color color) {
+    final hsl = HSLColor.fromColor(color);
+    return hsl.withLightness((hsl.lightness * 0.85).clamp(0.0, 1.0)).toColor();
+  }
+}
+
+class AppButtonStyles {
+  static ButtonStyle primaryFilled(ColorScheme colors, {EdgeInsets? padding}) {
+    return ElevatedButton.styleFrom(
+      backgroundColor: AppButtonPalette.primaryFill(colors),
+      foregroundColor: AppButtonPalette.primaryOnFill(colors),
+      disabledBackgroundColor: colors.onSurfaceVariant.withValues(alpha: 0.2),
+      disabledForegroundColor: colors.onSurfaceVariant.withValues(alpha: 0.6),
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      padding: padding,
+    );
+  }
+
+  static ButtonStyle primaryOutline(
+    ColorScheme colors, {
+    EdgeInsets? padding,
+    double borderWidth = 1.4,
+    Color? backgroundColor,
+    bool useLighter = false,
+  }) {
+    final foreground = useLighter
+        ? AppButtonPalette.textMutedLight(colors)
+        : AppButtonPalette.textMuted(colors);
+    final outline = useLighter
+        ? AppButtonPalette.outlineMutedLight(colors)
+        : AppButtonPalette.outlineMuted(colors);
+    final background = useLighter
+        ? AppButtonPalette.outlineBackgroundMutedLight(colors)
+        : AppButtonPalette.outlineBackgroundMuted(colors);
+    return OutlinedButton.styleFrom(
+      foregroundColor: foreground,
+      side: BorderSide(color: outline, width: borderWidth),
+      backgroundColor: backgroundColor ?? background,
+      padding: padding,
+    );
+  }
+
+  static ButtonStyle primaryText(ColorScheme colors, {EdgeInsets? padding}) {
+    return TextButton.styleFrom(
+      foregroundColor: AppButtonPalette.text(colors),
+      padding: padding,
+    );
+  }
+
+  static ButtonStyle destructiveFilled(
+    ColorScheme colors, {
+    EdgeInsets? padding,
+  }) {
+    return ElevatedButton.styleFrom(
+      backgroundColor: colors.error,
+      foregroundColor: colors.onError,
+      disabledBackgroundColor: colors.error.withValues(alpha: 0.4),
+      disabledForegroundColor: colors.onSurfaceVariant.withValues(alpha: 0.6),
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      padding: padding,
+    );
+  }
 }
 
 class AppAnim {
@@ -153,6 +286,7 @@ class AppAnim {
   static const switcher = Duration(milliseconds: 220);
   static const dialogDuration = fast;
   static const sheetDuration = Duration(milliseconds: 200);
+  static const longPressDelay = Duration(milliseconds: 500);
 
   static const easeOut = Curves.easeOut;
   static const easeOutCubic = Curves.easeOutCubic;
@@ -161,6 +295,7 @@ class AppAnim {
 
   static const buttonPressScale = 0.9;
   static const dialogStartScale = 0.8;
+  static const listItemPopStartScale = 0.96;
 }
 
 /// Intent-based tokens to avoid sprinkling raw numbers in widgets.

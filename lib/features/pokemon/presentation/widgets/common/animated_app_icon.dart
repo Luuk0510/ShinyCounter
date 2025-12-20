@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/app_image.dart';
 
 class AnimatedAppIcon extends StatefulWidget {
   const AnimatedAppIcon({super.key, required this.assetPath, this.size = 28});
@@ -114,12 +115,13 @@ class _AnimatedAppIconState extends State<AnimatedAppIcon>
       key: AnimatedAppIcon.tapTargetKey,
       child: AnimatedBuilder(
         animation: _controller,
-        child: Image.asset(
-          widget.assetPath,
+        child: AppImage(
+          image: AssetImage(widget.assetPath),
           width: widget.size,
           height: widget.size,
-          errorBuilder: (_, _, _) =>
-              const Icon(Icons.catching_pokemon, size: 24),
+          borderRadius: 0,
+          fallbackIcon: Icons.catching_pokemon,
+          fallbackIconSize: 24,
         ),
         builder: (context, child) {
           return Transform.rotate(

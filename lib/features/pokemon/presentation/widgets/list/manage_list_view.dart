@@ -36,6 +36,10 @@ class ManageListView extends StatefulWidget {
 
   final List<Pokemon> pokemonSorted;
 
+  static Key rowKey(String id) => ValueKey('manage.row.$id');
+  static Key editKey(String id) => ValueKey('manage.edit.$id');
+  static Key deleteKey(String id) => ValueKey('manage.delete.$id');
+
   @override
   State<ManageListView> createState() => _ManageListViewState();
 }
@@ -54,6 +58,8 @@ class _ManageListViewState extends State<ManageListView> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final editIconColor = _actionIconColor(colors.primary);
+    final deleteIconColor = _actionIconColor(colors.error);
     final viewInsets = MediaQuery.of(context).viewInsets.bottom;
     final filter = _query.trim().toLowerCase();
     final digitsOnly = filter.replaceAll(RegExp(r'[^0-9]'), '');
@@ -149,6 +155,7 @@ class _ManageListViewState extends State<ManageListView> {
                         itemBuilder: (context, index) {
                           final p = filtered[index];
                           return ListTile(
+                            key: ManageListView.rowKey(p.id),
                             leading: ManagePokemonImage(pokemon: p),
                             title: Text(
                               p.name,
@@ -167,16 +174,21 @@ class _ManageListViewState extends State<ManageListView> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
+                                  key: ManageListView.editKey(p.id),
+                                  iconSize: AppSizes.cardActionIcon,
                                   icon: const Icon(Icons.edit),
+                                  color: editIconColor,
                                   tooltip: context.l10n.manageEditTooltip,
                                   onPressed: () => Navigator.of(context).pop(
                                     ManageAction(pokemon: p, delete: false),
                                   ),
                                 ),
                                 IconButton(
+                                  key: ManageListView.deleteKey(p.id),
+                                  iconSize: AppSizes.cardActionIcon,
                                   icon: const Icon(Icons.delete_outline),
                                   tooltip: context.l10n.manageDeleteTooltip,
-                                  color: colors.error,
+                                  color: deleteIconColor,
                                   onPressed: () => Navigator.of(
                                     context,
                                   ).pop(ManageAction(pokemon: p, delete: true)),
@@ -202,5 +214,10 @@ class _ManageListViewState extends State<ManageListView> {
     final dexNum = dexNumberFromPokemon(p);
     if (dexNum == null) return true;
     return isDexInGen(dexNum, gen);
+  }
+
+  Color _actionIconColor(Color color) {
+    final hsl = HSLColor.fromColor(color);
+    return hsl.withLightness((hsl.lightness * 0.9).clamp(0.0, 1.0)).toColor();
   }
 }

@@ -6,10 +6,11 @@ import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_entry.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/filters/search_gen_filter_row.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/selectable_row.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 
 class AddPokemonController extends ChangeNotifier {
   AddPokemonController({required SpriteService spriteService})
@@ -138,6 +139,10 @@ class AddPokemonController extends ChangeNotifier {
 class AddPokemonDialog extends StatelessWidget {
   const AddPokemonDialog({super.key});
 
+  static const Key cancelButtonKey = Key('addPokemon.cancelButton');
+  static const Key chooseButtonKey = Key('addPokemon.chooseButton');
+  static Key optionKey(String dex) => ValueKey('addPokemon.option.$dex');
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<AddPokemonController>(
@@ -176,6 +181,12 @@ class _AddPokemonView extends StatelessWidget {
         textAlign: TextAlign.center,
         style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
       ),
+      titlePadding: const EdgeInsets.only(
+        left: AppSpacing.lg,
+        right: AppSpacing.lg,
+        top: AppSpacing.lg,
+        bottom: AppSpacing.md,
+      ),
       content: Builder(
         builder: (context) {
           final media = MediaQuery.of(context);
@@ -205,19 +216,21 @@ class _AddPokemonView extends StatelessWidget {
       ),
       actions: [
         TextButton(
+          key: AddPokemonDialog.cancelButtonKey,
           onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: colors.primary,
-            side: BorderSide(color: colors.primary, width: 1.4),
+          style: AppButtonStyles.primaryOutline(
+            colors,
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.xs,
             ),
+            useLighter: true,
           ),
           child: Text(l10n.cancel, style: AppTypography.button),
         ),
         const SizedBox(width: AppSpacing.sm),
         ElevatedButton(
+          key: AddPokemonDialog.chooseButtonKey,
           onPressed: controller.selected == null
               ? null
               : () {
@@ -232,15 +245,8 @@ class _AddPokemonView extends StatelessWidget {
                     ),
                   );
                 },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colors.primary,
-            foregroundColor: colors.onPrimary,
-            disabledBackgroundColor: colors.onSurfaceVariant.withValues(
-              alpha: 0.2,
-            ),
-            disabledForegroundColor: colors.onSurfaceVariant.withValues(
-              alpha: 0.6,
-            ),
+          style: AppButtonStyles.primaryFilled(
+            colors,
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.xs,
@@ -354,6 +360,8 @@ class _SpritePickerState extends State<_SpritePicker> {
                       controller: _scrollController,
                       thumbVisibility: true,
                       interactive: true,
+                      thickness: AppSizes.listScrollbarThickness,
+                      radius: const Radius.circular(AppRadii.sm),
                       child: ListView.builder(
                         controller: _scrollController,
                         padding: EdgeInsets.zero,
@@ -363,81 +371,69 @@ class _SpritePickerState extends State<_SpritePicker> {
                           final sprite = controller.filteredSprites[index];
                           final selected = sprite == controller.selected;
                           final name = controller.displayName(sprite);
-                          return InkWell(
+                          final selectedColor = AppButtonPalette.primaryAccent(
+                            widget.colors,
+                          );
+                          final checkWidth =
+                              AppSizes.cardActionIcon + AppSpacing.xs;
+                          return SelectableRow(
+                            key: AddPokemonDialog.optionKey(sprite.dex),
+                            selected: selected,
                             onTap: () => controller.select(sprite),
-                            borderRadius: BorderRadius.circular(AppRadii.md),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.md,
-                                vertical: AppSpacing.sm,
-                              ),
-                              decoration: BoxDecoration(
-                                color: selected
-                                    ? widget.colors.primary.withValues(
-                                        alpha: 0.08,
-                                      )
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(
-                                  AppRadii.md,
+                            selectedColor: selectedColor,
+                            height: AppSizes.listItemMinHeight,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '#${sprite.dex}',
+                                        style: AppTypography.button.copyWith(
+                                          color: selected
+                                              ? selectedColor
+                                              : widget.colors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      const SizedBox(height: AppSpacing.xs),
+                                      Text(
+                                        name,
+                                        style: AppTypography.sectionTitle
+                                            .copyWith(
+                                              color: selected
+                                                  ? selectedColor
+                                                  : widget.colors.onSurface,
+                                            ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              height: AppSizes.listItemMinHeight,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '#${sprite.dex}',
-                                          style: AppTypography.button.copyWith(
-                                            color: selected
-                                                ? widget.colors.primary
-                                                : widget
-                                                      .colors
-                                                      .onSurfaceVariant,
-                                          ),
-                                        ),
-                                        const SizedBox(height: AppSpacing.xs),
-                                        Text(
-                                          name,
-                                          style: AppTypography.sectionTitle
-                                              .copyWith(
-                                                color: selected
-                                                    ? widget.colors.primary
-                                                    : widget.colors.onSurface,
-                                              ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadii.sm,
                                   ),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                      AppRadii.sm,
-                                    ),
-                                    child: PokemonImage(
-                                      path: sprite.path,
-                                      isLocalFile: false,
-                                      width: AppSizes.spriteThumb,
-                                      height: AppSizes.spriteThumb,
-                                      borderRadius: AppRadii.sm,
-                                      fallbackIconSize:
-                                          AppSizes.spriteThumb * 0.55,
-                                    ),
+                                  child: PokemonImage(
+                                    path: sprite.path,
+                                    isLocalFile: false,
+                                    width: AppSizes.spriteThumb,
+                                    height: AppSizes.spriteThumb,
+                                    borderRadius: AppRadii.sm,
+                                    fallbackIconSize:
+                                        AppSizes.spriteThumb * 0.55,
                                   ),
-                                  if (selected) ...[
-                                    const SizedBox(width: AppSpacing.xs),
-                                    Icon(
-                                      Icons.check_circle,
-                                      color: widget.colors.primary,
-                                    ),
-                                  ],
-                                ],
-                              ),
+                                ),
+                                SelectableCheckmark(
+                                  selected: selected,
+                                  selectedColor: selectedColor,
+                                  iconSize: AppSizes.cardActionIcon,
+                                  animate: true,
+                                  width: checkWidth,
+                                ),
+                              ],
                             ),
                           );
                         },
@@ -469,26 +465,8 @@ String _generateId(String dex) =>
     'custom_${dex}_${DateTime.now().microsecondsSinceEpoch}';
 
 Future<Pokemon?> showAddPokemonDialog(BuildContext context) {
-  return showGeneralDialog<Pokemon?>(
+  return showScaledDialog<Pokemon?>(
     context: context,
-    barrierDismissible: true,
-    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-    barrierColor: Colors.black54,
-    transitionDuration: AppAnim.dialogDuration,
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        const AddPokemonDialog(),
-    transitionBuilder: (context, animation, secondaryAnimation, child) {
-      final curved = CurvedAnimation(
-        parent: animation,
-        curve: AppAnim.dialogCurve,
-      );
-      final scale = Tween<double>(begin: 0.65, end: 1).animate(curved);
-      return DialogEntry(
-        child: FadeTransition(
-          opacity: animation,
-          child: Transform.scale(scale: scale.value, child: child),
-        ),
-      );
-    },
+    builder: (_) => const AddPokemonDialog(),
   );
 }

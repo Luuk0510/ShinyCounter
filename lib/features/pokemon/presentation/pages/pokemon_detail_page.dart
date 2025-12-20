@@ -11,6 +11,7 @@ import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_c
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_daily_counts_sheet.dart';
 import 'package:shiny_counter/features/pokemon/shared/state/counter_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
@@ -134,14 +135,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   }
 
   Future<void> _showEditDialog() async {
-    final result = await showModalBottomSheet<EditSheetResult>(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
-      ),
-      backgroundColor: Theme.of(context).cardColor,
-      barrierColor: Colors.black.withValues(alpha: 0.4),
+    final result = await showPokemonBottomSheet<EditSheetResult>(
+      context,
+      barrierOpacity: AppOpacity.detailSheetBarrier,
       builder: (context) {
         return EditCountersSheet(
           pokemonName: widget.pokemon.name,
@@ -173,14 +169,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   }
 
   Future<void> _showDailyCountsEditor() async {
-    final result = await showModalBottomSheet<Map<String, int>>(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.md)),
-      ),
-      backgroundColor: Theme.of(context).cardColor,
-      barrierColor: Colors.black.withValues(alpha: 0.4),
+    final result = await showPokemonBottomSheet<Map<String, int>>(
+      context,
+      barrierOpacity: AppOpacity.detailSheetBarrier,
       builder: (context) {
         return EditDailyCountsSheet(
           dailyCounts: _controller.dailyCounts,
@@ -202,8 +193,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         scrolledUnderElevation: 0,
         elevation: 0,
         centerTitle: true,
+        toolbarHeight: AppSizes.toolbarHeight,
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
+        iconTheme: const IconThemeData(size: AppSizes.appBarActionIcon),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             bottom: Radius.circular(AppRadii.lg),
@@ -230,11 +223,13 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         ),
         actions: [
           IconButton(
+            iconSize: AppSizes.appBarActionIcon,
             icon: const Icon(Icons.edit),
             tooltip: context.l10n.editCounterTooltip,
             onPressed: _showEditDialog,
           ),
           IconButton(
+            iconSize: AppSizes.appBarActionIcon,
             icon: const Icon(Icons.open_in_new_rounded),
             tooltip: context.l10n.openOverlayTooltip,
             onPressed: _togglePill,
@@ -292,7 +287,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                                   child: GestureDetector(
                                     behavior: HitTestBehavior.opaque,
                                     onTap: _showEditDialog,
-                                    child: HuntInfoCard(
+                                    child: CountInfoCard(
                                       colors: colors,
                                       startedAt: _controller.startedAt,
                                       caughtAt: _controller.caughtAt,

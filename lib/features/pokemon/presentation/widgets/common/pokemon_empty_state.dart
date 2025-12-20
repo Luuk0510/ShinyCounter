@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/app_image.dart';
 
 class PokemonEmptyState extends StatelessWidget {
   const PokemonEmptyState({
@@ -23,15 +24,14 @@ class PokemonEmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(
-            imageAsset,
+          AppImage(
+            image: AssetImage(imageAsset),
             width: AppSizes.emptyStateImage,
             height: AppSizes.emptyStateImage,
             fit: BoxFit.contain,
-            errorBuilder: (context, error, stack) => const Icon(
-              Icons.catching_pokemon,
-              size: AppSizes.emptyStateFallback,
-            ),
+            borderRadius: 0,
+            fallbackIcon: Icons.catching_pokemon,
+            fallbackIconSize: AppSizes.emptyStateFallback,
           ),
           const SizedBox(height: AppSpacing.md),
           Text(

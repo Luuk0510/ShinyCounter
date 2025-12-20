@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/daily_counts_service.dart';
 
 class EditDailyCountsSheet extends StatefulWidget {
   const EditDailyCountsSheet({
@@ -23,19 +24,12 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
   @override
   void initState() {
     super.initState();
-    final entries = widget.dailyCounts.entries.toList()
-      ..sort((a, b) => b.key.compareTo(a.key));
-    if (entries.isEmpty) {
-      _rows.add(_RowData(DateTime.now(), TextEditingController(text: '0')));
-    } else {
-      for (final entry in entries) {
-        _rows.add(
-          _RowData(
-            DateTime.tryParse(entry.key) ?? DateTime.now(),
-            TextEditingController(text: '${entry.value}'),
-          ),
-        );
-      }
+    const service = DailyCountsService();
+    final seeds = service.buildSeeds(widget.dailyCounts);
+    for (final seed in seeds) {
+      _rows.add(
+        _RowData(seed.date, TextEditingController(text: '${seed.count}')),
+      );
     }
   }
 
@@ -98,10 +92,10 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
               child: OutlinedButton.icon(
                 icon: const Icon(Icons.add),
                 onPressed: _addRow,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: colors.primary,
-                  side: BorderSide(color: colors.primary, width: 1.3),
-                  backgroundColor: colors.primary.withValues(alpha: 0.08),
+                style: AppButtonStyles.primaryOutline(
+                  colors,
+                  borderWidth: 1.3,
+                  useLighter: true,
                 ),
                 label: Text(
                   l10n.addCountRow,
@@ -117,10 +111,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: colors.primary,
-                      side: BorderSide(color: colors.primary, width: 1.4),
-                      backgroundColor: colors.primary.withValues(alpha: 0.08),
+                    style: AppButtonStyles.primaryOutline(
+                      colors,
+                      useLighter: true,
                     ),
                     child: Text(
                       l10n.cancel,
@@ -134,10 +127,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: _save,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colors.primary,
-                      foregroundColor: colors.onPrimary,
-                    ),
+                    style: AppButtonStyles.primaryFilled(colors),
                     child: Text(
                       l10n.save,
                       style: AppTypography.button.copyWith(
@@ -179,6 +169,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
               child: Text(
                 widget.dayFormatter(_dayKey(row.date)),
                 style: AppTypography.button.copyWith(
+                  color: colors.onSurface,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -191,6 +182,10 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           child: TextField(
             controller: row.controller,
             keyboardType: TextInputType.number,
+            style: AppTypography.button.copyWith(
+              color: colors.onSurface,
+              fontWeight: FontWeight.w700,
+            ),
             decoration: InputDecoration(
               labelText: l10n.countLabel,
               isDense: true,
@@ -264,7 +259,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              style: TextButton.styleFrom(foregroundColor: colors.primary),
+              style: AppButtonStyles.primaryText(colors),
               child: Text(context.l10n.cancel),
             ),
             TextButton(
@@ -278,14 +273,16 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
                 }
                 Navigator.of(context).pop(parsed);
               },
-              style: TextButton.styleFrom(foregroundColor: colors.primary),
+              style: AppButtonStyles.primaryText(colors),
               child: Text(context.l10n.save),
             ),
           ],
         );
       },
     );
-    controller.dispose();
+    Future<void>.delayed(
+      AppAnim.dialogDuration,
+    ).whenComplete(controller.dispose);
     return result;
   }
 
