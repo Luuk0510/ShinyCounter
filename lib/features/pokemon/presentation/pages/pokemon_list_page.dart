@@ -348,7 +348,6 @@ class _PokemonListPageState extends State<PokemonListPage>
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
     final uncaught = _allPokemon.where((p) => !_isCaught(p)).toList()
       ..sort(pokemonDexComparator);
     final caught = _allPokemon.where((p) => _isCaught(p)).toList()
@@ -356,7 +355,7 @@ class _PokemonListPageState extends State<PokemonListPage>
 
     return Scaffold(
       appBar: _buildAppBar(colors),
-      body: _buildBody(colors, bottomPadding, uncaught, caught),
+      body: _buildBody(colors, uncaught, caught),
     );
   }
 
@@ -438,7 +437,6 @@ class _PokemonListPageState extends State<PokemonListPage>
 
   Widget _buildBody(
     ColorScheme colors,
-    double bottomPadding,
     List<Pokemon> uncaught,
     List<Pokemon> caught,
   ) {
@@ -505,21 +503,28 @@ class _PokemonListPageState extends State<PokemonListPage>
       );
     }
 
-    return Scrollbar(
-      controller: _listController,
-      thumbVisibility: false,
-      interactive: true,
-      radius: const Radius.circular(AppRadii.sm),
-      thickness: AppSizes.listScrollbarThickness,
-      child: ListView(
+    return SafeArea(
+      top: false,
+      left: false,
+      right: false,
+      bottom: true,
+      minimum: const EdgeInsets.only(bottom: AppSpacing.xs),
+      child: Scrollbar(
         controller: _listController,
-        padding: EdgeInsets.fromLTRB(
-          AppSizes.cardPaddingH - AppSpacing.xs,
-          AppSpacing.xs,
-          AppSizes.cardPaddingH - AppSpacing.xs,
-          bottomPadding,
+        thumbVisibility: false,
+        interactive: true,
+        radius: const Radius.circular(AppRadii.sm),
+        thickness: AppSizes.listScrollbarThickness,
+        child: ListView(
+          controller: _listController,
+          padding: const EdgeInsets.fromLTRB(
+            AppSizes.cardPaddingH - AppSpacing.xs,
+            AppSpacing.xs,
+            AppSizes.cardPaddingH - AppSpacing.xs,
+            AppSpacing.xs,
+          ),
+          children: sections,
         ),
-        children: sections,
       ),
     );
   }
