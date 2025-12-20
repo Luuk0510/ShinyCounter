@@ -20,5 +20,9 @@ void main() {
     test('formatDayKey returns original on invalid', () {
       expect(formatDayKey('not-a-date'), 'not-a-date');
     });
+
+    test('formatDayKey handles full ISO timestamps', () {
+      expect(formatDayKey('2024-05-03T12:30:00Z'), '03-05-2024');
+    });
   });
 }

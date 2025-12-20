@@ -61,6 +61,25 @@ void main() {
       expect(dexValueFromPokemon(custom), 123);
     });
 
+    test('dexNumberFromPokemon falls back to id when path has no digits', () {
+      const byId = Pokemon(
+        id: '0042',
+        name: 'Golbat',
+        imagePath: 'assets/custom.png',
+      );
+      expect(dexNumberFromPokemon(byId), 42);
+    });
+
+    test('dexNumberFromPokemon returns null when no digits', () {
+      const missing = Pokemon(
+        id: 'custom_no_digits',
+        name: 'MissingNo',
+        imagePath: 'assets/unknown.png',
+      );
+      expect(dexNumberFromPokemon(missing), isNull);
+      expect(dexValueFromPokemon(missing), 1 << 30);
+    });
+
     test('pokemonDexComparator sorts by dex then name', () {
       final sorted = [charizard, custom, bulba]..sort(pokemonDexComparator);
       expect(sorted.first, bulba);
