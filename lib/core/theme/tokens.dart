@@ -250,10 +250,7 @@ class AppButtonStyles {
         : AppButtonPalette.outlineBackgroundMuted(colors);
     return OutlinedButton.styleFrom(
       foregroundColor: foreground,
-      side: BorderSide(
-        color: outline,
-        width: borderWidth,
-      ),
+      side: BorderSide(color: outline, width: borderWidth),
       backgroundColor: backgroundColor ?? background,
       padding: padding,
     );
