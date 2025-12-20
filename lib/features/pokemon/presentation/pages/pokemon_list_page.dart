@@ -268,9 +268,8 @@ class _PokemonListPageState extends State<PokemonListPage>
           const SizedBox(width: AppSpacing.sm),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colors.error,
-              foregroundColor: colors.onError,
+            style: AppButtonStyles.destructiveFilled(
+              colors,
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.xl,
                 vertical: AppSpacing.sm,

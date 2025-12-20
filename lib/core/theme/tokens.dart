@@ -243,6 +243,21 @@ class AppButtonStyles {
       padding: padding,
     );
   }
+
+  static ButtonStyle destructiveFilled(
+    ColorScheme colors, {
+    EdgeInsets? padding,
+  }) {
+    return ElevatedButton.styleFrom(
+      backgroundColor: colors.error,
+      foregroundColor: colors.onError,
+      disabledBackgroundColor: colors.error.withValues(alpha: 0.4),
+      disabledForegroundColor: colors.onSurfaceVariant.withValues(alpha: 0.6),
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      padding: padding,
+    );
+  }
 }
 
 class AppAnim {

@@ -9,6 +9,7 @@ import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/filters/search_gen_filter_row.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/selectable_row.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 
 class AddPokemonController extends ChangeNotifier {
@@ -374,100 +375,64 @@ class _SpritePickerState extends State<_SpritePicker> {
                           );
                           final checkWidth =
                               AppSizes.cardActionIcon + AppSpacing.xs;
-                          final radius = BorderRadius.circular(AppRadii.md);
-                          return Material(
-                            color: Colors.transparent,
-                            borderRadius: radius,
-                            clipBehavior: Clip.antiAlias,
-                            child: InkWell(
-                              key: AddPokemonDialog.optionKey(sprite.dex),
-                              onTap: () => controller.select(sprite),
-                              borderRadius: radius,
-                              child: Ink(
-                                height: AppSizes.listItemMinHeight,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.md,
-                                  vertical: AppSpacing.sm,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: selected
-                                      ? selectedColor.withValues(alpha: 0.08)
-                                      : Colors.transparent,
-                                  borderRadius: radius,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '#${sprite.dex}',
-                                            style: AppTypography.button
-                                                .copyWith(
-                                                  color: selected
-                                                      ? selectedColor
-                                                      : widget
-                                                            .colors
-                                                            .onSurfaceVariant,
-                                                ),
-                                          ),
-                                          const SizedBox(height: AppSpacing.xs),
-                                          Text(
-                                            name,
-                                            style: AppTypography.sectionTitle
-                                                .copyWith(
-                                                  color: selected
-                                                      ? selectedColor
-                                                      : widget.colors.onSurface,
-                                                ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                        AppRadii.sm,
-                                      ),
-                                      child: PokemonImage(
-                                        path: sprite.path,
-                                        isLocalFile: false,
-                                        width: AppSizes.spriteThumb,
-                                        height: AppSizes.spriteThumb,
-                                        borderRadius: AppRadii.sm,
-                                        fallbackIconSize:
-                                            AppSizes.spriteThumb * 0.55,
-                                      ),
-                                    ),
-                                    AnimatedSize(
-                                      duration: AppAnim.fast,
-                                      curve: AppAnim.easeOutCubic,
-                                      alignment: Alignment.centerRight,
-                                      clipBehavior: Clip.hardEdge,
-                                      child: SizedBox(
-                                        width: selected ? checkWidth : 0,
-                                        child: Align(
-                                          alignment: Alignment.centerRight,
-                                          child: AnimatedOpacity(
-                                            duration: AppAnim.fast,
-                                            curve: AppAnim.easeOutCubic,
-                                            opacity: selected ? 1 : 0,
-                                            child: Icon(
-                                              Icons.check_circle,
-                                              color: selectedColor,
-                                              size: AppSizes.cardActionIcon,
-                                            ),
-                                          ),
+                          return SelectableRow(
+                            key: AddPokemonDialog.optionKey(sprite.dex),
+                            selected: selected,
+                            onTap: () => controller.select(sprite),
+                            selectedColor: selectedColor,
+                            height: AppSizes.listItemMinHeight,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '#${sprite.dex}',
+                                        style: AppTypography.button.copyWith(
+                                          color: selected
+                                              ? selectedColor
+                                              : widget.colors.onSurfaceVariant,
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(height: AppSpacing.xs),
+                                      Text(
+                                        name,
+                                        style: AppTypography.sectionTitle
+                                            .copyWith(
+                                              color: selected
+                                                  ? selectedColor
+                                                  : widget.colors.onSurface,
+                                            ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadii.sm,
+                                  ),
+                                  child: PokemonImage(
+                                    path: sprite.path,
+                                    isLocalFile: false,
+                                    width: AppSizes.spriteThumb,
+                                    height: AppSizes.spriteThumb,
+                                    borderRadius: AppRadii.sm,
+                                    fallbackIconSize:
+                                        AppSizes.spriteThumb * 0.55,
+                                  ),
+                                ),
+                                SelectableCheckmark(
+                                  selected: selected,
+                                  selectedColor: selectedColor,
+                                  iconSize: AppSizes.cardActionIcon,
+                                  animate: true,
+                                  width: checkWidth,
+                                ),
+                              ],
                             ),
                           );
                         },

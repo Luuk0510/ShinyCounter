@@ -4,6 +4,7 @@ export 'common/game_dropdown.dart';
 export 'common/pokemon_empty_state.dart';
 export 'common/pokemon_image.dart';
 export 'common/pokemon_image_provider.dart';
+export 'common/selectable_row.dart';
 export 'common/shimmer_box.dart';
 export 'detail/counter_controls.dart';
 export 'detail/daily_counts_list.dart';

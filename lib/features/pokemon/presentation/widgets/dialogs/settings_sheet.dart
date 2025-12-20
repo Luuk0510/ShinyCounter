@@ -4,6 +4,7 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/selectable_row.dart';
 
 class SettingsDialog extends StatefulWidget {
   const SettingsDialog({super.key});
@@ -136,38 +137,33 @@ class _ThemeOption extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final selectedColor = AppButtonPalette.primaryAccent(colors);
-    final radius = BorderRadius.circular(AppRadii.md);
-    return Material(
-      color: Colors.transparent,
-      borderRadius: radius,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  label,
-                  style: AppTypography.sectionTitle.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: selected ? selectedColor : colors.onSurface,
-                  ),
-                ),
+    return SelectableRow(
+      selected: selected,
+      onTap: onTap,
+      selectedColor: selectedColor,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: AppTypography.sectionTitle.copyWith(
+                fontWeight: FontWeight.w700,
+                color: selected ? selectedColor : colors.onSurface,
               ),
-              const SizedBox(width: AppSpacing.sm),
-              Icon(
-                selected ? Icons.check_circle : Icons.circle_outlined,
-                color: selected ? selectedColor : colors.onSurfaceVariant,
-              ),
-            ],
+            ),
           ),
-        ),
+          const SizedBox(width: AppSpacing.sm),
+          SelectableCheckmark(
+            selected: selected,
+            selectedColor: selectedColor,
+            unselectedIcon: Icons.circle_outlined,
+            unselectedColor: colors.onSurfaceVariant,
+          ),
+        ],
       ),
     );
   }
