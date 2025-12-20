@@ -5,11 +5,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/detail/detai
 
 Widget _wrap(Widget child) {
   return MaterialApp(
-    home: Scaffold(
-      body: Builder(
-        builder: (context) => child,
-      ),
-    ),
+    home: Scaffold(body: Builder(builder: (context) => child)),
   );
 }
 

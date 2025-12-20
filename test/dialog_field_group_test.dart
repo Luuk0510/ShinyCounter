@@ -9,10 +9,7 @@ void main() {
         textDirection: TextDirection.ltr,
         child: DialogFieldGroup(
           spacing: 12,
-          children: [
-            Text('First'),
-            Text('Second'),
-          ],
+          children: [Text('First'), Text('Second')],
         ),
       ),
     );
@@ -25,6 +22,21 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('passes crossAxisAlignment to column', (tester) async {
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: DialogFieldGroup(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [Text('One')],
+        ),
+      ),
+    );
+
+    final column = tester.widget<Column>(find.byType(Column));
+    expect(column.crossAxisAlignment, CrossAxisAlignment.center);
   });
 
   testWidgets('returns empty widget when no children', (tester) async {

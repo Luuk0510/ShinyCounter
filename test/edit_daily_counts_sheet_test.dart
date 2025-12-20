@@ -101,8 +101,9 @@ void main() {
     await _pumpSheet(tester);
     expect(find.byType(EditDailyCountsSheet), findsOneWidget);
 
-    final initialDeleteCount =
-        tester.widgetList(find.byIcon(Icons.delete_outline)).length;
+    final initialDeleteCount = tester
+        .widgetList(find.byIcon(Icons.delete_outline))
+        .length;
 
     await tester.tap(find.text(l10n(tester).addCountRow));
     await _pumpSheet(tester);
@@ -135,5 +136,4 @@ void main() {
     expect(result, isNotNull);
     expect(result!.values, contains(7));
   });
-
 }

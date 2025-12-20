@@ -4,11 +4,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokem
 
 Widget _wrap(Widget child) {
   return MaterialApp(
-    home: Scaffold(
-      body: Builder(
-        builder: (context) => child,
-      ),
-    ),
+    home: Scaffold(body: Builder(builder: (context) => child)),
   );
 }
 
@@ -32,7 +28,7 @@ void main() {
     expect(find.text('No Pokémon'), findsOneWidget);
     expect(find.text('Add'), findsOneWidget);
 
-    await tester.tap(find.text('Add'));
+    await tester.tap(find.byIcon(Icons.add));
     expect(tapped, isTrue);
   });
 }

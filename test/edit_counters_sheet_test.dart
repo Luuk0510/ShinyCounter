@@ -78,4 +78,32 @@ void main() {
     final result = await future;
     expect(result, isNull);
   });
+
+  testWidgets('invalid counter shows SnackBar and stays open', (tester) async {
+    await tester.pumpWidget(_wrap());
+
+    final future = _showSheet<EditSheetResult>(
+      tester,
+      const EditCountersSheet(
+        pokemonName: 'Eevee',
+        counter: 5,
+        startedAt: null,
+        caughtAt: null,
+        caughtGame: null,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), '-1');
+    await tester.tap(find.text('Save'));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('Enter a valid counter'), findsOneWidget);
+    expect(find.byType(EditCountersSheet), findsOneWidget);
+
+    // Close to avoid leaving the sheet open in the test.
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(await future, isNull);
+  });
 }

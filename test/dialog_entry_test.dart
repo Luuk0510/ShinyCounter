@@ -20,10 +20,7 @@ void main() {
     await tester.pumpWidget(
       const Directionality(
         textDirection: TextDirection.ltr,
-        child: DialogEntry(
-          reverse: true,
-          child: Text('Reverse'),
-        ),
+        child: DialogEntry(reverse: true, child: Text('Reverse')),
       ),
     );
 

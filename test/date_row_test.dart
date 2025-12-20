@@ -10,12 +10,7 @@ void main() {
   testWidgets('shows placeholder when date is null', (tester) async {
     await tester.pumpWidget(
       _wrap(
-        DateRow(
-          label: 'Start',
-          value: null,
-          onPick: () {},
-          onClear: () {},
-        ),
+        DateRow(label: 'Start', value: null, onPick: () {}, onClear: () {}),
       ),
     );
 

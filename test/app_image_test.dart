@@ -23,4 +23,23 @@ void main() {
 
     expect(find.byIcon(Icons.broken_image), findsOneWidget);
   });
+
+  testWidgets('uses fallback builder when provided', (tester) async {
+    final originalOnError = FlutterError.onError;
+    addTearDown(() => FlutterError.onError = originalOnError);
+    FlutterError.onError = (_) {};
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: AppImage(
+          image: const AssetImage('assets/missing_image.png'),
+          fallbackBuilder: (_, __) => const Text('fallback'),
+          borderRadius: 0,
+        ),
+      ),
+    );
+
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('fallback'), findsOneWidget);
+  });
 }
