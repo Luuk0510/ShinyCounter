@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/routing/app_router.dart';
@@ -9,6 +10,7 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart'
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
+import 'package:shiny_counter/l10n/app_localizations.dart';
 
 import 'helpers/fakes.dart';
 
@@ -39,17 +41,21 @@ void main() {
           Provider<SaveCustomPokemonUseCase>(
             create: (_) => SaveCustomPokemonUseCase(repo),
           ),
-          Provider<LoadCaughtUseCase>(
-            create: (_) => LoadCaughtUseCase(repo),
-          ),
-          Provider<SpriteService>(
-            create: (_) => FakeSpriteService(const []),
-          ),
-          Provider<CounterSync>(
-            create: (_) => FakeCounterSync(),
-          ),
+          Provider<LoadCaughtUseCase>(create: (_) => LoadCaughtUseCase(repo)),
+          Provider<SpriteService>(create: (_) => FakeSpriteService(const [])),
+          Provider<CounterSync>(create: (_) => FakeCounterSync()),
         ],
-        child: MaterialApp.router(routerConfig: router),
+        child: MaterialApp.router(
+          routerConfig: router,
+          locale: const Locale('en'),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
 

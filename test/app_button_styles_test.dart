@@ -8,8 +8,8 @@ void main() {
     expect(AppButtonPalette.primaryFill(colors), AppColors.seed);
     final expectedOnFill =
         ThemeData.estimateBrightnessForColor(AppColors.seed) == Brightness.dark
-            ? Colors.white
-            : Colors.black;
+        ? Colors.white
+        : Colors.black;
     expect(AppButtonPalette.primaryOnFill(colors), expectedOnFill);
     expect(
       AppButtonPalette.primaryHighlight(colors),
@@ -33,13 +33,7 @@ void main() {
   test('destructive style resolves error colors', () {
     final colors = const ColorScheme.light();
     final style = AppButtonStyles.destructiveFilled(colors);
-    expect(
-      style.backgroundColor?.resolve(<MaterialState>{}),
-      colors.error,
-    );
-    expect(
-      style.foregroundColor?.resolve(<MaterialState>{}),
-      colors.onError,
-    );
+    expect(style.backgroundColor?.resolve(<MaterialState>{}), colors.error);
+    expect(style.foregroundColor?.resolve(<MaterialState>{}), colors.onError);
   });
 }

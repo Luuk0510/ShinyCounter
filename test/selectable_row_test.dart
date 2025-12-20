@@ -22,10 +22,7 @@ void main() {
 
     final ink = tester.widget<Ink>(find.byType(Ink));
     final decoration = ink.decoration as BoxDecoration;
-    expect(
-      decoration.color,
-      color.withValues(alpha: 0.08),
-    );
+    expect(decoration.color, color.withValues(alpha: 0.08));
   });
 
   testWidgets('SelectableRow shows transparent background when unselected', (

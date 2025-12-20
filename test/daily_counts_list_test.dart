@@ -15,9 +15,7 @@ Widget _wrap(Widget child) {
       GlobalCupertinoLocalizations.delegate,
     ],
     supportedLocales: AppLocalizations.supportedLocales,
-    home: Scaffold(
-      body: Builder(builder: (context) => child),
-    ),
+    home: Scaffold(body: Builder(builder: (context) => child)),
   );
 }
 
