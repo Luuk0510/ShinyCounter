@@ -21,11 +21,11 @@ void main() {
     final colors = ColorScheme.fromSeed(seedColor: AppColors.seed);
     final style = AppButtonStyles.primaryFilled(colors);
     expect(
-      style.backgroundColor?.resolve(<MaterialState>{}),
+      style.backgroundColor?.resolve(<WidgetState>{}),
       AppButtonPalette.primaryFill(colors),
     );
     expect(
-      style.foregroundColor?.resolve(<MaterialState>{}),
+      style.foregroundColor?.resolve(<WidgetState>{}),
       AppButtonPalette.primaryOnFill(colors),
     );
   });
@@ -33,7 +33,7 @@ void main() {
   test('destructive style resolves error colors', () {
     final colors = const ColorScheme.light();
     final style = AppButtonStyles.destructiveFilled(colors);
-    expect(style.backgroundColor?.resolve(<MaterialState>{}), colors.error);
-    expect(style.foregroundColor?.resolve(<MaterialState>{}), colors.onError);
+    expect(style.backgroundColor?.resolve(<WidgetState>{}), colors.error);
+    expect(style.foregroundColor?.resolve(<WidgetState>{}), colors.onError);
   });
 }

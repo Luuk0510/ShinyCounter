@@ -33,7 +33,7 @@ void main() {
       MaterialApp(
         home: AppImage(
           image: const AssetImage('assets/missing_image.png'),
-          fallbackBuilder: (_, __) => const Text('fallback'),
+          fallbackBuilder: (_, _) => const Text('fallback'),
           borderRadius: 0,
         ),
       ),

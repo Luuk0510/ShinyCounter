@@ -24,7 +24,7 @@ Future<T?> _pushSheet<T>(WidgetTester tester, Widget sheet) {
     PageRouteBuilder(
       transitionDuration: Duration.zero,
       reverseTransitionDuration: Duration.zero,
-      pageBuilder: (_, __, ___) => Scaffold(body: sheet),
+      pageBuilder: (_, _, _) => Scaffold(body: sheet),
     ),
   );
 }
