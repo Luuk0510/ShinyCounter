@@ -259,6 +259,7 @@ class _PokemonListPageState extends State<PokemonListPage>
                 horizontal: AppSpacing.xl,
                 vertical: AppSpacing.sm,
               ),
+              useLighter: true,
             ),
             child: Text(
               context.l10n.confirmDeleteCancel,

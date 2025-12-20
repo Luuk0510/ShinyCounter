@@ -110,6 +110,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 horizontal: AppSizes.settingsActionPaddingH,
                 vertical: AppSizes.settingsActionPaddingV,
               ),
+              useLighter: true,
             ),
             child: Text(
               l10n.cancel,

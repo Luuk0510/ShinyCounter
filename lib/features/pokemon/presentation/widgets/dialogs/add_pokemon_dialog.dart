@@ -224,6 +224,7 @@ class _AddPokemonView extends StatelessWidget {
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.xs,
             ),
+            useLighter: true,
           ),
           child: Text(l10n.cancel, style: AppTypography.button),
         ),

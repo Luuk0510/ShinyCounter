@@ -195,6 +195,18 @@ class AppButtonPalette {
     return AppColors.seed;
   }
 
+  static Color outlineMutedLight(ColorScheme colors) {
+    return primaryHighlight(colors);
+  }
+
+  static Color outlineBackgroundMutedLight(ColorScheme colors) {
+    return primaryHighlight(colors).withValues(alpha: 0.12);
+  }
+
+  static Color textMutedLight(ColorScheme colors) {
+    return primaryHighlight(colors);
+  }
+
   static Color _brighten(Color color) {
     final hsl = HSLColor.fromColor(color);
     return hsl.withLightness((hsl.lightness * 1.20).clamp(0.0, 1.0)).toColor();
@@ -224,15 +236,24 @@ class AppButtonStyles {
     EdgeInsets? padding,
     double borderWidth = 1.4,
     Color? backgroundColor,
+    bool useLighter = false,
   }) {
+    final foreground = useLighter
+        ? AppButtonPalette.textMutedLight(colors)
+        : AppButtonPalette.textMuted(colors);
+    final outline = useLighter
+        ? AppButtonPalette.outlineMutedLight(colors)
+        : AppButtonPalette.outlineMuted(colors);
+    final background = useLighter
+        ? AppButtonPalette.outlineBackgroundMutedLight(colors)
+        : AppButtonPalette.outlineBackgroundMuted(colors);
     return OutlinedButton.styleFrom(
-      foregroundColor: AppButtonPalette.textMuted(colors),
+      foregroundColor: foreground,
       side: BorderSide(
-        color: AppButtonPalette.outlineMuted(colors),
+        color: outline,
         width: borderWidth,
       ),
-      backgroundColor:
-          backgroundColor ?? AppButtonPalette.outlineBackgroundMuted(colors),
+      backgroundColor: backgroundColor ?? background,
       padding: padding,
     );
   }

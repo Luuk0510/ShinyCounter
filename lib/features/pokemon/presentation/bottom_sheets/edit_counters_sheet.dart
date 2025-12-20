@@ -162,6 +162,7 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
                   style: AppButtonStyles.primaryOutline(
                     colors,
                     borderWidth: AppSizes.sheetActionWidth,
+                    useLighter: true,
                   ),
                   child: Text(
                     l10n.cancel,

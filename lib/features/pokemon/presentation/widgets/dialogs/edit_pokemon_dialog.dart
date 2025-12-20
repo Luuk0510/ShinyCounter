@@ -77,6 +77,7 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
               horizontal: AppSpacing.xl,
               vertical: AppSpacing.sm,
             ),
+            useLighter: true,
           ),
           child: Text(l10n.cancel, style: AppTypography.button),
         ),
