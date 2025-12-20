@@ -18,6 +18,7 @@ class DateRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final editColor = AppButtonPalette.primaryHighlight(colors);
     String two(int v) => v.toString().padLeft(2, '0');
     final formatted = value == null
         ? '--'
@@ -52,8 +53,16 @@ class DateRow extends StatelessWidget {
             ),
           ),
         ),
-        IconButton(icon: const Icon(Icons.edit_calendar), onPressed: onPick),
-        IconButton(icon: const Icon(Icons.clear), onPressed: onClear),
+        IconButton(
+          icon: const Icon(Icons.edit_calendar),
+          color: editColor,
+          onPressed: onPick,
+        ),
+        IconButton(
+          icon: const Icon(Icons.clear),
+          color: colors.error,
+          onPressed: onClear,
+        ),
       ],
     );
   }

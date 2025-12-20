@@ -371,7 +371,7 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
-  /// **'Hunt history'**
+  /// **'Count history'**
   String get huntHistoryTitle;
 
   ///

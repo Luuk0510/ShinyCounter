@@ -4,8 +4,8 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
 import 'package:shiny_counter/l10n/app_localizations.dart';
 
-class HuntInfoCard extends StatelessWidget {
-  const HuntInfoCard({
+class CountInfoCard extends StatelessWidget {
+  const CountInfoCard({
     super.key,
     required this.colors,
     required this.startedAt,

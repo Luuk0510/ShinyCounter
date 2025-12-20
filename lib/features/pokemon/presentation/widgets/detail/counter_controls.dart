@@ -48,16 +48,16 @@ class CounterControls extends StatelessWidget {
             _RoundIconButton(
               icon: Icons.remove,
               onPressed: onDecrement,
-              background: colors.primaryContainer,
-              foreground: colors.onPrimaryContainer,
+              background: AppButtonPalette.primaryFill(colors),
+              foreground: AppButtonPalette.primaryOnFill(colors),
               enabled: enabled,
             ),
             const SizedBox(width: AppSpacing.xl),
             _RoundIconButton(
               icon: Icons.add,
               onPressed: onIncrement,
-              background: colors.primaryContainer,
-              foreground: colors.onPrimaryContainer,
+              background: AppButtonPalette.primaryFill(colors),
+              foreground: AppButtonPalette.primaryOnFill(colors),
               enabled: enabled,
             ),
           ],
@@ -95,6 +95,8 @@ class _RoundIconButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: effectiveBg,
         foregroundColor: effectiveFg,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(AppSizes.counterButtonPadding),
         minimumSize: const Size(
