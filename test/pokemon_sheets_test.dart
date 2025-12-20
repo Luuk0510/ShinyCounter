@@ -37,4 +37,32 @@ void main() {
     expect(color, isNotNull);
     expect(color!.a, moreOrLessEquals(0.5, epsilon: 0.01));
   });
+
+  testWidgets('applies custom background color', (tester) async {
+    const sheetColor = Color(0xFF123456);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () {
+                showPokemonBottomSheet<void>(
+                  context,
+                  backgroundColor: sheetColor,
+                  builder: (_) => const SizedBox(height: 10, width: 10),
+                );
+              },
+              child: const Text('Open'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+
+    final sheet = tester.widget<BottomSheet>(find.byType(BottomSheet));
+    expect(sheet.backgroundColor, sheetColor);
+  });
 }
