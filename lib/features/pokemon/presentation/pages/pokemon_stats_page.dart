@@ -10,6 +10,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_app_bar.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_card.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_expandable_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_game_stats_page.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
@@ -267,17 +268,9 @@ class _StatsGamesCard extends StatefulWidget {
 }
 
 class _StatsGamesCardState extends State<_StatsGamesCard> {
-  bool _expanded = false;
-
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final l10n = context.l10n;
-    final hasOverflow = widget.games.length > 3;
-    final visibleGames = _expanded || !hasOverflow
-        ? widget.games
-        : widget.games.take(3).toList();
-
     return StatsCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -293,46 +286,19 @@ class _StatsGamesCardState extends State<_StatsGamesCard> {
           const SizedBox(height: AppSpacing.sm),
           Align(
             alignment: Alignment.center,
-            child: Material(
-              type: MaterialType.transparency,
-              child: AnimatedSize(
-                duration: AppAnim.normal,
-                curve: AppAnim.easeOutCubic,
-                alignment: Alignment.topCenter,
-                child: _StatsGamesTable(
+            child: StatsExpandableSection(
+              itemCount: widget.games.length,
+              foregroundColor: colors.onSurfaceVariant,
+              builder: (visibleCount) {
+                final visibleGames = widget.games.take(visibleCount).toList();
+                return _StatsGamesTable(
                   games: visibleGames,
                   colors: colors,
                   caughtByGame: widget.caughtByGame,
-                ),
-              ),
+                );
+              },
             ),
           ),
-          if (hasOverflow) ...[
-            const SizedBox(height: AppSpacing.sm),
-            TextButton(
-              onPressed: () => setState(() => _expanded = !_expanded),
-              style: TextButton.styleFrom(
-                foregroundColor: colors.onSurfaceVariant,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _expanded
-                        ? l10n.statsGamesShowLess
-                        : l10n.statsGamesShowMore,
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  AnimatedRotation(
-                    turns: _expanded ? 0.5 : 0.0,
-                    duration: AppAnim.normal,
-                    curve: AppAnim.easeOutCubic,
-                    child: const Icon(Icons.expand_more, size: 18),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -446,16 +412,9 @@ class _StatsRecentCard extends StatefulWidget {
 }
 
 class _StatsRecentCardState extends State<_StatsRecentCard> {
-  bool _expanded = false;
-
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final l10n = context.l10n;
-    final hasOverflow = widget.items.length > 3;
-    final visibleItems = _expanded || !hasOverflow
-        ? widget.items
-        : widget.items.take(3).toList();
 
     return StatsCard(
       child: Column(
@@ -472,39 +431,18 @@ class _StatsRecentCardState extends State<_StatsRecentCard> {
           const SizedBox(height: AppSpacing.sm),
           Align(
             alignment: Alignment.center,
-            child: AnimatedSize(
-              duration: AppAnim.normal,
-              curve: AppAnim.easeOutCubic,
-              alignment: Alignment.topCenter,
-              child: _StatsRecentTable(items: visibleItems, colors: colors),
+            child: StatsExpandableSection(
+              itemCount: widget.items.length,
+              foregroundColor: colors.onSurfaceVariant,
+              builder: (visibleCount) {
+                final visibleItems = widget.items.take(visibleCount).toList();
+                return _StatsRecentTable(
+                  items: visibleItems,
+                  colors: colors,
+                );
+              },
             ),
           ),
-          if (hasOverflow) ...[
-            const SizedBox(height: AppSpacing.sm),
-            TextButton(
-              onPressed: () => setState(() => _expanded = !_expanded),
-              style: TextButton.styleFrom(
-                foregroundColor: colors.onSurfaceVariant,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _expanded
-                        ? l10n.statsGamesShowLess
-                        : l10n.statsGamesShowMore,
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  AnimatedRotation(
-                    turns: _expanded ? 0.5 : 0.0,
-                    duration: AppAnim.normal,
-                    curve: AppAnim.easeOutCubic,
-                    child: const Icon(Icons.expand_more, size: 18),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
       ),
     );
