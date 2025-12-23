@@ -79,6 +79,7 @@ class _StatsCountsChartState extends State<StatsCountsChart> {
           final tooltipOffset = _tooltipPosition == null
               ? const Offset(0, 0)
               : _clampTooltipOffset(_tooltipPosition!, size);
+          final touchThreshold = math.max(constraints.maxWidth, 1.0).toDouble();
           return Stack(
             children: [
               LineChart(
@@ -162,6 +163,7 @@ class _StatsCountsChartState extends State<StatsCountsChart> {
                   lineTouchData: LineTouchData(
                     handleBuiltInTouches: true,
                     touchCallback: _handleTouch,
+                    touchSpotThreshold: touchThreshold,
                     touchTooltipData: LineTouchTooltipData(
                       getTooltipItems: (touchedSpots) =>
                           List<LineTooltipItem?>.filled(
