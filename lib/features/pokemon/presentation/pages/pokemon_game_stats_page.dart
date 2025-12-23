@@ -85,16 +85,7 @@ class PokemonGameStatsPage extends StatelessWidget {
                         ),
                         borderRadius: AppRadii.lg,
                         useMaterial: false,
-                        titleStyle: AppTypography.title.copyWith(
-                          color: colors.onSurface,
-                          fontWeight: FontWeight.w700,
-                          fontSize: AppSizes.statsGameRowTextSize,
-                        ),
-                        trailingStyle: AppTypography.title.copyWith(
-                          color: colors.onSurface,
-                          fontWeight: FontWeight.w700,
-                          fontSize: AppSizes.statsGameRowTextSize,
-                        ),
+                        textSize: AppSizes.statsGameRowTextSize,
                       ),
                     ),
                   ),

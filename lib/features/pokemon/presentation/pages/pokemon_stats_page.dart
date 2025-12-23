@@ -219,28 +219,14 @@ class _StatsMetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StatsCard(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: AppTypography.button.copyWith(
-              color: colors.onSurfaceVariant,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            value,
-            textAlign: TextAlign.center,
-            style: AppTypography.title.copyWith(
-              fontWeight: FontWeight.w800,
-              color: colors.onSurface,
-            ),
-          ),
-        ],
+      title: label,
+      child: Text(
+        value,
+        textAlign: TextAlign.center,
+        style: AppTypography.title.copyWith(
+          fontWeight: FontWeight.w800,
+          color: colors.onSurface,
+        ),
       ),
     );
   }
@@ -273,18 +259,10 @@ class _StatsGamesCardState extends State<_StatsGamesCard> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return StatsCard(
+      title: widget.label,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            widget.label,
-            textAlign: TextAlign.center,
-            style: AppTypography.button.copyWith(
-              color: colors.onSurfaceVariant,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
           Align(
             alignment: Alignment.center,
             child: StatsExpandableSection(
@@ -294,7 +272,6 @@ class _StatsGamesCardState extends State<_StatsGamesCard> {
                 final visibleGames = widget.games.take(visibleCount).toList();
                 return _StatsGamesTable(
                   games: visibleGames,
-                  colors: colors,
                   caughtByGame: widget.caughtByGame,
                 );
               },
@@ -307,14 +284,9 @@ class _StatsGamesCardState extends State<_StatsGamesCard> {
 }
 
 class _StatsGamesTable extends StatelessWidget {
-  const _StatsGamesTable({
-    required this.games,
-    required this.colors,
-    required this.caughtByGame,
-  });
+  const _StatsGamesTable({required this.games, required this.caughtByGame});
 
   final List<GameCatchStat> games;
-  final ColorScheme colors;
   final Map<String, List<PokemonCaughtEntry>> caughtByGame;
 
   @override
@@ -325,7 +297,6 @@ class _StatsGamesTable extends StatelessWidget {
         for (final game in games)
           _StatsGamesRow(
             game: game,
-            colors: colors,
             items: caughtByGame[game.game] ?? const [],
           ),
       ],
@@ -334,14 +305,9 @@ class _StatsGamesTable extends StatelessWidget {
 }
 
 class _StatsGamesRow extends StatelessWidget {
-  const _StatsGamesRow({
-    required this.game,
-    required this.colors,
-    required this.items,
-  });
+  const _StatsGamesRow({required this.game, required this.items});
 
   final GameCatchStat game;
-  final ColorScheme colors;
   final List<PokemonCaughtEntry> items;
 
   @override
@@ -357,14 +323,6 @@ class _StatsGamesRow extends StatelessWidget {
           : () => context.goToStatsGame(
               PokemonGameStatsArgs(game: game.game, items: items),
             ),
-      titleStyle: AppTypography.listTitle.copyWith(
-        color: colors.onSurface,
-        fontWeight: FontWeight.w700,
-      ),
-      trailingStyle: AppTypography.listTitle.copyWith(
-        color: colors.onSurface,
-        fontWeight: FontWeight.w700,
-      ),
     );
   }
 }
@@ -385,18 +343,10 @@ class _StatsRecentCardState extends State<_StatsRecentCard> {
     final colors = Theme.of(context).colorScheme;
 
     return StatsCard(
+      title: widget.label,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            widget.label,
-            textAlign: TextAlign.center,
-            style: AppTypography.button.copyWith(
-              color: colors.onSurfaceVariant,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
           Align(
             alignment: Alignment.center,
             child: StatsExpandableSection(
@@ -404,7 +354,7 @@ class _StatsRecentCardState extends State<_StatsRecentCard> {
               foregroundColor: colors.onSurfaceVariant,
               builder: (visibleCount) {
                 final visibleItems = widget.items.take(visibleCount).toList();
-                return _StatsRecentTable(items: visibleItems, colors: colors);
+                return _StatsRecentTable(items: visibleItems);
               },
             ),
           ),
@@ -415,26 +365,22 @@ class _StatsRecentCardState extends State<_StatsRecentCard> {
 }
 
 class _StatsRecentTable extends StatelessWidget {
-  const _StatsRecentTable({required this.items, required this.colors});
+  const _StatsRecentTable({required this.items});
 
   final List<PokemonCaughtEntry> items;
-  final ColorScheme colors;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        for (final item in items) _StatsRecentRow(item: item, colors: colors),
-      ],
+      children: [for (final item in items) _StatsRecentRow(item: item)],
     );
   }
 }
 
 class _StatsRecentRow extends StatelessWidget {
-  const _StatsRecentRow({required this.item, required this.colors});
+  const _StatsRecentRow({required this.item});
 
   final PokemonCaughtEntry item;
-  final ColorScheme colors;
 
   @override
   Widget build(BuildContext context) {
@@ -451,14 +397,6 @@ class _StatsRecentRow extends StatelessWidget {
       maxWidth: AppSizes.statsRecentCatchTableMaxWidth,
       stackOnNarrow: true,
       onTap: () => context.goToPokemon(item.pokemon),
-      titleStyle: AppTypography.listTitle.copyWith(
-        color: colors.onSurface,
-        fontWeight: FontWeight.w700,
-      ),
-      trailingStyle: AppTypography.listTitle.copyWith(
-        color: colors.onSurface,
-        fontWeight: FontWeight.w700,
-      ),
     );
   }
 }

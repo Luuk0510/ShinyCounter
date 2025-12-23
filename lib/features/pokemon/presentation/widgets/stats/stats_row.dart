@@ -18,6 +18,7 @@ class StatsRow extends StatelessWidget {
     ),
     this.borderRadius = AppRadii.sm,
     this.useMaterial = true,
+    this.textSize,
     this.titleStyle,
     this.trailingStyle,
   });
@@ -32,11 +33,20 @@ class StatsRow extends StatelessWidget {
   final EdgeInsets padding;
   final double borderRadius;
   final bool useMaterial;
+  final double? textSize;
   final TextStyle? titleStyle;
   final TextStyle? trailingStyle;
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final baseStyle = AppTypography.listTitle.copyWith(
+      color: colors.onSurface,
+      fontWeight: FontWeight.w700,
+      fontSize: textSize ?? AppTypography.listTitle.fontSize,
+    );
+    final resolvedTitleStyle = titleStyle ?? baseStyle;
+    final resolvedTrailingStyle = trailingStyle ?? baseStyle;
     Widget content = ResponsiveTextRow(
       leading: leading,
       title: title,
@@ -46,8 +56,8 @@ class StatsRow extends StatelessWidget {
       stackOnNarrow: stackOnNarrow,
       stackThreshold: 0.7,
       padding: padding,
-      titleStyle: titleStyle,
-      trailingStyle: trailingStyle,
+      titleStyle: resolvedTitleStyle,
+      trailingStyle: resolvedTrailingStyle,
     );
 
     if (onTap != null) {
