@@ -40,7 +40,8 @@ class StatsRow extends StatelessWidget {
       padding: padding,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final isCompact = stackOnNarrow && constraints.maxWidth < maxWidth * 0.7;
+          final isCompact =
+              stackOnNarrow && constraints.maxWidth < maxWidth * 0.7;
           if (isCompact) {
             return Row(
               children: [
