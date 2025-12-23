@@ -9,6 +9,7 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokem
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_app_bar.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_game_stats_page.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
@@ -215,13 +216,7 @@ class _StatsMetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: AppInsets.card,
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(AppRadii.md),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.3)),
-      ),
+    return StatsCard(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -283,13 +278,7 @@ class _StatsGamesCardState extends State<_StatsGamesCard> {
         ? widget.games
         : widget.games.take(3).toList();
 
-    return Container(
-      padding: AppInsets.card,
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(AppRadii.md),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.3)),
-      ),
+    return StatsCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -468,13 +457,7 @@ class _StatsRecentCardState extends State<_StatsRecentCard> {
         ? widget.items
         : widget.items.take(3).toList();
 
-    return Container(
-      padding: AppInsets.card,
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(AppRadii.md),
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.3)),
-      ),
+    return StatsCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
