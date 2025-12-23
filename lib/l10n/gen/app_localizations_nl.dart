@@ -48,6 +48,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get statsRecentLabel => 'Recent gevangen';
 
   @override
+  String get statsRangeReset => 'Reset';
+
+  @override
   String get manageTitle => 'Beheer Pokémon';
 
   @override

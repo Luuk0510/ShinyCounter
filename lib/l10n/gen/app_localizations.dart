@@ -179,6 +179,12 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
+  /// **'Reset'**
+  String get statsRangeReset;
+
+  ///
+  ///
+  /// In en, this message translates to:
   /// **'Manage Pokémon'**
   String get manageTitle;
 

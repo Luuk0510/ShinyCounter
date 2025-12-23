@@ -48,6 +48,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsRecentLabel => 'Recent catches';
 
   @override
+  String get statsRangeReset => 'Reset';
+
+  @override
   String get manageTitle => 'Manage Pokémon';
 
   @override

@@ -52,6 +52,10 @@
   "@statsRecentLabel": {
     "description": ""
   },
+  "statsRangeReset": "Reset",
+  "@statsRangeReset": {
+    "description": ""
+  },
   "manageTitle": "Beheer Pokémon",
   "@manageTitle": {
     "description": ""

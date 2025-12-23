@@ -127,14 +127,18 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     if (!mounted) return;
     setState(() {
       _chartRange = range;
-      _summary = StatsSummary(
-        totalPokemon: _summary.totalPokemon,
-        caughtPokemon: _summary.caughtPokemon,
-        totalCounts: _summary.totalCounts,
+      _summary = _summary.copyWith(
         dailyTotals: _buildDailyTotals(_states, range),
-        caughtGames: _summary.caughtGames,
-        caughtByGame: _summary.caughtByGame,
-        recentCaught: _summary.recentCaught,
+      );
+    });
+  }
+
+  void _resetChartRange() {
+    final range = _defaultChartRange();
+    setState(() {
+      _chartRange = range;
+      _summary = _summary.copyWith(
+        dailyTotals: _buildDailyTotals(_states, range),
       );
     });
   }
@@ -207,6 +211,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                         label: l10n.huntHistoryTitle,
                         rangeLabel: _formatRangeLabel(_chartRange),
                         onPickRange: _pickChartRange,
+                        onResetRange: _resetChartRange,
                         counts: _summary.dailyTotals,
                       );
 
@@ -294,6 +299,26 @@ class StatsSummary {
   final List<GameCatchStat> caughtGames;
   final Map<String, List<PokemonCaughtEntry>> caughtByGame;
   final List<PokemonCaughtEntry> recentCaught;
+
+  StatsSummary copyWith({
+    int? totalPokemon,
+    int? caughtPokemon,
+    int? totalCounts,
+    List<StatsDailyCount>? dailyTotals,
+    List<GameCatchStat>? caughtGames,
+    Map<String, List<PokemonCaughtEntry>>? caughtByGame,
+    List<PokemonCaughtEntry>? recentCaught,
+  }) {
+    return StatsSummary(
+      totalPokemon: totalPokemon ?? this.totalPokemon,
+      caughtPokemon: caughtPokemon ?? this.caughtPokemon,
+      totalCounts: totalCounts ?? this.totalCounts,
+      dailyTotals: dailyTotals ?? this.dailyTotals,
+      caughtGames: caughtGames ?? this.caughtGames,
+      caughtByGame: caughtByGame ?? this.caughtByGame,
+      recentCaught: recentCaught ?? this.recentCaught,
+    );
+  }
 }
 
 class _StatsMetricCard extends StatelessWidget {
@@ -328,12 +353,14 @@ class _StatsCountsChartCard extends StatelessWidget {
     required this.label,
     required this.rangeLabel,
     required this.onPickRange,
+    required this.onResetRange,
     required this.counts,
   });
 
   final String label;
   final String rangeLabel;
   final VoidCallback onPickRange;
+  final VoidCallback onResetRange;
   final List<StatsDailyCount> counts;
 
   @override
@@ -345,17 +372,34 @@ class _StatsCountsChartCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          TextButton.icon(
-            onPressed: onPickRange,
-            icon: Icon(Icons.date_range, color: colors.onSurfaceVariant),
-            label: Text(
-              rangeLabel,
-              style: AppTypography.listTitle.copyWith(
-                color: colors.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
-                fontSize: AppSizes.statsRangeTextSize,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton.icon(
+                onPressed: onPickRange,
+                icon: Icon(Icons.date_range, color: colors.onSurfaceVariant),
+                label: Text(
+                  rangeLabel,
+                  style: AppTypography.listTitle.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                    fontSize: AppSizes.statsRangeTextSize,
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(width: AppSpacing.sm),
+              TextButton(
+                onPressed: onResetRange,
+                child: Text(
+                  context.l10n.statsRangeReset,
+                  style: AppTypography.listTitle.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                    fontSize: AppSizes.statsRangeTextSize,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.sm),
           StatsCountsChart(counts: counts),
