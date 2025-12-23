@@ -3,6 +3,7 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 
@@ -33,7 +34,17 @@ class PokemonGameStatsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(args.game),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GameLogo(game: args.game, size: AppSizes.gameLogoSize),
+            const SizedBox(width: AppSpacing.sm),
+            Text(
+              l10n.huntGame(args.game),
+              style: AppTypography.title.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
         centerTitle: true,
         toolbarHeight: AppSizes.toolbarHeight,
         shape: const RoundedRectangleBorder(
