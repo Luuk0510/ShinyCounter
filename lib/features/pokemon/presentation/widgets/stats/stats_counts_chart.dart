@@ -93,13 +93,13 @@ class StatsCountsChart extends StatelessWidget {
               spots: spots,
               isCurved: true,
               color: AppButtonPalette.primaryFill(colors),
-              barWidth: AppSizes.statsChartStroke,
+              barWidth: AppSizes.statsChartStroke + 1,
               dotData: const FlDotData(show: false),
               belowBarData: BarAreaData(
                 show: true,
                 color: AppButtonPalette.primaryFill(
                   colors,
-                ).withValues(alpha: 0.16),
+                ).withValues(alpha: 0.22),
               ),
             ),
           ],
