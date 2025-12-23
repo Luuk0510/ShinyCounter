@@ -31,7 +31,8 @@ class _StatsExpandableSectionState extends State<StatsExpandableSection> {
         ? widget.itemCount
         : widget.initialVisible;
     final foreground =
-        widget.foregroundColor ?? Theme.of(context).colorScheme.onSurfaceVariant;
+        widget.foregroundColor ??
+        Theme.of(context).colorScheme.onSurfaceVariant;
 
     return Column(
       children: [

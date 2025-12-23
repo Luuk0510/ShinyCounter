@@ -11,6 +11,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokem
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_app_bar.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_expandable_section.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_row.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_game_stats_page.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
@@ -345,57 +346,24 @@ class _StatsGamesRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-      child: Align(
-        alignment: Alignment.center,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppSizes.statsCaughtGameTableMaxWidth,
-          ),
-          child: Material(
-            type: MaterialType.transparency,
-            child: InkWell(
-              onTap: items.isEmpty
-                  ? null
-                  : () => context.goToStatsGame(
-                      PokemonGameStatsArgs(game: game.game, items: items),
-                    ),
-              borderRadius: BorderRadius.circular(AppRadii.sm),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                child: Row(
-                  children: [
-                    GameLogo(game: game.game, size: AppSizes.gameLogoSize),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        game.game,
-                        style: AppTypography.listTitle.copyWith(
-                          color: colors.onSurface,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: AppSizes.statsGameCountWidth,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          '${game.count}',
-                          style: AppTypography.listTitle.copyWith(
-                            color: colors.onSurface,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+    return StatsRow(
+      leading: GameLogo(game: game.game, size: AppSizes.gameLogoSize),
+      title: game.game,
+      trailing: '${game.count}',
+      trailingWidth: AppSizes.statsGameCountWidth,
+      maxWidth: AppSizes.statsCaughtGameTableMaxWidth,
+      onTap: items.isEmpty
+          ? null
+          : () => context.goToStatsGame(
+              PokemonGameStatsArgs(game: game.game, items: items),
             ),
-          ),
-        ),
+      titleStyle: AppTypography.listTitle.copyWith(
+        color: colors.onSurface,
+        fontWeight: FontWeight.w700,
+      ),
+      trailingStyle: AppTypography.listTitle.copyWith(
+        color: colors.onSurface,
+        fontWeight: FontWeight.w700,
       ),
     );
   }
@@ -436,10 +404,7 @@ class _StatsRecentCardState extends State<_StatsRecentCard> {
               foregroundColor: colors.onSurfaceVariant,
               builder: (visibleCount) {
                 final visibleItems = widget.items.take(visibleCount).toList();
-                return _StatsRecentTable(
-                  items: visibleItems,
-                  colors: colors,
-                );
+                return _StatsRecentTable(items: visibleItems, colors: colors);
               },
             ),
           ),
@@ -473,58 +438,25 @@ class _StatsRecentRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-      child: Align(
-        alignment: Alignment.center,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: AppSizes.statsRecentCatchTableMaxWidth,
-          ),
-          child: Material(
-            type: MaterialType.transparency,
-            child: InkWell(
-              onTap: () => context.goToPokemon(item.pokemon),
-              borderRadius: BorderRadius.circular(AppRadii.sm),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                child: Row(
-                  children: [
-                    PokemonImage(
-                      path: item.pokemon.imagePath,
-                      isLocalFile: item.pokemon.isLocalFile,
-                      width: AppSizes.statsPokemonImage,
-                      height: AppSizes.statsPokemonImage,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        item.pokemon.name,
-                        style: AppTypography.listTitle.copyWith(
-                          color: colors.onSurface,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: AppSizes.statsDateWidth,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          formatDate(item.caughtAt),
-                          style: AppTypography.listTitle.copyWith(
-                            color: colors.onSurface,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
+    return StatsRow(
+      leading: PokemonImage(
+        path: item.pokemon.imagePath,
+        isLocalFile: item.pokemon.isLocalFile,
+        width: AppSizes.statsPokemonImage,
+        height: AppSizes.statsPokemonImage,
+      ),
+      title: item.pokemon.name,
+      trailing: formatDate(item.caughtAt),
+      trailingWidth: AppSizes.statsDateWidth,
+      maxWidth: AppSizes.statsRecentCatchTableMaxWidth,
+      onTap: () => context.goToPokemon(item.pokemon),
+      titleStyle: AppTypography.listTitle.copyWith(
+        color: colors.onSurface,
+        fontWeight: FontWeight.w700,
+      ),
+      trailingStyle: AppTypography.listTitle.copyWith(
+        color: colors.onSurface,
+        fontWeight: FontWeight.w700,
       ),
     );
   }
