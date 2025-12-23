@@ -388,18 +388,18 @@ class _PokemonListPageState extends State<PokemonListPage>
         },
       ),
       foregroundColor: colors.onSurface,
-        title: LayoutBuilder(
-          builder: (context, constraints) {
-            return ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: constraints.maxWidth),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.center,
-                child: _ListAppBarTitle(title: context.l10n.appTitle),
-              ),
-            );
-          },
-        ),
+      title: LayoutBuilder(
+        builder: (context, constraints) {
+          return ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.center,
+              child: _ListAppBarTitle(title: context.l10n.appTitle),
+            ),
+          );
+        },
+      ),
       actions: [
         IconButton(
           key: PokemonListPage.statsKey,

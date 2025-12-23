@@ -36,6 +36,18 @@
   "@statsTotalCountsLabel": {
     "description": ""
   },
+  "statsGamesLabel": "Gevangen in games",
+  "@statsGamesLabel": {
+    "description": ""
+  },
+  "statsGamesShowMore": "Toon alles",
+  "@statsGamesShowMore": {
+    "description": ""
+  },
+  "statsGamesShowLess": "Toon minder",
+  "@statsGamesShowLess": {
+    "description": ""
+  },
   "manageTitle": "Beheer Pokémon",
   "@manageTitle": {
     "description": ""

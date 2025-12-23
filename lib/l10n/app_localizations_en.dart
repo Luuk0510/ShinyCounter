@@ -36,6 +36,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsTotalCountsLabel => 'Total counts';
 
   @override
+  String get statsGamesLabel => 'Caught in games';
+
+  @override
+  String get statsGamesShowMore => 'Show all';
+
+  @override
+  String get statsGamesShowLess => 'Show less';
+
+  @override
   String get manageTitle => 'Manage Pokémon';
 
   @override

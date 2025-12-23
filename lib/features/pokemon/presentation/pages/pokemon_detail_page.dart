@@ -541,9 +541,7 @@ class _DetailInfoSection extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   onTap: onDailyCounts,
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxWidth: 200,
-                    ),
+                    constraints: const BoxConstraints(maxWidth: 200),
                     child: DailyCountsList(
                       colors: colors,
                       dailyCounts: controller.dailyCounts,

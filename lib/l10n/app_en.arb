@@ -36,6 +36,18 @@
   "@statsTotalCountsLabel": {
     "description": ""
   },
+  "statsGamesLabel": "Caught in games",
+  "@statsGamesLabel": {
+    "description": ""
+  },
+  "statsGamesShowMore": "Show all",
+  "@statsGamesShowMore": {
+    "description": ""
+  },
+  "statsGamesShowLess": "Show less",
+  "@statsGamesShowLess": {
+    "description": ""
+  },
   "manageTitle": "Manage Pokémon",
   "@manageTitle": {
     "description": ""
