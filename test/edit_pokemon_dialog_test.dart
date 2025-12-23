@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/edit_pokemon_dialog.dart';
-import 'package:shiny_counter/l10n/app_localizations.dart';
+import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 Widget _wrap() {
   return MaterialApp(

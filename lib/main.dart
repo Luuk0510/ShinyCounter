@@ -8,7 +8,7 @@ import 'core/routing/app_router.dart';
 import 'core/theme/theme.dart';
 import 'core/theme/theme_notifier.dart';
 import 'features/pokemon/overlay/counter_overlay.dart' as counter_overlay;
-import 'package:shiny_counter/l10n/app_localizations.dart';
+import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 import 'core/l10n/locale_notifier.dart';
 
 Future<void> main() async {
