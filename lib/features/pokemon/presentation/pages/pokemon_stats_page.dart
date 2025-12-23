@@ -15,8 +15,8 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_expandable_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_row.dart';
 import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
+import 'package:shiny_counter/features/pokemon/shared/services/stats_aggregation_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 
 class PokemonStatsPage extends StatefulWidget {
   const PokemonStatsPage({super.key});
@@ -28,9 +28,7 @@ class PokemonStatsPage extends StatefulWidget {
 class _PokemonStatsPageState extends State<PokemonStatsPage> {
   static const int _defaultChartDays = 30;
 
-  late final LoadCustomPokemonUseCase _loadCustomPokemon;
-  late final LoadCaughtUseCase _loadCaught;
-  late final CounterSync _sync;
+  late final StatsAggregationService _statsService;
   late DateTimeRange _chartRange;
   List<CounterState> _states = const [];
   bool _loading = true;
@@ -39,69 +37,21 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
   @override
   void initState() {
     super.initState();
-    _loadCustomPokemon = context.read<LoadCustomPokemonUseCase>();
-    _loadCaught = context.read<LoadCaughtUseCase>();
-    _sync = context.read<CounterSync>();
+    _statsService = StatsAggregationService(
+      loadCustomPokemon: context.read<LoadCustomPokemonUseCase>(),
+      loadCaught: context.read<LoadCaughtUseCase>(),
+      sync: context.read<CounterSync>(),
+    );
     _chartRange = _defaultChartRange();
     _loadStats();
   }
 
   Future<void> _loadStats() async {
-    final pokemon = await _loadCustomPokemon();
-    final caught = await _loadCaught(pokemon);
-    final states = await Future.wait(
-      pokemon.map((p) {
-        final keys = CounterKeys.fromId(p.id);
-        return _sync.loadState(keys.counter, keys.caught);
-      }),
-    );
-    final totalCounts = states.fold<int>(0, (sum, state) => sum + state.count);
-    final caughtByGame = <String, int>{};
-    final caughtEntriesByGame = <String, List<PokemonCaughtEntry>>{};
-    final recentCaught = <PokemonCaughtEntry>[];
-    final dailyTotals = _buildDailyTotals(states, _chartRange);
-    for (var i = 0; i < states.length; i++) {
-      final state = states[i];
-      if (!state.isCaught) continue;
-      final game = state.caughtGame;
-      if (game != null && game.isNotEmpty) {
-        caughtByGame.update(game, (value) => value + 1, ifAbsent: () => 1);
-        caughtEntriesByGame
-            .putIfAbsent(game, () => [])
-            .add(PokemonCaughtEntry(pokemon[i], state.caughtAt));
-      }
-      final caughtAt = state.caughtAt;
-      if (caughtAt == null) continue;
-      recentCaught.add(PokemonCaughtEntry(pokemon[i], caughtAt));
-    }
-    final caughtGames =
-        caughtByGame.entries
-            .map((entry) => GameCatchStat(entry.key, entry.value))
-            .toList()
-          ..sort((a, b) {
-            final byCount = b.count.compareTo(a.count);
-            return byCount != 0 ? byCount : a.game.compareTo(b.game);
-          });
-    for (final entries in caughtEntriesByGame.values) {
-      entries.sort((a, b) {
-        final left = a.caughtAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final right = b.caughtAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        return right.compareTo(left);
-      });
-    }
-    recentCaught.sort((a, b) => b.caughtAt!.compareTo(a.caughtAt!));
+    final snapshot = await _statsService.loadStats(_chartRange);
     if (!mounted) return;
     setState(() {
-      _states = states;
-      _summary = StatsSummary(
-        totalPokemon: pokemon.length,
-        caughtPokemon: caught.length,
-        totalCounts: totalCounts,
-        dailyTotals: dailyTotals,
-        caughtGames: caughtGames,
-        caughtByGame: caughtEntriesByGame,
-        recentCaught: recentCaught,
-      );
+      _states = snapshot.states;
+      _summary = snapshot.summary;
       _loading = false;
     });
   }
@@ -127,9 +77,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     if (!mounted) return;
     setState(() {
       _chartRange = range;
-      _summary = _summary.copyWith(
-        dailyTotals: _buildDailyTotals(_states, range),
-      );
+      _summary = _statsService.updateSummaryForRange(_summary, _states, range);
     });
   }
 
@@ -137,43 +85,8 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     final range = _defaultChartRange();
     setState(() {
       _chartRange = range;
-      _summary = _summary.copyWith(
-        dailyTotals: _buildDailyTotals(_states, range),
-      );
+      _summary = _statsService.updateSummaryForRange(_summary, _states, range);
     });
-  }
-
-  List<StatsDailyCount> _buildDailyTotals(
-    List<CounterState> states,
-    DateTimeRange range,
-  ) {
-    final start = DateTime(
-      range.start.year,
-      range.start.month,
-      range.start.day,
-    );
-    final end = DateTime(range.end.year, range.end.month, range.end.day);
-    final totals = <DateTime, int>{};
-    final days = end.difference(start).inDays;
-    for (var i = 0; i <= days; i++) {
-      final day = start.add(Duration(days: i));
-      totals[day] = 0;
-    }
-    for (final state in states) {
-      if (state.dailyCounts.isEmpty) continue;
-      for (final entry in state.dailyCounts.entries) {
-        final parsed = DateTime.tryParse(entry.key);
-        if (parsed == null) continue;
-        final day = DateTime(parsed.year, parsed.month, parsed.day);
-        if (day.isBefore(start) || day.isAfter(end)) continue;
-        totals.update(day, (value) => value + entry.value, ifAbsent: () => 0);
-      }
-    }
-    final sortedDays = totals.keys.toList()..sort();
-    return [
-      for (final day in sortedDays)
-        StatsDailyCount(date: day, count: totals[day] ?? 0),
-    ];
   }
 
   @override
@@ -272,55 +185,6 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
   }
 }
 
-class StatsSummary {
-  const StatsSummary({
-    required this.totalPokemon,
-    required this.caughtPokemon,
-    required this.totalCounts,
-    required this.dailyTotals,
-    required this.caughtGames,
-    required this.caughtByGame,
-    required this.recentCaught,
-  });
-
-  const StatsSummary.empty()
-    : totalPokemon = 0,
-      caughtPokemon = 0,
-      totalCounts = 0,
-      dailyTotals = const <StatsDailyCount>[],
-      caughtGames = const <GameCatchStat>[],
-      caughtByGame = const <String, List<PokemonCaughtEntry>>{},
-      recentCaught = const <PokemonCaughtEntry>[];
-
-  final int totalPokemon;
-  final int caughtPokemon;
-  final int totalCounts;
-  final List<StatsDailyCount> dailyTotals;
-  final List<GameCatchStat> caughtGames;
-  final Map<String, List<PokemonCaughtEntry>> caughtByGame;
-  final List<PokemonCaughtEntry> recentCaught;
-
-  StatsSummary copyWith({
-    int? totalPokemon,
-    int? caughtPokemon,
-    int? totalCounts,
-    List<StatsDailyCount>? dailyTotals,
-    List<GameCatchStat>? caughtGames,
-    Map<String, List<PokemonCaughtEntry>>? caughtByGame,
-    List<PokemonCaughtEntry>? recentCaught,
-  }) {
-    return StatsSummary(
-      totalPokemon: totalPokemon ?? this.totalPokemon,
-      caughtPokemon: caughtPokemon ?? this.caughtPokemon,
-      totalCounts: totalCounts ?? this.totalCounts,
-      dailyTotals: dailyTotals ?? this.dailyTotals,
-      caughtGames: caughtGames ?? this.caughtGames,
-      caughtByGame: caughtByGame ?? this.caughtByGame,
-      recentCaught: recentCaught ?? this.recentCaught,
-    );
-  }
-}
-
 class _StatsMetricCard extends StatelessWidget {
   const _StatsMetricCard({
     required this.label,
@@ -411,13 +275,6 @@ class _StatsCountsChartCard extends StatelessWidget {
 
 String _formatRangeLabel(DateTimeRange range) {
   return '${formatDate(range.start)} – ${formatDate(range.end)}';
-}
-
-class GameCatchStat {
-  const GameCatchStat(this.game, this.count);
-
-  final String game;
-  final int count;
 }
 
 class _StatsGamesCard extends StatefulWidget {

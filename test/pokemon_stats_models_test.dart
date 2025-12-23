@@ -29,4 +29,21 @@ void main() {
     expect(daily.date, date);
     expect(daily.count, count);
   });
+
+  test('GameCatchStat stores game and count', () {
+    const stat = GameCatchStat('Emerald', 7);
+
+    expect(stat.game, 'Emerald');
+    expect(stat.count, 7);
+  });
+
+  test('StatsSummary copyWith updates daily totals', () {
+    const empty = StatsSummary.empty();
+    final daily = [StatsDailyCount(date: DateTime(2024, 4, 4), count: 5)];
+
+    final updated = empty.copyWith(dailyTotals: daily);
+
+    expect(updated.totalPokemon, 0);
+    expect(updated.dailyTotals, daily);
+  });
 }

@@ -20,3 +20,59 @@ class StatsDailyCount {
   final DateTime date;
   final int count;
 }
+
+class GameCatchStat {
+  const GameCatchStat(this.game, this.count);
+
+  final String game;
+  final int count;
+}
+
+class StatsSummary {
+  const StatsSummary({
+    required this.totalPokemon,
+    required this.caughtPokemon,
+    required this.totalCounts,
+    required this.dailyTotals,
+    required this.caughtGames,
+    required this.caughtByGame,
+    required this.recentCaught,
+  });
+
+  const StatsSummary.empty()
+    : totalPokemon = 0,
+      caughtPokemon = 0,
+      totalCounts = 0,
+      dailyTotals = const <StatsDailyCount>[],
+      caughtGames = const <GameCatchStat>[],
+      caughtByGame = const <String, List<PokemonCaughtEntry>>{},
+      recentCaught = const <PokemonCaughtEntry>[];
+
+  final int totalPokemon;
+  final int caughtPokemon;
+  final int totalCounts;
+  final List<StatsDailyCount> dailyTotals;
+  final List<GameCatchStat> caughtGames;
+  final Map<String, List<PokemonCaughtEntry>> caughtByGame;
+  final List<PokemonCaughtEntry> recentCaught;
+
+  StatsSummary copyWith({
+    int? totalPokemon,
+    int? caughtPokemon,
+    int? totalCounts,
+    List<StatsDailyCount>? dailyTotals,
+    List<GameCatchStat>? caughtGames,
+    Map<String, List<PokemonCaughtEntry>>? caughtByGame,
+    List<PokemonCaughtEntry>? recentCaught,
+  }) {
+    return StatsSummary(
+      totalPokemon: totalPokemon ?? this.totalPokemon,
+      caughtPokemon: caughtPokemon ?? this.caughtPokemon,
+      totalCounts: totalCounts ?? this.totalCounts,
+      dailyTotals: dailyTotals ?? this.dailyTotals,
+      caughtGames: caughtGames ?? this.caughtGames,
+      caughtByGame: caughtByGame ?? this.caughtByGame,
+      recentCaught: recentCaught ?? this.recentCaught,
+    );
+  }
+}
