@@ -67,7 +67,7 @@ class PokemonGameStatsPage extends StatelessWidget {
                   alignment: Alignment.center,
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(
-                      maxWidth: AppSizes.statsTableMaxWidth,
+                      maxWidth: AppSizes.statsRecentCatchTableMaxWidth,
                     ),
                     child: Material(
                       type: MaterialType.transparency,

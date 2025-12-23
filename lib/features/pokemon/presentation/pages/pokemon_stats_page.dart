@@ -433,7 +433,7 @@ class _StatsGamesRow extends StatelessWidget {
         alignment: Alignment.center,
         child: ConstrainedBox(
           constraints: const BoxConstraints(
-            maxWidth: AppSizes.statsTableMaxWidth,
+            maxWidth: AppSizes.statsCaughtGameTableMaxWidth,
           ),
           child: Material(
             type: MaterialType.transparency,
@@ -591,39 +591,53 @@ class _StatsRecentRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-      child: Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          onTap: () => context.goToPokemon(item.pokemon),
-          borderRadius: BorderRadius.circular(AppRadii.sm),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                PokemonImage(
-                  path: item.pokemon.imagePath,
-                  isLocalFile: item.pokemon.isLocalFile,
-                  width: AppSizes.statsPokemonImage,
-                  height: AppSizes.statsPokemonImage,
+      child: Align(
+        alignment: Alignment.center,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: AppSizes.statsRecentCatchTableMaxWidth,
+          ),
+          child: Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              onTap: () => context.goToPokemon(item.pokemon),
+              borderRadius: BorderRadius.circular(AppRadii.sm),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                child: Row(
+                  children: [
+                    PokemonImage(
+                      path: item.pokemon.imagePath,
+                      isLocalFile: item.pokemon.isLocalFile,
+                      width: AppSizes.statsPokemonImage,
+                      height: AppSizes.statsPokemonImage,
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        item.pokemon.name,
+                        style: AppTypography.listTitle.copyWith(
+                          color: colors.onSurface,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: AppSizes.statsDateWidth,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          formatDate(item.caughtAt),
+                          style: AppTypography.listTitle.copyWith(
+                            color: colors.onSurface,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  item.pokemon.name,
-                  style: AppTypography.listTitle.copyWith(
-                    color: colors.onSurface,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.lg),
-                Text(
-                  formatDate(item.caughtAt),
-                  style: AppTypography.listTitle.copyWith(
-                    color: colors.onSurface,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
