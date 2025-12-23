@@ -12,7 +12,8 @@ class StatsCountsChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (counts.isEmpty) return const SizedBox.shrink();
-    final colors = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     final maxValue = counts
         .map((entry) => entry.count)
         .fold<int>(0, (max, value) => value > max ? value : max);
@@ -79,14 +80,14 @@ class StatsCountsChart extends StatelessWidget {
             LineChartBarData(
               spots: spots,
               isCurved: true,
-              color: AppButtonPalette.primaryHighlight(colors),
+              color: AppButtonPalette.primaryFill(colors),
               barWidth: AppSizes.statsChartStroke,
               dotData: const FlDotData(show: false),
               belowBarData: BarAreaData(
                 show: true,
-                color: AppButtonPalette.primaryHighlight(
-                  colors,
-                ).withValues(alpha: 0.12),
+                color: AppButtonPalette.primaryFill(colors).withValues(
+                  alpha: 0.16,
+                ),
               ),
             ),
           ],
@@ -94,10 +95,14 @@ class StatsCountsChart extends StatelessWidget {
             handleBuiltInTouches: true,
             touchTooltipData: LineTouchTooltipData(
               tooltipRoundedRadius: AppRadii.sm,
+              tooltipBorder: BorderSide(
+                color: colors.outlineVariant.withValues(alpha: 0.3),
+              ),
+              getTooltipColor: (_) => theme.cardColor,
               getTooltipItems: (touchedSpots) {
                 return [
                   for (final spot in touchedSpots)
-                    _buildTooltipItem(spot, counts),
+                    _buildTooltipItem(spot, counts, colors),
                 ];
               },
             ),
@@ -137,15 +142,16 @@ class StatsCountsChart extends StatelessWidget {
   LineTooltipItem _buildTooltipItem(
     LineBarSpot spot,
     List<StatsDailyCount> counts,
+    ColorScheme colors,
   ) {
     final index = spot.x.round();
     if (index < 0 || index >= counts.length) {
       return const LineTooltipItem('', TextStyle());
     }
     final entry = counts[index];
-    const dateStyle = TextStyle(color: Colors.white70);
-    const countStyle = TextStyle(
-      color: Colors.white,
+    final dateStyle = TextStyle(color: colors.onSurfaceVariant);
+    final countStyle = TextStyle(
+      color: colors.onSurface,
       fontWeight: FontWeight.w700,
     );
     return LineTooltipItem(
