@@ -48,6 +48,10 @@
   "@statsGamesShowLess": {
     "description": ""
   },
+  "statsRecentLabel": "Recent gevangen",
+  "@statsRecentLabel": {
+    "description": ""
+  },
   "manageTitle": "Beheer Pokémon",
   "@manageTitle": {
     "description": ""

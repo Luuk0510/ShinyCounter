@@ -48,6 +48,10 @@
   "@statsGamesShowLess": {
     "description": ""
   },
+  "statsRecentLabel": "Recent catches",
+  "@statsRecentLabel": {
+    "description": ""
+  },
   "manageTitle": "Manage Pokémon",
   "@manageTitle": {
     "description": ""

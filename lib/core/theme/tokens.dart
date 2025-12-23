@@ -60,6 +60,9 @@ class AppSizes {
   // pokemon_list_page
   static const dividerThickness = 1.0;
 
+  // pokemon_stats_page.dart
+  static const statsPokemonImage = 44.0;
+
   // count_info_card.dart date_row.dart
   static const dateLabelSize = 17.0;
   static const dateValueSize = 18.0;
