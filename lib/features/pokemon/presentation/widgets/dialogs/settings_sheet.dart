@@ -101,22 +101,38 @@ class _SettingsDialogState extends State<SettingsDialog> {
         ),
       ),
       actions: [
-        Center(
-          child: TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            style: AppButtonStyles.primaryOutline(
-              colors,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSizes.settingsActionPaddingH,
-                vertical: AppSizes.settingsActionPaddingV,
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: AppButtonStyles.primaryOutline(
+                  colors,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.settingsActionPaddingH,
+                    vertical: AppSizes.settingsActionPaddingV,
+                  ),
+                  useLighter: true,
+                ),
+                child: Text(
+                  l10n.cancel,
+                  style: AppTypography.button.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
-              useLighter: true,
             ),
-            child: Text(
-              l10n.cancel,
-              style: AppTypography.button.copyWith(fontWeight: FontWeight.w700),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              'v2.2.0',
+              style: AppTypography.button.copyWith(
+                fontSize: AppSizes.overlayLabelSize,
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
+          ],
         ),
       ],
     );
