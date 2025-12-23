@@ -429,44 +429,52 @@ class _StatsGamesRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-      child: Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          onTap: items.isEmpty
-              ? null
-              : () => context.goToStatsGame(
-                  PokemonGameStatsArgs(game: game.game, items: items),
-                ),
-          borderRadius: BorderRadius.circular(AppRadii.sm),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GameLogo(game: game.game, size: AppSizes.gameLogoSize),
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  game.game,
-                  style: AppTypography.listTitle.copyWith(
-                    color: colors.onSurface,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.lg),
-                SizedBox(
-                  width: AppSizes.statsGameCountWidth,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      '${game.count}',
-                      style: AppTypography.listTitle.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: FontWeight.w700,
+      child: Align(
+        alignment: Alignment.center,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: AppSizes.statsTableMaxWidth,
+          ),
+          child: Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              onTap: items.isEmpty
+                  ? null
+                  : () => context.goToStatsGame(
+                      PokemonGameStatsArgs(game: game.game, items: items),
+                    ),
+              borderRadius: BorderRadius.circular(AppRadii.sm),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                child: Row(
+                  children: [
+                    GameLogo(game: game.game, size: AppSizes.gameLogoSize),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        game.game,
+                        style: AppTypography.listTitle.copyWith(
+                          color: colors.onSurface,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                  ),
+                    SizedBox(
+                      width: AppSizes.statsGameCountWidth,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          '${game.count}',
+                          style: AppTypography.listTitle.copyWith(
+                            color: colors.onSurface,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

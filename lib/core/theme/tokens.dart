@@ -63,6 +63,8 @@ class AppSizes {
   // pokemon_stats_page.dart
   static const statsPokemonImage = 44.0;
   static const statsGameCountWidth = 64.0;
+  static const statsTableMaxWidth = 230.0;
+  static const statsDateWidth = 96.0;
 
   // count_info_card.dart date_row.dart
   static const dateLabelSize = 17.0;

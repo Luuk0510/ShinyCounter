@@ -63,43 +63,57 @@ class PokemonGameStatsPage extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xs),
               itemBuilder: (context, index) {
                 final entry = items[index];
-                return Material(
-                  type: MaterialType.transparency,
-                  child: InkWell(
-                    onTap: () => context.goToPokemon(entry.pokemon),
-                    borderRadius: BorderRadius.circular(AppRadii.sm),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.sm,
-                        horizontal: AppSpacing.sm,
-                      ),
-                      child: Row(
-                        children: [
-                          PokemonImage(
-                            path: entry.pokemon.imagePath,
-                            isLocalFile: entry.pokemon.isLocalFile,
-                            width: AppSizes.statsPokemonImage,
-                            height: AppSizes.statsPokemonImage,
+                return Align(
+                  alignment: Alignment.center,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: AppSizes.statsTableMaxWidth,
+                    ),
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: InkWell(
+                        onTap: () => context.goToPokemon(entry.pokemon),
+                        borderRadius: BorderRadius.circular(AppRadii.sm),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.sm,
+                            horizontal: AppSpacing.sm,
                           ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: Text(
-                              entry.pokemon.name,
-                              style: AppTypography.listTitle.copyWith(
-                                color: colors.onSurface,
-                                fontWeight: FontWeight.w700,
+                          child: Row(
+                            children: [
+                              PokemonImage(
+                                path: entry.pokemon.imagePath,
+                                isLocalFile: entry.pokemon.isLocalFile,
+                                width: AppSizes.statsPokemonImage,
+                                height: AppSizes.statsPokemonImage,
                               ),
-                            ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
+                                child: Text(
+                                  entry.pokemon.name,
+                                  style: AppTypography.listTitle.copyWith(
+                                    color: colors.onSurface,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              SizedBox(
+                                width: AppSizes.statsDateWidth,
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    formatDate(entry.caughtAt),
+                                    style: AppTypography.listTitle.copyWith(
+                                      color: colors.onSurface,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Text(
-                            formatDate(entry.caughtAt),
-                            style: AppTypography.listTitle.copyWith(
-                              color: colors.onSurface,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
