@@ -35,15 +35,20 @@ void main() {
     );
 
     final chartFinder = find.byType(LineChart);
-    final center = tester.getCenter(chartFinder);
-    await tester.tapAt(center);
+    final chartRect = tester.getRect(chartFinder);
+    final point = Offset(
+      chartRect.left + chartRect.width * 0.1,
+      chartRect.center.dy,
+    );
+
+    final gesture = await tester.startGesture(point);
+    await tester.pump();
+    await gesture.moveBy(const Offset(1, 0));
     await tester.pump();
 
-    expect(
-      find.byWidgetPredicate(
-        (widget) => widget.runtimeType.toString() == '_StatsChartTooltip',
-      ),
-      findsOneWidget,
-    );
+    expect(find.text('123'), findsOneWidget);
+
+    await gesture.up();
+    await tester.pump();
   });
 }
