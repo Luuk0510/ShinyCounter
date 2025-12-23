@@ -37,7 +37,7 @@ class PokemonGameStatsPage extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            GameLogo(game: args.game, size: AppSizes.gameLogoSize),
+            GameLogo(game: args.game, size: AppSizes.appBarTitleIcon),
             const SizedBox(width: AppSpacing.sm),
             Text(
               l10n.huntGame(args.game),
@@ -47,10 +47,28 @@ class PokemonGameStatsPage extends StatelessWidget {
         ),
         centerTitle: true,
         toolbarHeight: AppSizes.toolbarHeight,
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        iconTheme: const IconThemeData(size: AppSizes.appBarActionIcon),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             bottom: Radius.circular(AppRadii.lg),
           ),
+        ),
+        flexibleSpace: Builder(
+          builder: (context) {
+            final scopedCard = Theme.of(context).cardColor;
+            return Container(
+              decoration: BoxDecoration(
+                color: scopedCard,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(AppRadii.lg),
+                ),
+              ),
+            );
+          },
         ),
       ),
       body: items.isEmpty
