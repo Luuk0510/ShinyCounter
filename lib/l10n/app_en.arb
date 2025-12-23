@@ -150,8 +150,8 @@
   "@huntStart": {
     "description": ""
   },
-  "huntCatch": "Catch",
-  "@huntCatch": {
+  "huntCaught": "Caught",
+  "@huntCaught": {
     "description": ""
   },
   "huntGame": "Pokemon {game}",

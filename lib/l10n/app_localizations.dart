@@ -323,8 +323,8 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
-  /// **'Catch'**
-  String get huntCatch;
+  /// **'Caught'**
+  String get huntCaught;
 
   /// No description provided for @huntGame.
   ///

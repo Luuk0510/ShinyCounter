@@ -122,7 +122,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get huntStart => 'Start';
 
   @override
-  String get huntCatch => 'Gevangen';
+  String get huntCaught => 'Gevangen';
 
   @override
   String huntGame(Object game) {

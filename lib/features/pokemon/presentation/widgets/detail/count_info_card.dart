@@ -52,7 +52,7 @@ class CountInfoCard extends StatelessWidget {
         children: [
           _HuntDatesRow(
             startLabel: l10n.huntStart,
-            catchLabel: l10n.huntCatch,
+            catchLabel: l10n.huntCaught,
             startValue: formatter(startedAt),
             catchValue: formatter(caughtAt),
             labelStyle: labelStyle,
