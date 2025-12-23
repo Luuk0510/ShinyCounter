@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:shiny_counter/core/routing/app_router.dart';
 import 'package:shiny_counter/core/theme/app_assets.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/l10n/locale_notifier.dart';
@@ -13,6 +15,7 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokem
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_list_page.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/settings_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/list/manage_list_view.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/list/pokemon_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_empty_state.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
@@ -83,6 +86,52 @@ Widget _wrap(Widget child, {required PokemonRepository repo}) {
         ],
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(body: child),
+      ),
+    ),
+  );
+}
+
+Widget _wrapWithRouter({
+  required PokemonRepository repo,
+  required GoRouter router,
+}) {
+  final assetBundle = TestAssetBundle([
+    AppAssets.appIcon,
+    AppAssets.pokeballIcon,
+  ]);
+  final store = MemoryKeyValueStore();
+  return DefaultAssetBundle(
+    bundle: assetBundle,
+    child: MultiProvider(
+      providers: [
+        Provider<PokemonRepository>.value(value: repo),
+        Provider<LoadCustomPokemonUseCase>(
+          create: (_) => LoadCustomPokemonUseCase(repo),
+        ),
+        Provider<SaveCustomPokemonUseCase>(
+          create: (_) => SaveCustomPokemonUseCase(repo),
+        ),
+        Provider<LoadCaughtUseCase>(create: (_) => LoadCaughtUseCase(repo)),
+        Provider<SpriteService>(
+          create: (_) => FakeSpriteService(const <ParsedSprite>[]),
+        ),
+        ChangeNotifierProvider<ThemeNotifier>(
+          create: (_) => ThemeNotifier(store),
+        ),
+        ChangeNotifierProvider<LocaleNotifier>(
+          create: (_) => LocaleNotifier(store),
+        ),
+      ],
+      child: MaterialApp.router(
+        routerConfig: router,
+        locale: const Locale('en'),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
       ),
     ),
   );
@@ -226,5 +275,60 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(SettingsDialog), findsOneWidget);
+  });
+
+  testWidgets('stats icon navigates to stats page', (tester) async {
+    final repo = _FakeRepo(custom: const [], caught: const {});
+    final router = GoRouter(
+      initialLocation: AppRoutes.home,
+      routes: [
+        GoRoute(
+          path: AppRoutes.home,
+          builder: (context, state) => const PokemonListPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.stats,
+          builder: (context, state) => const Scaffold(body: Text('Stats Page')),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(_wrapWithRouter(repo: repo, router: router));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    await tester.tap(find.byKey(PokemonListPage.statsKey));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Stats Page'), findsOneWidget);
+  });
+
+  testWidgets('long press shows edit/delete actions on custom card', (
+    tester,
+  ) async {
+    const pokemon = Pokemon(
+      id: 'custom_0001',
+      name: 'Bulbasaur',
+      imagePath: AppAssets.pokeballIcon,
+    );
+    final repo = _FakeRepo(custom: const [pokemon], caught: const {});
+
+    await tester.pumpWidget(_wrap(const PokemonListPage(), repo: repo));
+    await tester.pump(const Duration(milliseconds: 300));
+    for (var i = 0; i < 40 && find.text('Bulbasaur').evaluate().isEmpty; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+
+    final card = find.byType(PokemonCard);
+    await tester.longPress(card);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(of: card, matching: find.byIcon(Icons.edit)),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: card, matching: find.byIcon(Icons.delete_outline)),
+      findsOneWidget,
+    );
   });
 }
