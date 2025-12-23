@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/responsive_text_row.dart';
 
 class StatsRow extends StatelessWidget {
   const StatsRow({
@@ -36,87 +37,17 @@ class StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = Padding(
+    Widget content = ResponsiveTextRow(
+      leading: leading,
+      title: title,
+      trailing: trailing,
+      trailingWidth: trailingWidth,
+      maxWidth: maxWidth,
+      stackOnNarrow: stackOnNarrow,
+      stackThreshold: 0.7,
       padding: padding,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final isCompact =
-              stackOnNarrow && constraints.maxWidth < maxWidth * 0.7;
-          if (isCompact) {
-            return Row(
-              children: [
-                leading,
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: titleStyle,
-                            maxLines: 1,
-                            softWrap: false,
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            trailing,
-                            style: trailingStyle,
-                            maxLines: 1,
-                            softWrap: false,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          }
-
-          return Row(
-            children: [
-              leading,
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      title,
-                      style: titleStyle,
-                      maxLines: 1,
-                      softWrap: false,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: trailingWidth,
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      trailing,
-                      style: trailingStyle,
-                      maxLines: 1,
-                      softWrap: false,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
+      titleStyle: titleStyle,
+      trailingStyle: trailingStyle,
     );
 
     if (onTap != null) {
