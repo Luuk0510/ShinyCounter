@@ -3,12 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
-import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
+import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_game_stats_page.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 
@@ -46,17 +46,21 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     );
     final totalCounts = states.fold<int>(0, (sum, state) => sum + state.count);
     final caughtByGame = <String, int>{};
-    final recentCaught = <PokemonCaughtStat>[];
+    final caughtEntriesByGame = <String, List<PokemonCaughtEntry>>{};
+    final recentCaught = <PokemonCaughtEntry>[];
     for (var i = 0; i < states.length; i++) {
       final state = states[i];
       if (!state.isCaught) continue;
       final game = state.caughtGame;
       if (game != null && game.isNotEmpty) {
         caughtByGame.update(game, (value) => value + 1, ifAbsent: () => 1);
+        caughtEntriesByGame
+            .putIfAbsent(game, () => [])
+            .add(PokemonCaughtEntry(pokemon[i], state.caughtAt));
       }
       final caughtAt = state.caughtAt;
       if (caughtAt == null) continue;
-      recentCaught.add(PokemonCaughtStat(pokemon[i], caughtAt));
+      recentCaught.add(PokemonCaughtEntry(pokemon[i], caughtAt));
     }
     final caughtGames =
         caughtByGame.entries
@@ -66,7 +70,14 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
             final byCount = b.count.compareTo(a.count);
             return byCount != 0 ? byCount : a.game.compareTo(b.game);
           });
-    recentCaught.sort((a, b) => b.caughtAt.compareTo(a.caughtAt));
+    for (final entries in caughtEntriesByGame.values) {
+      entries.sort((a, b) {
+        final left = a.caughtAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final right = b.caughtAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return right.compareTo(left);
+      });
+    }
+    recentCaught.sort((a, b) => b.caughtAt!.compareTo(a.caughtAt!));
     if (!mounted) return;
     setState(() {
       _summary = StatsSummary(
@@ -74,6 +85,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
         caughtPokemon: caught.length,
         totalCounts: totalCounts,
         caughtGames: caughtGames,
+        caughtByGame: caughtEntriesByGame,
         recentCaught: recentCaught,
       );
       _loading = false;
@@ -108,6 +120,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                     : _StatsGamesCard(
                         label: l10n.statsGamesLabel,
                         games: _summary.caughtGames,
+                        caughtByGame: _summary.caughtByGame,
                       );
                 final recentCard = _summary.recentCaught.isEmpty
                     ? null
@@ -160,6 +173,7 @@ class StatsSummary {
     required this.caughtPokemon,
     required this.totalCounts,
     required this.caughtGames,
+    required this.caughtByGame,
     required this.recentCaught,
   });
 
@@ -168,13 +182,15 @@ class StatsSummary {
       caughtPokemon = 0,
       totalCounts = 0,
       caughtGames = const <GameCatchStat>[],
-      recentCaught = const <PokemonCaughtStat>[];
+      caughtByGame = const <String, List<PokemonCaughtEntry>>{},
+      recentCaught = const <PokemonCaughtEntry>[];
 
   final int totalPokemon;
   final int caughtPokemon;
   final int totalCounts;
   final List<GameCatchStat> caughtGames;
-  final List<PokemonCaughtStat> recentCaught;
+  final Map<String, List<PokemonCaughtEntry>> caughtByGame;
+  final List<PokemonCaughtEntry> recentCaught;
 }
 
 class _StatsAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -277,18 +293,16 @@ class GameCatchStat {
   final int count;
 }
 
-class PokemonCaughtStat {
-  const PokemonCaughtStat(this.pokemon, this.caughtAt);
-
-  final Pokemon pokemon;
-  final DateTime caughtAt;
-}
-
 class _StatsGamesCard extends StatefulWidget {
-  const _StatsGamesCard({required this.label, required this.games});
+  const _StatsGamesCard({
+    required this.label,
+    required this.games,
+    required this.caughtByGame,
+  });
 
   final String label;
   final List<GameCatchStat> games;
+  final Map<String, List<PokemonCaughtEntry>> caughtByGame;
 
   @override
   State<_StatsGamesCard> createState() => _StatsGamesCardState();
@@ -327,11 +341,18 @@ class _StatsGamesCardState extends State<_StatsGamesCard> {
           const SizedBox(height: AppSpacing.sm),
           Align(
             alignment: Alignment.center,
-            child: AnimatedSize(
-              duration: AppAnim.normal,
-              curve: AppAnim.easeOutCubic,
-              alignment: Alignment.topCenter,
-              child: _StatsGamesTable(games: visibleGames, colors: colors),
+            child: Material(
+              type: MaterialType.transparency,
+              child: AnimatedSize(
+                duration: AppAnim.normal,
+                curve: AppAnim.easeOutCubic,
+                alignment: Alignment.topCenter,
+                child: _StatsGamesTable(
+                  games: visibleGames,
+                  colors: colors,
+                  caughtByGame: widget.caughtByGame,
+                ),
+              ),
             ),
           ),
           if (hasOverflow) ...[
@@ -367,10 +388,15 @@ class _StatsGamesCardState extends State<_StatsGamesCard> {
 }
 
 class _StatsGamesTable extends StatelessWidget {
-  const _StatsGamesTable({required this.games, required this.colors});
+  const _StatsGamesTable({
+    required this.games,
+    required this.colors,
+    required this.caughtByGame,
+  });
 
   final List<GameCatchStat> games;
   final ColorScheme colors;
+  final Map<String, List<PokemonCaughtEntry>> caughtByGame;
 
   @override
   Widget build(BuildContext context) {
@@ -384,32 +410,48 @@ class _StatsGamesTable extends StatelessWidget {
         for (final game in games)
           TableRow(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GameLogo(game: game.game, size: AppSizes.gameLogoSize),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      game.game,
+              TableRowInkWell(
+                onTap: () {
+                  final items = caughtByGame[game.game] ?? const [];
+                  context.goToStatsGame(
+                    PokemonGameStatsArgs(game: game.game, items: items),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GameLogo(game: game.game, size: AppSizes.gameLogoSize),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        game.game,
+                        style: AppTypography.listTitle.copyWith(
+                          color: colors.onSurface,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              TableRowInkWell(
+                onTap: () {
+                  final items = caughtByGame[game.game] ?? const [];
+                  context.goToStatsGame(
+                    PokemonGameStatsArgs(game: game.game, items: items),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: AppSpacing.lg),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '${game.count}',
                       style: AppTypography.listTitle.copyWith(
                         color: colors.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: AppSpacing.lg),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    '${game.count}',
-                    style: AppTypography.listTitle.copyWith(
-                      color: colors.onSurface,
-                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -425,7 +467,7 @@ class _StatsRecentCard extends StatefulWidget {
   const _StatsRecentCard({required this.label, required this.items});
 
   final String label;
-  final List<PokemonCaughtStat> items;
+  final List<PokemonCaughtEntry> items;
 
   @override
   State<_StatsRecentCard> createState() => _StatsRecentCardState();
@@ -506,7 +548,7 @@ class _StatsRecentCardState extends State<_StatsRecentCard> {
 class _StatsRecentTable extends StatelessWidget {
   const _StatsRecentTable({required this.items, required this.colors});
 
-  final List<PokemonCaughtStat> items;
+  final List<PokemonCaughtEntry> items;
   final ColorScheme colors;
 
   @override
@@ -522,7 +564,7 @@ class _StatsRecentTable extends StatelessWidget {
 class _StatsRecentRow extends StatelessWidget {
   const _StatsRecentRow({required this.item, required this.colors});
 
-  final PokemonCaughtStat item;
+  final PokemonCaughtEntry item;
   final ColorScheme colors;
 
   @override
