@@ -67,6 +67,8 @@ class AppSizes {
   static const statsRecentCatchTableMaxWidth = 300.0;
   static const statsDateWidth = 115.0;
   static const statsRowTextSize = 20.0;
+  static const statsChartHeight = 180.0;
+  static const statsChartStroke = 2.0;
 
   // pokemon_game_stats_page.dart
   static const statsGameRowImage = 110.0;

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
@@ -10,6 +11,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_app_bar.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_card.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_counts_chart.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_expandable_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_row.dart';
 import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
@@ -24,6 +26,8 @@ class PokemonStatsPage extends StatefulWidget {
 }
 
 class _PokemonStatsPageState extends State<PokemonStatsPage> {
+  static const int _chartDays = 30;
+
   late final LoadCustomPokemonUseCase _loadCustomPokemon;
   late final LoadCaughtUseCase _loadCaught;
   late final CounterSync _sync;
@@ -52,6 +56,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     final caughtByGame = <String, int>{};
     final caughtEntriesByGame = <String, List<PokemonCaughtEntry>>{};
     final recentCaught = <PokemonCaughtEntry>[];
+    final dailyTotals = _buildDailyTotals(states);
     for (var i = 0; i < states.length; i++) {
       final state = states[i];
       if (!state.isCaught) continue;
@@ -88,12 +93,39 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
         totalPokemon: pokemon.length,
         caughtPokemon: caught.length,
         totalCounts: totalCounts,
+        dailyTotals: dailyTotals,
         caughtGames: caughtGames,
         caughtByGame: caughtEntriesByGame,
         recentCaught: recentCaught,
       );
       _loading = false;
     });
+  }
+
+  List<StatsDailyCount> _buildDailyTotals(List<CounterState> states) {
+    final now = DateTime.now();
+    final end = DateTime(now.year, now.month, now.day);
+    final start = end.subtract(const Duration(days: _chartDays - 1));
+    final totals = <DateTime, int>{};
+    for (var i = 0; i < _chartDays; i++) {
+      final day = start.add(Duration(days: i));
+      totals[day] = 0;
+    }
+    for (final state in states) {
+      if (state.dailyCounts.isEmpty) continue;
+      for (final entry in state.dailyCounts.entries) {
+        final parsed = DateTime.tryParse(entry.key);
+        if (parsed == null) continue;
+        final day = DateTime(parsed.year, parsed.month, parsed.day);
+        if (day.isBefore(start) || day.isAfter(end)) continue;
+        totals.update(day, (value) => value + entry.value, ifAbsent: () => 0);
+      }
+    }
+    final days = totals.keys.toList()..sort();
+    return [
+      for (final day in days)
+        StatsDailyCount(date: day, count: totals[day] ?? 0),
+    ];
   }
 
   @override
@@ -125,6 +157,12 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                   value: '${_summary.totalCounts}',
                   colors: colors,
                 );
+                final history = _summary.dailyTotals.isEmpty
+                    ? null
+                    : _StatsCountsChartCard(
+                        label: l10n.huntHistoryTitle,
+                        counts: _summary.dailyTotals,
+                      );
 
                 final gamesCard = _summary.caughtGames.isEmpty
                     ? null
@@ -171,6 +209,10 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                       const SizedBox(height: AppSpacing.lg),
                       recentCard,
                     ],
+                    if (history != null) ...[
+                      const SizedBox(height: AppSpacing.lg),
+                      history,
+                    ],
                   ],
                 );
               },
@@ -184,6 +226,7 @@ class StatsSummary {
     required this.totalPokemon,
     required this.caughtPokemon,
     required this.totalCounts,
+    required this.dailyTotals,
     required this.caughtGames,
     required this.caughtByGame,
     required this.recentCaught,
@@ -193,6 +236,7 @@ class StatsSummary {
     : totalPokemon = 0,
       caughtPokemon = 0,
       totalCounts = 0,
+      dailyTotals = const <StatsDailyCount>[],
       caughtGames = const <GameCatchStat>[],
       caughtByGame = const <String, List<PokemonCaughtEntry>>{},
       recentCaught = const <PokemonCaughtEntry>[];
@@ -200,6 +244,7 @@ class StatsSummary {
   final int totalPokemon;
   final int caughtPokemon;
   final int totalCounts;
+  final List<StatsDailyCount> dailyTotals;
   final List<GameCatchStat> caughtGames;
   final Map<String, List<PokemonCaughtEntry>> caughtByGame;
   final List<PokemonCaughtEntry> recentCaught;
@@ -228,6 +273,21 @@ class _StatsMetricCard extends StatelessWidget {
           color: colors.onSurface,
         ),
       ),
+    );
+  }
+}
+
+class _StatsCountsChartCard extends StatelessWidget {
+  const _StatsCountsChartCard({required this.label, required this.counts});
+
+  final String label;
+  final List<StatsDailyCount> counts;
+
+  @override
+  Widget build(BuildContext context) {
+    return StatsCard(
+      title: label,
+      child: StatsCountsChart(counts: counts),
     );
   }
 }

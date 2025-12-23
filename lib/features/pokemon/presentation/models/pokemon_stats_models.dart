@@ -13,3 +13,10 @@ class PokemonGameStatsArgs {
   final String game;
   final List<PokemonCaughtEntry> items;
 }
+
+class StatsDailyCount {
+  const StatsDailyCount({required this.date, required this.count});
+
+  final DateTime date;
+  final int count;
+}
