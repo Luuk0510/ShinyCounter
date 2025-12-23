@@ -12,7 +12,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_expandable_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_row.dart';
-import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_game_stats_page.dart';
+import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 

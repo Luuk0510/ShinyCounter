@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/pokemon/domain/entities/pokemon.dart';
-import '../../features/pokemon/presentation/pages/pokemon_game_stats_page.dart';
+import '../../features/pokemon/presentation/models/pokemon_stats_models.dart';
 import 'app_router.dart';
 
 extension PokemonRoutes on BuildContext {

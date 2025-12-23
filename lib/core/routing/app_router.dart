@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_detail_page.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_game_stats_page.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_list_page.dart';
