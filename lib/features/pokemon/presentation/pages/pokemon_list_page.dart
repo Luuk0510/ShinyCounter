@@ -387,29 +387,18 @@ class _PokemonListPageState extends State<PokemonListPage>
         },
       ),
       foregroundColor: colors.onSurface,
-      title: LayoutBuilder(
-        builder: (context, constraints) {
-          return ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: constraints.maxWidth),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedAppIcon(
-                    assetPath: AppAssets.appIcon,
-                    size: AppSizes.appBarTitleIcon,
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Text(context.l10n.appTitle, style: AppTypography.title),
-                ],
+        title: LayoutBuilder(
+          builder: (context, constraints) {
+            return ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.center,
+                child: _ListAppBarTitle(title: context.l10n.appTitle),
               ),
-            ),
-          );
-        },
-      ),
+            );
+          },
+        ),
       actions: [
         IconButton(
           key: PokemonListPage.addPokemonKey,
@@ -527,6 +516,28 @@ class _PokemonListPageState extends State<PokemonListPage>
           children: sections,
         ),
       ),
+    );
+  }
+}
+
+class _ListAppBarTitle extends StatelessWidget {
+  const _ListAppBarTitle({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        AnimatedAppIcon(
+          assetPath: AppAssets.appIcon,
+          size: AppSizes.appBarTitleIcon,
+        ),
+        const SizedBox(width: AppSpacing.xs),
+        Text(title, style: AppTypography.title),
+      ],
     );
   }
 }

@@ -189,52 +189,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        elevation: 0,
-        centerTitle: true,
-        toolbarHeight: AppSizes.toolbarHeight,
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        iconTheme: const IconThemeData(size: AppSizes.appBarActionIcon),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(AppRadii.lg),
-          ),
-        ),
-        flexibleSpace: Builder(
-          builder: (context) {
-            final scopedCard = Theme.of(context).cardColor;
-            return Container(
-              decoration: BoxDecoration(
-                color: scopedCard,
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(AppRadii.lg),
-                ),
-              ),
-            );
-          },
-        ),
-        title: Text(
-          widget.pokemon.name,
-          style: Theme.of(context).textTheme.titleLarge?.merge(
-            AppTypography.title.copyWith(fontWeight: FontWeight.w700),
-          ),
-        ),
-        actions: [
-          IconButton(
-            iconSize: AppSizes.appBarActionIcon,
-            icon: const Icon(Icons.edit),
-            tooltip: context.l10n.editCounterTooltip,
-            onPressed: _showEditDialog,
-          ),
-          IconButton(
-            iconSize: AppSizes.appBarActionIcon,
-            icon: const Icon(Icons.open_in_new_rounded),
-            tooltip: context.l10n.openOverlayTooltip,
-            onPressed: _togglePill,
-          ),
-        ],
+      appBar: _DetailAppBar(
+        pokemonName: widget.pokemon.name,
+        onEdit: _showEditDialog,
+        onTogglePill: _togglePill,
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -265,60 +223,15 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                     _buildImageSection(colors),
                     const SizedBox(height: AppSpacing.sm),
                     _buildCatchButton(colors),
-                    Padding(
-                      padding: const EdgeInsets.only(top: AppSpacing.xl),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CounterControls(
-                            count: _controller.counter,
-                            enabled: !_controller.isCaught,
-                            onDecrement: _decrement,
-                            onIncrement: _increment,
-                            onEdit: _showEditDialog,
-                          ),
-                          const SizedBox(height: AppSpacing.xl),
-                          Align(
-                            alignment: Alignment.center,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IntrinsicWidth(
-                                  child: GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onTap: _showEditDialog,
-                                    child: CountInfoCard(
-                                      colors: colors,
-                                      startedAt: _controller.startedAt,
-                                      caughtAt: _controller.caughtAt,
-                                      caughtGame: _controller.caughtGame,
-                                      formatter: formatDate,
-                                      onSelectGame: _showEditDialog,
-                                      onGameChanged: (value) =>
-                                          _controller.setCaughtGame(value),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: AppSpacing.lg),
-                                GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: _showDailyCountsEditor,
-                                  child: ConstrainedBox(
-                                    constraints: const BoxConstraints(
-                                      maxWidth: 200,
-                                    ),
-                                    child: DailyCountsList(
-                                      colors: colors,
-                                      dailyCounts: _controller.dailyCounts,
-                                      dayFormatter: formatDayKey,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                    _DetailInfoSection(
+                      colors: colors,
+                      controller: _controller,
+                      onEdit: _showEditDialog,
+                      onDailyCounts: _showDailyCountsEditor,
+                      onGameChanged: (value) =>
+                          _controller.setCaughtGame(value),
+                      onIncrement: _increment,
+                      onDecrement: _decrement,
                     ),
                   ],
                 ),
@@ -500,5 +413,149 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       return shinyPath.replaceFirst('_r.', '_n.');
     }
     return null;
+  }
+}
+
+class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _DetailAppBar({
+    required this.pokemonName,
+    required this.onEdit,
+    required this.onTogglePill,
+  });
+
+  final String pokemonName;
+  final VoidCallback onEdit;
+  final VoidCallback onTogglePill;
+
+  @override
+  Size get preferredSize => const Size.fromHeight(AppSizes.toolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      scrolledUnderElevation: 0,
+      elevation: 0,
+      centerTitle: true,
+      toolbarHeight: AppSizes.toolbarHeight,
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      iconTheme: const IconThemeData(size: AppSizes.appBarActionIcon),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(AppRadii.lg),
+        ),
+      ),
+      flexibleSpace: Builder(
+        builder: (context) {
+          final scopedCard = Theme.of(context).cardColor;
+          return Container(
+            decoration: BoxDecoration(
+              color: scopedCard,
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(AppRadii.lg),
+              ),
+            ),
+          );
+        },
+      ),
+      title: Text(
+        pokemonName,
+        style: Theme.of(context).textTheme.titleLarge?.merge(
+          AppTypography.title.copyWith(fontWeight: FontWeight.w700),
+        ),
+      ),
+      actions: [
+        IconButton(
+          iconSize: AppSizes.appBarActionIcon,
+          icon: const Icon(Icons.edit),
+          tooltip: context.l10n.editCounterTooltip,
+          onPressed: onEdit,
+        ),
+        IconButton(
+          iconSize: AppSizes.appBarActionIcon,
+          icon: const Icon(Icons.open_in_new_rounded),
+          tooltip: context.l10n.openOverlayTooltip,
+          onPressed: onTogglePill,
+        ),
+      ],
+    );
+  }
+}
+
+class _DetailInfoSection extends StatelessWidget {
+  const _DetailInfoSection({
+    required this.colors,
+    required this.controller,
+    required this.onEdit,
+    required this.onDailyCounts,
+    required this.onGameChanged,
+    required this.onIncrement,
+    required this.onDecrement,
+  });
+
+  final ColorScheme colors;
+  final CounterController controller;
+  final VoidCallback onEdit;
+  final VoidCallback onDailyCounts;
+  final ValueChanged<String?> onGameChanged;
+  final VoidCallback onIncrement;
+  final VoidCallback onDecrement;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.xl),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CounterControls(
+            count: controller.counter,
+            enabled: !controller.isCaught,
+            onDecrement: onDecrement,
+            onIncrement: onIncrement,
+            onEdit: onEdit,
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          Align(
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IntrinsicWidth(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onEdit,
+                    child: CountInfoCard(
+                      colors: colors,
+                      startedAt: controller.startedAt,
+                      caughtAt: controller.caughtAt,
+                      caughtGame: controller.caughtGame,
+                      formatter: formatDate,
+                      onSelectGame: onEdit,
+                      onGameChanged: onGameChanged,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: onDailyCounts,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: 200,
+                    ),
+                    child: DailyCountsList(
+                      colors: colors,
+                      dailyCounts: controller.dailyCounts,
+                      dayFormatter: formatDayKey,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
