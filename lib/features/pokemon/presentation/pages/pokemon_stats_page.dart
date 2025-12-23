@@ -400,50 +400,61 @@ class _StatsGamesTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Table(
-      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-      columnWidths: const {
-        0: IntrinsicColumnWidth(),
-        1: IntrinsicColumnWidth(),
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         for (final game in games)
-          TableRow(
-            children: [
-              TableRowInkWell(
-                onTap: () {
-                  final items = caughtByGame[game.game] ?? const [];
-                  context.goToStatsGame(
-                    PokemonGameStatsArgs(game: game.game, items: items),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GameLogo(game: game.game, size: AppSizes.gameLogoSize),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text(
-                        game.game,
-                        style: AppTypography.listTitle.copyWith(
-                          color: colors.onSurface,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
+          _StatsGamesRow(
+            game: game,
+            colors: colors,
+            items: caughtByGame[game.game] ?? const [],
+          ),
+      ],
+    );
+  }
+}
+
+class _StatsGamesRow extends StatelessWidget {
+  const _StatsGamesRow({
+    required this.game,
+    required this.colors,
+    required this.items,
+  });
+
+  final GameCatchStat game;
+  final ColorScheme colors;
+  final List<PokemonCaughtEntry> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: items.isEmpty
+              ? null
+              : () => context.goToStatsGame(
+                  PokemonGameStatsArgs(game: game.game, items: items),
+                ),
+          borderRadius: BorderRadius.circular(AppRadii.sm),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GameLogo(game: game.game, size: AppSizes.gameLogoSize),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  game.game,
+                  style: AppTypography.listTitle.copyWith(
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              ),
-              TableRowInkWell(
-                onTap: () {
-                  final items = caughtByGame[game.game] ?? const [];
-                  context.goToStatsGame(
-                    PokemonGameStatsArgs(game: game.game, items: items),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(left: AppSpacing.lg),
+                const SizedBox(width: AppSpacing.lg),
+                SizedBox(
+                  width: AppSizes.statsGameCountWidth,
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: Text(
@@ -455,10 +466,11 @@ class _StatsGamesTable extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-      ],
+        ),
+      ),
     );
   }
 }

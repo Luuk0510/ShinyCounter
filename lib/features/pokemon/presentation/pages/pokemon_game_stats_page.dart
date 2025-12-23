@@ -59,7 +59,7 @@ class PokemonGameStatsPage extends StatelessWidget {
                 AppSpacing.xl,
               ),
               itemCount: items.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, index) =>
                   const SizedBox(height: AppSpacing.xs),
               itemBuilder: (context, index) {
                 final entry = items[index];
