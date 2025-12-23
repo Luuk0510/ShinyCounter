@@ -29,6 +29,7 @@ class PokemonListPage extends StatefulWidget {
   static const Key addPokemonKey = Key('list.addPokemon');
   static const Key managePokemonKey = Key('list.managePokemon');
   static const Key settingsKey = Key('list.settings');
+  static const Key statsKey = Key('list.stats');
 
   @override
   State<PokemonListPage> createState() => _PokemonListPageState();
@@ -400,6 +401,13 @@ class _PokemonListPageState extends State<PokemonListPage>
           },
         ),
       actions: [
+        IconButton(
+          key: PokemonListPage.statsKey,
+          iconSize: AppSizes.appBarActionIcon,
+          icon: const Icon(Icons.bar_chart_rounded),
+          tooltip: context.l10n.statsTitle,
+          onPressed: () => context.goToStats(),
+        ),
         IconButton(
           key: PokemonListPage.addPokemonKey,
           iconSize: AppSizes.appBarActionIcon,

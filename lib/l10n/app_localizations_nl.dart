@@ -27,6 +27,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tooltipSettings => 'Instellingen';
 
   @override
+  String get statsTitle => 'Statistieken';
+
+  @override
+  String get statsCaughtLabel => 'Gevangen Pokémon';
+
+  @override
+  String get statsTotalCountsLabel => 'Totaal aantal';
+
+  @override
   String get manageTitle => 'Beheer Pokémon';
 
   @override

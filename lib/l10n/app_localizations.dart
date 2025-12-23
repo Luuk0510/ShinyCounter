@@ -137,6 +137,24 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statsTitle;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Caught Pokémon'**
+  String get statsCaughtLabel;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Total counts'**
+  String get statsTotalCountsLabel;
+
+  ///
+  ///
+  /// In en, this message translates to:
   /// **'Manage Pokémon'**
   String get manageTitle;
 

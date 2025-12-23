@@ -3,10 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_detail_page.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_list_page.dart';
+import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_stats_page.dart';
 
 class AppRoutes {
   static const home = '/';
   static const pokemonDetail = '/pokemon';
+  static const stats = '/stats';
 }
 
 class AppRouter {
@@ -29,6 +31,10 @@ class AppRouter {
               }
               return PokemonDetailPage(pokemon: extra);
             },
+          ),
+          GoRoute(
+            path: AppRoutes.stats,
+            builder: (context, state) => const PokemonStatsPage(),
           ),
         ],
       );

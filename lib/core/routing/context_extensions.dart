@@ -12,4 +12,8 @@ extension PokemonRoutes on BuildContext {
   void replaceWithPokemon(Pokemon pokemon) {
     pushReplacement(AppRoutes.pokemonDetail, extra: pokemon);
   }
+
+  Future<T?> goToStats<T>() {
+    return push<T>(AppRoutes.stats);
+  }
 }

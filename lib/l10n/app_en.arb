@@ -24,6 +24,18 @@
   "@tooltipSettings": {
     "description": ""
   },
+  "statsTitle": "Statistics",
+  "@statsTitle": {
+    "description": ""
+  },
+  "statsCaughtLabel": "Caught Pokémon",
+  "@statsCaughtLabel": {
+    "description": ""
+  },
+  "statsTotalCountsLabel": "Total counts",
+  "@statsTotalCountsLabel": {
+    "description": ""
+  },
   "manageTitle": "Manage Pokémon",
   "@manageTitle": {
     "description": ""
