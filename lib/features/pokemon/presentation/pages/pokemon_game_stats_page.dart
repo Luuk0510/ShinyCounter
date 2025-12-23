@@ -70,8 +70,8 @@ class PokemonGameStatsPage extends StatelessWidget {
                         leading: PokemonImage(
                           path: entry.pokemon.imagePath,
                           isLocalFile: entry.pokemon.isLocalFile,
-                          width: AppSizes.statsPokemonImage * 2.5,
-                          height: AppSizes.statsPokemonImage * 2.5,
+                          width: AppSizes.statsGameRowImage,
+                          height: AppSizes.statsGameRowImage,
                         ),
                         title: entry.pokemon.name,
                         trailing: formatDate(entry.caughtAt),

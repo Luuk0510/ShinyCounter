@@ -69,6 +69,7 @@ class AppSizes {
   static const statsRowTextSize = 20.0;
 
   // pokemon_game_stats_page.dart
+  static const statsGameRowImage = 110.0;
   static const statsGameTableMaxWidth = 450.0;
   static const statsGameRowTextSize = 25.0;
   static const statsGameDateWidth = 200.0;
@@ -105,6 +106,8 @@ class AppSizes {
   static const cardActionBlur = 5.0;
   static const cardActionIcon = 28.0;
   static const cardActionIconScale = 1.3;
+  static const cardActionButtonWidthScale = 3.0;
+  static const cardActionButtonHeightScale = 2.5;
 
   // pokemon_empty_state.dart
   static const emptyStateImage = 96.0;

@@ -291,8 +291,8 @@ class _ActionIcon extends StatelessWidget {
         icon: Icon(icon, color: iconColor, size: iconSize),
         onPressed: onPressed,
         constraints: BoxConstraints.tightFor(
-          width: size * 3,
-          height: size * 2.5,
+          width: size * AppSizes.cardActionButtonWidthScale,
+          height: size * AppSizes.cardActionButtonHeightScale,
         ),
         padding: EdgeInsets.zero,
       ),
