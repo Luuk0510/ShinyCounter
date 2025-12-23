@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
+import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
@@ -520,8 +521,8 @@ class _StatsRecentTable extends StatelessWidget {
         for (final item in items)
           TableRow(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+              _StatsRecentCell(
+                onTap: () => context.goToPokemon(item.pokemon),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -542,22 +543,54 @@ class _StatsRecentTable extends StatelessWidget {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: AppSpacing.lg),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    formatDate(item.caughtAt),
-                    style: AppTypography.listTitle.copyWith(
-                      color: colors.onSurface,
-                      fontWeight: FontWeight.w700,
-                    ),
+              _StatsRecentCell(
+                onTap: () => context.goToPokemon(item.pokemon),
+                leftPad: AppSpacing.lg,
+                alignRight: true,
+                child: Text(
+                  formatDate(item.caughtAt),
+                  style: AppTypography.listTitle.copyWith(
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
             ],
           ),
       ],
+    );
+  }
+}
+
+class _StatsRecentCell extends StatelessWidget {
+  const _StatsRecentCell({
+    required this.onTap,
+    required this.child,
+    this.leftPad = 0,
+    this.alignRight = false,
+  });
+
+  final VoidCallback onTap;
+  final Widget child;
+  final double leftPad;
+  final bool alignRight;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: leftPad,
+        top: AppSpacing.xs,
+        bottom: AppSpacing.xs,
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadii.sm),
+        child: Align(
+          alignment: alignRight ? Alignment.centerRight : Alignment.centerLeft,
+          child: child,
+        ),
+      ),
     );
   }
 }
