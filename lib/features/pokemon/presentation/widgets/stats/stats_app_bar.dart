@@ -37,7 +37,18 @@ class StatsAppBar extends StatelessWidget implements PreferredSizeWidget {
           );
         },
       ),
-      title: title,
+      title: LayoutBuilder(
+        builder: (context, constraints) {
+          return ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.center,
+              child: title,
+            ),
+          );
+        },
+      ),
     );
   }
 }

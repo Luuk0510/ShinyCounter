@@ -55,38 +55,47 @@ class PokemonGameStatsPage extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xs),
               itemBuilder: (context, index) {
                 final entry = items[index];
-                return Material(
-                  color: Theme.of(context).cardColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadii.md),
-                  ),
-                  child: StatsRow(
-                    leading: PokemonImage(
-                      path: entry.pokemon.imagePath,
-                      isLocalFile: entry.pokemon.isLocalFile,
-                      width: AppSizes.statsPokemonImage * 2.5,
-                      height: AppSizes.statsPokemonImage * 2.5,
+                return Align(
+                  alignment: Alignment.center,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: AppSizes.statsGameTableMaxWidth,
                     ),
-                    title: entry.pokemon.name,
-                    trailing: formatDate(entry.caughtAt),
-                    trailingWidth: AppSizes.statsGameDateWidth,
-                    maxWidth: AppSizes.statsGameTableMaxWidth,
-                    onTap: () => context.goToPokemon(entry.pokemon),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.sm,
-                      horizontal: AppSpacing.sm,
-                    ),
-                    borderRadius: AppRadii.md,
-                    useMaterial: false,
-                    titleStyle: AppTypography.title.copyWith(
-                      color: colors.onSurface,
-                      fontWeight: FontWeight.w700,
-                      fontSize: AppSizes.statsGameRowTextSize,
-                    ),
-                    trailingStyle: AppTypography.title.copyWith(
-                      color: colors.onSurface,
-                      fontWeight: FontWeight.w700,
-                      fontSize: AppSizes.statsGameRowTextSize,
+                    child: Material(
+                      color: Theme.of(context).cardColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadii.lg),
+                      ),
+                      child: StatsRow(
+                        leading: PokemonImage(
+                          path: entry.pokemon.imagePath,
+                          isLocalFile: entry.pokemon.isLocalFile,
+                          width: AppSizes.statsPokemonImage * 2.5,
+                          height: AppSizes.statsPokemonImage * 2.5,
+                        ),
+                        title: entry.pokemon.name,
+                        trailing: formatDate(entry.caughtAt),
+                        trailingWidth: AppSizes.statsGameDateWidth,
+                        maxWidth: AppSizes.statsGameTableMaxWidth,
+                        stackOnNarrow: true,
+                        onTap: () => context.goToPokemon(entry.pokemon),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.sm,
+                          horizontal: AppSpacing.sm,
+                        ),
+                        borderRadius: AppRadii.lg,
+                        useMaterial: false,
+                        titleStyle: AppTypography.title.copyWith(
+                          color: colors.onSurface,
+                          fontWeight: FontWeight.w700,
+                          fontSize: AppSizes.statsGameRowTextSize,
+                        ),
+                        trailingStyle: AppTypography.title.copyWith(
+                          color: colors.onSurface,
+                          fontWeight: FontWeight.w700,
+                          fontSize: AppSizes.statsGameRowTextSize,
+                        ),
+                      ),
                     ),
                   ),
                 );

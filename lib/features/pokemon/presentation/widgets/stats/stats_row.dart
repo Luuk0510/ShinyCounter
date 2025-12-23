@@ -10,6 +10,7 @@ class StatsRow extends StatelessWidget {
     required this.trailingWidth,
     required this.maxWidth,
     this.onTap,
+    this.stackOnNarrow = false,
     this.padding = const EdgeInsets.symmetric(
       vertical: AppSpacing.xs,
       horizontal: AppSpacing.xs,
@@ -26,6 +27,7 @@ class StatsRow extends StatelessWidget {
   final double trailingWidth;
   final VoidCallback? onTap;
   final double maxWidth;
+  final bool stackOnNarrow;
   final EdgeInsets padding;
   final double borderRadius;
   final bool useMaterial;
@@ -36,19 +38,83 @@ class StatsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget content = Padding(
       padding: padding,
-      child: Row(
-        children: [
-          leading,
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(child: Text(title, style: titleStyle)),
-          SizedBox(
-            width: trailingWidth,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(trailing, style: trailingStyle),
-            ),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = stackOnNarrow && constraints.maxWidth < maxWidth * 0.7;
+          if (isCompact) {
+            return Row(
+              children: [
+                leading,
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: titleStyle,
+                            maxLines: 1,
+                            softWrap: false,
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            trailing,
+                            style: trailingStyle,
+                            maxLines: 1,
+                            softWrap: false,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+
+          return Row(
+            children: [
+              leading,
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      title,
+                      style: titleStyle,
+                      maxLines: 1,
+                      softWrap: false,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: trailingWidth,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      trailing,
+                      style: trailingStyle,
+                      maxLines: 1,
+                      softWrap: false,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
 

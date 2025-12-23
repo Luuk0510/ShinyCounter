@@ -449,6 +449,7 @@ class _StatsRecentRow extends StatelessWidget {
       trailing: formatDate(item.caughtAt),
       trailingWidth: AppSizes.statsDateWidth,
       maxWidth: AppSizes.statsRecentCatchTableMaxWidth,
+      stackOnNarrow: true,
       onTap: () => context.goToPokemon(item.pokemon),
       titleStyle: AppTypography.listTitle.copyWith(
         color: colors.onSurface,
