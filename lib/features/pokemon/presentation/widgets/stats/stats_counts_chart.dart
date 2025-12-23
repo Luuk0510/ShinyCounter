@@ -32,7 +32,15 @@ class StatsCountsChart extends StatelessWidget {
         LineChartData(
           minY: 0,
           maxY: axisMax,
-          gridData: const FlGridData(show: false),
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            horizontalInterval: 1,
+            getDrawingHorizontalLine: (value) => FlLine(
+              color: colors.outlineVariant.withValues(alpha: 0.18),
+              strokeWidth: 1,
+            ),
+          ),
           borderData: FlBorderData(show: false),
           titlesData: FlTitlesData(
             leftTitles: AxisTitles(
