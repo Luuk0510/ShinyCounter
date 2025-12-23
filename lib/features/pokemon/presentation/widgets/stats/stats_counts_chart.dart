@@ -68,8 +68,12 @@ class StatsCountsChart extends StatelessWidget {
                     return const SizedBox.shrink();
                   }
                   final date = counts[index].date;
-                  return Padding(
-                    padding: const EdgeInsets.only(top: AppSpacing.xs),
+                  return SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    fitInside: SideTitleFitInsideData.fromTitleMeta(
+                      meta,
+                      distanceFromEdge: AppSpacing.xs,
+                    ),
                     child: Text(formatDate(date), style: labelStyle),
                   );
                 },
@@ -85,9 +89,9 @@ class StatsCountsChart extends StatelessWidget {
               dotData: const FlDotData(show: false),
               belowBarData: BarAreaData(
                 show: true,
-                color: AppButtonPalette.primaryFill(colors).withValues(
-                  alpha: 0.16,
-                ),
+                color: AppButtonPalette.primaryFill(
+                  colors,
+                ).withValues(alpha: 0.16),
               ),
             ),
           ],
