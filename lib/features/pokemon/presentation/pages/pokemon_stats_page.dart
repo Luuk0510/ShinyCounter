@@ -511,84 +511,59 @@ class _StatsRecentTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Table(
-      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-      columnWidths: const {
-        0: IntrinsicColumnWidth(),
-        1: IntrinsicColumnWidth(),
-      },
+    return Column(
       children: [
-        for (final item in items)
-          TableRow(
-            children: [
-              _StatsRecentCell(
-                onTap: () => context.goToPokemon(item.pokemon),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    PokemonImage(
-                      path: item.pokemon.imagePath,
-                      isLocalFile: item.pokemon.isLocalFile,
-                      width: AppSizes.statsPokemonImage,
-                      height: AppSizes.statsPokemonImage,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      item.pokemon.name,
-                      style: AppTypography.listTitle.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
+        for (final item in items) _StatsRecentRow(item: item, colors: colors),
+      ],
+    );
+  }
+}
+
+class _StatsRecentRow extends StatelessWidget {
+  const _StatsRecentRow({required this.item, required this.colors});
+
+  final PokemonCaughtStat item;
+  final ColorScheme colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: () => context.goToPokemon(item.pokemon),
+          borderRadius: BorderRadius.circular(AppRadii.sm),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PokemonImage(
+                  path: item.pokemon.imagePath,
+                  isLocalFile: item.pokemon.isLocalFile,
+                  width: AppSizes.statsPokemonImage,
+                  height: AppSizes.statsPokemonImage,
                 ),
-              ),
-              _StatsRecentCell(
-                onTap: () => context.goToPokemon(item.pokemon),
-                leftPad: AppSpacing.lg,
-                alignRight: true,
-                child: Text(
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  item.pokemon.name,
+                  style: AppTypography.listTitle.copyWith(
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.lg),
+                Text(
                   formatDate(item.caughtAt),
                   style: AppTypography.listTitle.copyWith(
                     color: colors.onSurface,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-      ],
-    );
-  }
-}
-
-class _StatsRecentCell extends StatelessWidget {
-  const _StatsRecentCell({
-    required this.onTap,
-    required this.child,
-    this.leftPad = 0,
-    this.alignRight = false,
-  });
-
-  final VoidCallback onTap;
-  final Widget child;
-  final double leftPad;
-  final bool alignRight;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: leftPad,
-        top: AppSpacing.xs,
-        bottom: AppSpacing.xs,
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadii.sm),
-        child: Align(
-          alignment: alignRight ? Alignment.centerRight : Alignment.centerLeft,
-          child: child,
         ),
       ),
     );
