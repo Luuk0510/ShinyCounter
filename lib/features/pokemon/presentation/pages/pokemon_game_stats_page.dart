@@ -5,6 +5,7 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_app_bar.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 
 class PokemonCaughtEntry {
@@ -33,7 +34,7 @@ class PokemonGameStatsPage extends StatelessWidget {
     final items = args.items;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: StatsAppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -44,31 +45,6 @@ class PokemonGameStatsPage extends StatelessWidget {
               style: AppTypography.title.copyWith(fontWeight: FontWeight.w700),
             ),
           ],
-        ),
-        centerTitle: true,
-        toolbarHeight: AppSizes.toolbarHeight,
-        scrolledUnderElevation: 0,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        iconTheme: const IconThemeData(size: AppSizes.appBarActionIcon),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(AppRadii.lg),
-          ),
-        ),
-        flexibleSpace: Builder(
-          builder: (context) {
-            final scopedCard = Theme.of(context).cardColor;
-            return Container(
-              decoration: BoxDecoration(
-                color: scopedCard,
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(AppRadii.lg),
-                ),
-              ),
-            );
-          },
         ),
       ),
       body: items.isEmpty

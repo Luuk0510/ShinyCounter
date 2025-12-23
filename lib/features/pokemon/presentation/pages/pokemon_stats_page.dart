@@ -8,6 +8,7 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart'
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_app_bar.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_game_stats_page.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
@@ -98,7 +99,14 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     final l10n = context.l10n;
 
     return Scaffold(
-      appBar: _StatsAppBar(title: l10n.statsTitle),
+      appBar: StatsAppBar(
+        title: Text(
+          l10n.statsTitle,
+          style: Theme.of(context).textTheme.titleLarge?.merge(
+            AppTypography.title.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ),
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : LayoutBuilder(
@@ -192,52 +200,6 @@ class StatsSummary {
   final List<GameCatchStat> caughtGames;
   final Map<String, List<PokemonCaughtEntry>> caughtByGame;
   final List<PokemonCaughtEntry> recentCaught;
-}
-
-class _StatsAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _StatsAppBar({required this.title});
-
-  final String title;
-
-  @override
-  Size get preferredSize => const Size.fromHeight(AppSizes.toolbarHeight);
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      scrolledUnderElevation: 0,
-      elevation: 0,
-      centerTitle: true,
-      toolbarHeight: AppSizes.toolbarHeight,
-      backgroundColor: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
-      iconTheme: const IconThemeData(size: AppSizes.appBarActionIcon),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(AppRadii.lg),
-        ),
-      ),
-      flexibleSpace: Builder(
-        builder: (context) {
-          final scopedCard = Theme.of(context).cardColor;
-          return Container(
-            decoration: BoxDecoration(
-              color: scopedCard,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(AppRadii.lg),
-              ),
-            ),
-          );
-        },
-      ),
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.titleLarge?.merge(
-          AppTypography.title.copyWith(fontWeight: FontWeight.w700),
-        ),
-      ),
-    );
-  }
 }
 
 class _StatsMetricCard extends StatelessWidget {
