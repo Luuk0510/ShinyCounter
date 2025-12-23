@@ -129,12 +129,13 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                         items: _summary.recentCaught,
                       );
 
+                final viewInset = MediaQuery.of(context).viewPadding.bottom;
                 return ListView(
-                  padding: const EdgeInsets.fromLTRB(
+                  padding: EdgeInsets.fromLTRB(
                     AppSpacing.xl,
                     AppSpacing.lg,
                     AppSpacing.xl,
-                    AppSpacing.xl,
+                    AppSpacing.xl + viewInset,
                   ),
                   children: [
                     if (isWide)
