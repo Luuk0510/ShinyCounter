@@ -99,10 +99,13 @@ class PokemonGameStatsPage extends StatelessWidget {
                       maxWidth: AppSizes.statsRecentCatchTableMaxWidth,
                     ),
                     child: Material(
-                      type: MaterialType.transparency,
+                      color: Theme.of(context).cardColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadii.md),
+                      ),
                       child: InkWell(
                         onTap: () => context.goToPokemon(entry.pokemon),
-                        borderRadius: BorderRadius.circular(AppRadii.sm),
+                        borderRadius: BorderRadius.circular(AppRadii.md),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                             vertical: AppSpacing.sm,
