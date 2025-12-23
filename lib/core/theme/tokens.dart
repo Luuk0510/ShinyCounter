@@ -69,6 +69,9 @@ class AppSizes {
   static const statsRowTextSize = 20.0;
   static const statsChartHeight = 200.0;
   static const statsChartStroke = 2.0;
+  static const statsRangeTextSize = 16.0;
+  static const statsChartTooltipWidth = 160.0;
+  static const statsChartTooltipHeight = 54.0;
 
   // pokemon_game_stats_page.dart
   static const statsGameRowImage = 110.0;

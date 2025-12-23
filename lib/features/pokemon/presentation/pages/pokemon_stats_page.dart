@@ -26,11 +26,13 @@ class PokemonStatsPage extends StatefulWidget {
 }
 
 class _PokemonStatsPageState extends State<PokemonStatsPage> {
-  static const int _chartDays = 30;
+  static const int _defaultChartDays = 30;
 
   late final LoadCustomPokemonUseCase _loadCustomPokemon;
   late final LoadCaughtUseCase _loadCaught;
   late final CounterSync _sync;
+  late DateTimeRange _chartRange;
+  List<CounterState> _states = const [];
   bool _loading = true;
   StatsSummary _summary = const StatsSummary.empty();
 
@@ -40,6 +42,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     _loadCustomPokemon = context.read<LoadCustomPokemonUseCase>();
     _loadCaught = context.read<LoadCaughtUseCase>();
     _sync = context.read<CounterSync>();
+    _chartRange = _defaultChartRange();
     _loadStats();
   }
 
@@ -56,7 +59,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     final caughtByGame = <String, int>{};
     final caughtEntriesByGame = <String, List<PokemonCaughtEntry>>{};
     final recentCaught = <PokemonCaughtEntry>[];
-    final dailyTotals = _buildDailyTotals(states);
+    final dailyTotals = _buildDailyTotals(states, _chartRange);
     for (var i = 0; i < states.length; i++) {
       final state = states[i];
       if (!state.isCaught) continue;
@@ -89,6 +92,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     recentCaught.sort((a, b) => b.caughtAt!.compareTo(a.caughtAt!));
     if (!mounted) return;
     setState(() {
+      _states = states;
       _summary = StatsSummary(
         totalPokemon: pokemon.length,
         caughtPokemon: caught.length,
@@ -102,12 +106,52 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     });
   }
 
-  List<StatsDailyCount> _buildDailyTotals(List<CounterState> states) {
+  DateTimeRange _defaultChartRange() {
     final now = DateTime.now();
     final end = DateTime(now.year, now.month, now.day);
-    final start = end.subtract(const Duration(days: _chartDays - 1));
+    final start = end.subtract(const Duration(days: _defaultChartDays - 1));
+    return DateTimeRange(start: start, end: end);
+  }
+
+  Future<void> _pickChartRange() async {
+    final now = DateTime.now();
+    final lastDate = DateTime(now.year, now.month, now.day);
+    final firstDate = DateTime(now.year - 1, now.month, now.day);
+    final range = await showDateRangePicker(
+      context: context,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      initialDateRange: _chartRange,
+    );
+    if (range == null) return;
+    if (!mounted) return;
+    setState(() {
+      _chartRange = range;
+      _summary = StatsSummary(
+        totalPokemon: _summary.totalPokemon,
+        caughtPokemon: _summary.caughtPokemon,
+        totalCounts: _summary.totalCounts,
+        dailyTotals: _buildDailyTotals(_states, range),
+        caughtGames: _summary.caughtGames,
+        caughtByGame: _summary.caughtByGame,
+        recentCaught: _summary.recentCaught,
+      );
+    });
+  }
+
+  List<StatsDailyCount> _buildDailyTotals(
+    List<CounterState> states,
+    DateTimeRange range,
+  ) {
+    final start = DateTime(
+      range.start.year,
+      range.start.month,
+      range.start.day,
+    );
+    final end = DateTime(range.end.year, range.end.month, range.end.day);
     final totals = <DateTime, int>{};
-    for (var i = 0; i < _chartDays; i++) {
+    final days = end.difference(start).inDays;
+    for (var i = 0; i <= days; i++) {
       final day = start.add(Duration(days: i));
       totals[day] = 0;
     }
@@ -121,9 +165,9 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
         totals.update(day, (value) => value + entry.value, ifAbsent: () => 0);
       }
     }
-    final days = totals.keys.toList()..sort();
+    final sortedDays = totals.keys.toList()..sort();
     return [
-      for (final day in days)
+      for (final day in sortedDays)
         StatsDailyCount(date: day, count: totals[day] ?? 0),
     ];
   }
@@ -161,6 +205,8 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                     ? null
                     : _StatsCountsChartCard(
                         label: l10n.huntHistoryTitle,
+                        rangeLabel: _formatRangeLabel(_chartRange),
+                        onPickRange: _pickChartRange,
                         counts: _summary.dailyTotals,
                       );
 
@@ -278,18 +324,49 @@ class _StatsMetricCard extends StatelessWidget {
 }
 
 class _StatsCountsChartCard extends StatelessWidget {
-  const _StatsCountsChartCard({required this.label, required this.counts});
+  const _StatsCountsChartCard({
+    required this.label,
+    required this.rangeLabel,
+    required this.onPickRange,
+    required this.counts,
+  });
 
   final String label;
+  final String rangeLabel;
+  final VoidCallback onPickRange;
   final List<StatsDailyCount> counts;
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return StatsCard(
       title: label,
-      child: StatsCountsChart(counts: counts),
+      titleSpacing: AppSpacing.xs,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          TextButton.icon(
+            onPressed: onPickRange,
+            icon: Icon(Icons.date_range, color: colors.onSurfaceVariant),
+            label: Text(
+              rangeLabel,
+              style: AppTypography.listTitle.copyWith(
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+                fontSize: AppSizes.statsRangeTextSize,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          StatsCountsChart(counts: counts),
+        ],
+      ),
     );
   }
+}
+
+String _formatRangeLabel(DateTimeRange range) {
+  return '${formatDate(range.start)} – ${formatDate(range.end)}';
 }
 
 class GameCatchStat {
