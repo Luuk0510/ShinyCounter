@@ -139,7 +139,7 @@ class _StatsCountsChartState extends State<StatsCountsChart> {
                           }
                           final date = counts[index].date;
                           return SideTitleWidget(
-                            axisSide: meta.axisSide,
+                            meta: meta,
                             fitInside: SideTitleFitInsideData.fromTitleMeta(
                               meta,
                               distanceFromEdge: AppSpacing.xs,

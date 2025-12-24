@@ -354,6 +354,7 @@ class AppInsets {
       AppSpacing.xl + bottomInset,
     );
   }
+
   static const chip = EdgeInsets.symmetric(
     horizontal: AppSpacing.sm,
     vertical: AppSpacing.xs,
