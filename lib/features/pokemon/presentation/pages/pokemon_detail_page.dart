@@ -342,8 +342,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: i == _currentSpriteIndex
-                      ? colors.primary
-                      : colors.primary.withValues(alpha: 0.3),
+                      ? AppButtonPalette.primaryFill(colors)
+                      : AppButtonPalette.primaryFill(
+                          colors,
+                        ).withValues(alpha: 0.5),
                 ),
               ),
             ),
