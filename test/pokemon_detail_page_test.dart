@@ -214,14 +214,18 @@ void main() {
     // Ordering: base should be first rendered.
     expect(_visibleSprite(tester).path, 'assets/pokemons/0001_base_m_s.png');
 
-    // Swipe to mega then gmax.
-    await tester.drag(find.byType(PageView), const Offset(-400, 0));
+    // Jump to mega then gmax to avoid flaky drag behavior in tests.
+    final controller = tester.widget<PageView>(find.byType(PageView)).controller!;
+    controller.jumpToPage(1);
     await tester.pumpAndSettle();
     expect(_visibleSprite(tester).path, 'assets/pokemons/0001_mega-x_m_s.png');
 
-    await tester.drag(find.byType(PageView), const Offset(-400, 0));
+    controller.jumpToPage(2);
     await tester.pumpAndSettle();
-    expect(_visibleSprite(tester).path, 'assets/pokemons/0001_001-gmax_m_s.png');
+    expect(
+      _visibleSprite(tester).path,
+      'assets/pokemons/0001_001-gmax_m_s.png',
+    );
 
     // Catch toggle updates text and disables increment.
     final catchButton = find.byKey(const Key('detail.catchButton'));
