@@ -7,12 +7,35 @@ import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_detail_page.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 import 'helpers/fakes.dart';
 import 'helpers/test_asset_bundle.dart';
+
+PokemonImage _visibleSprite(WidgetTester tester) {
+  final pageView = find.byType(PageView);
+  final viewport = tester.getRect(pageView);
+  final viewportCenter = viewport.center;
+  PokemonImage? closest;
+  var bestDistance = double.infinity;
+
+  for (final element in tester.elementList(
+    find.descendant(of: pageView, matching: find.byType(PokemonImage)),
+  )) {
+    final box = element.renderObject as RenderBox;
+    final rect = box.localToGlobal(Offset.zero) & box.size;
+    final distance = (rect.center - viewportCenter).distance;
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      closest = element.widget as PokemonImage;
+    }
+  }
+
+  return closest!;
+}
 
 Widget _wrap(
   Widget child, {
@@ -189,25 +212,16 @@ void main() {
     }
 
     // Ordering: base should be first rendered.
-    expect(
-      find.byKey(const ValueKey('assets/pokemons/0001_base_m_s.png')),
-      findsOneWidget,
-    );
+    expect(_visibleSprite(tester).path, 'assets/pokemons/0001_base_m_s.png');
 
     // Swipe to mega then gmax.
     await tester.drag(find.byType(PageView), const Offset(-400, 0));
     await tester.pumpAndSettle();
-    expect(
-      find.byKey(const ValueKey('assets/pokemons/0001_mega-x_m_s.png')),
-      findsOneWidget,
-    );
+    expect(_visibleSprite(tester).path, 'assets/pokemons/0001_mega-x_m_s.png');
 
     await tester.drag(find.byType(PageView), const Offset(-400, 0));
     await tester.pumpAndSettle();
-    expect(
-      find.byKey(const ValueKey('assets/pokemons/0001_001-gmax_m_s.png')),
-      findsOneWidget,
-    );
+    expect(_visibleSprite(tester).path, 'assets/pokemons/0001_001-gmax_m_s.png');
 
     // Catch toggle updates text and disables increment.
     final catchButton = find.byKey(const Key('detail.catchButton'));

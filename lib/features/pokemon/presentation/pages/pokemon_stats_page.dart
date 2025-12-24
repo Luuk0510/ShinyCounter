@@ -4,9 +4,7 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
-import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_app_bar.dart';
@@ -15,7 +13,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_expandable_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_row.dart';
 import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
-import 'package:shiny_counter/features/pokemon/shared/services/stats_aggregation_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/services/stats_aggregation_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 
 class PokemonStatsPage extends StatefulWidget {
@@ -38,9 +36,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
   void initState() {
     super.initState();
     _statsService = StatsAggregationService(
-      loadCustomPokemon: context.read<LoadCustomPokemonUseCase>(),
-      loadCaught: context.read<LoadCaughtUseCase>(),
-      sync: context.read<CounterSync>(),
+      repository: context.read<StatsRepository>(),
     );
     _chartRange = _defaultChartRange();
     _loadStats();

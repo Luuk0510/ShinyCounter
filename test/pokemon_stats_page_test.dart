@@ -7,41 +7,22 @@ import 'package:shiny_counter/core/routing/app_router.dart';
 import 'package:shiny_counter/core/theme/app_assets.dart';
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
-import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
-import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_stats_page.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_counts_chart.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/game_assets.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
-import 'helpers/fakes.dart';
 import 'helpers/test_asset_bundle.dart';
 
-class _FakeRepo implements PokemonRepository {
-  _FakeRepo({required List<Pokemon> custom, required Set<String> caught})
-    : _custom = List<Pokemon>.from(custom),
-      _caught = Set<String>.from(caught);
+class _FakeStatsRepository implements StatsRepository {
+  _FakeStatsRepository(this._data);
 
-  final List<Pokemon> _custom;
-  final Set<String> _caught;
+  final StatsSourceData _data;
 
   @override
-  Future<List<Pokemon>> loadCustomPokemon() async => List.unmodifiable(_custom);
-
-  @override
-  Future<void> saveCustomPokemon(List<Pokemon> custom) async {
-    _custom
-      ..clear()
-      ..addAll(custom);
-  }
-
-  @override
-  Future<Set<String>> loadCaught(List<Pokemon> allPokemon) async =>
-      Set.unmodifiable(_caught);
+  Future<StatsSourceData> loadStatsSource() async => _data;
 }
 
 String _dateKey(DateTime date) {
@@ -52,22 +33,14 @@ String _dateKey(DateTime date) {
 
 Widget _wrapStatsApp({
   required GoRouter router,
-  required PokemonRepository repo,
-  required CounterSync sync,
+  required StatsRepository statsRepository,
   required Iterable<String> assetKeys,
 }) {
   final assetBundle = TestAssetBundle(assetKeys);
   return DefaultAssetBundle(
     bundle: assetBundle,
     child: MultiProvider(
-      providers: [
-        Provider<PokemonRepository>.value(value: repo),
-        Provider<LoadCustomPokemonUseCase>(
-          create: (_) => LoadCustomPokemonUseCase(repo),
-        ),
-        Provider<LoadCaughtUseCase>(create: (_) => LoadCaughtUseCase(repo)),
-        Provider<CounterSync>.value(value: sync),
-      ],
+      providers: [Provider<StatsRepository>.value(value: statsRepository)],
       child: MaterialApp.router(
         routerConfig: router,
         locale: const Locale('en'),
@@ -124,11 +97,6 @@ void main() {
         imagePath: AppAssets.pokeballIcon,
       ),
     ];
-    final repo = _FakeRepo(
-      custom: pokemon,
-      caught: {'0001', '0002', '0003', '0004'},
-    );
-    final sync = FakeCounterSync();
     final states = [
       CounterState(
         count: 10,
@@ -159,10 +127,13 @@ void main() {
         dailyCounts: {dateKey: 6},
       ),
     ];
-    for (var i = 0; i < pokemon.length; i++) {
-      final keys = CounterKeys.fromId(pokemon[i].id);
-      await sync.saveState(keys.counter, keys.caught, states[i]);
-    }
+    final statsRepository = _FakeStatsRepository(
+      StatsSourceData(
+        pokemon: pokemon,
+        caught: {'0001', '0002', '0003', '0004'},
+        states: states,
+      ),
+    );
 
     final router = GoRouter(
       initialLocation: AppRoutes.stats,
@@ -186,8 +157,7 @@ void main() {
     await tester.pumpWidget(
       _wrapStatsApp(
         router: router,
-        repo: repo,
-        sync: sync,
+        statsRepository: statsRepository,
         assetKeys: [
           AppAssets.appIcon,
           AppAssets.pokeballIcon,
@@ -238,18 +208,19 @@ void main() {
       name: 'Bulbasaur',
       imagePath: AppAssets.pokeballIcon,
     );
-    final repo = _FakeRepo(custom: const [pokemon], caught: const {'0001'});
-    final sync = FakeCounterSync();
-    final keys = CounterKeys.fromId('0001');
-    await sync.saveState(
-      keys.counter,
-      keys.caught,
-      CounterState(
-        count: 42,
-        isCaught: true,
-        caughtGame: 'Gold',
-        caughtAt: now,
-        dailyCounts: {dateKey: 2},
+    final statsRepository = _FakeStatsRepository(
+      StatsSourceData(
+        pokemon: const [pokemon],
+        caught: const {'0001'},
+        states: [
+          CounterState(
+            count: 42,
+            isCaught: true,
+            caughtGame: 'Gold',
+            caughtAt: now,
+            dailyCounts: {dateKey: 2},
+          ),
+        ],
       ),
     );
 
@@ -270,8 +241,7 @@ void main() {
     await tester.pumpWidget(
       _wrapStatsApp(
         router: router,
-        repo: repo,
-        sync: sync,
+        statsRepository: statsRepository,
         assetKeys: [
           AppAssets.appIcon,
           AppAssets.pokeballIcon,
