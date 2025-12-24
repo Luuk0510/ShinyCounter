@@ -515,12 +515,7 @@ class _PokemonListPageState extends State<PokemonListPage>
         thickness: AppSizes.listScrollbarThickness,
         child: ListView(
           controller: _listController,
-          padding: const EdgeInsets.fromLTRB(
-            AppSizes.cardPaddingH - AppSpacing.xs,
-            AppSpacing.xs,
-            AppSizes.cardPaddingH - AppSpacing.xs,
-            AppSpacing.xs,
-          ),
+          padding: AppInsets.page.copyWith(bottom: AppSpacing.xs),
           children: sections,
         ),
       ),

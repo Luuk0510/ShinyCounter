@@ -341,16 +341,16 @@ class AppInsets {
     vertical: AppSizes.overlayPadV,
   );
   static const page = EdgeInsets.fromLTRB(
+    AppSpacing.sm,
     AppSpacing.lg,
-    AppSpacing.lg,
-    AppSpacing.lg,
+    AppSpacing.sm,
     AppSpacing.xl,
   );
   static EdgeInsets pageWithBottomInset(double bottomInset) {
     return EdgeInsets.fromLTRB(
+      AppSpacing.sm,
       AppSpacing.lg,
-      AppSpacing.lg,
-      AppSpacing.lg,
+      AppSpacing.sm,
       AppSpacing.xl + bottomInset,
     );
   }

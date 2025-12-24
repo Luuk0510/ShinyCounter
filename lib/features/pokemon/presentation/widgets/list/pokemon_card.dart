@@ -94,10 +94,7 @@ class _PokemonCardState extends State<PokemonCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSizes.cardPaddingH,
-        vertical: AppSizes.cardPaddingV,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: AppSizes.cardPaddingV),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isCompact = constraints.maxWidth < 420;

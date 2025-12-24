@@ -209,12 +209,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: constraints.maxHeight),
               child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  AppSpacing.xl,
-                  AppSpacing.lg,
-                  AppSpacing.xl,
-                  bottomPadding,
-                ),
+                padding: AppInsets.page.copyWith(bottom: bottomPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
