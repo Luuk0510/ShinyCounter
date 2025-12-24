@@ -163,6 +163,7 @@ class AppSizes {
 
   /// pokemon_detail_page.dart
   static const pageIndicatorDot = 8.0;
+  static const pageIndicatorDotActive = 10.0;
   static const primaryButtonWidth = 150.0;
   static const buttonTextSize = 18.0;
 }

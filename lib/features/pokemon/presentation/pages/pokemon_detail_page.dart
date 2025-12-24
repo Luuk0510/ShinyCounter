@@ -335,10 +335,16 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
               sprites.length,
-              (i) => Container(
+              (i) => AnimatedContainer(
+                duration: AppAnim.switcher,
+                curve: AppAnim.easeOutCubic,
                 margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                width: AppSizes.pageIndicatorDot,
-                height: AppSizes.pageIndicatorDot,
+                width: i == _currentSpriteIndex
+                    ? AppSizes.pageIndicatorDotActive
+                    : AppSizes.pageIndicatorDot,
+                height: i == _currentSpriteIndex
+                    ? AppSizes.pageIndicatorDotActive
+                    : AppSizes.pageIndicatorDot,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: i == _currentSpriteIndex
