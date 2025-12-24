@@ -215,7 +215,9 @@ void main() {
     expect(_visibleSprite(tester).path, 'assets/pokemons/0001_base_m_s.png');
 
     // Jump to mega then gmax to avoid flaky drag behavior in tests.
-    final controller = tester.widget<PageView>(find.byType(PageView)).controller!;
+    final controller = tester
+        .widget<PageView>(find.byType(PageView))
+        .controller!;
     controller.jumpToPage(1);
     await tester.pumpAndSettle();
     expect(_visibleSprite(tester).path, 'assets/pokemons/0001_mega-x_m_s.png');

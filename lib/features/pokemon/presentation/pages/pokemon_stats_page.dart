@@ -137,6 +137,8 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                         label: l10n.statsRecentLabel,
                         items: _summary.recentCaught,
                       );
+                final showSideBySide =
+                    isWide && gamesCard != null && recentCard != null;
 
                 final viewInset = MediaQuery.of(context).viewPadding.bottom;
                 return ListView(
@@ -156,13 +158,25 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                       const SizedBox(height: AppSpacing.lg),
                       total,
                     ],
-                    if (gamesCard != null) ...[
+                    if (showSideBySide) ...[
                       const SizedBox(height: AppSpacing.lg),
-                      gamesCard,
-                    ],
-                    if (recentCard != null) ...[
-                      const SizedBox(height: AppSpacing.lg),
-                      recentCard,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: gamesCard),
+                          const SizedBox(width: AppSpacing.lg),
+                          Expanded(child: recentCard),
+                        ],
+                      ),
+                    ] else ...[
+                      if (gamesCard != null) ...[
+                        const SizedBox(height: AppSpacing.lg),
+                        gamesCard,
+                      ],
+                      if (recentCard != null) ...[
+                        const SizedBox(height: AppSpacing.lg),
+                        recentCard,
+                      ],
                     ],
                     if (history != null) ...[
                       const SizedBox(height: AppSpacing.lg),
