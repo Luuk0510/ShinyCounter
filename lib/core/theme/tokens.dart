@@ -8,6 +8,18 @@ class AppColors {
   static const oledSurface = Color(0xFF0A0A0A);
 }
 
+class AppSeedColors {
+  static const red = Color(0xFFB53F3F);
+  static const orange = Color(0xFFB5783F);
+  static const yellow = Color(0xFFB5B33F);
+  static const green = Color(0xFF60B53F);
+  static const teal = Color(0xFF3FB5AB);
+  static const blue = Color(0xFF3F8AB5);
+  static const darkBlue = Color(0xFF3F41B5);
+  static const purple = Color(0xFF8A3FB5);
+  static const pink = Color(0xFFB53F92);
+}
+
 class AppSpacing {
   static const none = 0.0;
   static const xs = 4.0;
@@ -34,6 +46,7 @@ class AppSizes {
   // settings_sheet.dart
   static const sheetHandleWidth = 44.0;
   static const sheetHandleHeight = 5.0;
+  static const seedSwatch = 20.0;
 
   // add_pokemon_dialog.dart
   static const dialogMaxWidth = 420.0; // edit_pokemon_dialog.dart
@@ -181,44 +194,41 @@ class AppOpacity {
 
 class AppButtonPalette {
   static Color primaryFill(ColorScheme colors) {
-    return AppColors.seed;
+    return colors.primary;
   }
 
   static Color primaryOnFill(ColorScheme colors) {
-    return ThemeData.estimateBrightnessForColor(AppColors.seed) ==
-            Brightness.dark
-        ? Colors.white
-        : Colors.black;
+    return colors.onPrimary;
   }
 
   static Color primaryAccent(ColorScheme colors) {
-    return _brighten(primaryFill(colors));
+    return _brighten(colors.primary);
   }
 
   static Color primaryHighlight(ColorScheme colors) {
-    return Color.lerp(primaryFill(colors), Colors.white, 0.25)!;
+    return Color.lerp(colors.primary, Colors.white, 0.25)!;
   }
 
   static Color outline(ColorScheme colors) {
-    return AppColors.seed;
+    return colors.primary;
   }
 
   static Color outlineBackground(ColorScheme colors) {
-    return AppColors.seed.withValues(alpha: 0.08);
+    return colors.primary.withValues(alpha: 0.08);
   }
 
-  static Color text(ColorScheme colors) => AppColors.seed;
+  static Color text(ColorScheme colors) => colors.primary;
 
   static Color outlineMuted(ColorScheme colors) {
-    return AppColors.seed;
+    return colors.primary;
   }
 
   static Color outlineBackgroundMuted(ColorScheme colors) {
-    return AppColors.seed.withValues(alpha: 0.08);
+    return colors.primary.withValues(alpha: 0.08);
   }
 
   static Color textMuted(ColorScheme colors) {
-    return AppColors.seed;
+    return colors.primary;
   }
 
   static Color outlineMutedLight(ColorScheme colors) {

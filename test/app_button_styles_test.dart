@@ -5,15 +5,11 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 void main() {
   test('primary palette uses seed color', () {
     final colors = ColorScheme.fromSeed(seedColor: AppColors.seed);
-    expect(AppButtonPalette.primaryFill(colors), AppColors.seed);
-    final expectedOnFill =
-        ThemeData.estimateBrightnessForColor(AppColors.seed) == Brightness.dark
-        ? Colors.white
-        : Colors.black;
-    expect(AppButtonPalette.primaryOnFill(colors), expectedOnFill);
+    expect(AppButtonPalette.primaryFill(colors), colors.primary);
+    expect(AppButtonPalette.primaryOnFill(colors), colors.onPrimary);
     expect(
       AppButtonPalette.primaryHighlight(colors),
-      Color.lerp(AppColors.seed, Colors.white, 0.25),
+      Color.lerp(colors.primary, Colors.white, 0.25),
     );
   });
 

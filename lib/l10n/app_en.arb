@@ -134,6 +134,50 @@
   "@settingsTitle": {
     "description": ""
   },
+  "settingsAccentColor": "Accent color",
+  "@settingsAccentColor": {
+    "description": ""
+  },
+  "colorDefault": "Default",
+  "@colorDefault": {
+    "description": ""
+  },
+  "colorRed": "Red",
+  "@colorRed": {
+    "description": ""
+  },
+  "colorOrange": "Orange",
+  "@colorOrange": {
+    "description": ""
+  },
+  "colorYellow": "Yellow",
+  "@colorYellow": {
+    "description": ""
+  },
+  "colorGreen": "Green",
+  "@colorGreen": {
+    "description": ""
+  },
+  "colorTeal": "Teal",
+  "@colorTeal": {
+    "description": ""
+  },
+  "colorBlue": "Blue",
+  "@colorBlue": {
+    "description": ""
+  },
+  "colorDarkBlue": "Dark blue",
+  "@colorDarkBlue": {
+    "description": ""
+  },
+  "colorPurple": "Purple",
+  "@colorPurple": {
+    "description": ""
+  },
+  "colorPink": "Pink",
+  "@colorPink": {
+    "description": ""
+  },
   "settingsSystem": "System",
   "@settingsSystem": {
     "description": ""

@@ -134,6 +134,50 @@
   "@settingsTitle": {
     "description": ""
   },
+  "settingsAccentColor": "Accentkleur",
+  "@settingsAccentColor": {
+    "description": ""
+  },
+  "colorDefault": "Standaard",
+  "@colorDefault": {
+    "description": ""
+  },
+  "colorRed": "Rood",
+  "@colorRed": {
+    "description": ""
+  },
+  "colorOrange": "Oranje",
+  "@colorOrange": {
+    "description": ""
+  },
+  "colorYellow": "Geel",
+  "@colorYellow": {
+    "description": ""
+  },
+  "colorGreen": "Groen",
+  "@colorGreen": {
+    "description": ""
+  },
+  "colorTeal": "Turkoois",
+  "@colorTeal": {
+    "description": ""
+  },
+  "colorBlue": "Blauw",
+  "@colorBlue": {
+    "description": ""
+  },
+  "colorDarkBlue": "Donkerblauw",
+  "@colorDarkBlue": {
+    "description": ""
+  },
+  "colorPurple": "Paars",
+  "@colorPurple": {
+    "description": ""
+  },
+  "colorPink": "Roze",
+  "@colorPink": {
+    "description": ""
+  },
   "settingsSystem": "Systeem",
   "@settingsSystem": {
     "description": ""

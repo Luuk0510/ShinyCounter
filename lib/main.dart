@@ -34,11 +34,14 @@ class MyApp extends StatelessWidget {
         builder: (context) {
           final theme = context.watch<ThemeNotifier>();
           final locale = context.watch<LocaleNotifier>().locale;
+          final seedColor = theme.seedColor;
           return MaterialApp.router(
             onGenerateTitle: (context) =>
                 AppLocalizations.of(context)?.appTitle ?? 'Shiny Counter',
-            theme: AppTheme.light(),
-            darkTheme: theme.useOledDark ? AppTheme.oled() : AppTheme.dark(),
+            theme: AppTheme.light(seedColor: seedColor),
+            darkTheme: theme.useOledDark
+                ? AppTheme.oled(seedColor: seedColor)
+                : AppTheme.dark(seedColor: seedColor),
             themeMode: theme.mode,
             routerConfig: router,
             locale: locale,

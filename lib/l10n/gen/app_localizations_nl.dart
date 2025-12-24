@@ -110,6 +110,39 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsTitle => 'Thema';
 
   @override
+  String get settingsAccentColor => 'Accentkleur';
+
+  @override
+  String get colorDefault => 'Standaard';
+
+  @override
+  String get colorRed => 'Rood';
+
+  @override
+  String get colorOrange => 'Oranje';
+
+  @override
+  String get colorYellow => 'Geel';
+
+  @override
+  String get colorGreen => 'Groen';
+
+  @override
+  String get colorTeal => 'Turkoois';
+
+  @override
+  String get colorBlue => 'Blauw';
+
+  @override
+  String get colorDarkBlue => 'Donkerblauw';
+
+  @override
+  String get colorPurple => 'Paars';
+
+  @override
+  String get colorPink => 'Roze';
+
+  @override
   String get settingsSystem => 'Systeem';
 
   @override

@@ -5,6 +5,7 @@ import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/selectable_row.dart';
+import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 class SettingsDialog extends StatefulWidget {
   const SettingsDialog({super.key});
@@ -16,12 +17,15 @@ class SettingsDialog extends StatefulWidget {
 class _SettingsDialogState extends State<SettingsDialog> {
   late ThemeMode _mode;
   Locale? _locale;
+  Color? _seedColor;
 
   @override
   void initState() {
     super.initState();
     _mode = context.read<ThemeNotifier>().mode;
     _locale = context.read<LocaleNotifier>().locale;
+    final theme = context.read<ThemeNotifier>();
+    _seedColor = theme.usesDefaultSeed ? null : theme.seedColor;
   }
 
   void _setMode(ThemeMode mode, {bool? useOled}) {
@@ -33,6 +37,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
   void _setLocale(Locale locale) {
     context.read<LocaleNotifier>().setLocale(locale);
     setState(() => _locale = locale);
+  }
+
+  void _setSeedColor(Color? color) {
+    context.read<ThemeNotifier>().setSeedColor(color);
+    setState(() => _seedColor = color);
   }
 
   @override
@@ -97,6 +106,23 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   context.watch<ThemeNotifier>().useOledDark,
               onTap: () => _setMode(ThemeMode.dark, useOled: true),
             ),
+            const SizedBox(height: AppSpacing.lg),
+            Text(
+              l10n.settingsAccentColor,
+              style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            ..._seedOptions(l10n).map((option) {
+              final selected = option.color == null
+                  ? _seedColor == null
+                  : _seedColor?.value == option.color!.value;
+              return _SeedOptionRow(
+                label: option.label,
+                swatch: option.swatch,
+                selected: selected,
+                onTap: () => _setSeedColor(option.color),
+              );
+            }),
           ],
         ),
       ),
@@ -139,6 +165,65 @@ class _SettingsDialogState extends State<SettingsDialog> {
   }
 }
 
+class _SeedOption {
+  const _SeedOption({required this.label, required this.color, this.swatch});
+
+  final String label;
+  final Color? color;
+  final Color? swatch;
+}
+
+List<_SeedOption> _seedOptions(AppLocalizations l10n) {
+  return [
+    _SeedOption(label: l10n.colorDefault, color: null, swatch: AppColors.seed),
+    _SeedOption(
+      label: l10n.colorRed,
+      color: AppSeedColors.red,
+      swatch: AppSeedColors.red,
+    ),
+    _SeedOption(
+      label: l10n.colorOrange,
+      color: AppSeedColors.orange,
+      swatch: AppSeedColors.orange,
+    ),
+    _SeedOption(
+      label: l10n.colorYellow,
+      color: AppSeedColors.yellow,
+      swatch: AppSeedColors.yellow,
+    ),
+    _SeedOption(
+      label: l10n.colorGreen,
+      color: AppSeedColors.green,
+      swatch: AppSeedColors.green,
+    ),
+    _SeedOption(
+      label: l10n.colorTeal,
+      color: AppSeedColors.teal,
+      swatch: AppSeedColors.teal,
+    ),
+    _SeedOption(
+      label: l10n.colorBlue,
+      color: AppSeedColors.blue,
+      swatch: AppSeedColors.blue,
+    ),
+    _SeedOption(
+      label: l10n.colorDarkBlue,
+      color: AppSeedColors.darkBlue,
+      swatch: AppSeedColors.darkBlue,
+    ),
+    _SeedOption(
+      label: l10n.colorPurple,
+      color: AppSeedColors.purple,
+      swatch: AppSeedColors.purple,
+    ),
+    _SeedOption(
+      label: l10n.colorPink,
+      color: AppSeedColors.pink,
+      swatch: AppSeedColors.pink,
+    ),
+  ];
+}
+
 class _ThemeOption extends StatelessWidget {
   const _ThemeOption({
     required this.label,
@@ -164,6 +249,68 @@ class _ThemeOption extends StatelessWidget {
       ),
       child: Row(
         children: [
+          Expanded(
+            child: Text(
+              label,
+              style: AppTypography.sectionTitle.copyWith(
+                fontWeight: FontWeight.w700,
+                color: selected ? selectedColor : colors.onSurface,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          SelectableCheckmark(
+            selected: selected,
+            selectedColor: selectedColor,
+            unselectedIcon: Icons.circle_outlined,
+            unselectedColor: colors.onSurfaceVariant,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SeedOptionRow extends StatelessWidget {
+  const _SeedOptionRow({
+    required this.label,
+    required this.swatch,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final Color? swatch;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final selectedColor = swatch ?? AppButtonPalette.primaryAccent(colors);
+    return SelectableRow(
+      selected: selected,
+      onTap: onTap,
+      selectedColor: selectedColor,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: AppSizes.seedSwatch,
+            height: AppSizes.seedSwatch,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: swatch ?? AppButtonPalette.primaryFill(colors),
+              border: Border.all(
+                color: colors.outlineVariant.withValues(alpha: 0.4),
+                width: 1,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               label,

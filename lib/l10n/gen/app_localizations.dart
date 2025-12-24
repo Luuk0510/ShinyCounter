@@ -299,6 +299,72 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
+  /// **'Accent color'**
+  String get settingsAccentColor;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get colorDefault;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get colorRed;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Orange'**
+  String get colorOrange;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow'**
+  String get colorYellow;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get colorGreen;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Teal'**
+  String get colorTeal;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get colorBlue;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Dark blue'**
+  String get colorDarkBlue;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Purple'**
+  String get colorPurple;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Pink'**
+  String get colorPink;
+
+  ///
+  ///
+  /// In en, this message translates to:
   /// **'System'**
   String get settingsSystem;
 
