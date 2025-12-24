@@ -238,7 +238,7 @@ class _ThemeOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final selectedColor = AppButtonPalette.primaryAccent(colors);
+    final selectedColor = AppButtonPalette.primaryFill(colors);
     return SelectableRow(
       selected: selected,
       onTap: onTap,

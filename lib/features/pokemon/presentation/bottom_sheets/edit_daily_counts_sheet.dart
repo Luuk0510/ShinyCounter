@@ -199,7 +199,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           onPressed: () => _removeRow(index),
           tooltip: l10n.manageDeleteTooltip,
           icon: const Icon(Icons.delete_outline),
-          color: colors.error,
+          color: AppButtonPalette.deleteIcon(colors),
         ),
       ],
     );

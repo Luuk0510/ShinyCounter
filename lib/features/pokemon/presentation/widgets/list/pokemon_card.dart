@@ -247,7 +247,7 @@ class _ActionOverlay extends StatelessWidget {
                       _ActionIcon(
                         icon: Icons.delete_outline,
                         onPressed: onDelete!,
-                        color: colors.error,
+                        color: AppButtonPalette.deleteIcon(colors),
                         size: AppSizes.cardActionIcon,
                       ),
                   ],

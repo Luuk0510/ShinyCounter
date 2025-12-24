@@ -59,7 +59,9 @@ class _ManageListViewState extends State<ManageListView> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final editIconColor = _actionIconColor(colors.primary);
-    final deleteIconColor = _actionIconColor(colors.error);
+    final deleteIconColor = _actionIconColor(
+      AppButtonPalette.deleteIcon(colors),
+    );
     final viewInsets = MediaQuery.of(context).viewInsets.bottom;
     final filter = _query.trim().toLowerCase();
     final digitsOnly = filter.replaceAll(RegExp(r'[^0-9]'), '');

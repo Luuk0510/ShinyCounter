@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   static const seed = Color(0xFF3F51B5);
+  static const deleteIcon = Color.fromARGB(255, 247, 69, 69);
   static const darkBackground = Color(0xFF151924);
   static const darkSurface = Color(0xFF1E2430);
   static const oledBackground = Color(0xFF000000);
@@ -243,6 +244,10 @@ class AppButtonPalette {
     return primaryHighlight(colors);
   }
 
+  static Color deleteIcon(ColorScheme colors) {
+    return AppColors.deleteIcon;
+  }
+
   static Color _brighten(Color color) {
     final hsl = HSLColor.fromColor(color);
     return hsl.withLightness((hsl.lightness * 1.20).clamp(0.0, 1.0)).toColor();
@@ -302,10 +307,15 @@ class AppButtonStyles {
     ColorScheme colors, {
     EdgeInsets? padding,
   }) {
+    final deleteColor = AppButtonPalette.deleteIcon(colors);
+    final onDelete =
+        ThemeData.estimateBrightnessForColor(deleteColor) == Brightness.dark
+        ? Colors.white
+        : Colors.black;
     return ElevatedButton.styleFrom(
-      backgroundColor: colors.error,
-      foregroundColor: colors.onError,
-      disabledBackgroundColor: colors.error.withValues(alpha: 0.4),
+      backgroundColor: deleteColor,
+      foregroundColor: onDelete,
+      disabledBackgroundColor: deleteColor.withValues(alpha: 0.4),
       disabledForegroundColor: colors.onSurfaceVariant.withValues(alpha: 0.6),
       elevation: 0,
       surfaceTintColor: Colors.transparent,
