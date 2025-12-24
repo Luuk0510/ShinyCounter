@@ -103,6 +103,7 @@ class AppSizes {
   // pokemon_detail_page.dart
   static const detailImageSize = 300.0;
   static const detailImageFallback = 140.0;
+  static const catchSparkleSize = 64.0;
 
   // game_dropdown.dart
   static const gameLogoSize = 32.0; // count_info_card.dart
@@ -341,6 +342,11 @@ class AppAnim {
   static const buttonPressScale = 0.9;
   static const dialogStartScale = 0.8;
   static const listItemPopStartScale = 0.96;
+  static const sparkleDuration = Duration(milliseconds: 420);
+  static const sparkleStartScale = 0.7;
+  static const sparkleEndScale = 1.1;
+  static const sparkleRotationTurns = 0.08;
+  static const sparkleFadeInFraction = 0.35;
 }
 
 /// Intent-based tokens to avoid sprinkling raw numbers in widgets.
