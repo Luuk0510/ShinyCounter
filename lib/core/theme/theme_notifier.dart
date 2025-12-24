@@ -69,6 +69,6 @@ class ThemeNotifier extends ChangeNotifier {
       await _store.remove(AppPrefsKeys.themeSeed);
       return;
     }
-    await _store.setInt(AppPrefsKeys.themeSeed, _seedColor!.value);
+    await _store.setInt(AppPrefsKeys.themeSeed, _seedColor!.toARGB32());
   }
 }

@@ -117,7 +117,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ..._seedOptions(l10n).map((option) {
               final selected = option.color == null
                   ? _seedColor == null
-                  : _seedColor?.value == option.color!.value;
+                  : _seedColor?.toARGB32() == option.color!.toARGB32();
               return _SeedOptionRow(
                 label: option.label,
                 swatch: option.swatch,
