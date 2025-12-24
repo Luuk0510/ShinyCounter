@@ -144,12 +144,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
 
                 final viewInset = MediaQuery.of(context).viewPadding.bottom;
                 return ListView(
-                  padding: EdgeInsets.fromLTRB(
-                    AppSpacing.xl,
-                    AppSpacing.lg,
-                    AppSpacing.xl,
-                    AppSpacing.xl + viewInset,
-                  ),
+                  padding: AppInsets.pageWithBottomInset(viewInset),
                   children: [
                     if (isWide)
                       Row(
@@ -236,11 +231,22 @@ class _StatsCountsChartCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextButton.icon(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isNarrow =
+                  constraints.maxWidth < AppSizes.statsRangeStackWidth;
+              final buttonStyle = TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xs,
+                  vertical: 0,
+                ),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              );
+              final dateButton = TextButton.icon(
                 onPressed: onPickRange,
+                style: buttonStyle,
                 icon: Icon(Icons.date_range, color: colors.onSurfaceVariant),
                 label: Text(
                   rangeLabel,
@@ -250,10 +256,10 @@ class _StatsCountsChartCard extends StatelessWidget {
                     fontSize: AppSizes.statsRangeTextSize,
                   ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              TextButton(
+              );
+              final resetButton = TextButton(
                 onPressed: onResetRange,
+                style: buttonStyle,
                 child: Text(
                   context.l10n.statsRangeReset,
                   style: AppTypography.listTitle.copyWith(
@@ -262,11 +268,39 @@ class _StatsCountsChartCard extends StatelessWidget {
                     fontSize: AppSizes.statsRangeTextSize,
                   ),
                 ),
-              ),
-            ],
+              );
+              final controls = isNarrow
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        dateButton,
+                        const SizedBox(height: AppSizes.statsRangeStackGap),
+                        resetButton,
+                      ],
+                    )
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        dateButton,
+                        const SizedBox(width: AppSpacing.sm),
+                        resetButton,
+                      ],
+                    );
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  controls,
+                  const SizedBox(height: AppSpacing.sm),
+                  StatsCountsChart(
+                    counts: counts,
+                    height: isNarrow
+                        ? AppSizes.statsChartHeightCompact
+                        : AppSizes.statsChartHeight,
+                  ),
+                ],
+              );
+            },
           ),
-          const SizedBox(height: AppSpacing.sm),
-          StatsCountsChart(counts: counts),
         ],
       ),
     );

@@ -68,8 +68,11 @@ class AppSizes {
   static const statsDateWidth = 115.0;
   static const statsRowTextSize = 20.0;
   static const statsChartHeight = 200.0;
+  static const statsChartHeightCompact = 180.0;
   static const statsChartStroke = 2.0;
   static const statsRangeTextSize = 16.0;
+  static const statsRangeStackWidth = 360.0;
+  static const statsRangeStackGap = 0.0;
   static const statsChartTooltipWidth = 160.0;
   static const statsChartTooltipHeight = 54.0;
 
@@ -337,6 +340,20 @@ class AppInsets {
     horizontal: AppSizes.overlayPadH,
     vertical: AppSizes.overlayPadV,
   );
+  static const page = EdgeInsets.fromLTRB(
+    AppSpacing.lg,
+    AppSpacing.lg,
+    AppSpacing.lg,
+    AppSpacing.xl,
+  );
+  static EdgeInsets pageWithBottomInset(double bottomInset) {
+    return EdgeInsets.fromLTRB(
+      AppSpacing.lg,
+      AppSpacing.lg,
+      AppSpacing.lg,
+      AppSpacing.xl + bottomInset,
+    );
+  }
   static const chip = EdgeInsets.symmetric(
     horizontal: AppSpacing.sm,
     vertical: AppSpacing.xs,

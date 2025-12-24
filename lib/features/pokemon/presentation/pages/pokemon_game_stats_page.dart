@@ -44,12 +44,7 @@ class PokemonGameStatsPage extends StatelessWidget {
               ),
             )
           : ListView.separated(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.xl,
-                AppSpacing.lg,
-                AppSpacing.xl,
-                AppSpacing.xl,
-              ),
+              padding: AppInsets.page,
               itemCount: items.length,
               separatorBuilder: (_, index) =>
                   const SizedBox(height: AppSpacing.xs),

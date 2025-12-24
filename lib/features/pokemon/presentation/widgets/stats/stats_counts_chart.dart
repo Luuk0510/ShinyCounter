@@ -7,9 +7,14 @@ import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 
 class StatsCountsChart extends StatefulWidget {
-  const StatsCountsChart({super.key, required this.counts});
+  const StatsCountsChart({
+    super.key,
+    required this.counts,
+    this.height = AppSizes.statsChartHeight,
+  });
 
   final List<StatsDailyCount> counts;
+  final double height;
 
   @override
   State<StatsCountsChart> createState() => _StatsCountsChartState();
@@ -72,7 +77,7 @@ class _StatsCountsChartState extends State<StatsCountsChart> {
       context,
     ).textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant);
     return SizedBox(
-      height: AppSizes.statsChartHeight,
+      height: widget.height,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final size = Size(constraints.maxWidth, constraints.maxHeight);
