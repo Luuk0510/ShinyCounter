@@ -9,6 +9,7 @@ import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
+import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
@@ -48,17 +49,23 @@ class _FakeRepo implements PokemonRepository {
       Set.unmodifiable(_caught);
 }
 
-Widget _wrap(Widget child, {required PokemonRepository repo}) {
+Widget _wrap(
+  Widget child, {
+  required PokemonRepository repo,
+  CounterSync? counterSync,
+}) {
   final assetBundle = TestAssetBundle([
     AppAssets.appIcon,
     AppAssets.pokeballIcon,
   ]);
   final store = MemoryKeyValueStore();
+  final sync = counterSync ?? FakeCounterSync();
   return DefaultAssetBundle(
     bundle: assetBundle,
     child: MultiProvider(
       providers: [
         Provider<PokemonRepository>.value(value: repo),
+        Provider<CounterSync>.value(value: sync),
         Provider<LoadCustomPokemonUseCase>(
           create: (_) => LoadCustomPokemonUseCase(repo),
         ),
@@ -94,17 +101,20 @@ Widget _wrap(Widget child, {required PokemonRepository repo}) {
 Widget _wrapWithRouter({
   required PokemonRepository repo,
   required GoRouter router,
+  CounterSync? counterSync,
 }) {
   final assetBundle = TestAssetBundle([
     AppAssets.appIcon,
     AppAssets.pokeballIcon,
   ]);
   final store = MemoryKeyValueStore();
+  final sync = counterSync ?? FakeCounterSync();
   return DefaultAssetBundle(
     bundle: assetBundle,
     child: MultiProvider(
       providers: [
         Provider<PokemonRepository>.value(value: repo),
+        Provider<CounterSync>.value(value: sync),
         Provider<LoadCustomPokemonUseCase>(
           create: (_) => LoadCustomPokemonUseCase(repo),
         ),
@@ -138,6 +148,14 @@ Widget _wrapWithRouter({
 }
 
 void main() {
+  testWidgets('shows loading indicator before data loads', (tester) async {
+    final repo = _FakeRepo(custom: const [], caught: const {});
+
+    await tester.pumpWidget(_wrap(const PokemonListPage(), repo: repo));
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  });
+
   testWidgets('collapses and expands uncaught/caught sections', (tester) async {
     const a = Pokemon(
       id: '0001',
@@ -302,6 +320,40 @@ void main() {
     expect(find.text('Stats Page'), findsOneWidget);
   });
 
+  testWidgets('tapping a pokemon navigates to detail route', (tester) async {
+    const pokemon = Pokemon(
+      id: '0001',
+      name: 'Bulbasaur',
+      imagePath: AppAssets.pokeballIcon,
+    );
+    final repo = _FakeRepo(custom: const [pokemon], caught: const {});
+    final router = GoRouter(
+      initialLocation: AppRoutes.home,
+      routes: [
+        GoRoute(
+          path: AppRoutes.home,
+          builder: (context, state) => const PokemonListPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.pokemonDetail,
+          builder: (context, state) =>
+              const Scaffold(body: Text('Detail Page')),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(_wrapWithRouter(repo: repo, router: router));
+    await tester.pump(const Duration(milliseconds: 300));
+    for (var i = 0; i < 40 && find.text('Bulbasaur').evaluate().isEmpty; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+
+    await tester.tap(find.text('Bulbasaur'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Detail Page'), findsOneWidget);
+  });
+
   testWidgets('long press shows edit/delete actions on custom card', (
     tester,
   ) async {
@@ -330,5 +382,40 @@ void main() {
       find.descendant(of: card, matching: find.byIcon(Icons.delete_outline)),
       findsOneWidget,
     );
+  });
+
+  testWidgets('manage delete removes pokemon after confirm', (tester) async {
+    const pokemon = Pokemon(
+      id: 'custom_0001',
+      name: 'Bulbasaur',
+      imagePath: AppAssets.pokeballIcon,
+    );
+    final repo = _FakeRepo(custom: const [pokemon], caught: const {});
+    final sync = FakeCounterSync();
+    await sync.setCounter('counter_custom_0001', 12);
+    await sync.setCaught('caught_custom_0001', true);
+
+    await tester.pumpWidget(
+      _wrap(const PokemonListPage(), repo: repo, counterSync: sync),
+    );
+    await tester.pump(const Duration(milliseconds: 300));
+    for (var i = 0; i < 40 && find.text('Bulbasaur').evaluate().isEmpty; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+
+    await tester.tap(find.byKey(PokemonListPage.managePokemonKey));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(ManageListView.deleteKey(pokemon.id)));
+    await tester.pumpAndSettle();
+
+    final context = tester.element(find.byType(PokemonListPage));
+    await tester.tap(
+      find.text(AppLocalizations.of(context)!.confirmDeleteDelete),
+    );
+    await tester.pumpAndSettle();
+
+    expect(await repo.loadCustomPokemon(), isEmpty);
+    expect(find.byType(PokemonEmptyState), findsOneWidget);
   });
 }

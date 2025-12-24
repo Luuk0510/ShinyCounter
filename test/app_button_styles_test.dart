@@ -29,7 +29,12 @@ void main() {
   test('destructive style resolves error colors', () {
     final colors = const ColorScheme.light();
     final style = AppButtonStyles.destructiveFilled(colors);
-    expect(style.backgroundColor?.resolve(<WidgetState>{}), colors.error);
-    expect(style.foregroundColor?.resolve(<WidgetState>{}), colors.onError);
+    final deleteColor = AppButtonPalette.deleteIcon(colors);
+    final onDelete =
+        ThemeData.estimateBrightnessForColor(deleteColor) == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+    expect(style.backgroundColor?.resolve(<WidgetState>{}), deleteColor);
+    expect(style.foregroundColor?.resolve(<WidgetState>{}), onDelete);
   });
 }
