@@ -48,7 +48,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
+    final viewInset = MediaQuery.of(context).viewPadding.bottom;
     return AlertDialog(
+      insetPadding: AppInsets.pageWithBottomInset(viewInset),
       backgroundColor: Theme.of(context).cardColor,
       surfaceTintColor: Colors.transparent,
       title: Text(
