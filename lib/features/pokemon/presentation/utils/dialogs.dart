@@ -16,7 +16,8 @@ Future<T?> showScaledDialog<T>({
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     barrierColor: barrierColor ?? Colors.black54,
     transitionDuration: duration,
-    pageBuilder: (context, animation, secondaryAnimation) => builder(context),
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        SafeArea(top: true, bottom: false, child: builder(context)),
     transitionBuilder: (context, animation, _, child) {
       final curved = CurvedAnimation(parent: animation, curve: curve);
       final scale = Tween<double>(begin: startScale, end: 1).animate(curved);
