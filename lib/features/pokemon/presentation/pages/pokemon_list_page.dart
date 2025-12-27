@@ -358,6 +358,11 @@ class _PokemonListPageState extends State<PokemonListPage>
     return Scaffold(
       appBar: _buildAppBar(colors),
       body: _buildBody(colors, uncaught, caught),
+      bottomNavigationBar: _ListBottomBar(
+        onStats: () => context.goToStats(),
+        onAdd: _onAddPokemon,
+        onManage: _openManagePokemonList,
+      ),
     );
   }
 
@@ -401,27 +406,6 @@ class _PokemonListPageState extends State<PokemonListPage>
         },
       ),
       actions: [
-        IconButton(
-          key: PokemonListPage.statsKey,
-          iconSize: AppSizes.appBarActionIcon,
-          icon: const Icon(Icons.bar_chart_rounded),
-          tooltip: context.l10n.statsTitle,
-          onPressed: () => context.goToStats(),
-        ),
-        IconButton(
-          key: PokemonListPage.addPokemonKey,
-          iconSize: AppSizes.appBarActionIcon,
-          icon: const Icon(Icons.add_circle),
-          tooltip: context.l10n.tooltipAddPokemon,
-          onPressed: _onAddPokemon,
-        ),
-        IconButton(
-          key: PokemonListPage.managePokemonKey,
-          iconSize: AppSizes.appBarActionIcon,
-          icon: const Icon(Icons.edit_note),
-          tooltip: context.l10n.tooltipManagePokemon,
-          onPressed: _openManagePokemonList,
-        ),
         IconButton(
           key: PokemonListPage.settingsKey,
           iconSize: AppSizes.appBarActionIcon,
@@ -505,7 +489,7 @@ class _PokemonListPageState extends State<PokemonListPage>
       top: false,
       left: false,
       right: false,
-      bottom: true,
+      bottom: false,
       minimum: const EdgeInsets.only(bottom: AppSpacing.xs),
       child: Scrollbar(
         controller: _listController,
@@ -541,6 +525,108 @@ class _ListAppBarTitle extends StatelessWidget {
         const SizedBox(width: AppSpacing.xs),
         Text(title, style: AppTypography.title),
       ],
+    );
+  }
+}
+
+class _ListBottomBar extends StatelessWidget {
+  const _ListBottomBar({
+    required this.onStats,
+    required this.onAdd,
+    required this.onManage,
+  });
+
+  final VoidCallback onStats;
+  final VoidCallback onAdd;
+  final VoidCallback onManage;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final colors = Theme.of(context).colorScheme;
+    return SafeArea(
+      top: false,
+      left: false,
+      right: false,
+      child: Material(
+        color: Theme.of(context).cardColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadii.lg),
+          ),
+        ),
+        child: SizedBox(
+          height: kBottomNavigationBarHeight,
+          child: Row(
+            children: [
+              _BottomAction(
+                key: PokemonListPage.statsKey,
+                icon: Icons.bar_chart_rounded,
+                label: l10n.statsTitle,
+                onTap: onStats,
+                colors: colors,
+              ),
+              _BottomAction(
+                key: PokemonListPage.addPokemonKey,
+                icon: Icons.add_circle,
+                label: l10n.tooltipAddPokemon,
+                onTap: onAdd,
+                colors: colors,
+              ),
+              _BottomAction(
+                key: PokemonListPage.managePokemonKey,
+                icon: Icons.edit_note,
+                label: l10n.tooltipManagePokemon,
+                onTap: onManage,
+                colors: colors,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BottomAction extends StatelessWidget {
+  const _BottomAction({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    required this.colors,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final ColorScheme colors;
+
+  @override
+  Widget build(BuildContext context) {
+    final labelStyle = Theme.of(context).textTheme.labelSmall?.copyWith(
+      fontWeight: FontWeight.w700,
+      color: colors.onSurface,
+    );
+    return Expanded(
+      child: InkResponse(
+        onTap: onTap,
+        radius: kBottomNavigationBarHeight,
+        containedInkWell: true,
+        highlightShape: BoxShape.rectangle,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: AppSizes.appBarActionIcon,
+              color: colors.onSurface,
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(label, style: labelStyle, textAlign: TextAlign.center),
+          ],
+        ),
+      ),
     );
   }
 }
