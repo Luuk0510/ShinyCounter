@@ -80,6 +80,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
             const SizedBox(height: AppSpacing.md),
             Expanded(
               child: ListView.separated(
+                padding: const EdgeInsets.only(top: AppSpacing.sm),
                 itemBuilder: (context, index) => _buildRow(context, index),
                 separatorBuilder: (_, _) =>
                     const SizedBox(height: AppSpacing.md),
