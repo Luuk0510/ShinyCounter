@@ -12,6 +12,7 @@ Future<T?> showPokemonBottomSheet<T>(
   return showModalBottomSheet<T>(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     showDragHandle: showDragHandle,
     transitionAnimationController: transitionController,
     backgroundColor: backgroundColor ?? Theme.of(context).cardColor,

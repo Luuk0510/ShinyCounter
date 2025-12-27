@@ -76,6 +76,7 @@ class _ManageListViewState extends State<ManageListView> {
           }).toList();
 
     return SafeArea(
+      top: false,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.lg,
