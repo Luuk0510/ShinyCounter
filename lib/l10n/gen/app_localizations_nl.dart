@@ -113,6 +113,37 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsAccentColor => 'Accentkleur';
 
   @override
+  String get settingsDataTitle => 'Gegevens';
+
+  @override
+  String get settingsExportJson => 'Backup exporteren (JSON)';
+
+  @override
+  String get settingsImportJson => 'Backup importeren (JSON)';
+
+  @override
+  String get settingsImportConfirmTitle => 'Gegevens vervangen?';
+
+  @override
+  String get settingsImportConfirmMessage =>
+      'Importeren overschrijft je huidige gegevens.';
+
+  @override
+  String get settingsImportConfirmAction => 'Importeren';
+
+  @override
+  String get settingsExportSuccess => 'Backup geëxporteerd';
+
+  @override
+  String get settingsImportSuccess => 'Backup geïmporteerd';
+
+  @override
+  String get settingsExportFailed => 'Export mislukt';
+
+  @override
+  String get settingsImportFailed => 'Import mislukt';
+
+  @override
   String get colorDefault => 'Standaard';
 
   @override

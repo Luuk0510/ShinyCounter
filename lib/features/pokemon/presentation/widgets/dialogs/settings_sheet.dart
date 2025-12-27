@@ -1,10 +1,18 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:file_saver/file_saver.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/l10n/locale_notifier.dart';
+import 'package:shiny_counter/core/storage/app_backup_service.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/selectable_row.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 class SettingsDialog extends StatefulWidget {
@@ -18,6 +26,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
   late ThemeMode _mode;
   Locale? _locale;
   Color? _seedColor;
+  final AppBackupService _backupService = AppBackupService();
 
   @override
   void initState() {
@@ -42,6 +51,137 @@ class _SettingsDialogState extends State<SettingsDialog> {
   void _setSeedColor(Color? color) {
     context.read<ThemeNotifier>().setSeedColor(color);
     setState(() => _seedColor = color);
+  }
+
+  Future<void> _exportBackup() async {
+    final l10n = context.l10n;
+    try {
+      final content = await _backupService.exportJson();
+      if (!mounted) return;
+      final bytes = Uint8List.fromList(utf8.encode(content));
+      final now = DateTime.now();
+      final filename =
+          'shiny_counter_backup_${now.year.toString().padLeft(4, '0')}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}.json';
+      final path = await FileSaver.instance.saveAs(
+        name: filename.replaceAll('.json', ''),
+        bytes: bytes,
+        ext: 'json',
+        mimeType: MimeType.json,
+      );
+      if (path == null || path.isEmpty) return;
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.settingsExportSuccess)));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.settingsExportFailed)));
+    }
+  }
+
+  Future<void> _importBackup() async {
+    final l10n = context.l10n;
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['json'],
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty) return;
+      final file = result.files.single;
+      final bytes = file.bytes;
+      final path = file.path;
+      if (bytes == null && path == null) return;
+      if (!mounted) return;
+      final confirmed = await showScaledDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: Theme.of(context).cardColor,
+          surfaceTintColor: Colors.transparent,
+          title: Text(
+            l10n.settingsImportConfirmTitle,
+            textAlign: TextAlign.center,
+            style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
+          ),
+          content: Text(
+            l10n.settingsImportConfirmMessage,
+            textAlign: TextAlign.center,
+            style: AppTypography.button.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actionsPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.sm,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              style: AppButtonStyles.primaryOutline(
+                Theme.of(context).colorScheme,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xl,
+                  vertical: AppSpacing.sm,
+                ),
+                useLighter: true,
+              ),
+              child: Text(
+                l10n.cancel,
+                style: AppTypography.button.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: AppButtonStyles.primaryFilled(
+                Theme.of(context).colorScheme,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xl,
+                  vertical: AppSpacing.sm,
+                ),
+              ),
+              child: Text(
+                l10n.settingsImportConfirmAction,
+                style: AppTypography.button.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+
+      final raw = bytes != null
+          ? utf8.decode(bytes)
+          : await File(path!).readAsString();
+      await _backupService.importJson(raw);
+
+      if (!mounted) return;
+      final theme = context.read<ThemeNotifier>();
+      final locale = context.read<LocaleNotifier>();
+      await theme.reload();
+      await locale.reload();
+      if (!mounted) return;
+      setState(() {
+        _mode = theme.mode;
+        _locale = locale.locale;
+        _seedColor = theme.usesDefaultSeed ? null : theme.seedColor;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.settingsImportSuccess)));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.settingsImportFailed)));
+    }
   }
 
   @override
@@ -125,6 +265,23 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 onTap: () => _setSeedColor(option.color),
               );
             }),
+            const SizedBox(height: AppSpacing.lg),
+            Text(
+              l10n.settingsDataTitle,
+              style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _ActionRow(
+              icon: Icons.upload_rounded,
+              label: l10n.settingsExportJson,
+              onTap: _exportBackup,
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            _ActionRow(
+              icon: Icons.download_rounded,
+              label: l10n.settingsImportJson,
+              onTap: _importBackup,
+            ),
           ],
         ),
       ),
@@ -328,6 +485,47 @@ class _SeedOptionRow extends StatelessWidget {
             selectedColor: selectedColor,
             unselectedIcon: Icons.circle_outlined,
             unselectedColor: colors.onSurfaceVariant,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionRow extends StatelessWidget {
+  const _ActionRow({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return SelectableRow(
+      selected: false,
+      onTap: onTap,
+      selectedColor: AppButtonPalette.primaryFill(colors),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: colors.onSurfaceVariant),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              label,
+              style: AppTypography.sectionTitle.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colors.onSurface,
+              ),
+            ),
           ),
         ],
       ),

@@ -135,6 +135,16 @@
     "description": ""
   },
   "settingsAccentColor": "Accent color",
+  "settingsDataTitle": "Data",
+  "settingsExportJson": "Export backup (JSON)",
+  "settingsImportJson": "Import backup (JSON)",
+  "settingsImportConfirmTitle": "Replace your data?",
+  "settingsImportConfirmMessage": "Importing will overwrite your current data.",
+  "settingsImportConfirmAction": "Import",
+  "settingsExportSuccess": "Backup exported",
+  "settingsImportSuccess": "Backup imported",
+  "settingsExportFailed": "Export failed",
+  "settingsImportFailed": "Import failed",
   "@settingsAccentColor": {
     "description": ""
   },

@@ -135,6 +135,16 @@
     "description": ""
   },
   "settingsAccentColor": "Accentkleur",
+  "settingsDataTitle": "Gegevens",
+  "settingsExportJson": "Backup exporteren (JSON)",
+  "settingsImportJson": "Backup importeren (JSON)",
+  "settingsImportConfirmTitle": "Gegevens vervangen?",
+  "settingsImportConfirmMessage": "Importeren overschrijft je huidige gegevens.",
+  "settingsImportConfirmAction": "Importeren",
+  "settingsExportSuccess": "Backup geëxporteerd",
+  "settingsImportSuccess": "Backup geïmporteerd",
+  "settingsExportFailed": "Export mislukt",
+  "settingsImportFailed": "Import mislukt",
   "@settingsAccentColor": {
     "description": ""
   },

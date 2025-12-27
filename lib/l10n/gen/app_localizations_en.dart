@@ -113,6 +113,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAccentColor => 'Accent color';
 
   @override
+  String get settingsDataTitle => 'Data';
+
+  @override
+  String get settingsExportJson => 'Export backup (JSON)';
+
+  @override
+  String get settingsImportJson => 'Import backup (JSON)';
+
+  @override
+  String get settingsImportConfirmTitle => 'Replace your data?';
+
+  @override
+  String get settingsImportConfirmMessage =>
+      'Importing will overwrite your current data.';
+
+  @override
+  String get settingsImportConfirmAction => 'Import';
+
+  @override
+  String get settingsExportSuccess => 'Backup exported';
+
+  @override
+  String get settingsImportSuccess => 'Backup imported';
+
+  @override
+  String get settingsExportFailed => 'Export failed';
+
+  @override
+  String get settingsImportFailed => 'Import failed';
+
+  @override
   String get colorDefault => 'Default';
 
   @override

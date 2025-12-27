@@ -33,6 +33,8 @@ class ThemeNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> reload() => _load();
+
   Future<void> _load() async {
     final storedMode = await _store.getString(AppPrefsKeys.themeMode);
     final storedOled = await _store.getBool(AppPrefsKeys.themeOled);

@@ -18,6 +18,8 @@ class LocaleNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> reload() => _load();
+
   Future<void> _load() async {
     final code = await _store.getString(AppPrefsKeys.appLocale);
     if (code != null && code.isNotEmpty) {

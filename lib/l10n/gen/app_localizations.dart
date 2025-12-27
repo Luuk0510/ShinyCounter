@@ -302,6 +302,66 @@ abstract class AppLocalizations {
   /// **'Accent color'**
   String get settingsAccentColor;
 
+  /// No description provided for @settingsDataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Data'**
+  String get settingsDataTitle;
+
+  /// No description provided for @settingsExportJson.
+  ///
+  /// In en, this message translates to:
+  /// **'Export backup (JSON)'**
+  String get settingsExportJson;
+
+  /// No description provided for @settingsImportJson.
+  ///
+  /// In en, this message translates to:
+  /// **'Import backup (JSON)'**
+  String get settingsImportJson;
+
+  /// No description provided for @settingsImportConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace your data?'**
+  String get settingsImportConfirmTitle;
+
+  /// No description provided for @settingsImportConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing will overwrite your current data.'**
+  String get settingsImportConfirmMessage;
+
+  /// No description provided for @settingsImportConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get settingsImportConfirmAction;
+
+  /// No description provided for @settingsExportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup exported'**
+  String get settingsExportSuccess;
+
+  /// No description provided for @settingsImportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup imported'**
+  String get settingsImportSuccess;
+
+  /// No description provided for @settingsExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed'**
+  String get settingsExportFailed;
+
+  /// No description provided for @settingsImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed'**
+  String get settingsImportFailed;
+
   ///
   ///
   /// In en, this message translates to:
