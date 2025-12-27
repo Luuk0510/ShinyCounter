@@ -11,7 +11,7 @@ import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/storage/app_backup_service.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/common/selectable_row.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/settings_sections.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
@@ -186,7 +186,6 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
     final viewInset = MediaQuery.of(context).viewPadding.bottom;
     return AlertDialog(
@@ -194,7 +193,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       backgroundColor: Theme.of(context).cardColor,
       surfaceTintColor: Colors.transparent,
       title: Text(
-        l10n.tooltipSettings,
+        AppLocalizations.of(context)!.tooltipSettings,
         textAlign: TextAlign.center,
         style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
       ),
@@ -203,85 +202,19 @@ class _SettingsDialogState extends State<SettingsDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.settingsLanguage,
-              style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _ThemeOption(
-              label: l10n.languageEnglish,
-              selected: _locale?.languageCode == 'en',
-              onTap: () => _setLocale(const Locale('en')),
-            ),
-            _ThemeOption(
-              label: l10n.languageDutch,
-              selected: _locale?.languageCode == 'nl',
-              onTap: () => _setLocale(const Locale('nl')),
+            LanguageSection(
+              selectedLocale: _locale,
+              onLocaleChanged: _setLocale,
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text(
-              l10n.settingsTitle,
-              style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _ThemeOption(
-              label: l10n.settingsSystem,
-              selected: _mode == ThemeMode.system,
-              onTap: () => _setMode(ThemeMode.system),
-            ),
-            _ThemeOption(
-              label: l10n.settingsLight,
-              selected: _mode == ThemeMode.light,
-              onTap: () => _setMode(ThemeMode.light),
-            ),
-            _ThemeOption(
-              label: l10n.settingsDark,
-              selected:
-                  _mode == ThemeMode.dark &&
-                  !context.watch<ThemeNotifier>().useOledDark,
-              onTap: () => _setMode(ThemeMode.dark, useOled: false),
-            ),
-            _ThemeOption(
-              label: l10n.settingsOled,
-              selected:
-                  _mode == ThemeMode.dark &&
-                  context.watch<ThemeNotifier>().useOledDark,
-              onTap: () => _setMode(ThemeMode.dark, useOled: true),
+            ThemeSection(mode: _mode, onModeChanged: _setMode),
+            const SizedBox(height: AppSpacing.lg),
+            AccentColorSection(
+              seedColor: _seedColor,
+              onSeedColorChanged: _setSeedColor,
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text(
-              l10n.settingsAccentColor,
-              style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            ..._seedOptions(l10n).map((option) {
-              final selected = option.color == null
-                  ? _seedColor == null
-                  : _seedColor?.toARGB32() == option.color!.toARGB32();
-              return _SeedOptionRow(
-                label: option.label,
-                swatch: option.swatch,
-                selected: selected,
-                onTap: () => _setSeedColor(option.color),
-              );
-            }),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              l10n.settingsDataTitle,
-              style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _ActionRow(
-              icon: Icons.upload_rounded,
-              label: l10n.settingsExportJson,
-              onTap: _exportBackup,
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            _ActionRow(
-              icon: Icons.download_rounded,
-              label: l10n.settingsImportJson,
-              onTap: _importBackup,
-            ),
+            DataSection(onExport: _exportBackup, onImport: _importBackup),
           ],
         ),
       ),
@@ -301,7 +234,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   useLighter: true,
                 ),
                 child: Text(
-                  l10n.cancel,
+                  AppLocalizations.of(context)!.cancel,
                   style: AppTypography.button.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -320,215 +253,6 @@ class _SettingsDialogState extends State<SettingsDialog> {
           ],
         ),
       ],
-    );
-  }
-}
-
-class _SeedOption {
-  const _SeedOption({required this.label, required this.color, this.swatch});
-
-  final String label;
-  final Color? color;
-  final Color? swatch;
-}
-
-List<_SeedOption> _seedOptions(AppLocalizations l10n) {
-  return [
-    _SeedOption(label: l10n.colorDefault, color: null, swatch: AppColors.seed),
-    _SeedOption(
-      label: l10n.colorRed,
-      color: AppSeedColors.red,
-      swatch: AppSeedColors.red,
-    ),
-    _SeedOption(
-      label: l10n.colorOrange,
-      color: AppSeedColors.orange,
-      swatch: AppSeedColors.orange,
-    ),
-    _SeedOption(
-      label: l10n.colorYellow,
-      color: AppSeedColors.yellow,
-      swatch: AppSeedColors.yellow,
-    ),
-    _SeedOption(
-      label: l10n.colorGreen,
-      color: AppSeedColors.green,
-      swatch: AppSeedColors.green,
-    ),
-    _SeedOption(
-      label: l10n.colorTeal,
-      color: AppSeedColors.teal,
-      swatch: AppSeedColors.teal,
-    ),
-    _SeedOption(
-      label: l10n.colorBlue,
-      color: AppSeedColors.blue,
-      swatch: AppSeedColors.blue,
-    ),
-    _SeedOption(
-      label: l10n.colorDarkBlue,
-      color: AppSeedColors.darkBlue,
-      swatch: AppSeedColors.darkBlue,
-    ),
-    _SeedOption(
-      label: l10n.colorPurple,
-      color: AppSeedColors.purple,
-      swatch: AppSeedColors.purple,
-    ),
-    _SeedOption(
-      label: l10n.colorPink,
-      color: AppSeedColors.pink,
-      swatch: AppSeedColors.pink,
-    ),
-  ];
-}
-
-class _ThemeOption extends StatelessWidget {
-  const _ThemeOption({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final selectedColor = AppButtonPalette.primaryFill(colors);
-    return SelectableRow(
-      selected: selected,
-      onTap: onTap,
-      selectedColor: selectedColor,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: AppTypography.sectionTitle.copyWith(
-                fontWeight: FontWeight.w700,
-                color: selected ? selectedColor : colors.onSurface,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          SelectableCheckmark(
-            selected: selected,
-            selectedColor: selectedColor,
-            unselectedIcon: Icons.circle_outlined,
-            unselectedColor: colors.onSurfaceVariant,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SeedOptionRow extends StatelessWidget {
-  const _SeedOptionRow({
-    required this.label,
-    required this.swatch,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final Color? swatch;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final selectedColor = swatch ?? AppButtonPalette.primaryAccent(colors);
-    return SelectableRow(
-      selected: selected,
-      onTap: onTap,
-      selectedColor: selectedColor,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: AppSizes.seedSwatch,
-            height: AppSizes.seedSwatch,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: swatch ?? AppButtonPalette.primaryFill(colors),
-              border: Border.all(
-                color: colors.outlineVariant.withValues(alpha: 0.4),
-                width: 1,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              label,
-              style: AppTypography.sectionTitle.copyWith(
-                fontWeight: FontWeight.w700,
-                color: selected ? selectedColor : colors.onSurface,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          SelectableCheckmark(
-            selected: selected,
-            selectedColor: selectedColor,
-            unselectedIcon: Icons.circle_outlined,
-            unselectedColor: colors.onSurfaceVariant,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ActionRow extends StatelessWidget {
-  const _ActionRow({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return SelectableRow(
-      selected: false,
-      onTap: onTap,
-      selectedColor: AppButtonPalette.primaryFill(colors),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: colors.onSurfaceVariant),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              label,
-              style: AppTypography.sectionTitle.copyWith(
-                fontWeight: FontWeight.w700,
-                color: colors.onSurface,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -311,13 +311,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsExportJson.
   ///
   /// In en, this message translates to:
-  /// **'Export backup (JSON)'**
+  /// **'Export backup'**
   String get settingsExportJson;
 
   /// No description provided for @settingsImportJson.
   ///
   /// In en, this message translates to:
-  /// **'Import backup (JSON)'**
+  /// **'Import backup'**
   String get settingsImportJson;
 
   /// No description provided for @settingsImportConfirmTitle.

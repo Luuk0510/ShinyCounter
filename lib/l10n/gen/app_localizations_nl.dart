@@ -116,10 +116,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsDataTitle => 'Gegevens';
 
   @override
-  String get settingsExportJson => 'Backup exporteren (JSON)';
+  String get settingsExportJson => 'Backup exporteren';
 
   @override
-  String get settingsImportJson => 'Backup importeren (JSON)';
+  String get settingsImportJson => 'Backup importeren';
 
   @override
   String get settingsImportConfirmTitle => 'Gegevens vervangen?';

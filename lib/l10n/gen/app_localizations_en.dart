@@ -116,10 +116,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDataTitle => 'Data';
 
   @override
-  String get settingsExportJson => 'Export backup (JSON)';
+  String get settingsExportJson => 'Export backup';
 
   @override
-  String get settingsImportJson => 'Import backup (JSON)';
+  String get settingsImportJson => 'Import backup';
 
   @override
   String get settingsImportConfirmTitle => 'Replace your data?';
