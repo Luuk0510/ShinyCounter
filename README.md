@@ -17,10 +17,11 @@ Pokémon shiny counter app in Flutter.
 
 ## Usage
 
-1. `flutter pub get`
-2. Run: `flutter run`
-3. Tests: `flutter test`  
-4. Coverage:  
+1. `flutter pub get` (installs dependencies listed in `pubspec.yaml`)
+2. `flutter gen-l10n` (generates localization files from `lib/l10n/*.arb`)
+3. `flutter run` (Run application)
+4. `flutter test` (Execute all tests)
+5. Coverage:  
    - `flutter test --coverage`  
    - `dart run tools/lcov_viewer.dart coverage/lcov.info > coverage/coverage.html`
 
