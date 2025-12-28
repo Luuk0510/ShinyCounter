@@ -32,7 +32,7 @@ class CounterControls extends StatelessWidget {
           onTap: onEdit,
           child: TweenAnimationBuilder<double>(
             key: ValueKey(count),
-            tween: Tween<double>(begin: 1.05, end: 1),
+            tween: Tween<double>(begin: 1.1, end: 1),
             duration: AppAnim.fast,
             builder: (context, scale, child) =>
                 Transform.scale(scale: scale, child: child),
@@ -45,7 +45,7 @@ class CounterControls extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: AppSpacing.md),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

@@ -27,7 +27,7 @@ class AppSizes {
   static const dropdownWidth = 115.0;
 
   // counter_controls.dart
-  static const counterButtonSize = 80.0; // pokemon_detail_page.dart
+  static const counterButtonSize = 90.0; // pokemon_detail_page.dart
   static const counterButtonPadding = 18.0;
   static const counterIconSize = 32.0;
 

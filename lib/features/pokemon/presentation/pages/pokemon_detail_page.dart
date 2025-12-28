@@ -635,7 +635,7 @@ class _DetailInfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.xl),
+      padding: const EdgeInsets.only(top: AppSpacing.lg),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
