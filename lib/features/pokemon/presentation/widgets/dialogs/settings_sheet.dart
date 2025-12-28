@@ -189,7 +189,12 @@ class _SettingsDialogState extends State<SettingsDialog> {
     final colors = Theme.of(context).colorScheme;
     final viewInset = MediaQuery.of(context).viewPadding.bottom;
     return AlertDialog(
-      insetPadding: AppInsets.pageWithBottomInset(viewInset),
+      insetPadding: EdgeInsets.fromLTRB(
+        AppSpacing.sm,
+        AppSpacing.sm,
+        AppSpacing.sm,
+        AppSpacing.sm + viewInset,
+      ),
       backgroundColor: Theme.of(context).cardColor,
       surfaceTintColor: Colors.transparent,
       title: Text(
