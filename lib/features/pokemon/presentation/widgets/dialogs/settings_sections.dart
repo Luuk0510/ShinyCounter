@@ -329,7 +329,7 @@ class _SeedOptionRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final rowColor = swatch ?? AppButtonPalette.primaryAccent(colors);
-    final highlightColor = AppButtonPalette.highlightFor(rowColor);
+    final highlightColor = AppButtonPalette.primaryHighlight(colors);
     final checkmarkColor = swatch ?? AppButtonPalette.primaryFill(colors);
     return SelectableRow(
       selected: selected,
