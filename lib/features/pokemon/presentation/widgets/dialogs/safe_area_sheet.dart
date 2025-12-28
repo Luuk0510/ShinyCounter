@@ -8,7 +8,7 @@ class SafeAreaSheet extends StatelessWidget {
     super.key,
     required this.child,
     this.padding = EdgeInsets.zero,
-    this.safeAreaTop = false,
+    this.safeAreaTop = true,
     this.safeAreaBottom = true,
     this.safeAreaSides = true,
   });
