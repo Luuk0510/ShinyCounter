@@ -15,7 +15,17 @@ class AppButtonPalette {
   }
 
   static Color primaryHighlight(ColorScheme colors) {
-    return Color.lerp(colors.primary, Colors.white, 0.25)!;
+    return highlightFor(colors.primary);
+  }
+
+  static Color highlightFor(Color color) {
+    return Color.lerp(color, Colors.white, 0.25)!;
+  }
+
+  static Color onSeed(Color seed) {
+    return ThemeData.estimateBrightnessForColor(seed) == Brightness.dark
+        ? Colors.white
+        : Colors.black;
   }
 
   static Color outline(ColorScheme colors) {

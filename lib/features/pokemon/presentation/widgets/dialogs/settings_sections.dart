@@ -278,11 +278,12 @@ class _ThemeOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final selectedColor = AppButtonPalette.primaryFill(colors);
+    final highlightColor = AppButtonPalette.primaryHighlight(colors);
+    final checkmarkColor = context.watch<ThemeNotifier>().seedColor;
     return SelectableRow(
       selected: selected,
       onTap: onTap,
-      selectedColor: selectedColor,
+      selectedColor: highlightColor,
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
         vertical: AppSpacing.sm,
@@ -294,14 +295,14 @@ class _ThemeOption extends StatelessWidget {
               label,
               style: AppTypography.sectionTitle.copyWith(
                 fontWeight: FontWeight.w700,
-                color: selected ? selectedColor : colors.onSurface,
+                color: selected ? highlightColor : colors.onSurface,
               ),
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
           SelectableCheckmark(
             selected: selected,
-            selectedColor: selectedColor,
+            selectedColor: checkmarkColor,
             unselectedIcon: Icons.circle_outlined,
             unselectedColor: colors.onSurfaceVariant,
           ),
@@ -327,11 +328,13 @@ class _SeedOptionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final selectedColor = swatch ?? AppButtonPalette.primaryAccent(colors);
+    final rowColor = swatch ?? AppButtonPalette.primaryAccent(colors);
+    final highlightColor = AppButtonPalette.highlightFor(rowColor);
+    final checkmarkColor = swatch ?? AppButtonPalette.primaryFill(colors);
     return SelectableRow(
       selected: selected,
       onTap: onTap,
-      selectedColor: selectedColor,
+      selectedColor: rowColor,
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
         vertical: AppSpacing.sm,
@@ -356,14 +359,14 @@ class _SeedOptionRow extends StatelessWidget {
               label,
               style: AppTypography.sectionTitle.copyWith(
                 fontWeight: FontWeight.w700,
-                color: selected ? selectedColor : colors.onSurface,
+                color: selected ? highlightColor : colors.onSurface,
               ),
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
           SelectableCheckmark(
             selected: selected,
-            selectedColor: selectedColor,
+            selectedColor: checkmarkColor,
             unselectedIcon: Icons.circle_outlined,
             unselectedColor: colors.onSurfaceVariant,
           ),
