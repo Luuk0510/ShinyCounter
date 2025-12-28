@@ -15,18 +15,8 @@ class ThemeNotifier extends ChangeNotifier {
 
   ThemeMode get mode => _mode;
   bool get useOledDark => _useOledDark;
-  Color get seedColor {
-    final stored = _seedColor?.toARGB32();
-    if (stored == null || stored == AppColors.legacySeed.toARGB32()) {
-      return AppColors.seed;
-    }
-    return _seedColor!;
-  }
-
-  bool get usesDefaultSeed {
-    final stored = _seedColor?.toARGB32();
-    return stored == null || stored == AppColors.legacySeed.toARGB32();
-  }
+  Color get seedColor => _seedColor ?? AppColors.seed;
+  bool get usesDefaultSeed => _seedColor == null;
 
   void setMode(ThemeMode mode, {bool? useOledDark}) {
     _mode = mode;
@@ -65,7 +55,11 @@ class ThemeNotifier extends ChangeNotifier {
       _useOledDark = storedOled;
     }
     if (storedSeed != null) {
-      if (storedSeed == AppColors.legacySeed.toARGB32()) {
+      final legacySeeds = {
+        AppColors.legacySeed.toARGB32(),
+        AppColors.legacySeedGray.toARGB32(),
+      };
+      if (legacySeeds.contains(storedSeed)) {
         await _store.remove(AppPrefsKeys.themeSeed);
         _seedColor = null;
       } else {
@@ -82,8 +76,7 @@ class ThemeNotifier extends ChangeNotifier {
   }
 
   Future<void> _persistSeed() async {
-    if (_seedColor == null ||
-        _seedColor!.toARGB32() == AppColors.legacySeed.toARGB32()) {
+    if (_seedColor == null) {
       await _store.remove(AppPrefsKeys.themeSeed);
       return;
     }

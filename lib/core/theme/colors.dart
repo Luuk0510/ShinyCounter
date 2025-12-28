@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const seed = Color(0xFF808080);
+  static const seed = AppSeedColors.blue;
   static const legacySeed = Color(0xFF3F51B5);
+  static const legacySeedGray = Color(0xFF808080);
   static const deleteIcon = Color.fromARGB(255, 247, 69, 69);
   static const darkBackground = Color(0xFF151924);
   static const darkSurface = Color(0xFF1E2430);

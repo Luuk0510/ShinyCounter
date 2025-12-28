@@ -111,9 +111,7 @@ class AccentColorSection extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         ..._seedOptions(l10n).map((option) {
-          final selected = option.color == null
-              ? seedColor == null
-              : seedColor?.toARGB32() == option.color!.toARGB32();
+          final selected = seedColor?.toARGB32() == option.color?.toARGB32();
           return _SeedOptionRow(
             label: option.label,
             swatch: option.swatch,
@@ -215,7 +213,6 @@ class _SeedOption {
 
 List<_SeedOption> _seedOptions(AppLocalizations l10n) {
   return [
-    _SeedOption(label: l10n.colorDefault, color: null, swatch: AppColors.seed),
     _SeedOption(
       label: l10n.colorRed,
       color: AppSeedColors.red,

@@ -33,8 +33,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
     super.initState();
     _mode = context.read<ThemeNotifier>().mode;
     _locale = context.read<LocaleNotifier>().locale;
-    final theme = context.read<ThemeNotifier>();
-    _seedColor = theme.usesDefaultSeed ? null : theme.seedColor;
+    _seedColor = context.read<ThemeNotifier>().seedColor;
   }
 
   void _setMode(ThemeMode mode, {bool? useOled}) {
@@ -171,7 +170,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       setState(() {
         _mode = theme.mode;
         _locale = locale.locale;
-        _seedColor = theme.usesDefaultSeed ? null : theme.seedColor;
+        _seedColor = theme.seedColor;
       });
       ScaffoldMessenger.of(
         context,
