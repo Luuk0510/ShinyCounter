@@ -27,6 +27,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltipSettings => 'Settings';
 
   @override
+  String get statsTitle => 'Statistics';
+
+  @override
+  String get statsCaughtLabel => 'Caught Pokémon';
+
+  @override
+  String get statsTotalCountsLabel => 'Total counts';
+
+  @override
+  String get statsGamesLabel => 'Caught in games';
+
+  @override
+  String get statsGamesShowMore => 'Show all';
+
+  @override
+  String get statsGamesShowLess => 'Show less';
+
+  @override
+  String get statsRecentLabel => 'Recent catches';
+
+  @override
+  String get statsRangeReset => 'Reset';
+
+  @override
   String get manageTitle => 'Manage Pokémon';
 
   @override
@@ -86,6 +110,70 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTitle => 'Theme';
 
   @override
+  String get settingsAccentColor => 'Accent color';
+
+  @override
+  String get settingsDataTitle => 'Data';
+
+  @override
+  String get settingsExportJson => 'Export backup';
+
+  @override
+  String get settingsImportJson => 'Import backup';
+
+  @override
+  String get settingsImportConfirmTitle => 'Replace your data?';
+
+  @override
+  String get settingsImportConfirmMessage =>
+      'Importing will overwrite your current data.';
+
+  @override
+  String get settingsImportConfirmAction => 'Import';
+
+  @override
+  String get settingsExportSuccess => 'Backup exported';
+
+  @override
+  String get settingsImportSuccess => 'Backup imported';
+
+  @override
+  String get settingsExportFailed => 'Export failed';
+
+  @override
+  String get settingsImportFailed => 'Import failed';
+
+  @override
+  String get colorDefault => 'Default';
+
+  @override
+  String get colorRed => 'Red';
+
+  @override
+  String get colorOrange => 'Orange';
+
+  @override
+  String get colorYellow => 'Yellow';
+
+  @override
+  String get colorGreen => 'Green';
+
+  @override
+  String get colorTeal => 'Teal';
+
+  @override
+  String get colorBlue => 'Blue';
+
+  @override
+  String get colorDarkBlue => 'Dark blue';
+
+  @override
+  String get colorPurple => 'Purple';
+
+  @override
+  String get colorPink => 'Pink';
+
+  @override
   String get settingsSystem => 'System';
 
   @override
@@ -122,7 +210,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get huntStart => 'Start';
 
   @override
-  String get huntCatch => 'Catch';
+  String get huntCaught => 'Caught';
 
   @override
   String huntGame(Object game) {

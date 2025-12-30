@@ -9,8 +9,8 @@ class AppTheme {
     'oled': oled(),
   };
 
-  static ThemeData light() {
-    final scheme = ColorScheme.fromSeed(seedColor: AppColors.seed);
+  static ThemeData light({Color? seedColor}) {
+    final scheme = ColorScheme.fromSeed(seedColor: seedColor ?? AppColors.seed);
     final cardColor = scheme.surfaceContainerHigh;
     return ThemeData(
       colorScheme: scheme.copyWith(
@@ -34,19 +34,22 @@ class AppTheme {
     );
   }
 
-  static ThemeData dark() {
+  static ThemeData dark({Color? seedColor}) {
+    final seed = seedColor ?? AppColors.seed;
     final darkSchemeBase = ColorScheme.fromSeed(
-      seedColor: AppColors.seed,
+      seedColor: seed,
       brightness: Brightness.dark,
     );
+    final tintedSurface = Color.lerp(AppColors.darkSurface, seed, 0.08)!;
+    final tintedBackground = Color.lerp(AppColors.darkBackground, seed, 0.06)!;
     final scheme = darkSchemeBase.copyWith(
-      surface: AppColors.darkSurface,
-      surfaceContainerHighest: AppColors.darkSurface,
+      surface: tintedSurface,
+      surfaceContainerHighest: tintedSurface,
     );
     final cardColor = scheme.surfaceContainerHighest;
     return ThemeData(
       colorScheme: scheme,
-      scaffoldBackgroundColor: AppColors.darkBackground,
+      scaffoldBackgroundColor: tintedBackground,
       cardColor: cardColor,
       cardTheme: CardThemeData(
         color: cardColor,
@@ -61,9 +64,9 @@ class AppTheme {
     );
   }
 
-  static ThemeData oled() {
+  static ThemeData oled({Color? seedColor}) {
     final darkSchemeBase = ColorScheme.fromSeed(
-      seedColor: AppColors.seed,
+      seedColor: seedColor ?? AppColors.seed,
       brightness: Brightness.dark,
     );
     final scheme = darkSchemeBase.copyWith(

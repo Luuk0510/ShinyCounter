@@ -10,7 +10,7 @@ import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart'
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
-import 'package:shiny_counter/l10n/app_localizations.dart';
+import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 import 'helpers/fakes.dart';
 

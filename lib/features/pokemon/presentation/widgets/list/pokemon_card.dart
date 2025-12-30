@@ -94,10 +94,7 @@ class _PokemonCardState extends State<PokemonCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSizes.cardPaddingH,
-        vertical: AppSizes.cardPaddingV,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: AppSizes.cardPaddingV),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isCompact = constraints.maxWidth < 420;
@@ -250,7 +247,7 @@ class _ActionOverlay extends StatelessWidget {
                       _ActionIcon(
                         icon: Icons.delete_outline,
                         onPressed: onDelete!,
-                        color: colors.error,
+                        color: AppButtonPalette.deleteIcon(colors),
                         size: AppSizes.cardActionIcon,
                       ),
                   ],
@@ -291,8 +288,8 @@ class _ActionIcon extends StatelessWidget {
         icon: Icon(icon, color: iconColor, size: iconSize),
         onPressed: onPressed,
         constraints: BoxConstraints.tightFor(
-          width: size * 3,
-          height: size * 2.5,
+          width: size * AppSizes.cardActionButtonWidthScale,
+          height: size * AppSizes.cardActionButtonHeightScale,
         ),
         padding: EdgeInsets.zero,
       ),

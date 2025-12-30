@@ -1,6 +1,8 @@
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
 import 'package:shiny_counter/features/pokemon/data/repositories/prefs_pokemon_repository.dart';
+import 'package:shiny_counter/features/pokemon/data/repositories/stats_repository_impl.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
+import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
@@ -16,6 +18,7 @@ class AppLocator {
   static final AppLocator instance = AppLocator._();
 
   late final PokemonRepository pokemonRepository;
+  late final StatsRepository statsRepository;
   late final CounterSync counterSyncService;
   late final LoadCustomPokemonUseCase loadCustomPokemon;
   late final SaveCustomPokemonUseCase saveCustomPokemon;
@@ -30,6 +33,10 @@ class AppLocator {
       storage: PokemonStorage(store: prefsStore),
     );
     counterSyncService = await CounterSyncService.instance(store: prefsStore);
+    statsRepository = StatsRepositoryImpl(
+      pokemonRepository: pokemonRepository,
+      counterSync: counterSyncService,
+    );
     loadCustomPokemon = LoadCustomPokemonUseCase(pokemonRepository);
     saveCustomPokemon = SaveCustomPokemonUseCase(pokemonRepository);
     loadCaught = LoadCaughtUseCase(pokemonRepository);

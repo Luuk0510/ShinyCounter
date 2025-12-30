@@ -60,7 +60,7 @@ class DateRow extends StatelessWidget {
         ),
         IconButton(
           icon: const Icon(Icons.clear),
-          color: colors.error,
+          color: AppButtonPalette.deleteIcon(colors),
           onPressed: onClear,
         ),
       ],

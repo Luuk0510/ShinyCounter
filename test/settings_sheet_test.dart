@@ -8,7 +8,7 @@ import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/storage/app_prefs_keys.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/settings_sheet.dart';
-import 'package:shiny_counter/l10n/app_localizations.dart';
+import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 import 'helpers/memory_store.dart';
 

@@ -272,7 +272,7 @@ class _DateGroup extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         DateRow(
-          label: l10n.huntCatch,
+          label: l10n.huntCaught,
           value: catchDate,
           onPick: () => _pickDate(context, catchDate).then((value) {
             if (value != null) onCatchChanged(value);

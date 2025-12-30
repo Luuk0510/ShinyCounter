@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 
 class CounterControls extends StatelessWidget {
@@ -21,6 +23,8 @@ class CounterControls extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final seedColor = context.watch<ThemeNotifier>().seedColor;
+    final onSeed = AppButtonPalette.onSeed(seedColor);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -28,7 +32,7 @@ class CounterControls extends StatelessWidget {
           onTap: onEdit,
           child: TweenAnimationBuilder<double>(
             key: ValueKey(count),
-            tween: Tween<double>(begin: 1.05, end: 1),
+            tween: Tween<double>(begin: 1.1, end: 1),
             duration: AppAnim.fast,
             builder: (context, scale, child) =>
                 Transform.scale(scale: scale, child: child),
@@ -41,23 +45,23 @@ class CounterControls extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: AppSpacing.md),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _RoundIconButton(
               icon: Icons.remove,
               onPressed: onDecrement,
-              background: AppButtonPalette.primaryFill(colors),
-              foreground: AppButtonPalette.primaryOnFill(colors),
+              background: seedColor,
+              foreground: onSeed,
               enabled: enabled,
             ),
             const SizedBox(width: AppSpacing.xl),
             _RoundIconButton(
               icon: Icons.add,
               onPressed: onIncrement,
-              background: AppButtonPalette.primaryFill(colors),
-              foreground: AppButtonPalette.primaryOnFill(colors),
+              background: seedColor,
+              foreground: onSeed,
               enabled: enabled,
             ),
           ],
