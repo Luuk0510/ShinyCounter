@@ -80,6 +80,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
             const SizedBox(height: AppSpacing.md),
             Expanded(
               child: ListView.separated(
+                padding: const EdgeInsets.only(top: AppSpacing.sm),
                 itemBuilder: (context, index) => _buildRow(context, index),
                 separatorBuilder: (_, _) =>
                     const SizedBox(height: AppSpacing.md),
@@ -199,7 +200,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           onPressed: () => _removeRow(index),
           tooltip: l10n.manageDeleteTooltip,
           icon: const Icon(Icons.delete_outline),
-          color: colors.error,
+          color: AppButtonPalette.deleteIcon(colors),
         ),
       ],
     );

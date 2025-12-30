@@ -6,13 +6,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/add_pokemon_dialog.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/filters/search_gen_filter_row.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
-import 'package:shiny_counter/l10n/app_localizations.dart';
+import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 import 'helpers/fakes.dart';
+import 'helpers/memory_store.dart';
 import 'helpers/test_asset_bundle.dart';
 
 Future<void> _waitForText(
@@ -35,8 +37,13 @@ Widget _wrap(Widget child, {required SpriteService spriteService}) {
   ]);
   return DefaultAssetBundle(
     bundle: bundle,
-    child: Provider<SpriteService>.value(
-      value: spriteService,
+    child: MultiProvider(
+      providers: [
+        Provider<SpriteService>.value(value: spriteService),
+        ChangeNotifierProvider<ThemeNotifier>(
+          create: (_) => ThemeNotifier(MemoryKeyValueStore()),
+        ),
+      ],
       child: MaterialApp(
         locale: const Locale('en'),
         localizationsDelegates: const [

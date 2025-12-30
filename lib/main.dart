@@ -8,7 +8,7 @@ import 'core/routing/app_router.dart';
 import 'core/theme/theme.dart';
 import 'core/theme/theme_notifier.dart';
 import 'features/pokemon/overlay/counter_overlay.dart' as counter_overlay;
-import 'package:shiny_counter/l10n/app_localizations.dart';
+import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 import 'core/l10n/locale_notifier.dart';
 
 Future<void> main() async {
@@ -34,11 +34,14 @@ class MyApp extends StatelessWidget {
         builder: (context) {
           final theme = context.watch<ThemeNotifier>();
           final locale = context.watch<LocaleNotifier>().locale;
+          final seedColor = theme.seedColor;
           return MaterialApp.router(
             onGenerateTitle: (context) =>
                 AppLocalizations.of(context)?.appTitle ?? 'Shiny Counter',
-            theme: AppTheme.light(),
-            darkTheme: theme.useOledDark ? AppTheme.oled() : AppTheme.dark(),
+            theme: AppTheme.light(seedColor: seedColor),
+            darkTheme: theme.useOledDark
+                ? AppTheme.oled(seedColor: seedColor)
+                : AppTheme.dark(seedColor: seedColor),
             themeMode: theme.mode,
             routerConfig: router,
             locale: locale,

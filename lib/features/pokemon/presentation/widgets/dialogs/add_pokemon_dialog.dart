@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
+import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
@@ -283,6 +284,7 @@ class _SpritePickerState extends State<_SpritePicker> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AddPokemonController>();
+    final seedColor = context.watch<ThemeNotifier>().seedColor;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -374,6 +376,7 @@ class _SpritePickerState extends State<_SpritePicker> {
                           final selectedColor = AppButtonPalette.primaryAccent(
                             widget.colors,
                           );
+                          final checkmarkColor = seedColor;
                           final checkWidth =
                               AppSizes.cardActionIcon + AppSpacing.xs;
                           return SelectableRow(
@@ -428,7 +431,7 @@ class _SpritePickerState extends State<_SpritePicker> {
                                 ),
                                 SelectableCheckmark(
                                   selected: selected,
-                                  selectedColor: selectedColor,
+                                  selectedColor: checkmarkColor,
                                   iconSize: AppSizes.cardActionIcon,
                                   animate: true,
                                   width: checkWidth,

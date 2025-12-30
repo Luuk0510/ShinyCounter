@@ -24,6 +24,38 @@
   "@tooltipSettings": {
     "description": ""
   },
+  "statsTitle": "Statistics",
+  "@statsTitle": {
+    "description": ""
+  },
+  "statsCaughtLabel": "Caught Pokémon",
+  "@statsCaughtLabel": {
+    "description": ""
+  },
+  "statsTotalCountsLabel": "Total counts",
+  "@statsTotalCountsLabel": {
+    "description": ""
+  },
+  "statsGamesLabel": "Caught in games",
+  "@statsGamesLabel": {
+    "description": ""
+  },
+  "statsGamesShowMore": "Show all",
+  "@statsGamesShowMore": {
+    "description": ""
+  },
+  "statsGamesShowLess": "Show less",
+  "@statsGamesShowLess": {
+    "description": ""
+  },
+  "statsRecentLabel": "Recent catches",
+  "@statsRecentLabel": {
+    "description": ""
+  },
+  "statsRangeReset": "Reset",
+  "@statsRangeReset": {
+    "description": ""
+  },
   "manageTitle": "Manage Pokémon",
   "@manageTitle": {
     "description": ""
@@ -102,6 +134,60 @@
   "@settingsTitle": {
     "description": ""
   },
+  "settingsAccentColor": "Accent color",
+  "settingsDataTitle": "Data",
+  "settingsExportJson": "Export backup",
+  "settingsImportJson": "Import backup",
+  "settingsImportConfirmTitle": "Replace your data?",
+  "settingsImportConfirmMessage": "Importing will overwrite your current data.",
+  "settingsImportConfirmAction": "Import",
+  "settingsExportSuccess": "Backup exported",
+  "settingsImportSuccess": "Backup imported",
+  "settingsExportFailed": "Export failed",
+  "settingsImportFailed": "Import failed",
+  "@settingsAccentColor": {
+    "description": ""
+  },
+  "colorDefault": "Default",
+  "@colorDefault": {
+    "description": ""
+  },
+  "colorRed": "Red",
+  "@colorRed": {
+    "description": ""
+  },
+  "colorOrange": "Orange",
+  "@colorOrange": {
+    "description": ""
+  },
+  "colorYellow": "Yellow",
+  "@colorYellow": {
+    "description": ""
+  },
+  "colorGreen": "Green",
+  "@colorGreen": {
+    "description": ""
+  },
+  "colorTeal": "Teal",
+  "@colorTeal": {
+    "description": ""
+  },
+  "colorBlue": "Blue",
+  "@colorBlue": {
+    "description": ""
+  },
+  "colorDarkBlue": "Dark blue",
+  "@colorDarkBlue": {
+    "description": ""
+  },
+  "colorPurple": "Purple",
+  "@colorPurple": {
+    "description": ""
+  },
+  "colorPink": "Pink",
+  "@colorPink": {
+    "description": ""
+  },
   "settingsSystem": "System",
   "@settingsSystem": {
     "description": ""
@@ -150,8 +236,8 @@
   "@huntStart": {
     "description": ""
   },
-  "huntCatch": "Catch",
-  "@huntCatch": {
+  "huntCaught": "Caught",
+  "@huntCaught": {
     "description": ""
   },
   "huntGame": "Pokemon {game}",

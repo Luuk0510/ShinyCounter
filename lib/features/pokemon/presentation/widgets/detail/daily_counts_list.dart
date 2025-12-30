@@ -101,7 +101,7 @@ class DailyCountsList extends StatelessWidget {
                     Text(
                       '${entry.value}',
                       style: AppTypography.sectionTitle.copyWith(
-                        color: AppButtonPalette.primaryHighlight(colors),
+                        color: colors.onSurface,
                         fontWeight: FontWeight.w800,
                       ),
                     ),

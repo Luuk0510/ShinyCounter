@@ -18,7 +18,7 @@ import 'app_localizations_nl.dart';
 /// `supportedLocales` list. For example:
 ///
 /// ```dart
-/// import 'l10n/app_localizations.dart';
+/// import 'gen/app_localizations.dart';
 ///
 /// return MaterialApp(
 ///   localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -137,6 +137,54 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statsTitle;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Caught Pokémon'**
+  String get statsCaughtLabel;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Total counts'**
+  String get statsTotalCountsLabel;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Caught in games'**
+  String get statsGamesLabel;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Show all'**
+  String get statsGamesShowMore;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get statsGamesShowLess;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Recent catches'**
+  String get statsRecentLabel;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get statsRangeReset;
+
+  ///
+  ///
+  /// In en, this message translates to:
   /// **'Manage Pokémon'**
   String get manageTitle;
 
@@ -251,6 +299,132 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
+  /// **'Accent color'**
+  String get settingsAccentColor;
+
+  /// No description provided for @settingsDataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Data'**
+  String get settingsDataTitle;
+
+  /// No description provided for @settingsExportJson.
+  ///
+  /// In en, this message translates to:
+  /// **'Export backup'**
+  String get settingsExportJson;
+
+  /// No description provided for @settingsImportJson.
+  ///
+  /// In en, this message translates to:
+  /// **'Import backup'**
+  String get settingsImportJson;
+
+  /// No description provided for @settingsImportConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace your data?'**
+  String get settingsImportConfirmTitle;
+
+  /// No description provided for @settingsImportConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing will overwrite your current data.'**
+  String get settingsImportConfirmMessage;
+
+  /// No description provided for @settingsImportConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get settingsImportConfirmAction;
+
+  /// No description provided for @settingsExportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup exported'**
+  String get settingsExportSuccess;
+
+  /// No description provided for @settingsImportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup imported'**
+  String get settingsImportSuccess;
+
+  /// No description provided for @settingsExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed'**
+  String get settingsExportFailed;
+
+  /// No description provided for @settingsImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed'**
+  String get settingsImportFailed;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get colorDefault;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get colorRed;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Orange'**
+  String get colorOrange;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow'**
+  String get colorYellow;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get colorGreen;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Teal'**
+  String get colorTeal;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get colorBlue;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Dark blue'**
+  String get colorDarkBlue;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Purple'**
+  String get colorPurple;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Pink'**
+  String get colorPink;
+
+  ///
+  ///
+  /// In en, this message translates to:
   /// **'System'**
   String get settingsSystem;
 
@@ -323,8 +497,8 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
-  /// **'Catch'**
-  String get huntCatch;
+  /// **'Caught'**
+  String get huntCaught;
 
   /// No description provided for @huntGame.
   ///
