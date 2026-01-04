@@ -40,6 +40,10 @@
   "@statsGamesLabel": {
     "description": ""
   },
+  "statsResetsByGameLabel": "Resets per game",
+  "@statsResetsByGameLabel": {
+    "description": ""
+  },
   "statsGamesShowMore": "Toon alles",
   "@statsGamesShowMore": {
     "description": ""

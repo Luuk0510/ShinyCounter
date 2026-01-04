@@ -40,6 +40,10 @@
   "@statsGamesLabel": {
     "description": ""
   },
+  "statsResetsByGameLabel": "Resets by game",
+  "@statsResetsByGameLabel": {
+    "description": ""
+  },
   "statsGamesShowMore": "Show all",
   "@statsGamesShowMore": {
     "description": ""

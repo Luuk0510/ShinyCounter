@@ -39,6 +39,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsGamesLabel => 'Caught in games';
 
   @override
+  String get statsResetsByGameLabel => 'Resets by game';
+
+  @override
   String get statsGamesShowMore => 'Show all';
 
   @override

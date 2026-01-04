@@ -161,6 +161,12 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
+  /// **'Resets by game'**
+  String get statsResetsByGameLabel;
+
+  ///
+  ///
+  /// In en, this message translates to:
   /// **'Show all'**
   String get statsGamesShowMore;
 

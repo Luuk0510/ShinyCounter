@@ -11,6 +11,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_counts_chart.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_expandable_section.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_resets_pie_chart.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_row.dart';
 import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/stats_aggregation_service.dart';
@@ -137,6 +138,12 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                         label: l10n.statsRecentLabel,
                         items: _summary.recentCaught,
                       );
+                final resetsCard = _summary.resetsByGame.isEmpty
+                    ? null
+                    : _StatsResetsCard(
+                        label: l10n.statsResetsByGameLabel,
+                        resets: _summary.resetsByGame,
+                      );
                 final showSideBySide =
                     isWide && gamesCard != null && recentCard != null;
 
@@ -177,6 +184,10 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                         const SizedBox(height: AppSpacing.lg),
                         recentCard,
                       ],
+                    ],
+                    if (resetsCard != null) ...[
+                      const SizedBox(height: AppSpacing.lg),
+                      resetsCard,
                     ],
                     if (history != null) ...[
                       const SizedBox(height: AppSpacing.lg),
@@ -442,6 +453,21 @@ class _StatsRecentCardState extends State<_StatsRecentCard> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _StatsResetsCard extends StatelessWidget {
+  const _StatsResetsCard({required this.label, required this.resets});
+
+  final String label;
+  final List<GameResetStat> resets;
+
+  @override
+  Widget build(BuildContext context) {
+    return StatsCard(
+      title: label,
+      child: StatsResetsPieChart(resets: resets),
     );
   }
 }

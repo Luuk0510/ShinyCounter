@@ -67,6 +67,8 @@ void main() {
     expect(summary.totalCounts, 170);
     expect(summary.caughtGames.first.game, 'Beta');
     expect(summary.caughtGames.first.count, 2);
+    expect(summary.resetsByGame.first.game, 'Alpha');
+    expect(summary.resetsByGame.first.count, 100);
     expect(summary.recentCaught.first.pokemon.id, 'p2');
 
     final counts = summary.dailyTotals.map((e) => e.count).toList();

@@ -39,6 +39,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get statsGamesLabel => 'Gevangen in games';
 
   @override
+  String get statsResetsByGameLabel => 'Resets per game';
+
+  @override
   String get statsGamesShowMore => 'Toon alles';
 
   @override
