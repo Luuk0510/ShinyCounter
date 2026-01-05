@@ -138,20 +138,22 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                         label: l10n.statsRecentLabel,
                         items: _summary.recentCaught,
                       );
-                final resetsCard = _summary.resetsByGame.isEmpty
-                    ? null
-                    : _StatsResetsCard(
-                        label: l10n.statsResetsByGameLabel,
-                        resets: _summary.resetsByGame,
-                      );
                 final resetsPokemonCard = _summary.resetsByPokemon.isEmpty
                     ? null
                     : _StatsPokemonResetsCard(
                         label: l10n.statsResetsPokemonLabel,
                         items: _summary.resetsByPokemon,
                       );
+                final resetsCard = _summary.resetsByGame.isEmpty
+                    ? null
+                    : _StatsResetsCard(
+                        label: l10n.statsResetsByGameLabel,
+                        resets: _summary.resetsByGame,
+                      );
                 final showSideBySide =
                     isWide && gamesCard != null && recentCard != null;
+                final showResetsSideBySide =
+                    isWide && resetsPokemonCard != null && resetsCard != null;
 
                 final viewInset = MediaQuery.of(context).viewPadding.bottom;
                 return ListView(
@@ -191,13 +193,25 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                         recentCard,
                       ],
                     ],
-                    if (resetsCard != null) ...[
+                    if (showResetsSideBySide) ...[
                       const SizedBox(height: AppSpacing.lg),
-                      resetsCard,
-                    ],
-                    if (resetsPokemonCard != null) ...[
-                      const SizedBox(height: AppSpacing.lg),
-                      resetsPokemonCard,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: resetsPokemonCard),
+                          const SizedBox(width: AppSpacing.lg),
+                          Expanded(child: resetsCard),
+                        ],
+                      ),
+                    ] else ...[
+                      if (resetsPokemonCard != null) ...[
+                        const SizedBox(height: AppSpacing.lg),
+                        resetsPokemonCard,
+                      ],
+                      if (resetsCard != null) ...[
+                        const SizedBox(height: AppSpacing.lg),
+                        resetsCard,
+                      ],
                     ],
                     if (history != null) ...[
                       const SizedBox(height: AppSpacing.lg),
