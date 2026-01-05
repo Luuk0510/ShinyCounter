@@ -203,6 +203,18 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
+  /// **'Edit layout'**
+  String get statsEditLayout;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Arrange cards'**
+  String get statsArrangeTitle;
+
+  ///
+  ///
+  /// In en, this message translates to:
   /// **'Manage Pokémon'**
   String get manageTitle;
 

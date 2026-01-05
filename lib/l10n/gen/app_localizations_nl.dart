@@ -60,6 +60,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get statsRangeReset => 'Reset';
 
   @override
+  String get statsEditLayout => 'Indeling bewerken';
+
+  @override
+  String get statsArrangeTitle => 'Kaarten ordenen';
+
+  @override
   String get manageTitle => 'Beheer Pokémon';
 
   @override

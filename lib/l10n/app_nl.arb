@@ -68,6 +68,14 @@
   "@statsRangeReset": {
     "description": ""
   },
+  "statsEditLayout": "Indeling bewerken",
+  "@statsEditLayout": {
+    "description": ""
+  },
+  "statsArrangeTitle": "Kaarten ordenen",
+  "@statsArrangeTitle": {
+    "description": ""
+  },
   "manageTitle": "Beheer Pokémon",
   "@manageTitle": {
     "description": ""
