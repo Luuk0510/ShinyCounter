@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_row.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/game_assets.dart';
 
 class StatsResetsPieChart extends StatelessWidget {
@@ -59,13 +60,16 @@ class StatsResetsPieChart extends StatelessWidget {
       builder: (context, constraints) {
         final isWide = constraints.maxWidth >= AppSizes.statsPieLegendMinWidth;
         if (isWide) {
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              chart,
-              const SizedBox(width: AppSpacing.lg),
-              Expanded(child: legend),
-            ],
+          return Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                chart,
+                const SizedBox(width: AppSpacing.lg),
+                legend,
+              ],
+            ),
           );
         }
         return Column(
@@ -112,10 +116,9 @@ class _LegendList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final rows = <Widget>[];
     for (var i = 0; i < resets.length; i++) {
-      rows.add(_LegendRow(stat: resets[i], color: palette[i], colors: colors));
+      rows.add(_LegendRow(stat: resets[i], color: palette[i]));
       if (i != resets.length - 1) {
         rows.add(const SizedBox(height: AppSpacing.xs));
       }
@@ -129,44 +132,23 @@ class _LegendList extends StatelessWidget {
 }
 
 class _LegendRow extends StatelessWidget {
-  const _LegendRow({
-    required this.stat,
-    required this.color,
-    required this.colors,
-  });
+  const _LegendRow({required this.stat, required this.color});
 
   final GameResetStat stat;
   final Color color;
-  final ColorScheme colors;
 
   @override
   Widget build(BuildContext context) {
-    final nameStyle = AppTypography.button.copyWith(
-      color: colors.onSurface,
-      fontWeight: FontWeight.w700,
-    );
-    final countStyle = AppTypography.button.copyWith(
-      color: colors.onSurfaceVariant,
-      fontWeight: FontWeight.w700,
-    );
-    return Row(
-      children: [
-        Container(
-          width: AppSpacing.sm,
-          height: AppSpacing.sm,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Text(
-            stat.game,
-            overflow: TextOverflow.ellipsis,
-            style: nameStyle,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Text('${stat.count}', style: countStyle),
-      ],
+    return StatsRow(
+      leading: Container(
+        width: AppSpacing.sm,
+        height: AppSpacing.sm,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      ),
+      title: stat.game,
+      trailing: '${stat.count}',
+      trailingWidth: AppSizes.statsGameCountWidth,
+      maxWidth: AppSizes.statsCaughtGameTableMaxWidth,
     );
   }
 }

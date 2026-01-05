@@ -416,7 +416,7 @@ class _StatsGamesRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StatsRow(
-      leading: GameLogo(game: game.game, size: AppSizes.gameLogoSize),
+      leading: GameLogo(game: game.game, size: AppSizes.statsPokemonImage),
       title: game.game,
       trailing: '${game.count}',
       trailingWidth: AppSizes.statsGameCountWidth,
@@ -580,7 +580,7 @@ class _StatsPokemonResetsRow extends StatelessWidget {
       title: item.pokemon.name,
       trailing: '${item.count}',
       trailingWidth: AppSizes.statsGameCountWidth,
-      maxWidth: AppSizes.statsRecentCatchTableMaxWidth,
+      maxWidth: AppSizes.statsResetsPokemonTableMaxWidth,
       stackOnNarrow: true,
       onTap: () => context.goToPokemon(item.pokemon),
     );
