@@ -32,6 +32,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
   List<CounterState> _states = const [];
   bool _loading = true;
   StatsSummary _summary = const StatsSummary.empty();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -87,6 +88,12 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final l10n = context.l10n;
@@ -131,18 +138,21 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                         label: l10n.statsGamesLabel,
                         games: _summary.caughtGames,
                         caughtByGame: _summary.caughtByGame,
+                        parentController: _scrollController,
                       );
                 final recentCard = _summary.recentCaught.isEmpty
                     ? null
                     : _StatsRecentCard(
                         label: l10n.statsRecentLabel,
                         items: _summary.recentCaught,
+                        parentController: _scrollController,
                       );
                 final resetsPokemonCard = _summary.resetsByPokemon.isEmpty
                     ? null
                     : _StatsPokemonResetsCard(
                         label: l10n.statsResetsPokemonLabel,
                         items: _summary.resetsByPokemon,
+                        parentController: _scrollController,
                       );
                 final resetsCard = _summary.resetsByGame.isEmpty
                     ? null
@@ -157,6 +167,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
 
                 final viewInset = MediaQuery.of(context).viewPadding.bottom;
                 return ListView(
+                  controller: _scrollController,
                   padding: AppInsets.pageWithBottomInset(viewInset),
                   children: [
                     if (isWide)
@@ -361,11 +372,13 @@ class _StatsGamesCard extends StatefulWidget {
     required this.label,
     required this.games,
     required this.caughtByGame,
+    required this.parentController,
   });
 
   final String label;
   final List<GameCatchStat> games;
   final Map<String, List<PokemonCaughtEntry>> caughtByGame;
+  final ScrollController parentController;
 
   @override
   State<_StatsGamesCard> createState() => _StatsGamesCardState();
@@ -385,6 +398,7 @@ class _StatsGamesCardState extends State<_StatsGamesCard> {
             child: StatsExpandableSection(
               itemCount: widget.games.length,
               foregroundColor: colors.onSurfaceVariant,
+              parentController: widget.parentController,
               builder: (visibleCount) {
                 final visibleGames = widget.games.take(visibleCount).toList();
                 return _StatsGamesTable(
@@ -445,10 +459,15 @@ class _StatsGamesRow extends StatelessWidget {
 }
 
 class _StatsRecentCard extends StatefulWidget {
-  const _StatsRecentCard({required this.label, required this.items});
+  const _StatsRecentCard({
+    required this.label,
+    required this.items,
+    required this.parentController,
+  });
 
   final String label;
   final List<PokemonCaughtEntry> items;
+  final ScrollController parentController;
 
   @override
   State<_StatsRecentCard> createState() => _StatsRecentCardState();
@@ -469,6 +488,7 @@ class _StatsRecentCardState extends State<_StatsRecentCard> {
             child: StatsExpandableSection(
               itemCount: widget.items.length,
               foregroundColor: colors.onSurfaceVariant,
+              parentController: widget.parentController,
               builder: (visibleCount) {
                 final visibleItems = widget.items.take(visibleCount).toList();
                 return _StatsRecentTable(items: visibleItems);
@@ -497,10 +517,15 @@ class _StatsResetsCard extends StatelessWidget {
 }
 
 class _StatsPokemonResetsCard extends StatelessWidget {
-  const _StatsPokemonResetsCard({required this.label, required this.items});
+  const _StatsPokemonResetsCard({
+    required this.label,
+    required this.items,
+    required this.parentController,
+  });
 
   final String label;
   final List<PokemonResetStat> items;
+  final ScrollController parentController;
 
   @override
   Widget build(BuildContext context) {
@@ -515,6 +540,7 @@ class _StatsPokemonResetsCard extends StatelessWidget {
             child: StatsExpandableSection(
               itemCount: items.length,
               foregroundColor: colors.onSurfaceVariant,
+              parentController: parentController,
               builder: (visibleCount) {
                 final visibleItems = items.take(visibleCount).toList();
                 return _StatsPokemonResetsTable(items: visibleItems);

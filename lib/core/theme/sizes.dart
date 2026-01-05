@@ -45,6 +45,9 @@ class AppSizes {
   static const statsResetsPokemonTableMaxWidth = 260.0;
   static const statsDateWidth = 115.0;
   static const statsRowTextSize = 20.0;
+  static const statsExpandableMaxVisible = 10;
+  static const statsExpandableRowHeight =
+      statsPokemonImage + (AppSpacing.xs * 2);
   static const statsChartHeight = 200.0;
   static const statsChartHeightCompact = 180.0;
   static const statsChartStroke = 2.0;
