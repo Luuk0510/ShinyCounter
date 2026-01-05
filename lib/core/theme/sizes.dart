@@ -50,6 +50,8 @@ class AppSizes {
       statsPokemonImage + (AppSpacing.xs * 2);
   static const statsChartHeight = 200.0;
   static const statsChartHeightCompact = 180.0;
+  static const statsPieChartMaxSize = 300.0;
+  static const statsPieChartMinSize = 180.0;
   static const statsChartStroke = 2.0;
   static const statsPieRadiusFactor = 0.34;
   static const statsPieCenterSpaceFactor = 0.22;

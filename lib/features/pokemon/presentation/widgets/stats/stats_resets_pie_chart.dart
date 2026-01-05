@@ -10,7 +10,7 @@ class StatsResetsPieChart extends StatelessWidget {
   const StatsResetsPieChart({
     super.key,
     required this.resets,
-    this.size = AppSizes.statsChartHeight,
+    this.size = AppSizes.statsPieChartMaxSize,
   });
 
   final List<GameResetStat> resets;
@@ -35,32 +35,39 @@ class StatsResetsPieChart extends StatelessWidget {
     final total = resets.fold<int>(0, (sum, entry) => sum + entry.count);
     final palette = _buildPalette(colors, resets.length);
     final sliceColors = _resolveColors(resets, palette);
-    final radius = size * AppSizes.statsPieRadiusFactor;
-    final centerSpace = size * AppSizes.statsPieCenterSpaceFactor;
-
-    final chart = Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.sm),
-      child: SizedBox(
-        width: size,
-        height: size,
-        child: PieChart(
-          PieChartData(
-            centerSpaceRadius: centerSpace,
-            sectionsSpace: AppSizes.statsPieSectionGap,
-            startDegreeOffset: -90,
-            sections: [
-              for (var i = 0; i < resets.length; i++)
-                _buildSection(resets[i], total, sliceColors[i], radius),
-            ],
-          ),
-        ),
-      ),
-    );
-
     final legend = _LegendList(resets: resets, palette: sliceColors);
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        const horizontalPadding = AppSpacing.lg;
+        final availableWidth = (constraints.maxWidth -
+                (horizontalPadding * 2))
+            .clamp(0.0, size);
+        final chartSize = availableWidth == 0.0 ? size : availableWidth;
+        final radius = chartSize * AppSizes.statsPieRadiusFactor;
+        final centerSpace = chartSize * AppSizes.statsPieCenterSpaceFactor;
+        final chart = Padding(
+          padding: const EdgeInsets.only(
+            top: AppSpacing.md,
+            left: horizontalPadding,
+            right: horizontalPadding,
+          ),
+          child: SizedBox(
+            width: chartSize,
+            height: chartSize,
+            child: PieChart(
+              PieChartData(
+                centerSpaceRadius: centerSpace,
+                sectionsSpace: AppSizes.statsPieSectionGap,
+                startDegreeOffset: -90,
+                sections: [
+                  for (var i = 0; i < resets.length; i++)
+                    _buildSection(resets[i], total, sliceColors[i], radius),
+                ],
+              ),
+            ),
+          ),
+        );
         final isWide = constraints.maxWidth >= AppSizes.statsPieLegendMinWidth;
         if (isWide) {
           return Center(
