@@ -42,6 +42,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsResetsByGameLabel => 'Resets by game';
 
   @override
+  String get statsResetsPokemonLabel => 'Most resets';
+
+  @override
+  String get statsResetsEmpty => 'No resets yet';
+
+  @override
   String get statsGamesShowMore => 'Show all';
 
   @override

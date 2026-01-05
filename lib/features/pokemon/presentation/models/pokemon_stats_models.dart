@@ -7,6 +7,13 @@ class PokemonCaughtEntry {
   final DateTime? caughtAt;
 }
 
+class PokemonResetStat {
+  const PokemonResetStat(this.pokemon, this.count);
+
+  final Pokemon pokemon;
+  final int count;
+}
+
 class PokemonGameStatsArgs {
   const PokemonGameStatsArgs({required this.game, required this.items});
 
@@ -45,6 +52,7 @@ class StatsSummary {
     required this.caughtByGame,
     required this.recentCaught,
     required this.resetsByGame,
+    required this.resetsByPokemon,
   });
 
   const StatsSummary.empty()
@@ -55,7 +63,8 @@ class StatsSummary {
       caughtGames = const <GameCatchStat>[],
       caughtByGame = const <String, List<PokemonCaughtEntry>>{},
       recentCaught = const <PokemonCaughtEntry>[],
-      resetsByGame = const <GameResetStat>[];
+      resetsByGame = const <GameResetStat>[],
+      resetsByPokemon = const <PokemonResetStat>[];
 
   final int totalPokemon;
   final int caughtPokemon;
@@ -65,6 +74,7 @@ class StatsSummary {
   final Map<String, List<PokemonCaughtEntry>> caughtByGame;
   final List<PokemonCaughtEntry> recentCaught;
   final List<GameResetStat> resetsByGame;
+  final List<PokemonResetStat> resetsByPokemon;
 
   StatsSummary copyWith({
     int? totalPokemon,
@@ -75,6 +85,7 @@ class StatsSummary {
     Map<String, List<PokemonCaughtEntry>>? caughtByGame,
     List<PokemonCaughtEntry>? recentCaught,
     List<GameResetStat>? resetsByGame,
+    List<PokemonResetStat>? resetsByPokemon,
   }) {
     return StatsSummary(
       totalPokemon: totalPokemon ?? this.totalPokemon,
@@ -85,6 +96,7 @@ class StatsSummary {
       caughtByGame: caughtByGame ?? this.caughtByGame,
       recentCaught: recentCaught ?? this.recentCaught,
       resetsByGame: resetsByGame ?? this.resetsByGame,
+      resetsByPokemon: resetsByPokemon ?? this.resetsByPokemon,
     );
   }
 }

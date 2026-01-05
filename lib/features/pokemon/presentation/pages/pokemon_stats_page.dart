@@ -144,6 +144,12 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                         label: l10n.statsResetsByGameLabel,
                         resets: _summary.resetsByGame,
                       );
+                final resetsPokemonCard = _summary.resetsByPokemon.isEmpty
+                    ? null
+                    : _StatsPokemonResetsCard(
+                        label: l10n.statsResetsPokemonLabel,
+                        items: _summary.resetsByPokemon,
+                      );
                 final showSideBySide =
                     isWide && gamesCard != null && recentCard != null;
 
@@ -188,6 +194,10 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                     if (resetsCard != null) ...[
                       const SizedBox(height: AppSpacing.lg),
                       resetsCard,
+                    ],
+                    if (resetsPokemonCard != null) ...[
+                      const SizedBox(height: AppSpacing.lg),
+                      resetsPokemonCard,
                     ],
                     if (history != null) ...[
                       const SizedBox(height: AppSpacing.lg),
@@ -472,6 +482,37 @@ class _StatsResetsCard extends StatelessWidget {
   }
 }
 
+class _StatsPokemonResetsCard extends StatelessWidget {
+  const _StatsPokemonResetsCard({required this.label, required this.items});
+
+  final String label;
+  final List<PokemonResetStat> items;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return StatsCard(
+      title: label,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: StatsExpandableSection(
+              itemCount: items.length,
+              foregroundColor: colors.onSurfaceVariant,
+              builder: (visibleCount) {
+                final visibleItems = items.take(visibleCount).toList();
+                return _StatsPokemonResetsTable(items: visibleItems);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _StatsRecentTable extends StatelessWidget {
   const _StatsRecentTable({required this.items});
 
@@ -481,6 +522,19 @@ class _StatsRecentTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [for (final item in items) _StatsRecentRow(item: item)],
+    );
+  }
+}
+
+class _StatsPokemonResetsTable extends StatelessWidget {
+  const _StatsPokemonResetsTable({required this.items});
+
+  final List<PokemonResetStat> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [for (final item in items) _StatsPokemonResetsRow(item: item)],
     );
   }
 }
@@ -502,6 +556,30 @@ class _StatsRecentRow extends StatelessWidget {
       title: item.pokemon.name,
       trailing: formatDate(item.caughtAt),
       trailingWidth: AppSizes.statsDateWidth,
+      maxWidth: AppSizes.statsRecentCatchTableMaxWidth,
+      stackOnNarrow: true,
+      onTap: () => context.goToPokemon(item.pokemon),
+    );
+  }
+}
+
+class _StatsPokemonResetsRow extends StatelessWidget {
+  const _StatsPokemonResetsRow({required this.item});
+
+  final PokemonResetStat item;
+
+  @override
+  Widget build(BuildContext context) {
+    return StatsRow(
+      leading: PokemonImage(
+        path: item.pokemon.imagePath,
+        isLocalFile: item.pokemon.isLocalFile,
+        width: AppSizes.statsPokemonImage,
+        height: AppSizes.statsPokemonImage,
+      ),
+      title: item.pokemon.name,
+      trailing: '${item.count}',
+      trailingWidth: AppSizes.statsGameCountWidth,
       maxWidth: AppSizes.statsRecentCatchTableMaxWidth,
       stackOnNarrow: true,
       onTap: () => context.goToPokemon(item.pokemon),

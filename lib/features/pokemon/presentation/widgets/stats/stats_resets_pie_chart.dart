@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/game_assets.dart';
@@ -16,13 +17,25 @@ class StatsResetsPieChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (resets.isEmpty) return const SizedBox.shrink();
-    final total = resets.fold<int>(0, (sum, entry) => sum + entry.count);
+    final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
+    if (resets.isEmpty) {
+      return Center(
+        child: Text(
+          l10n.statsResetsEmpty,
+          textAlign: TextAlign.center,
+          style: AppTypography.button.copyWith(
+            color: colors.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+    final total = resets.fold<int>(0, (sum, entry) => sum + entry.count);
     final palette = _buildPalette(colors, resets.length);
     final sliceColors = _resolveColors(resets, palette);
-    final radius = size * 0.34;
-    final centerSpace = size * 0.22;
+    final radius = size * AppSizes.statsPieRadiusFactor;
+    final centerSpace = size * AppSizes.statsPieCenterSpaceFactor;
 
     final chart = SizedBox(
       width: size,
@@ -30,16 +43,11 @@ class StatsResetsPieChart extends StatelessWidget {
       child: PieChart(
         PieChartData(
           centerSpaceRadius: centerSpace,
-          sectionsSpace: 1.5,
+          sectionsSpace: AppSizes.statsPieSectionGap,
           startDegreeOffset: -90,
           sections: [
             for (var i = 0; i < resets.length; i++)
-              _buildSection(
-                resets[i],
-                total,
-                sliceColors[i],
-                radius,
-              ),
+              _buildSection(resets[i], total, sliceColors[i], radius),
           ],
         ),
       ),
@@ -49,9 +57,7 @@ class StatsResetsPieChart extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isWide =
-            constraints.maxWidth >=
-            AppSizes.statsRangeStackWidth + size;
+        final isWide = constraints.maxWidth >= AppSizes.statsPieLegendMinWidth;
         if (isWide) {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,7 +87,7 @@ class StatsResetsPieChart extends StatelessWidget {
     double radius,
   ) {
     final percent = total == 0 ? 0 : (stat.count / total) * 100;
-    final showTitle = percent >= 7;
+    final showTitle = percent >= AppSizes.statsPieLabelMinPercent;
     final titleColor = _onSliceColor(color);
     return PieChartSectionData(
       color: color,
@@ -93,7 +99,7 @@ class StatsResetsPieChart extends StatelessWidget {
         fontWeight: FontWeight.w700,
         color: titleColor,
       ),
-      titlePositionPercentageOffset: 0.6,
+      titlePositionPercentageOffset: AppSizes.statsPieLabelOffset,
     );
   }
 }
@@ -183,10 +189,14 @@ List<Color> _buildPalette(ColorScheme colors, int count) {
   final step = 360.0 / (extra + 1);
   for (var i = 0; i < extra; i++) {
     final hue = (seed.hue + step * (i + 1)) % 360;
-    final lightness = (seed.lightness * 0.9).clamp(0.35, 0.7) as double;
-    final saturation = (seed.saturation * 0.85).clamp(0.35, 0.9) as double;
+    final lightness = (seed.lightness * 0.9).clamp(0.35, 0.7);
+    final saturation = (seed.saturation * 0.85).clamp(0.35, 0.9);
     palette.add(
-      seed.withHue(hue).withLightness(lightness).withSaturation(saturation).toColor(),
+      seed
+          .withHue(hue)
+          .withLightness(lightness)
+          .withSaturation(saturation)
+          .toColor(),
     );
   }
   return palette;

@@ -50,6 +50,7 @@ class StatsAggregationService {
     final caughtEntriesByGame = <String, List<PokemonCaughtEntry>>{};
     final recentCaught = <PokemonCaughtEntry>[];
     final resetTotalsByGame = <String, int>{};
+    final resetTotalsByPokemon = <PokemonResetStat>[];
 
     for (var i = 0; i < states.length; i++) {
       final state = states[i];
@@ -59,6 +60,11 @@ class StatsAggregationService {
           game,
           (value) => value + state.count,
           ifAbsent: () => state.count,
+        );
+      }
+      if (state.count > 0) {
+        resetTotalsByPokemon.add(
+          PokemonResetStat(pokemonNames[i], state.count),
         );
       }
       if (!state.isCaught) continue;
@@ -100,6 +106,10 @@ class StatsAggregationService {
             final byCount = b.count.compareTo(a.count);
             return byCount != 0 ? byCount : a.game.compareTo(b.game);
           });
+    resetTotalsByPokemon.sort((a, b) {
+      final byCount = b.count.compareTo(a.count);
+      return byCount != 0 ? byCount : a.pokemon.name.compareTo(b.pokemon.name);
+    });
 
     return StatsSummary(
       totalPokemon: pokemonCount,
@@ -110,6 +120,7 @@ class StatsAggregationService {
       caughtByGame: caughtEntriesByGame,
       recentCaught: recentCaught,
       resetsByGame: resetsByGame,
+      resetsByPokemon: resetTotalsByPokemon,
     );
   }
 

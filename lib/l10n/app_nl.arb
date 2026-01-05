@@ -44,6 +44,14 @@
   "@statsResetsByGameLabel": {
     "description": ""
   },
+  "statsResetsPokemonLabel": "Meeste resets",
+  "@statsResetsPokemonLabel": {
+    "description": ""
+  },
+  "statsResetsEmpty": "Nog geen resets",
+  "@statsResetsEmpty": {
+    "description": ""
+  },
   "statsGamesShowMore": "Toon alles",
   "@statsGamesShowMore": {
     "description": ""

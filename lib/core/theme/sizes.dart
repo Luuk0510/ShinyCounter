@@ -47,6 +47,12 @@ class AppSizes {
   static const statsChartHeight = 200.0;
   static const statsChartHeightCompact = 180.0;
   static const statsChartStroke = 2.0;
+  static const statsPieRadiusFactor = 0.34;
+  static const statsPieCenterSpaceFactor = 0.22;
+  static const statsPieSectionGap = 1.5;
+  static const statsPieLabelMinPercent = 7.0;
+  static const statsPieLabelOffset = 0.6;
+  static const statsPieLegendMinWidth = 560.0;
   static const statsRangeTextSize = 16.0;
   static const statsRangeStackWidth = 360.0;
   static const statsRangeStackGap = 0.0;

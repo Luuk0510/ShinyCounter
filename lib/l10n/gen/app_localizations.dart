@@ -167,6 +167,18 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
+  /// **'Most resets'**
+  String get statsResetsPokemonLabel;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'No resets yet'**
+  String get statsResetsEmpty;
+
+  ///
+  ///
+  /// In en, this message translates to:
   /// **'Show all'**
   String get statsGamesShowMore;
 

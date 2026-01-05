@@ -44,6 +44,14 @@
   "@statsResetsByGameLabel": {
     "description": ""
   },
+  "statsResetsPokemonLabel": "Most resets",
+  "@statsResetsPokemonLabel": {
+    "description": ""
+  },
+  "statsResetsEmpty": "No resets yet",
+  "@statsResetsEmpty": {
+    "description": ""
+  },
   "statsGamesShowMore": "Show all",
   "@statsGamesShowMore": {
     "description": ""
