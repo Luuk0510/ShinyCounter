@@ -38,18 +38,21 @@ class StatsResetsPieChart extends StatelessWidget {
     final radius = size * AppSizes.statsPieRadiusFactor;
     final centerSpace = size * AppSizes.statsPieCenterSpaceFactor;
 
-    final chart = SizedBox(
-      width: size,
-      height: size,
-      child: PieChart(
-        PieChartData(
-          centerSpaceRadius: centerSpace,
-          sectionsSpace: AppSizes.statsPieSectionGap,
-          startDegreeOffset: -90,
-          sections: [
-            for (var i = 0; i < resets.length; i++)
-              _buildSection(resets[i], total, sliceColors[i], radius),
-          ],
+    final chart = Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.sm),
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: PieChart(
+          PieChartData(
+            centerSpaceRadius: centerSpace,
+            sectionsSpace: AppSizes.statsPieSectionGap,
+            startDegreeOffset: -90,
+            sections: [
+              for (var i = 0; i < resets.length; i++)
+                _buildSection(resets[i], total, sliceColors[i], radius),
+            ],
+          ),
         ),
       ),
     );
