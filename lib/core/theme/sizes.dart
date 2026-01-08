@@ -6,6 +6,7 @@ class AppSizes {
   static const toolbarHeight = 52.0;
   static const appBarActionIcon = 28.0;
   static const appBarTitleIcon = 36.0; // animated_app_icon.dart
+  static const statsReorderHandle = 32.0;
 
   // settings_sheet.dart
   static const sheetHandleWidth = 44.0;

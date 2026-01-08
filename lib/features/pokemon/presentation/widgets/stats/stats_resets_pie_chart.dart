@@ -40,8 +40,7 @@ class StatsResetsPieChart extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         const horizontalPadding = AppSpacing.lg;
-        final availableWidth = (constraints.maxWidth -
-                (horizontalPadding * 2))
+        final availableWidth = (constraints.maxWidth - (horizontalPadding * 2))
             .clamp(0.0, size);
         final chartSize = availableWidth == 0.0 ? size : availableWidth;
         final radius = chartSize * AppSizes.statsPieRadiusFactor;

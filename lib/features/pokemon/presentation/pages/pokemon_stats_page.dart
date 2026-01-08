@@ -101,9 +101,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
   }
 
   void _openReorderSheet(Map<_StatsCardId, _StatsCardEntry> entries) {
-    final order = _cardOrder
-        .where(entries.containsKey)
-        .toList(growable: true);
+    final order = _cardOrder.where(entries.containsKey).toList(growable: true);
     for (final id in entries.keys) {
       if (!order.contains(id)) {
         order.add(id);
@@ -137,8 +135,9 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                 children: [
                   Text(
                     l10n.statsArrangeTitle,
-                    style: AppTypography.sectionTitle.copyWith(
+                    style: AppTypography.title.copyWith(
                       color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w800,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -147,10 +146,20 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                     constraints: BoxConstraints(maxHeight: maxHeight),
                     child: ReorderableListView(
                       shrinkWrap: true,
+                      buildDefaultDragHandles: false,
+                      proxyDecorator: (child, _, __) {
+                        return Material(
+                          color: colors.primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(AppRadii.md),
+                          elevation: 2,
+                          child: child,
+                        );
+                      },
                       onReorder: (oldIndex, newIndex) {
                         setSheetState(() {
-                          final adjustedIndex =
-                              newIndex > oldIndex ? newIndex - 1 : newIndex;
+                          final adjustedIndex = newIndex > oldIndex
+                              ? newIndex - 1
+                              : newIndex;
                           final moved = workingOrder.removeAt(oldIndex);
                           workingOrder.insert(adjustedIndex, moved);
                         });
@@ -161,12 +170,30 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                           index < workingOrder.length;
                           index++
                         )
-                          ListTile(
+                          Padding(
                             key: ValueKey(workingOrder[index]),
-                            title: Text(entries[workingOrder[index]]!.label),
-                            trailing: ReorderableDragStartListener(
-                              index: index,
-                              child: const Icon(Icons.drag_handle),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.xxs,
+                            ),
+                            child: Material(
+                              color: colors.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(AppRadii.md),
+                              child: ListTile(
+                                title: Text(
+                                  entries[workingOrder[index]]!.label,
+                                  style: AppTypography.button.copyWith(
+                                    fontSize: AppSizes.sheetFieldText,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                trailing: ReorderableDragStartListener(
+                                  index: index,
+                                  child: const Icon(
+                                    Icons.drag_handle,
+                                    size: AppSizes.statsReorderHandle,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                       ],
@@ -186,7 +213,12 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                             colors,
                             useLighter: true,
                           ),
-                          child: Text(l10n.statsRangeReset),
+                          child: Text(
+                            l10n.statsRangeReset,
+                            style: AppTypography.button.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
@@ -197,7 +229,12 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                             Navigator.of(sheetContext).pop();
                           },
                           style: AppButtonStyles.primaryFilled(colors),
-                          child: Text(l10n.save),
+                          child: Text(
+                            l10n.save,
+                            style: AppTypography.button.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                       ),
                     ],
