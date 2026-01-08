@@ -247,7 +247,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              'v2.2.0',
+              'v2.2.1',
               style: AppTypography.button.copyWith(
                 fontSize: AppSizes.overlayLabelSize,
                 color: colors.onSurfaceVariant,
