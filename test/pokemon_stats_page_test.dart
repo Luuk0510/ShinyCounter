@@ -67,6 +67,17 @@ Future<void> _pumpUntilLoaded(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _scrollUntilFound(WidgetTester tester, Finder finder) async {
+  final listFinder = find.byType(ListView);
+  for (var i = 0; i < 6; i++) {
+    if (finder.evaluate().isNotEmpty) {
+      return;
+    }
+    await tester.drag(listFinder, const Offset(0, -420));
+    await tester.pumpAndSettle();
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -173,7 +184,9 @@ void main() {
 
     expect(find.text('4 / 4'), findsOneWidget);
     expect(find.text('100'), findsOneWidget);
-    expect(find.byType(StatsCountsChart, skipOffstage: false), findsOneWidget);
+    final chartFinder = find.byType(StatsCountsChart);
+    await _scrollUntilFound(tester, chartFinder);
+    expect(chartFinder, findsOneWidget);
 
     final context = tester.element(find.byType(PokemonStatsPage));
     final l10n = AppLocalizations.of(context)!;
@@ -252,7 +265,18 @@ void main() {
 
     await _pumpUntilLoaded(tester);
 
-    await tester.tap(find.text('Gold'));
+    final context = tester.element(find.byType(PokemonStatsPage));
+    final l10n = AppLocalizations.of(context)!;
+    final gamesCard = find.ancestor(
+      of: find.text(l10n.statsGamesLabel),
+      matching: find.byType(StatsCard),
+    );
+    final goldRow = find.descendant(
+      of: gamesCard,
+      matching: find.text('Gold'),
+    );
+
+    await tester.tap(goldRow);
     await tester.pumpAndSettle();
 
     expect(find.text('Stats Game'), findsOneWidget);
