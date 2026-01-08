@@ -344,7 +344,8 @@ class _PokemonListPageState extends State<PokemonListPage>
       context: context,
       builder: (_) => const SettingsDialog(),
     );
-    setState(() {});
+    if (!mounted) return;
+    await _loadData();
   }
 
   @override
