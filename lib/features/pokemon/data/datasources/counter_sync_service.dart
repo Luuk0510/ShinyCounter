@@ -4,45 +4,23 @@ import 'dart:convert';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
 import 'package:shiny_counter/core/storage/key_value_store.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/counter_state.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/counter_overlay_payload.dart';
 import '../../overlay/counter_overlay_message.dart';
 import '../../domain/services/counter_sync.dart';
 import '../../shared/utils/counter_keys.dart';
 
-class CounterState {
-  const CounterState({
-    required this.count,
-    required this.isCaught,
-    this.startedAt,
-    this.caughtAt,
-    this.caughtGame,
-    this.dailyCounts = const {},
-  });
-
-  final int count;
-  final bool isCaught;
-  final DateTime? startedAt;
-  final DateTime? caughtAt;
-  final String? caughtGame;
-  final Map<String, int> dailyCounts;
-}
-
 class CounterSyncService implements CounterSync {
-  CounterSyncService._(this._store);
+  CounterSyncService({KeyValueStore? store})
+    : _store = store ?? SharedPrefsStore();
 
   final KeyValueStore _store;
-  static CounterSyncService? _instance;
   static final Stream<dynamic> _overlayStream = FlutterOverlayWindow
       .overlayListener
       .asBroadcastStream();
 
   @override
   Stream<dynamic> get overlayStream => _overlayStream;
-
-  static Future<CounterSyncService> instance({KeyValueStore? store}) async {
-    if (_instance != null) return _instance!;
-    _instance = CounterSyncService._(store ?? SharedPrefsStore());
-    return _instance!;
-  }
 
   @override
   Future<CounterState> loadState(String counterKey, String caughtKey) async {
@@ -144,7 +122,7 @@ class CounterSyncService implements CounterSync {
 
   @override
   Future<bool> ensureOverlay(
-    CounterOverlayMessage message, {
+    CounterOverlayPayload payload, {
     int width = 360,
     int height = 220,
   }) async {
@@ -155,19 +133,20 @@ class CounterSyncService implements CounterSync {
     }
     final active = await FlutterOverlayWindow.isActive();
     if (active) {
-      await shareToOverlay(message);
+      await shareToOverlay(payload);
       return true;
     }
-    await showOverlay(message, width: width, height: height);
+    await showOverlay(payload, width: width, height: height);
     return true;
   }
 
   @override
   Future<void> showOverlay(
-    CounterOverlayMessage message, {
+    CounterOverlayPayload payload, {
     int width = 360,
     int height = 220,
   }) async {
+    final message = _toOverlayMessage(payload);
     await FlutterOverlayWindow.showOverlay(
       enableDrag: true,
       overlayTitle: message.name,
@@ -178,14 +157,15 @@ class CounterSyncService implements CounterSync {
       height: height,
       width: width,
     );
-    await shareToOverlay(message);
+    await shareToOverlay(payload);
   }
 
   @override
   Future<bool> isOverlayActive() => FlutterOverlayWindow.isActive();
 
   @override
-  Future<void> shareToOverlay(CounterOverlayMessage message) async {
+  Future<void> shareToOverlay(CounterOverlayPayload payload) async {
+    final message = _toOverlayMessage(payload);
     await FlutterOverlayWindow.shareData(message.serialize());
   }
 
@@ -194,6 +174,15 @@ class CounterSyncService implements CounterSync {
 
   DateTime? _readDate(String? raw) =>
       raw == null ? null : DateTime.tryParse(raw);
+
+  CounterOverlayMessage _toOverlayMessage(CounterOverlayPayload payload) {
+    return CounterOverlayMessage(
+      name: payload.name,
+      counterKey: payload.counterKey,
+      count: payload.count,
+      enabled: payload.enabled,
+    );
+  }
 
   Map<String, int> _readDailyCounts(String? raw) {
     if (raw == null) return {};

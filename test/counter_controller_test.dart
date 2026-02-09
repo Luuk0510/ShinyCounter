@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 import 'package:shiny_counter/features/pokemon/shared/state/counter_controller.dart';
 
 import 'helpers/fakes.dart';
@@ -103,7 +104,14 @@ void main() {
       final controller = CounterController(pokemon: pokemon, sync: sync);
       await controller.init();
 
-      sync.emitOverlay('counter:Bulbasaur:counter_001:5:0');
+      sync.emitOverlay(
+        const CounterOverlayMessage(
+          name: 'Bulbasaur',
+          counterKey: 'counter_001',
+          count: 5,
+          enabled: false,
+        ).serialize(),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 10));
 
       expect(controller.counter, 5);
@@ -192,7 +200,14 @@ void main() {
       await controller.init();
       controller.setCounterManual(3);
 
-      sync.emitOverlay('counter:Other:counter_999:10:1');
+      sync.emitOverlay(
+        const CounterOverlayMessage(
+          name: 'Other',
+          counterKey: 'counter_999',
+          count: 10,
+          enabled: true,
+        ).serialize(),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 10));
 
       expect(controller.counter, 3);

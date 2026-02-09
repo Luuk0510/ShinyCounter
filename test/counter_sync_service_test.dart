@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shiny_counter/core/storage/key_value_store.dart';
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
-import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/counter_overlay_payload.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 
 class _MemoryStore implements KeyValueStore {
@@ -61,7 +61,7 @@ void main() {
 
   const counterKey = 'counter_001';
   const caughtKey = 'caught_001';
-  const message = CounterOverlayMessage(
+  const message = CounterOverlayPayload(
     name: 'Bulbasaur',
     counterKey: counterKey,
     count: 5,
@@ -78,9 +78,9 @@ void main() {
   bool isActive = false;
   bool showCalled = false;
 
-  setUpAll(() async {
+  setUpAll(() {
     store = _MemoryStore();
-    sync = await CounterSyncService.instance(store: store);
+    sync = CounterSyncService(store: store);
   });
 
   setUp(() {

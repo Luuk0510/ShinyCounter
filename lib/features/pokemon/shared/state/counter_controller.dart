@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/counter_overlay_payload.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
@@ -13,7 +13,7 @@ import 'package:shiny_counter/features/pokemon/shared/services/hunt_state_servic
 class CounterController extends ChangeNotifier {
   CounterController({
     required this.pokemon,
-    CounterSync? sync,
+    required CounterSync sync,
     ToggleCaughtUseCase? toggleCaughtUseCase,
   }) : _sync = sync,
        _toggleCaughtUseCase = toggleCaughtUseCase,
@@ -34,7 +34,7 @@ class CounterController extends ChangeNotifier {
   final CounterKeys _keys;
   final HuntStateService _huntState = HuntStateService();
 
-  CounterSync? _sync;
+  final CounterSync _sync;
   final ToggleCaughtUseCase? _toggleCaughtUseCase;
   StreamSubscription<dynamic>? _overlaySub;
   Timer? _overlayPoller;
@@ -47,7 +47,7 @@ class CounterController extends ChangeNotifier {
   String? get caughtGame => _caughtGame;
   Map<String, int> get dailyCounts => _dailyCounts;
 
-  CounterOverlayMessage get _message => CounterOverlayMessage(
+  CounterOverlayPayload get _message => CounterOverlayPayload(
     name: pokemon.name,
     counterKey: _keys.counter,
     count: _counter,
@@ -57,9 +57,8 @@ class CounterController extends ChangeNotifier {
       !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
   Future<void> init() async {
-    _sync ??= await CounterSyncService.instance();
     if (_overlaySupported) {
-      _overlaySub ??= _sync?.overlayStream.listen(_onOverlayData);
+      _overlaySub ??= _sync.overlayStream.listen(_onOverlayData);
     }
     await _loadState();
   }
@@ -91,7 +90,7 @@ class CounterController extends ChangeNotifier {
 
   Future<void> toggleCaught() async {
     _isCaught = !_isCaught;
-    final sync = await _getSync();
+    final sync = _sync;
     await _setCaught(_isCaught, sync: sync);
     if (_isCaught) {
       _caughtAt = DateTime.now();
@@ -111,7 +110,7 @@ class CounterController extends ChangeNotifier {
 
   Future<void> setStartedAtDate(DateTime? value) async {
     _startedAt = value;
-    final sync = await _getSync();
+    final sync = _sync;
     await sync.setStartedAt(_keys.counter, value);
     await _updateOverlay();
     notifyListeners();
@@ -119,7 +118,7 @@ class CounterController extends ChangeNotifier {
 
   Future<void> setCaughtAtDate(DateTime? value) async {
     _caughtAt = value;
-    final sync = await _getSync();
+    final sync = _sync;
     await sync.setCaughtAt(_keys.counter, value);
     if (value != null) {
       _isCaught = true;
@@ -134,7 +133,7 @@ class CounterController extends ChangeNotifier {
 
   Future<void> setCaughtGame(String? game) async {
     _caughtGame = game;
-    final sync = await _getSync();
+    final sync = _sync;
     await sync.setCaughtGame(_keys.counter, game);
     notifyListeners();
   }
@@ -147,7 +146,7 @@ class CounterController extends ChangeNotifier {
   }) async {
     final clamped = nextCount < 0 ? 0 : nextCount;
     final previous = _counter;
-    final sync = await _getSync();
+    final sync = _sync;
 
     var nextCaught = _isCaught;
     var nextCaughtAt = _caughtAt;
@@ -196,7 +195,7 @@ class CounterController extends ChangeNotifier {
   Future<void> toggleOverlay() async {
     if (!_overlaySupported) return;
 
-    final sync = await _getSync();
+    final sync = _sync;
     final isActive = await sync.ensureOverlay(
       _message,
       height: overlayHeight,
@@ -210,7 +209,7 @@ class CounterController extends ChangeNotifier {
   }
 
   Future<void> _loadState() async {
-    final sync = await _getSync();
+    final sync = _sync;
     final state = await sync.loadState(_keys.counter, _keys.caught);
     _counter = state.count;
     _isCaught = state.isCaught;
@@ -222,7 +221,7 @@ class CounterController extends ChangeNotifier {
   }
 
   Future<void> _persist({CounterSync? sync}) async {
-    final service = sync ?? await _getSync();
+    final service = sync ?? _sync;
     await service.setCounter(_keys.counter, _counter);
   }
 
@@ -232,7 +231,7 @@ class CounterController extends ChangeNotifier {
       await useCase.call(_keys.caught, value);
       return;
     }
-    final service = sync ?? await _getSync();
+    final service = sync ?? _sync;
     await service.setCaught(_keys.caught, value);
   }
 
@@ -240,7 +239,7 @@ class CounterController extends ChangeNotifier {
     final cleaned = Map<String, int>.from(counts)
       ..removeWhere((_, value) => value <= 0);
     _dailyCounts = cleaned;
-    final sync = await _getSync();
+    final sync = _sync;
     await sync.setDailyCounts(_keys.counter, cleaned);
     notifyListeners();
     await _updateOverlay();
@@ -248,8 +247,7 @@ class CounterController extends ChangeNotifier {
 
   Future<void> _updateOverlay() async {
     if (!_pillActive || !_overlaySupported) return;
-    final sync = await _getSync();
-    await sync.shareToOverlay(_message);
+    await _sync.shareToOverlay(_message);
   }
 
   void _onOverlayData(dynamic data) async {
@@ -265,7 +263,7 @@ class CounterController extends ChangeNotifier {
     final msg = CounterOverlayMessage.tryParse(data);
     if (msg == null || msg.counterKey != _keys.counter) return;
 
-    final sync = await _getSync();
+    final sync = _sync;
     final state = await sync.loadState(_keys.counter, _keys.caught);
     _counter = state.count;
     _isCaught = state.isCaught;
@@ -281,7 +279,7 @@ class CounterController extends ChangeNotifier {
     if (!_overlaySupported) return;
     _overlayPoller = Timer.periodic(const Duration(seconds: 1), (_) async {
       if (!_pillActive) return;
-      final sync = await _getSync();
+      final sync = _sync;
       final state = await sync.loadState(_keys.counter, _keys.caught);
       final changed =
           state.count != _counter ||
@@ -307,10 +305,5 @@ class CounterController extends ChangeNotifier {
       if (b[entry.key] != entry.value) return false;
     }
     return true;
-  }
-
-  Future<CounterSync> _getSync() async {
-    _sync ??= await CounterSyncService.instance();
-    return _sync!;
   }
 }

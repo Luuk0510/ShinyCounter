@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
-import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/counter_state.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/date_range.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
@@ -58,7 +59,9 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
   }
 
   Future<void> _loadStats() async {
-    final snapshot = await _statsService.loadStats(_chartRange);
+    final snapshot = await _statsService.loadStats(
+      _domainRangeFromUiRange(_chartRange),
+    );
     if (!mounted) return;
     setState(() {
       _states = snapshot.states;
@@ -88,7 +91,11 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     if (!mounted) return;
     setState(() {
       _chartRange = range;
-      _summary = _statsService.updateSummaryForRange(_summary, _states, range);
+      _summary = _statsService.updateSummaryForRange(
+        _summary,
+        _states,
+        _domainRangeFromUiRange(range),
+      );
     });
   }
 
@@ -96,8 +103,16 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     final range = _defaultChartRange();
     setState(() {
       _chartRange = range;
-      _summary = _statsService.updateSummaryForRange(_summary, _states, range);
+      _summary = _statsService.updateSummaryForRange(
+        _summary,
+        _states,
+        _domainRangeFromUiRange(range),
+      );
     });
+  }
+
+  DateRange _domainRangeFromUiRange(DateTimeRange range) {
+    return DateRange(start: range.start, end: range.end);
   }
 
   void _openReorderSheet(Map<_StatsCardId, _StatsCardEntry> entries) {

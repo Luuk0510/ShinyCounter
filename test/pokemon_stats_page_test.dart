@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/routing/app_router.dart';
 import 'package:shiny_counter/core/theme/app_assets.dart';
-import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/counter_state.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_stats_page.dart';
@@ -271,10 +271,7 @@ void main() {
       of: find.text(l10n.statsGamesLabel),
       matching: find.byType(StatsCard),
     );
-    final goldRow = find.descendant(
-      of: gamesCard,
-      matching: find.text('Gold'),
-    );
+    final goldRow = find.descendant(of: gamesCard, matching: find.text('Gold'));
 
     await tester.tap(goldRow);
     await tester.pumpAndSettle();

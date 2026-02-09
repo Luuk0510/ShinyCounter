@@ -32,7 +32,7 @@ class AppLocator {
     pokemonRepository = PrefsPokemonRepository(
       storage: PokemonStorage(store: prefsStore),
     );
-    counterSyncService = await CounterSyncService.instance(store: prefsStore);
+    counterSyncService = CounterSyncService(store: prefsStore);
     statsRepository = StatsRepositoryImpl(
       pokemonRepository: pokemonRepository,
       counterSync: counterSyncService,

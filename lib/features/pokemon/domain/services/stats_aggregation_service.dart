@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/counter_state.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/date_range.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/stats_models.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
-import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
 
 class StatsSnapshot {
   const StatsSnapshot({required this.summary, required this.states});
@@ -17,7 +17,7 @@ class StatsAggregationService {
 
   final StatsRepository _repository;
 
-  Future<StatsSnapshot> loadStats(DateTimeRange range) async {
+  Future<StatsSnapshot> loadStats(DateRange range) async {
     final source = await _repository.loadStatsSource();
     final summary = _buildSummary(
       pokemonCount: source.pokemon.length,
@@ -33,7 +33,7 @@ class StatsAggregationService {
   StatsSummary updateSummaryForRange(
     StatsSummary summary,
     List<CounterState> states,
-    DateTimeRange range,
+    DateRange range,
   ) {
     return summary.copyWith(dailyTotals: buildDailyTotals(states, range));
   }
@@ -42,7 +42,7 @@ class StatsAggregationService {
     required int pokemonCount,
     required int caughtCount,
     required List<CounterState> states,
-    required DateTimeRange range,
+    required DateRange range,
     required List<Pokemon> pokemonNames,
   }) {
     final totalCounts = states.fold<int>(0, (sum, state) => sum + state.count);
@@ -126,7 +126,7 @@ class StatsAggregationService {
 
   List<StatsDailyCount> buildDailyTotals(
     List<CounterState> states,
-    DateTimeRange range,
+    DateRange range,
   ) {
     final start = DateTime(
       range.start.year,
