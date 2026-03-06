@@ -112,6 +112,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     setState(() => _spritesLoading = true);
     final service = context.read<SpriteService>();
     final assets = await service.spritesForDex(parsed.dex);
+    if (!mounted) return;
     final shiny = assets.where((p) => p.shiny).toList()
       ..sort(compareSpritesForDetail);
     final normal = assets.where((p) => !p.shiny).toList()

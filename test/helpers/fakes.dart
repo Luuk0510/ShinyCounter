@@ -23,6 +23,7 @@ class FakeCounterSync implements CounterSync {
   Future<void> clearHuntDates(String counterKey) async {
     started[counterKey] = null;
     caughtAt[counterKey] = null;
+    caughtGame[counterKey] = null;
   }
 
   @override

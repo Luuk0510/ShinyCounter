@@ -58,6 +58,23 @@ void main() {
       expect(sync.caughtGame['counter_001'], isNull);
     });
 
+    test('setCounterManual to zero clears caught state and game', () async {
+      final sync = FakeCounterSync();
+      sync.caught['caught_001'] = true;
+      sync.caughtGame['counter_001'] = 'violet';
+      sync.counters['counter_001'] = 10;
+      final controller = CounterController(pokemon: pokemon, sync: sync);
+      await controller.init();
+
+      await controller.setCounterManual(0);
+
+      expect(controller.counter, 0);
+      expect(controller.isCaught, isFalse);
+      expect(controller.caughtGame, isNull);
+      expect(sync.caught['caught_001'], isFalse);
+      expect(sync.caughtGame['counter_001'], isNull);
+    });
+
     test('increment from zero sets startedAt and daily count', () async {
       final sync = FakeCounterSync();
       final controller = CounterController(pokemon: pokemon, sync: sync);

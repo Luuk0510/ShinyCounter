@@ -70,11 +70,6 @@ class AppButtonPalette {
     final hsl = HSLColor.fromColor(color);
     return hsl.withLightness((hsl.lightness * 1.20).clamp(0.0, 1.0)).toColor();
   }
-
-  static Color _darken(Color color) {
-    final hsl = HSLColor.fromColor(color);
-    return hsl.withLightness((hsl.lightness * 0.85).clamp(0.0, 1.0)).toColor();
-  }
 }
 
 class AppButtonStyles {

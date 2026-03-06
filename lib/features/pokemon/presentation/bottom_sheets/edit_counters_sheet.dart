@@ -194,18 +194,6 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
     );
   }
 
-  Future<DateTime?> _pickDate(DateTime? initial) async {
-    final now = DateTime.now();
-    final date = await showDatePicker(
-      context: context,
-      initialDate: initial ?? now,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (date == null) return null;
-    return DateTime(date.year, date.month, date.day);
-  }
-
   void _setDate({
     required DateTime? value,
     required ValueSetter<DateTime?> assign,

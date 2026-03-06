@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -47,6 +49,21 @@ class _FakeRepo implements PokemonRepository {
   @override
   Future<Set<String>> loadCaught(List<Pokemon> allPokemon) async =>
       Set.unmodifiable(_caught);
+}
+
+class _DelayedRepo implements PokemonRepository {
+  _DelayedRepo(this._customCompleter);
+
+  final Completer<List<Pokemon>> _customCompleter;
+
+  @override
+  Future<List<Pokemon>> loadCustomPokemon() => _customCompleter.future;
+
+  @override
+  Future<void> saveCustomPokemon(List<Pokemon> custom) async {}
+
+  @override
+  Future<Set<String>> loadCaught(List<Pokemon> allPokemon) async => {};
 }
 
 Widget _wrap(
@@ -154,6 +171,21 @@ void main() {
     await tester.pumpWidget(_wrap(const PokemonListPage(), repo: repo));
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  });
+
+  testWidgets('disposing during async load does not call setState', (
+    tester,
+  ) async {
+    final completer = Completer<List<Pokemon>>();
+    final repo = _DelayedRepo(completer);
+
+    await tester.pumpWidget(_wrap(const PokemonListPage(), repo: repo));
+    await tester.pumpWidget(const SizedBox.shrink());
+
+    completer.complete(const []);
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('collapses and expands uncaught/caught sections', (tester) async {

@@ -78,6 +78,7 @@ class _PokemonListPageState extends State<PokemonListPage>
       await _loadBasePokemon();
     }
     final custom = await _loadCustomPokemon();
+    if (!mounted) return;
     setState(() {
       _customPokemon
         ..clear()
