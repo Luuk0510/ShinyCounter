@@ -10,11 +10,9 @@ import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/hunt_state_service.dart';
 
 class CounterController extends ChangeNotifier {
-  CounterController({
-    required this.pokemon,
-    required CounterSync sync,
-  }) : _sync = sync,
-       _keys = CounterKeys.fromId(pokemon.id);
+  CounterController({required this.pokemon, required CounterSync sync})
+    : _sync = sync,
+      _keys = CounterKeys.fromId(pokemon.id);
 
   final Pokemon pokemon;
   final int overlayHeight = 200;

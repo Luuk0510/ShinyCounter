@@ -4,7 +4,8 @@ import 'package:shiny_counter/core/storage/app_prefs_keys.dart';
 import 'package:shiny_counter/core/storage/key_value_store.dart';
 
 class AppBackupService {
-  AppBackupService({KeyValueStore? store}) : _store = store ?? SharedPrefsStore();
+  AppBackupService({KeyValueStore? store})
+    : _store = store ?? SharedPrefsStore();
 
   final KeyValueStore _store;
 

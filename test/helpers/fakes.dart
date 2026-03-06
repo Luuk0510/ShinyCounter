@@ -58,7 +58,10 @@ class FakeCounterSync implements CounterSync {
   Future<List<CounterState>> loadStates(Iterable<String> counterKeys) async {
     return [
       for (final counterKey in counterKeys)
-        await loadState(counterKey, counterKey.replaceFirst('counter_', 'caught_')),
+        await loadState(
+          counterKey,
+          counterKey.replaceFirst('counter_', 'caught_'),
+        ),
     ];
   }
 
