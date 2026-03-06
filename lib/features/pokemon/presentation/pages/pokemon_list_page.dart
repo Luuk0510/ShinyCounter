@@ -6,20 +6,10 @@ import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/core/theme/app_assets.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
-import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
-import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
-import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
-import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
+import 'package:shiny_counter/features/pokemon/presentation/state/pokemon_list_page_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
-
-// Toggle to include the full dex by default. Off preserves the original
-// behavior (only custom/selected Pokémon).
-const bool _includeBaseDex = false;
 
 class PokemonListPage extends StatefulWidget {
   const PokemonListPage({super.key});
@@ -35,172 +25,34 @@ class PokemonListPage extends StatefulWidget {
 
 class _PokemonListPageState extends State<PokemonListPage>
     with TickerProviderStateMixin {
-  late final PokemonRepository _pokemonRepository;
-  final List<Pokemon> _customPokemon = [];
-  final List<Pokemon> _basePokemon = [];
-  Set<String> _caught = {};
-  bool _loading = true;
+  late final PokemonListPageController _controller;
   final ScrollController _listController = ScrollController();
-  bool _showUncaught = true;
-  bool _showCaught = true;
   AnimationController? _sheetController;
-
-  bool _isCustomPokemon(Pokemon pokemon) {
-    return _customPokemon.any((p) => p.id == pokemon.id);
-  }
-
-  List<Pokemon> get _allPokemon {
-    final combined = [..._basePokemon, ..._customPokemon];
-    combined.sort(pokemonDexComparator);
-    return combined;
-  }
 
   @override
   void initState() {
     super.initState();
-    _pokemonRepository = context.read<PokemonRepository>();
+    _controller = PokemonListPageController(
+      pokemonRepository: context.read(),
+      counterSync: context.read(),
+      spriteService: context.read(),
+    );
     _sheetController = AnimationController(
       vsync: this,
       duration: AppAnim.sheetDuration,
       reverseDuration: AppAnim.sheetDuration,
     );
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    if (_includeBaseDex) {
-      await _loadBasePokemon();
-    }
-    final custom = await _pokemonRepository.loadCustomPokemon();
-    if (!mounted) return;
-    setState(() {
-      _customPokemon
-        ..clear()
-        ..addAll(custom);
-    });
-    await _reloadCaught();
-    if (mounted) {
-      setState(() => _loading = false);
-      _precacheListSprites();
-    }
-  }
-
-  Future<void> _reloadCaught() async {
-    final caught = await _pokemonRepository.loadCaught(_allPokemon);
-    if (mounted) {
-      setState(() => _caught = caught);
-    }
-  }
-
-  int? _genderPriority(String token) {
-    switch (token) {
-      case 'm':
-      case 'md':
-      case 'mo':
-        return 0;
-      case 'mf':
-      case 'uk':
-        return 1;
-      case 'f':
-      case 'fd':
-      case 'fo':
-        return 2;
-      default:
-        return null;
-    }
-  }
-
-  Future<void> _loadBasePokemon() async {
-    if (_basePokemon.isNotEmpty) return;
-    try {
-      final names = await PokemonNames.load();
-      if (!mounted) return;
-      final sprites = await context.read<SpriteService>().loadSprites();
-      final chosen = <String, ParsedSprite>{};
-      for (final sprite in sprites) {
-        if (!sprite.shiny) continue;
-        if (isMegaOrGmaxForm(sprite.form)) continue;
-        final priority = _genderPriority(sprite.gender);
-        if (priority == null) continue;
-        final current = chosen[sprite.dex];
-        if (current == null ||
-            priority < _genderPriority(current.gender)! ||
-            (priority == _genderPriority(current.gender)! &&
-                sprite.form.compareTo(current.form) < 0)) {
-          chosen[sprite.dex] = sprite;
-        }
-      }
-
-      if (!mounted) return;
-      setState(() {
-        _basePokemon
-          ..clear()
-          ..addAll(
-            chosen.values.map(
-              (sprite) => Pokemon(
-                id: sprite.dex,
-                name: names.nameFor(sprite.dex),
-                imagePath: sprite.path,
-                isLocalFile: false,
-              ),
-            ),
-          );
-        _basePokemon.sort(pokemonDexComparator);
-      });
-    } catch (_) {
-      // If assets fail to load we leave the base list empty; the UI still works
-      // with custom Pokémon.
-    }
-  }
-
-  bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.id);
-
-  Future<void> _precacheListSprites() async {
-    final toPrecache = _allPokemon
-        .where((p) => !p.isLocalFile)
-        .take(AppLimits.listSpritePrecacheCount)
-        .toList();
-    if (toPrecache.isEmpty) return;
-    final service = context.read<SpriteService>();
-    await service.precacheSpritePaths(
-      context,
-      toPrecache.map((p) => p.imagePath),
-    );
-    final dexes = <String>[];
-    for (final p in toPrecache) {
-      final parsed = SpriteParser.parse(p.imagePath.split('/').last);
-      if (parsed != null) dexes.add(parsed.dex);
-    }
-    if (dexes.isNotEmpty) {
-      await service.warmupForDexes(dexes);
-    }
+    _controller.initialize(context);
   }
 
   Future<void> _onAddPokemon() async {
     final newPokemon = await showAddPokemonDialog(context);
     if (newPokemon == null) return;
-
-    setState(() {
-      _customPokemon.add(newPokemon);
-    });
-    await _pokemonRepository.saveCustomPokemon(_customPokemon);
-    await _reloadCaught();
+    await _controller.addPokemon(newPokemon);
   }
 
   Future<void> _applyPokemonEdit(Pokemon original, Pokemon updated) async {
-    final index = _customPokemon.indexWhere((p) => p.id == original.id);
-    if (index == -1) return;
-
-    setState(() {
-      _customPokemon[index] = updated;
-    });
-
-    await _pokemonRepository.saveCustomPokemon(_customPokemon);
-    await _reloadCaught();
-  }
-
-  Future<void> _clearPokemonState(Pokemon pokemon) async {
-    await context.read<CounterSync>().clearPokemonState(pokemon.id);
+    await _controller.applyPokemonEdit(original, updated);
   }
 
   Future<void> _confirmDelete(Pokemon pokemon) async {
@@ -282,24 +134,20 @@ class _PokemonListPageState extends State<PokemonListPage>
     );
 
     if (confirmed == true) {
-      setState(() {
-        _customPokemon.removeWhere((p) => p.id == pokemon.id);
-      });
-      await _pokemonRepository.saveCustomPokemon(_customPokemon);
-      await _clearPokemonState(pokemon);
-      await _reloadCaught();
+      await _controller.deletePokemonAndState(pokemon);
     }
   }
 
   @override
   void dispose() {
+    _controller.dispose();
     _sheetController?.dispose();
     _listController.dispose();
     super.dispose();
   }
 
   Future<void> _openManagePokemonList() async {
-    final pokemonSorted = [..._customPokemon]..sort(pokemonDexComparator);
+    final pokemonSorted = _controller.customPokemonSorted;
     if (pokemonSorted.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -316,8 +164,7 @@ class _PokemonListPageState extends State<PokemonListPage>
       builder: (context) => ManageListView(pokemonSorted: pokemonSorted),
     );
 
-    if (action == null) return;
-    if (!mounted) return;
+    if (action == null || !mounted) return;
     if (action.delete) {
       await _confirmDelete(action.pokemon);
     } else {
@@ -330,7 +177,7 @@ class _PokemonListPageState extends State<PokemonListPage>
 
   Future<void> _openDetail(Pokemon pokemon) async {
     await context.goToPokemon(pokemon);
-    await _reloadCaught();
+    await _controller.reloadCaught();
   }
 
   Future<void> _openSettings() async {
@@ -340,20 +187,19 @@ class _PokemonListPageState extends State<PokemonListPage>
       builder: (_) => const SettingsDialog(),
     );
     if (!mounted) return;
-    await _loadData();
+    await _controller.refresh(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final uncaught = _allPokemon.where((p) => !_isCaught(p)).toList()
-      ..sort(pokemonDexComparator);
-    final caught = _allPokemon.where((p) => _isCaught(p)).toList()
-      ..sort(pokemonDexComparator);
 
     return Scaffold(
       appBar: _buildAppBar(colors),
-      body: _buildBody(colors, uncaught, caught),
+      body: ListenableBuilder(
+        listenable: _controller,
+        builder: (context, _) => _buildBody(colors),
+      ),
       bottomNavigationBar: _ListBottomBar(
         onStats: () => context.goToStats(),
         onAdd: _onAddPokemon,
@@ -413,15 +259,11 @@ class _PokemonListPageState extends State<PokemonListPage>
     );
   }
 
-  Widget _buildBody(
-    ColorScheme colors,
-    List<Pokemon> uncaught,
-    List<Pokemon> caught,
-  ) {
-    if (_loading) {
+  Widget _buildBody(ColorScheme colors) {
+    if (_controller.loading) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (_allPokemon.isEmpty) {
+    if (_controller.allPokemon.isEmpty) {
       return PokemonEmptyState(
         onAddPressed: _onAddPokemon,
         imageAsset: AppAssets.pokeballIcon,
@@ -431,26 +273,28 @@ class _PokemonListPageState extends State<PokemonListPage>
       );
     }
 
+    final uncaught = _controller.uncaughtPokemonSorted;
+    final caught = _controller.caughtPokemonSorted;
     final sections = <Widget>[];
     if (uncaught.isNotEmpty) {
       sections.add(
         PokemonSection(
           title: context.l10n.sectionUncaught,
-          expanded: _showUncaught,
-          onToggle: () => setState(() => _showUncaught = !_showUncaught),
+          expanded: _controller.showUncaught,
+          onToggle: _controller.toggleUncaughtSection,
           pokemons: uncaught,
-          isCaught: _isCaught,
+          isCaught: _controller.isCaught,
           onTap: _openDetail,
-          canManage: _isCustomPokemon,
+          canManage: _controller.isCustomPokemon,
           onEdit: (pokemon) async {
-            if (!_isCustomPokemon(pokemon)) return;
+            if (!_controller.isCustomPokemon(pokemon)) return;
             final updated = await showEditPokemonDialog(context, pokemon);
             if (updated != null) {
               await _applyPokemonEdit(pokemon, updated);
             }
           },
           onDelete: (pokemon) async {
-            if (!_isCustomPokemon(pokemon)) return;
+            if (!_controller.isCustomPokemon(pokemon)) return;
             await _confirmDelete(pokemon);
           },
         ),
@@ -460,21 +304,21 @@ class _PokemonListPageState extends State<PokemonListPage>
       sections.add(
         PokemonSection(
           title: context.l10n.sectionCaught,
-          expanded: _showCaught,
-          onToggle: () => setState(() => _showCaught = !_showCaught),
+          expanded: _controller.showCaught,
+          onToggle: _controller.toggleCaughtSection,
           pokemons: caught,
-          isCaught: _isCaught,
+          isCaught: _controller.isCaught,
           onTap: _openDetail,
-          canManage: _isCustomPokemon,
+          canManage: _controller.isCustomPokemon,
           onEdit: (pokemon) async {
-            if (!_isCustomPokemon(pokemon)) return;
+            if (!_controller.isCustomPokemon(pokemon)) return;
             final updated = await showEditPokemonDialog(context, pokemon);
             if (updated != null) {
               await _applyPokemonEdit(pokemon, updated);
             }
           },
           onDelete: (pokemon) async {
-            if (!_isCustomPokemon(pokemon)) return;
+            if (!_controller.isCustomPokemon(pokemon)) return;
             await _confirmDelete(pokemon);
           },
         ),
