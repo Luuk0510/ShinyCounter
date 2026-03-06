@@ -6,6 +6,7 @@ import '../entities/counter_overlay_payload.dart';
 /// Abstraction for persisting counter state and syncing overlay data.
 abstract class CounterSync {
   Future<CounterState> loadState(String counterKey, String caughtKey);
+  Future<List<CounterState>> loadStates(Iterable<String> counterKeys);
   Future<void> saveState(
     String counterKey,
     String caughtKey,

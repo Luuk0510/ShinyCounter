@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/counter_overlay_payload.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/hunt_state_service.dart';
@@ -14,9 +13,7 @@ class CounterController extends ChangeNotifier {
   CounterController({
     required this.pokemon,
     required CounterSync sync,
-    ToggleCaughtUseCase? toggleCaughtUseCase,
   }) : _sync = sync,
-       _toggleCaughtUseCase = toggleCaughtUseCase,
        _keys = CounterKeys.fromId(pokemon.id);
 
   final Pokemon pokemon;
@@ -35,7 +32,6 @@ class CounterController extends ChangeNotifier {
   final HuntStateService _huntState = HuntStateService();
 
   final CounterSync _sync;
-  final ToggleCaughtUseCase? _toggleCaughtUseCase;
   StreamSubscription<dynamic>? _overlaySub;
   Timer? _overlayPoller;
 
@@ -226,11 +222,6 @@ class CounterController extends ChangeNotifier {
   }
 
   Future<void> _setCaught(bool value, {CounterSync? sync}) async {
-    final useCase = _toggleCaughtUseCase;
-    if (useCase != null) {
-      await useCase.call(_keys.caught, value);
-      return;
-    }
     final service = sync ?? _sync;
     await service.setCaught(_keys.caught, value);
   }

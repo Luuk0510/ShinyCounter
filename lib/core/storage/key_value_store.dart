@@ -8,6 +8,7 @@ abstract class KeyValueStore {
   Future<void> setInt(String key, int value);
   Future<bool?> getBool(String key);
   Future<void> setBool(String key, bool value);
+  Future<Map<String, Object?>> snapshot({bool reload = false});
   Future<void> remove(String key);
   Future<void> reload();
 }
@@ -52,6 +53,19 @@ class SharedPrefsStore implements KeyValueStore {
   Future<void> setBool(String key, bool value) async {
     final p = await _prefs;
     await p.setBool(key, value);
+  }
+
+  @override
+  Future<Map<String, Object?>> snapshot({bool reload = false}) async {
+    final p = await _prefs;
+    if (reload) {
+      await p.reload();
+    }
+    final values = <String, Object?>{};
+    for (final key in p.getKeys()) {
+      values[key] = p.get(key);
+    }
+    return values;
   }
 
   @override

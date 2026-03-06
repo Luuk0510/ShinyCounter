@@ -24,16 +24,21 @@ class CounterSyncService implements CounterSync {
 
   @override
   Future<CounterState> loadState(String counterKey, String caughtKey) async {
-    await _store.reload();
-    final keys = CounterKeys.fromCounterKey(counterKey);
-    return CounterState(
-      count: await _store.getInt(counterKey) ?? 0,
-      isCaught: await _store.getBool(caughtKey) ?? false,
-      startedAt: _readDate(await _store.getString(keys.startedAt)),
-      caughtAt: _readDate(await _store.getString(keys.caughtAt)),
-      caughtGame: await _store.getString(keys.caughtGame),
-      dailyCounts: _readDailyCounts(await _store.getString(keys.dailyCounts)),
-    );
+    final values = await _store.snapshot(reload: true);
+    return _readState(counterKey, caughtKey, values);
+  }
+
+  @override
+  Future<List<CounterState>> loadStates(Iterable<String> counterKeys) async {
+    final values = await _store.snapshot(reload: true);
+    return [
+      for (final counterKey in counterKeys)
+        _readState(
+          counterKey,
+          CounterKeys.fromCounterKey(counterKey).caught,
+          values,
+        ),
+    ];
   }
 
   @override
@@ -174,6 +179,22 @@ class CounterSyncService implements CounterSync {
 
   DateTime? _readDate(String? raw) =>
       raw == null ? null : DateTime.tryParse(raw);
+
+  CounterState _readState(
+    String counterKey,
+    String caughtKey,
+    Map<String, Object?> values,
+  ) {
+    final keys = CounterKeys.fromCounterKey(counterKey);
+    return CounterState(
+      count: values[counterKey] as int? ?? 0,
+      isCaught: values[caughtKey] as bool? ?? false,
+      startedAt: _readDate(values[keys.startedAt] as String?),
+      caughtAt: _readDate(values[keys.caughtAt] as String?),
+      caughtGame: values[keys.caughtGame] as String?,
+      dailyCounts: _readDailyCounts(values[keys.dailyCounts] as String?),
+    );
+  }
 
   CounterOverlayMessage _toOverlayMessage(CounterOverlayPayload payload) {
     return CounterOverlayMessage(

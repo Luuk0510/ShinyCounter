@@ -17,6 +17,13 @@ class _MemoryStore implements KeyValueStore {
   Future<String?> getString(String key) async => _strings[key];
 
   @override
+  Future<Map<String, Object?>> snapshot({bool reload = false}) async => {
+    ..._strings,
+    ..._ints,
+    ..._bools,
+  };
+
+  @override
   Future<void> reload() async {}
 
   @override

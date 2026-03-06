@@ -17,11 +17,8 @@ class StatsRepositoryImpl implements StatsRepository {
   Future<StatsSourceData> loadStatsSource() async {
     final pokemon = await _pokemonRepository.loadCustomPokemon();
     final caught = await _pokemonRepository.loadCaught(pokemon);
-    final states = await Future.wait(
-      pokemon.map((p) {
-        final keys = CounterKeys.fromId(p.id);
-        return _counterSync.loadState(keys.counter, keys.caught);
-      }),
+    final states = await _counterSync.loadStates(
+      pokemon.map((p) => CounterKeys.fromId(p.id).counter),
     );
     return StatsSourceData(pokemon: pokemon, caught: caught, states: states);
   }

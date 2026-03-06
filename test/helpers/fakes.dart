@@ -55,6 +55,14 @@ class FakeCounterSync implements CounterSync {
   }
 
   @override
+  Future<List<CounterState>> loadStates(Iterable<String> counterKeys) async {
+    return [
+      for (final counterKey in counterKeys)
+        await loadState(counterKey, counterKey.replaceFirst('counter_', 'caught_')),
+    ];
+  }
+
+  @override
   Future<void> saveState(
     String counterKey,
     String caughtKey,

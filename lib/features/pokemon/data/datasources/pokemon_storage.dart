@@ -51,10 +51,11 @@ class PokemonStorage {
   }
 
   Future<Set<String>> loadCaught(List<Pokemon> allPokemon) async {
+    final values = await _store.snapshot();
     final caught = <String>{};
     for (final p in allPokemon) {
       final caughtKey = CounterKeys.fromId(p.id).caught;
-      if (await _store.getBool(caughtKey) ?? false) {
+      if (values[caughtKey] as bool? ?? false) {
         caught.add(p.id);
       }
     }

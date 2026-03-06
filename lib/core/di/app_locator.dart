@@ -4,10 +4,6 @@ import 'package:shiny_counter/features/pokemon/data/repositories/stats_repositor
 import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/core/storage/key_value_store.dart';
 import 'package:shiny_counter/features/pokemon/data/datasources/pokemon_storage.dart';
@@ -20,10 +16,6 @@ class AppLocator {
   late final PokemonRepository pokemonRepository;
   late final StatsRepository statsRepository;
   late final CounterSync counterSyncService;
-  late final LoadCustomPokemonUseCase loadCustomPokemon;
-  late final SaveCustomPokemonUseCase saveCustomPokemon;
-  late final LoadCaughtUseCase loadCaught;
-  late final ToggleCaughtUseCase toggleCaught;
   late final SpriteService spriteRepository;
   late final KeyValueStore prefsStore;
 
@@ -37,10 +29,6 @@ class AppLocator {
       pokemonRepository: pokemonRepository,
       counterSync: counterSyncService,
     );
-    loadCustomPokemon = LoadCustomPokemonUseCase(pokemonRepository);
-    saveCustomPokemon = SaveCustomPokemonUseCase(pokemonRepository);
-    loadCaught = LoadCaughtUseCase(pokemonRepository);
-    toggleCaught = ToggleCaughtUseCase(counterSyncService);
     spriteRepository = SpriteRepository();
   }
 }

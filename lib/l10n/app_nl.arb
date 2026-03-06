@@ -165,6 +165,20 @@
   "settingsImportSuccess": "Backup geïmporteerd",
   "settingsExportFailed": "Export mislukt",
   "settingsImportFailed": "Import mislukt",
+  "settingsVersion": "Versie {version}",
+  "@settingsVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "routeErrorMissingPokemon": "Geen Pokémon meegegeven",
+  "@routeErrorMissingPokemon": {
+    "description": "Getoond als de Pokémon detailroute zonder Pokémon wordt geopend."
+  },
+  "routeErrorMissingGame": "Geen game meegegeven",
+  "@routeErrorMissingGame": {
+    "description": "Getoond als de game-statistiekenroute zonder game-args wordt geopend."
+  },
   "@settingsAccentColor": {
     "description": ""
   },

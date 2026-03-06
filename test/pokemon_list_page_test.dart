@@ -12,9 +12,6 @@ import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_list_page.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/settings_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/list/manage_list_view.dart';
@@ -83,13 +80,6 @@ Widget _wrap(
       providers: [
         Provider<PokemonRepository>.value(value: repo),
         Provider<CounterSync>.value(value: sync),
-        Provider<LoadCustomPokemonUseCase>(
-          create: (_) => LoadCustomPokemonUseCase(repo),
-        ),
-        Provider<SaveCustomPokemonUseCase>(
-          create: (_) => SaveCustomPokemonUseCase(repo),
-        ),
-        Provider<LoadCaughtUseCase>(create: (_) => LoadCaughtUseCase(repo)),
         Provider<SpriteService>(
           create: (_) => FakeSpriteService(const <ParsedSprite>[]),
         ),
@@ -132,13 +122,6 @@ Widget _wrapWithRouter({
       providers: [
         Provider<PokemonRepository>.value(value: repo),
         Provider<CounterSync>.value(value: sync),
-        Provider<LoadCustomPokemonUseCase>(
-          create: (_) => LoadCustomPokemonUseCase(repo),
-        ),
-        Provider<SaveCustomPokemonUseCase>(
-          create: (_) => SaveCustomPokemonUseCase(repo),
-        ),
-        Provider<LoadCaughtUseCase>(create: (_) => LoadCaughtUseCase(repo)),
         Provider<SpriteService>(
           create: (_) => FakeSpriteService(const <ParsedSprite>[]),
         ),
