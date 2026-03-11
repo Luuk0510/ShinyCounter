@@ -398,9 +398,9 @@ class _ListBottomBar extends StatelessWidget {
             sigmaY: _PokemonListPageState._barBlurSigma,
           ),
           child: Material(
-            color: Theme.of(
-              context,
-            ).cardColor.withValues(alpha: _PokemonListPageState._barSurfaceAlpha),
+            color: Theme.of(context).cardColor.withValues(
+              alpha: _PokemonListPageState._barSurfaceAlpha,
+            ),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(
                 top: Radius.circular(AppRadii.lg),
