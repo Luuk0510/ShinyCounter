@@ -161,6 +161,9 @@ class _PokemonListPageState extends State<PokemonListPage>
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: _buildAppBar(colors),
       body: ListenableBuilder(
         listenable: _controller,
