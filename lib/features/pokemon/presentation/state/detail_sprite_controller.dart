@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
+import 'package:shiny_counter/features/pokemon/presentation/state/controller_base.dart';
 
-class DetailSpriteController extends ChangeNotifier {
+class DetailSpriteController extends ControllerBase {
   bool _showShiny = true;
 
   bool get showShiny => _showShiny;
@@ -8,11 +8,11 @@ class DetailSpriteController extends ChangeNotifier {
   void toggle({required bool hasNormal}) {
     if (!hasNormal) return;
     _showShiny = !_showShiny;
-    notifyListeners();
+    safeNotifyListeners();
   }
 
   void reset() {
     _showShiny = true;
-    notifyListeners();
+    safeNotifyListeners();
   }
 }

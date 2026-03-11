@@ -1,7 +1,47 @@
+import 'dart:ui';
+
 import 'package:shiny_counter/core/theme/app_assets.dart';
 
 class GameAssets {
   static const String _defaultLogo = AppAssets.pokeballIcon;
+
+  static const Map<String, String> gameColorsHex = {
+    'Legends: ZA': '#7cc890',
+    'Scarlet': '#9e2a20',
+    'Violet': '#552277',
+    'Brilliant Diamond': '#0285c9',
+    'Shining Pearl': '#d8b2c3',
+    'Legends: Arceus': '#f6cb36',
+    'Sword': '#00a1eb',
+    'Shield': '#e50058',
+    "Let's Go Pikachu": '#f3d924',
+    "Let's Go Eevee": '#dfa151',
+    'Ultra Sun': '#f7ae00',
+    'Ultra Moon': '#1fa7df',
+    'Sun': '#f7af00',
+    'Moon': '#22bbe7',
+    'Omega Ruby': '#b70218',
+    'Alpha Sapphire': '#15b7e6',
+    'X': '#03549a',
+    'Y': '#cf1038',
+    'Black 2': '#0085ca',
+    'White 2': '#ea181f',
+    'Black': '#0e0e0e',
+    'White': '#ffffff',
+    'HeartGold': '#f8c838',
+    'SoulSilver': '#a0c0e8',
+    'Platinum': '#d8b800',
+    'Diamond': '#1058a8',
+    'Pearl': '#e068a0',
+    'Emerald': '#08a32b',
+    'Ruby': '#f71810',
+    'Sapphire': '#15b7e6',
+    'FireRed': '#da6434',
+    'LeafGreen': '#67df01',
+    'Crystal': '#73bac9',
+    'Gold': '#998a55',
+    'Silver': '#b0b8bf',
+  };
 
   static const Map<String, String> gameLogos = {
     'Legends: ZA': 'assets/games/legendsza.png',
@@ -81,4 +121,20 @@ class GameAssets {
   ];
 
   static String logoFor(String? game) => gameLogos[game] ?? _defaultLogo;
+
+  static Color? colorFor(String? game) {
+    return _parseHexColor(gameColorsHex[game]);
+  }
+
+  static Color? _parseHexColor(String? hex) {
+    if (hex == null || hex.isEmpty) return null;
+    final normalized = hex.replaceAll('#', '');
+    if (normalized.length != 6 && normalized.length != 8) return null;
+    final value = int.tryParse(normalized, radix: 16);
+    if (value == null) return null;
+    if (normalized.length == 6) {
+      return Color(0xFF000000 | value);
+    }
+    return Color(value);
+  }
 }

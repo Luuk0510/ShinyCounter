@@ -5,39 +5,38 @@ import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/presentation/state/controller_base.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/filters/search_gen_filter_row.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/selectable_row.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 
-class AddPokemonController extends ChangeNotifier {
+class AddPokemonController extends LoadableController {
   AddPokemonController({required SpriteService spriteService})
-    : _spriteService = spriteService {
-    _init();
-  }
+    : _spriteService = spriteService;
 
   final SpriteService _spriteService;
 
   final List<SpriteOption> _sprites = [];
   SpriteOption? _selectedSprite;
   String _search = '';
-  bool _loading = true;
   PokemonNames? _names;
   int? _selectedGen; // null = all
 
   List<SpriteOption> get sprites => List.unmodifiable(_sprites);
   SpriteOption? get selected => _selectedSprite;
-  bool get loading => _loading;
   String get search => _search;
   int? get selectedGen => _selectedGen;
 
-  Future<void> _init() async {
+  Future<void> initialize() async {
+    setLoading(true, notify: false);
     await Future.wait([_loadNames(), _loadSprites()]);
-    _loading = false;
-    notifyListeners();
+    if (isDisposed) return;
+    setLoading(false);
   }
 
   Future<void> _loadNames() async {
@@ -47,6 +46,7 @@ class AddPokemonController extends ChangeNotifier {
   Future<void> _loadSprites() async {
     try {
       final parsedSprites = await _spriteService.loadSprites(refresh: true);
+      if (isDisposed) return;
       final Map<String, SpriteOption> chosen = {};
       for (final parsed in parsedSprites) {
         if (!parsed.shiny) continue; // only shiny choices
@@ -73,6 +73,7 @@ class AddPokemonController extends ChangeNotifier {
           chosen.values.toList()..sort((a, b) => a.dex.compareTo(b.dex)),
         );
     } catch (_) {
+      if (isDisposed) return;
       _sprites.clear();
     }
   }
@@ -92,19 +93,19 @@ class AddPokemonController extends ChangeNotifier {
 
   void setSearch(String value) {
     _search = value;
-    notifyListeners();
+    safeNotifyListeners();
   }
 
   void setGen(int? gen) {
     _selectedGen = gen;
-    notifyListeners();
+    safeNotifyListeners();
   }
 
   void clearSearch() => setSearch('');
 
   void select(SpriteOption sprite) {
     _selectedSprite = sprite;
-    notifyListeners();
+    safeNotifyListeners();
   }
 
   String displayName(SpriteOption sprite) =>
@@ -148,7 +149,8 @@ class AddPokemonDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<AddPokemonController>(
       create: (_) =>
-          AddPokemonController(spriteService: context.read<SpriteService>()),
+          AddPokemonController(spriteService: context.read<SpriteService>())
+            ..initialize(),
       child: const _AddPokemonView(),
     );
   }
@@ -210,50 +212,37 @@ class _AddPokemonView extends StatelessWidget {
           );
         },
       ),
-      actionsAlignment: MainAxisAlignment.center,
       actionsPadding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
         vertical: AppSpacing.sm,
       ),
       actions: [
-        TextButton(
-          key: AddPokemonDialog.cancelButtonKey,
-          onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
-          style: AppButtonStyles.primaryOutline(
-            colors,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xl,
-              vertical: AppSpacing.xs,
-            ),
-            useLighter: true,
+        DialogActionRow(
+          colors: colors,
+          cancelLabel: l10n.cancel,
+          confirmLabel: l10n.choose,
+          cancelKey: AddPokemonDialog.cancelButtonKey,
+          confirmKey: AddPokemonDialog.chooseButtonKey,
+          buttonPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xl,
+            vertical: AppSpacing.xs,
           ),
-          child: Text(l10n.cancel, style: AppTypography.button),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        ElevatedButton(
-          key: AddPokemonDialog.chooseButtonKey,
-          onPressed: controller.selected == null
-              ? null
-              : () {
-                  final sprite = controller.selected!;
-                  final name = controller.displayName(sprite);
-                  Navigator.of(context).pop<Pokemon?>(
-                    Pokemon(
-                      id: _generateId(sprite.dex),
-                      name: name,
-                      imagePath: sprite.path,
-                      isLocalFile: false,
-                    ),
-                  );
-                },
-          style: AppButtonStyles.primaryFilled(
-            colors,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xl,
-              vertical: AppSpacing.xs,
-            ),
-          ),
-          child: Text(l10n.choose, style: AppTypography.button),
+          cancelTextStyle: AppTypography.button,
+          confirmTextStyle: AppTypography.button,
+          onCancel: () => Navigator.of(context).pop<Pokemon?>(null),
+          confirmEnabled: controller.selected != null,
+          onConfirm: () {
+            final sprite = controller.selected!;
+            final name = controller.displayName(sprite);
+            Navigator.of(context).pop<Pokemon?>(
+              Pokemon(
+                id: _generateId(sprite.dex),
+                name: name,
+                imagePath: sprite.path,
+                isLocalFile: false,
+              ),
+            );
+          },
         ),
       ],
     );

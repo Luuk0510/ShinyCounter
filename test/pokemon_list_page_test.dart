@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,9 +12,6 @@ import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_list_page.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/settings_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/list/manage_list_view.dart';
@@ -49,6 +48,21 @@ class _FakeRepo implements PokemonRepository {
       Set.unmodifiable(_caught);
 }
 
+class _DelayedRepo implements PokemonRepository {
+  _DelayedRepo(this._customCompleter);
+
+  final Completer<List<Pokemon>> _customCompleter;
+
+  @override
+  Future<List<Pokemon>> loadCustomPokemon() => _customCompleter.future;
+
+  @override
+  Future<void> saveCustomPokemon(List<Pokemon> custom) async {}
+
+  @override
+  Future<Set<String>> loadCaught(List<Pokemon> allPokemon) async => {};
+}
+
 Widget _wrap(
   Widget child, {
   required PokemonRepository repo,
@@ -66,13 +80,6 @@ Widget _wrap(
       providers: [
         Provider<PokemonRepository>.value(value: repo),
         Provider<CounterSync>.value(value: sync),
-        Provider<LoadCustomPokemonUseCase>(
-          create: (_) => LoadCustomPokemonUseCase(repo),
-        ),
-        Provider<SaveCustomPokemonUseCase>(
-          create: (_) => SaveCustomPokemonUseCase(repo),
-        ),
-        Provider<LoadCaughtUseCase>(create: (_) => LoadCaughtUseCase(repo)),
         Provider<SpriteService>(
           create: (_) => FakeSpriteService(const <ParsedSprite>[]),
         ),
@@ -115,13 +122,6 @@ Widget _wrapWithRouter({
       providers: [
         Provider<PokemonRepository>.value(value: repo),
         Provider<CounterSync>.value(value: sync),
-        Provider<LoadCustomPokemonUseCase>(
-          create: (_) => LoadCustomPokemonUseCase(repo),
-        ),
-        Provider<SaveCustomPokemonUseCase>(
-          create: (_) => SaveCustomPokemonUseCase(repo),
-        ),
-        Provider<LoadCaughtUseCase>(create: (_) => LoadCaughtUseCase(repo)),
         Provider<SpriteService>(
           create: (_) => FakeSpriteService(const <ParsedSprite>[]),
         ),
@@ -154,6 +154,21 @@ void main() {
     await tester.pumpWidget(_wrap(const PokemonListPage(), repo: repo));
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  });
+
+  testWidgets('disposing during async load does not call setState', (
+    tester,
+  ) async {
+    final completer = Completer<List<Pokemon>>();
+    final repo = _DelayedRepo(completer);
+
+    await tester.pumpWidget(_wrap(const PokemonListPage(), repo: repo));
+    await tester.pumpWidget(const SizedBox.shrink());
+
+    completer.complete(const []);
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('collapses and expands uncaught/caught sections', (tester) async {

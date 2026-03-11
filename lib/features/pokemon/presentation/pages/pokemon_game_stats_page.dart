@@ -7,7 +7,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_row.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_app_bar.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/formatters.dart';
 
 class PokemonGameStatsPage extends StatelessWidget {
   const PokemonGameStatsPage({super.key, required this.args});

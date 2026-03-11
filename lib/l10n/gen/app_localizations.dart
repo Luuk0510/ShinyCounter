@@ -161,6 +161,24 @@ abstract class AppLocalizations {
   ///
   ///
   /// In en, this message translates to:
+  /// **'Resets by game'**
+  String get statsResetsByGameLabel;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Most resets'**
+  String get statsResetsPokemonLabel;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'No resets yet'**
+  String get statsResetsEmpty;
+
+  ///
+  ///
+  /// In en, this message translates to:
   /// **'Show all'**
   String get statsGamesShowMore;
 
@@ -181,6 +199,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset'**
   String get statsRangeReset;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Edit layout'**
+  String get statsEditLayout;
+
+  ///
+  ///
+  /// In en, this message translates to:
+  /// **'Arrange cards'**
+  String get statsArrangeTitle;
 
   ///
   ///
@@ -361,6 +391,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Import failed'**
   String get settingsImportFailed;
+
+  /// No description provided for @settingsVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String settingsVersion(Object version);
+
+  /// Shown when the pokemon detail route is opened without a Pokemon.
+  ///
+  /// In en, this message translates to:
+  /// **'No Pokémon provided'**
+  String get routeErrorMissingPokemon;
+
+  /// Shown when the game stats route is opened without game args.
+  ///
+  /// In en, this message translates to:
+  /// **'No game provided'**
+  String get routeErrorMissingGame;
 
   ///
   ///

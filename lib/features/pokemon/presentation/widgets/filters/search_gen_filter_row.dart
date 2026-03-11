@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_field_styles.dart';
 
 class SearchGenFilterRow extends StatelessWidget {
   const SearchGenFilterRow({
@@ -43,12 +44,9 @@ class SearchGenFilterRow extends StatelessWidget {
             key: searchFieldKey,
             controller: searchController,
             onChanged: onQueryChanged,
-            decoration: InputDecoration(
+            decoration: PokemonFieldDecorations.standard(
               hintText: hintText,
               prefixIcon: const Icon(Icons.search),
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(AppRadii.sm)),
-              ),
               isDense: true,
               suffixIcon: query.isEmpty
                   ? null
@@ -70,11 +68,9 @@ class SearchGenFilterRow extends StatelessWidget {
             isDense: true,
             isExpanded: true,
             alignment: Alignment.centerLeft,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(AppRadii.sm)),
-              ),
-              contentPadding: EdgeInsets.symmetric(
+            decoration: PokemonFieldDecorations.standard(
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.sm,
                 vertical: AppSpacing.sm,
               ),

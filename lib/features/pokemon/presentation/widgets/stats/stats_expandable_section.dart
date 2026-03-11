@@ -8,12 +8,16 @@ class StatsExpandableSection extends StatefulWidget {
     required this.itemCount,
     required this.builder,
     this.initialVisible = 3,
+    this.maxExpandedVisible = AppSizes.statsExpandableMaxVisible,
     this.foregroundColor,
+    this.parentController,
   });
 
   final int itemCount;
   final int initialVisible;
+  final int maxExpandedVisible;
   final Color? foregroundColor;
+  final ScrollController? parentController;
   final Widget Function(int visibleCount) builder;
 
   @override
@@ -22,6 +26,13 @@ class StatsExpandableSection extends StatefulWidget {
 
 class _StatsExpandableSectionState extends State<StatsExpandableSection> {
   bool _expanded = false;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +41,49 @@ class _StatsExpandableSectionState extends State<StatsExpandableSection> {
     final visibleCount = _expanded || !hasOverflow
         ? widget.itemCount
         : widget.initialVisible;
+    final needsScroll =
+        _expanded && widget.itemCount > widget.maxExpandedVisible;
     final foreground =
         widget.foregroundColor ??
         Theme.of(context).colorScheme.onSurfaceVariant;
+    final parentController =
+        widget.parentController ?? PrimaryScrollController.maybeOf(context);
+    final content = widget.builder(visibleCount);
+    final maxHeight =
+        AppSizes.statsExpandableRowHeight * widget.maxExpandedVisible;
+    final body = needsScroll
+        ? ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: maxHeight),
+            child: Scrollbar(
+              controller: _scrollController,
+              thumbVisibility: true,
+              interactive: true,
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  if (notification is OverscrollNotification &&
+                      parentController != null &&
+                      parentController.hasClients) {
+                    final parentPosition = parentController.position;
+                    final target =
+                        (parentPosition.pixels + notification.overscroll).clamp(
+                          parentPosition.minScrollExtent,
+                          parentPosition.maxScrollExtent,
+                        );
+                    parentController.jumpTo(target);
+                  }
+                  return false;
+                },
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: const ClampingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                  child: content,
+                ),
+              ),
+            ),
+          )
+        : content;
 
     return Column(
       children: [
@@ -40,7 +91,7 @@ class _StatsExpandableSectionState extends State<StatsExpandableSection> {
           duration: AppAnim.normal,
           curve: AppAnim.easeOutCubic,
           alignment: Alignment.topCenter,
-          child: widget.builder(visibleCount),
+          child: body,
         ),
         if (hasOverflow) ...[
           const SizedBox(height: AppSpacing.sm),

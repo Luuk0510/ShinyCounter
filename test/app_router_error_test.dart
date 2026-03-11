@@ -6,9 +6,6 @@ import 'package:shiny_counter/core/routing/app_router.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
@@ -35,13 +32,7 @@ void main() {
     await tester.pumpWidget(
       MultiProvider(
         providers: [
-          Provider<LoadCustomPokemonUseCase>(
-            create: (_) => LoadCustomPokemonUseCase(repo),
-          ),
-          Provider<SaveCustomPokemonUseCase>(
-            create: (_) => SaveCustomPokemonUseCase(repo),
-          ),
-          Provider<LoadCaughtUseCase>(create: (_) => LoadCaughtUseCase(repo)),
+          Provider<PokemonRepository>.value(value: repo),
           Provider<SpriteService>(create: (_) => FakeSpriteService(const [])),
           Provider<CounterSync>(create: (_) => FakeCounterSync()),
         ],
@@ -62,6 +53,6 @@ void main() {
     router.go(AppRoutes.pokemonDetail);
     await tester.pumpAndSettle();
 
-    expect(find.text('Geen Pokémon meegegeven'), findsOneWidget);
+    expect(find.text('No Pokémon provided'), findsOneWidget);
   });
 }

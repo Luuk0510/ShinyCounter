@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/counter_state.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/date_range.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
@@ -54,7 +54,7 @@ void main() {
       StatsSourceData(pokemon: pokemon, caught: caught, states: states),
     );
     final service = StatsAggregationService(repository: repo);
-    final range = DateTimeRange(
+    final range = DateRange(
       start: DateTime(2024, 1, 1),
       end: DateTime(2024, 1, 3),
     );
@@ -67,6 +67,8 @@ void main() {
     expect(summary.totalCounts, 170);
     expect(summary.caughtGames.first.game, 'Beta');
     expect(summary.caughtGames.first.count, 2);
+    expect(summary.resetsByGame.first.game, 'Alpha');
+    expect(summary.resetsByGame.first.count, 100);
     expect(summary.recentCaught.first.pokemon.id, 'p2');
 
     final counts = summary.dailyTotals.map((e) => e.count).toList();
@@ -88,7 +90,7 @@ void main() {
       ),
     ];
 
-    final range = DateTimeRange(
+    final range = DateRange(
       start: DateTime(2024, 1, 2),
       end: DateTime(2024, 1, 2),
     );

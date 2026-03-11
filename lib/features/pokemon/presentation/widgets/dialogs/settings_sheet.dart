@@ -6,12 +6,14 @@ import 'package:file_saver/file_saver.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shiny_counter/core/app_metadata.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/storage/app_backup_service.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/settings_sections.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
@@ -96,9 +98,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       if (!mounted) return;
       final confirmed = await showScaledDialog<bool>(
         context: context,
-        builder: (_) => AlertDialog(
-          backgroundColor: Theme.of(context).cardColor,
-          surfaceTintColor: Colors.transparent,
+        builder: (_) => ConfirmationDialog(
           title: Text(
             l10n.settingsImportConfirmTitle,
             textAlign: TextAlign.center,
@@ -111,47 +111,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
               color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          actionsAlignment: MainAxisAlignment.center,
-          actionsPadding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.sm,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              style: AppButtonStyles.primaryOutline(
-                Theme.of(context).colorScheme,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                  vertical: AppSpacing.sm,
-                ),
-                useLighter: true,
-              ),
-              child: Text(
-                l10n.cancel,
-                style: AppTypography.button.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: AppButtonStyles.primaryFilled(
-                Theme.of(context).colorScheme,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                  vertical: AppSpacing.sm,
-                ),
-              ),
-              child: Text(
-                l10n.settingsImportConfirmAction,
-                style: AppTypography.button.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
+          cancelLabel: l10n.cancel,
+          confirmLabel: l10n.settingsImportConfirmAction,
         ),
       );
       if (confirmed != true) return;
@@ -247,7 +208,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              'v2.2.0',
+              context.l10n.settingsVersion(AppMetadata.version),
               style: AppTypography.button.copyWith(
                 fontSize: AppSizes.overlayLabelSize,
                 color: colors.onSurfaceVariant,

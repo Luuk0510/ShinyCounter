@@ -15,8 +15,8 @@ abstract class SpriteService {
   });
 }
 
-class SpriteRepository implements SpriteService {
-  SpriteRepository({AssetBundle? bundle}) : _bundle = bundle;
+class PokemonSpriteService implements SpriteService {
+  PokemonSpriteService({AssetBundle? bundle}) : _bundle = bundle;
 
   final AssetBundle? _bundle;
   List<ParsedSprite>? _cache;

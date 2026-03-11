@@ -5,13 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/routing/app_router.dart';
 import 'package:shiny_counter/core/theme/app_assets.dart';
-import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/counter_state.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_stats_page.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_card.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_counts_chart.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/game_assets.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/game_assets.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 import 'helpers/test_asset_bundle.dart';
@@ -70,7 +69,7 @@ Future<void> _pumpUntilLoaded(WidgetTester tester) async {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('stats page shows summary, games, recent, and chart', (
+  testWidgets('stats page shows summary, games, and recent stats', (
     tester,
   ) async {
     final now = DateTime.now();
@@ -173,31 +172,13 @@ void main() {
 
     expect(find.text('4 / 4'), findsOneWidget);
     expect(find.text('100'), findsOneWidget);
-    expect(find.byType(StatsCountsChart, skipOffstage: false), findsOneWidget);
 
     final context = tester.element(find.byType(PokemonStatsPage));
     final l10n = AppLocalizations.of(context)!;
-    final gamesCard = find.ancestor(
-      of: find.text(l10n.statsGamesLabel),
-      matching: find.byType(StatsCard),
-    );
-    final showMore = find.descendant(
-      of: gamesCard,
-      matching: find.text(l10n.statsGamesShowMore),
-    );
-
-    expect(showMore, findsOneWidget);
-    expect(find.text('Silver'), findsNothing);
-
-    await tester.tap(showMore);
-    await tester.pumpAndSettle();
-
-    expect(find.text('Silver'), findsOneWidget);
-
-    await tester.tap(find.text('Bulbasaur'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Pokemon Detail'), findsOneWidget);
+    expect(find.text(l10n.statsGamesLabel), findsOneWidget);
+    expect(find.text(l10n.statsRecentLabel), findsOneWidget);
+    expect(find.text('Gold'), findsWidgets);
+    expect(find.text('Bulbasaur'), findsOneWidget);
   });
 
   testWidgets('tapping a game row opens game stats page', (tester) async {
@@ -252,7 +233,15 @@ void main() {
 
     await _pumpUntilLoaded(tester);
 
-    await tester.tap(find.text('Gold'));
+    final context = tester.element(find.byType(PokemonStatsPage));
+    final l10n = AppLocalizations.of(context)!;
+    final gamesCard = find.ancestor(
+      of: find.text(l10n.statsGamesLabel),
+      matching: find.byType(StatsCard),
+    );
+    final goldRow = find.descendant(of: gamesCard, matching: find.text('Gold'));
+
+    await tester.tap(goldRow);
     await tester.pumpAndSettle();
 
     expect(find.text('Stats Game'), findsOneWidget);

@@ -39,6 +39,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get statsGamesLabel => 'Gevangen in games';
 
   @override
+  String get statsResetsByGameLabel => 'Resets per game';
+
+  @override
+  String get statsResetsPokemonLabel => 'Meeste resets';
+
+  @override
+  String get statsResetsEmpty => 'Nog geen resets';
+
+  @override
   String get statsGamesShowMore => 'Toon alles';
 
   @override
@@ -49,6 +58,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get statsRangeReset => 'Reset';
+
+  @override
+  String get statsEditLayout => 'Indeling bewerken';
+
+  @override
+  String get statsArrangeTitle => 'Kaarten ordenen';
 
   @override
   String get manageTitle => 'Beheer Pokémon';
@@ -142,6 +157,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settingsImportFailed => 'Import mislukt';
+
+  @override
+  String settingsVersion(Object version) {
+    return 'Versie $version';
+  }
+
+  @override
+  String get routeErrorMissingPokemon => 'Geen Pokémon meegegeven';
+
+  @override
+  String get routeErrorMissingGame => 'Geen game meegegeven';
 
   @override
   String get colorDefault => 'Standaard';

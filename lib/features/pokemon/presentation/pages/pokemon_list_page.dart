@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
@@ -6,22 +8,11 @@ import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/core/theme/app_assets.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
-import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
-import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
-import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
+import 'package:shiny_counter/features/pokemon/presentation/state/pokemon_list_page_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
-
-// Toggle to include the full dex by default. Off preserves the original
-// behavior (only custom/selected Pokémon).
-const bool _includeBaseDex = false;
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 
 class PokemonListPage extends StatefulWidget {
   const PokemonListPage({super.key});
@@ -37,184 +28,43 @@ class PokemonListPage extends StatefulWidget {
 
 class _PokemonListPageState extends State<PokemonListPage>
     with TickerProviderStateMixin {
-  late final LoadCustomPokemonUseCase _loadCustomPokemon;
-  late final SaveCustomPokemonUseCase _saveCustomPokemon;
-  late final LoadCaughtUseCase _loadCaught;
-  final List<Pokemon> _customPokemon = [];
-  final List<Pokemon> _basePokemon = [];
-  Set<String> _caught = {};
-  bool _loading = true;
+  static const double _barBlurSigma = 18;
+  static const double _barSurfaceAlpha = 0.76;
+
+  late final PokemonListPageController _controller;
   final ScrollController _listController = ScrollController();
-  bool _showUncaught = true;
-  bool _showCaught = true;
   AnimationController? _sheetController;
-
-  bool _isCustomPokemon(Pokemon pokemon) {
-    return _customPokemon.any((p) => p.id == pokemon.id);
-  }
-
-  List<Pokemon> get _allPokemon {
-    final combined = [..._basePokemon, ..._customPokemon];
-    combined.sort(pokemonDexComparator);
-    return combined;
-  }
 
   @override
   void initState() {
     super.initState();
-    _loadCustomPokemon = context.read<LoadCustomPokemonUseCase>();
-    _saveCustomPokemon = context.read<SaveCustomPokemonUseCase>();
-    _loadCaught = context.read<LoadCaughtUseCase>();
+    _controller = PokemonListPageController(
+      pokemonRepository: context.read(),
+      counterSync: context.read(),
+      spriteService: context.read(),
+    );
     _sheetController = AnimationController(
       vsync: this,
       duration: AppAnim.sheetDuration,
       reverseDuration: AppAnim.sheetDuration,
     );
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    if (_includeBaseDex) {
-      await _loadBasePokemon();
-    }
-    final custom = await _loadCustomPokemon();
-    setState(() {
-      _customPokemon
-        ..clear()
-        ..addAll(custom);
-    });
-    await _reloadCaught();
-    if (mounted) {
-      setState(() => _loading = false);
-      _precacheListSprites();
-    }
-  }
-
-  Future<void> _reloadCaught() async {
-    final caught = await _loadCaught(_allPokemon);
-    if (mounted) {
-      setState(() => _caught = caught);
-    }
-  }
-
-  int? _genderPriority(String token) {
-    switch (token) {
-      case 'm':
-      case 'md':
-      case 'mo':
-        return 0;
-      case 'mf':
-      case 'uk':
-        return 1;
-      case 'f':
-      case 'fd':
-      case 'fo':
-        return 2;
-      default:
-        return null;
-    }
-  }
-
-  Future<void> _loadBasePokemon() async {
-    if (_basePokemon.isNotEmpty) return;
-    try {
-      final names = await PokemonNames.load();
-      if (!mounted) return;
-      final sprites = await context.read<SpriteService>().loadSprites();
-      final chosen = <String, ParsedSprite>{};
-      for (final sprite in sprites) {
-        if (!sprite.shiny) continue;
-        if (isMegaOrGmaxForm(sprite.form)) continue;
-        final priority = _genderPriority(sprite.gender);
-        if (priority == null) continue;
-        final current = chosen[sprite.dex];
-        if (current == null ||
-            priority < _genderPriority(current.gender)! ||
-            (priority == _genderPriority(current.gender)! &&
-                sprite.form.compareTo(current.form) < 0)) {
-          chosen[sprite.dex] = sprite;
-        }
-      }
-
-      if (!mounted) return;
-      setState(() {
-        _basePokemon
-          ..clear()
-          ..addAll(
-            chosen.values.map(
-              (sprite) => Pokemon(
-                id: sprite.dex,
-                name: names.nameFor(sprite.dex),
-                imagePath: sprite.path,
-                isLocalFile: false,
-              ),
-            ),
-          );
-        _basePokemon.sort(pokemonDexComparator);
-      });
-    } catch (_) {
-      // If assets fail to load we leave the base list empty; the UI still works
-      // with custom Pokémon.
-    }
-  }
-
-  bool _isCaught(Pokemon pokemon) => _caught.contains(pokemon.id);
-
-  Future<void> _precacheListSprites() async {
-    final toPrecache = _allPokemon
-        .where((p) => !p.isLocalFile)
-        .take(AppLimits.listSpritePrecacheCount)
-        .toList();
-    if (toPrecache.isEmpty) return;
-    final service = context.read<SpriteService>();
-    await service.precacheSpritePaths(
-      context,
-      toPrecache.map((p) => p.imagePath),
-    );
-    final dexes = <String>[];
-    for (final p in toPrecache) {
-      final parsed = SpriteParser.parse(p.imagePath.split('/').last);
-      if (parsed != null) dexes.add(parsed.dex);
-    }
-    if (dexes.isNotEmpty) {
-      await service.warmupForDexes(dexes);
-    }
+    _controller.initialize(context);
   }
 
   Future<void> _onAddPokemon() async {
     final newPokemon = await showAddPokemonDialog(context);
     if (newPokemon == null) return;
-
-    setState(() {
-      _customPokemon.add(newPokemon);
-    });
-    await _saveCustomPokemon(_customPokemon);
-    await _reloadCaught();
+    await _controller.addPokemon(newPokemon);
   }
 
   Future<void> _applyPokemonEdit(Pokemon original, Pokemon updated) async {
-    final index = _customPokemon.indexWhere((p) => p.id == original.id);
-    if (index == -1) return;
-
-    setState(() {
-      _customPokemon[index] = updated;
-    });
-
-    await _saveCustomPokemon(_customPokemon);
-    await _reloadCaught();
-  }
-
-  Future<void> _clearPokemonState(Pokemon pokemon) async {
-    await context.read<CounterSync>().clearPokemonState(pokemon.id);
+    await _controller.applyPokemonEdit(original, updated);
   }
 
   Future<void> _confirmDelete(Pokemon pokemon) async {
-    final colors = Theme.of(context).colorScheme;
     final confirmed = await showScaledDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Theme.of(context).cardColor,
-        surfaceTintColor: Colors.transparent,
+      builder: (_) => ConfirmationDialog(
         title: Text(
           '${context.l10n.confirmDeleteTitle} ${pokemon.name}',
           textAlign: TextAlign.center,
@@ -231,7 +81,9 @@ class _PokemonListPageState extends State<PokemonListPage>
                 : '';
             return RichText(
               text: TextSpan(
-                style: AppTypography.button.copyWith(color: colors.onSurface),
+                style: AppTypography.button.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 children: [
                   TextSpan(text: parts.first),
                   TextSpan(
@@ -246,65 +98,27 @@ class _PokemonListPageState extends State<PokemonListPage>
             );
           },
         ),
-        actionsAlignment: MainAxisAlignment.center,
-        actionsPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.sm,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            style: AppButtonStyles.primaryOutline(
-              colors,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-                vertical: AppSpacing.sm,
-              ),
-              useLighter: true,
-            ),
-            child: Text(
-              context.l10n.confirmDeleteCancel,
-              style: AppTypography.button.copyWith(fontWeight: FontWeight.w700),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: AppButtonStyles.destructiveFilled(
-              colors,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-                vertical: AppSpacing.sm,
-              ),
-            ),
-            child: Text(
-              context.l10n.confirmDeleteDelete,
-              style: AppTypography.button.copyWith(fontWeight: FontWeight.w700),
-            ),
-          ),
-        ],
+        cancelLabel: context.l10n.confirmDeleteCancel,
+        confirmLabel: context.l10n.confirmDeleteDelete,
+        destructiveConfirm: true,
       ),
     );
 
     if (confirmed == true) {
-      setState(() {
-        _customPokemon.removeWhere((p) => p.id == pokemon.id);
-      });
-      await _saveCustomPokemon(_customPokemon);
-      await _clearPokemonState(pokemon);
-      await _reloadCaught();
+      await _controller.deletePokemonAndState(pokemon);
     }
   }
 
   @override
   void dispose() {
+    _controller.dispose();
     _sheetController?.dispose();
     _listController.dispose();
     super.dispose();
   }
 
   Future<void> _openManagePokemonList() async {
-    final pokemonSorted = [..._customPokemon]..sort(pokemonDexComparator);
+    final pokemonSorted = _controller.customPokemonSorted;
     if (pokemonSorted.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -321,8 +135,7 @@ class _PokemonListPageState extends State<PokemonListPage>
       builder: (context) => ManageListView(pokemonSorted: pokemonSorted),
     );
 
-    if (action == null) return;
-    if (!mounted) return;
+    if (action == null || !mounted) return;
     if (action.delete) {
       await _confirmDelete(action.pokemon);
     } else {
@@ -335,7 +148,7 @@ class _PokemonListPageState extends State<PokemonListPage>
 
   Future<void> _openDetail(Pokemon pokemon) async {
     await context.goToPokemon(pokemon);
-    await _reloadCaught();
+    await _controller.reloadCaught();
   }
 
   Future<void> _openSettings() async {
@@ -344,20 +157,23 @@ class _PokemonListPageState extends State<PokemonListPage>
       context: context,
       builder: (_) => const SettingsDialog(),
     );
-    setState(() {});
+    if (!mounted) return;
+    await _controller.refresh(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final uncaught = _allPokemon.where((p) => !_isCaught(p)).toList()
-      ..sort(pokemonDexComparator);
-    final caught = _allPokemon.where((p) => _isCaught(p)).toList()
-      ..sort(pokemonDexComparator);
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: _buildAppBar(colors),
-      body: _buildBody(colors, uncaught, caught),
+      body: ListenableBuilder(
+        listenable: _controller,
+        builder: (context, _) => _buildBody(colors),
+      ),
       bottomNavigationBar: _ListBottomBar(
         onStats: () => context.goToStats(),
         onAdd: _onAddPokemon,
@@ -382,11 +198,22 @@ class _PokemonListPageState extends State<PokemonListPage>
       flexibleSpace: Builder(
         builder: (context) {
           final scopedCard = Theme.of(context).cardColor;
-          return Container(
-            decoration: BoxDecoration(
-              color: scopedCard,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(AppRadii.lg),
+          return ClipRRect(
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(AppRadii.lg),
+            ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: _barBlurSigma,
+                sigmaY: _barBlurSigma,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: scopedCard.withValues(alpha: _barSurfaceAlpha),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(AppRadii.lg),
+                  ),
+                ),
               ),
             ),
           );
@@ -417,44 +244,54 @@ class _PokemonListPageState extends State<PokemonListPage>
     );
   }
 
-  Widget _buildBody(
-    ColorScheme colors,
-    List<Pokemon> uncaught,
-    List<Pokemon> caught,
-  ) {
-    if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+  Widget _buildBody(ColorScheme colors) {
+    final media = MediaQuery.of(context);
+    final topListPadding =
+        media.padding.top + AppSizes.toolbarHeight + AppSpacing.sm;
+    final bottomListPadding =
+        kBottomNavigationBarHeight + media.padding.bottom + AppSpacing.md;
+
+    if (_controller.loading) {
+      return Padding(
+        padding: EdgeInsets.only(top: topListPadding),
+        child: const Center(child: CircularProgressIndicator()),
+      );
     }
-    if (_allPokemon.isEmpty) {
-      return PokemonEmptyState(
-        onAddPressed: _onAddPokemon,
-        imageAsset: AppAssets.pokeballIcon,
-        colors: colors,
-        title: context.l10n.emptyTitle,
-        actionLabel: context.l10n.emptyAction,
+    if (_controller.allPokemon.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.only(top: topListPadding),
+        child: PokemonEmptyState(
+          onAddPressed: _onAddPokemon,
+          imageAsset: AppAssets.pokeballIcon,
+          colors: colors,
+          title: context.l10n.emptyTitle,
+          actionLabel: context.l10n.emptyAction,
+        ),
       );
     }
 
+    final uncaught = _controller.uncaughtPokemonSorted;
+    final caught = _controller.caughtPokemonSorted;
     final sections = <Widget>[];
     if (uncaught.isNotEmpty) {
       sections.add(
         PokemonSection(
           title: context.l10n.sectionUncaught,
-          expanded: _showUncaught,
-          onToggle: () => setState(() => _showUncaught = !_showUncaught),
+          expanded: _controller.showUncaught,
+          onToggle: _controller.toggleUncaughtSection,
           pokemons: uncaught,
-          isCaught: _isCaught,
+          isCaught: _controller.isCaught,
           onTap: _openDetail,
-          canManage: _isCustomPokemon,
+          canManage: _controller.isCustomPokemon,
           onEdit: (pokemon) async {
-            if (!_isCustomPokemon(pokemon)) return;
+            if (!_controller.isCustomPokemon(pokemon)) return;
             final updated = await showEditPokemonDialog(context, pokemon);
             if (updated != null) {
               await _applyPokemonEdit(pokemon, updated);
             }
           },
           onDelete: (pokemon) async {
-            if (!_isCustomPokemon(pokemon)) return;
+            if (!_controller.isCustomPokemon(pokemon)) return;
             await _confirmDelete(pokemon);
           },
         ),
@@ -464,21 +301,21 @@ class _PokemonListPageState extends State<PokemonListPage>
       sections.add(
         PokemonSection(
           title: context.l10n.sectionCaught,
-          expanded: _showCaught,
-          onToggle: () => setState(() => _showCaught = !_showCaught),
+          expanded: _controller.showCaught,
+          onToggle: _controller.toggleCaughtSection,
           pokemons: caught,
-          isCaught: _isCaught,
+          isCaught: _controller.isCaught,
           onTap: _openDetail,
-          canManage: _isCustomPokemon,
+          canManage: _controller.isCustomPokemon,
           onEdit: (pokemon) async {
-            if (!_isCustomPokemon(pokemon)) return;
+            if (!_controller.isCustomPokemon(pokemon)) return;
             final updated = await showEditPokemonDialog(context, pokemon);
             if (updated != null) {
               await _applyPokemonEdit(pokemon, updated);
             }
           },
           onDelete: (pokemon) async {
-            if (!_isCustomPokemon(pokemon)) return;
+            if (!_controller.isCustomPokemon(pokemon)) return;
             await _confirmDelete(pokemon);
           },
         ),
@@ -499,7 +336,10 @@ class _PokemonListPageState extends State<PokemonListPage>
         thickness: AppSizes.listScrollbarThickness,
         child: ListView(
           controller: _listController,
-          padding: AppInsets.page.copyWith(bottom: AppSpacing.xs),
+          padding: AppInsets.page.copyWith(
+            top: topListPadding,
+            bottom: bottomListPadding,
+          ),
           children: sections,
         ),
       ),
@@ -548,39 +388,52 @@ class _ListBottomBar extends StatelessWidget {
       top: false,
       left: false,
       right: false,
-      child: Material(
-        color: Theme.of(context).cardColor,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(AppRadii.lg),
-          ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppRadii.lg),
         ),
-        child: SizedBox(
-          height: kBottomNavigationBarHeight,
-          child: Row(
-            children: [
-              _BottomAction(
-                key: PokemonListPage.statsKey,
-                icon: Icons.bar_chart_rounded,
-                label: l10n.statsTitle,
-                onTap: onStats,
-                colors: colors,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: _PokemonListPageState._barBlurSigma,
+            sigmaY: _PokemonListPageState._barBlurSigma,
+          ),
+          child: Material(
+            color: Theme.of(context).cardColor.withValues(
+              alpha: _PokemonListPageState._barSurfaceAlpha,
+            ),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AppRadii.lg),
               ),
-              _BottomAction(
-                key: PokemonListPage.addPokemonKey,
-                icon: Icons.add_circle,
-                label: l10n.tooltipAddPokemon,
-                onTap: onAdd,
-                colors: colors,
+            ),
+            child: SizedBox(
+              height: kBottomNavigationBarHeight,
+              child: Row(
+                children: [
+                  _BottomAction(
+                    key: PokemonListPage.statsKey,
+                    icon: Icons.bar_chart_rounded,
+                    label: l10n.statsTitle,
+                    onTap: onStats,
+                    colors: colors,
+                  ),
+                  _BottomAction(
+                    key: PokemonListPage.addPokemonKey,
+                    icon: Icons.add_circle,
+                    label: l10n.tooltipAddPokemon,
+                    onTap: onAdd,
+                    colors: colors,
+                  ),
+                  _BottomAction(
+                    key: PokemonListPage.managePokemonKey,
+                    icon: Icons.edit_note,
+                    label: l10n.tooltipManagePokemon,
+                    onTap: onManage,
+                    colors: colors,
+                  ),
+                ],
               ),
-              _BottomAction(
-                key: PokemonListPage.managePokemonKey,
-                icon: Icons.edit_note,
-                label: l10n.tooltipManagePokemon,
-                onTap: onManage,
-                colors: colors,
-              ),
-            ],
+            ),
           ),
         ),
       ),

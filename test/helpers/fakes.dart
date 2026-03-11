@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/counter_overlay_payload.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/counter_state.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
-import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 
@@ -23,6 +23,7 @@ class FakeCounterSync implements CounterSync {
   Future<void> clearHuntDates(String counterKey) async {
     started[counterKey] = null;
     caughtAt[counterKey] = null;
+    caughtGame[counterKey] = null;
   }
 
   @override
@@ -51,6 +52,17 @@ class FakeCounterSync implements CounterSync {
       caughtGame: caughtGame[counterKey],
       dailyCounts: daily[counterKey] ?? const {},
     );
+  }
+
+  @override
+  Future<List<CounterState>> loadStates(Iterable<String> counterKeys) async {
+    return [
+      for (final counterKey in counterKeys)
+        await loadState(
+          counterKey,
+          counterKey.replaceFirst('counter_', 'caught_'),
+        ),
+    ];
   }
 
   @override
@@ -94,19 +106,19 @@ class FakeCounterSync implements CounterSync {
 
   @override
   Future<void> showOverlay(
-    CounterOverlayMessage message, {
+    CounterOverlayPayload payload, {
     int width = 360,
     int height = 220,
   }) async {}
 
   @override
   Future<bool> ensureOverlay(
-    CounterOverlayMessage message, {
+    CounterOverlayPayload payload, {
     int width = 360,
     int height = 220,
   }) async {
     ensureOverlayCount++;
-    await showOverlay(message, width: width, height: height);
+    await showOverlay(payload, width: width, height: height);
     return true;
   }
 
@@ -122,7 +134,7 @@ class FakeCounterSync implements CounterSync {
   int setDailyCalls = 0;
 
   @override
-  Future<void> shareToOverlay(CounterOverlayMessage message) async {
+  Future<void> shareToOverlay(CounterOverlayPayload payload) async {
     shareCount++;
   }
 

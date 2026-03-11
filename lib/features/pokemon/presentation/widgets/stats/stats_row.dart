@@ -43,7 +43,7 @@ class StatsRow extends StatelessWidget {
     final baseStyle = AppTypography.listTitle.copyWith(
       color: colors.onSurface,
       fontWeight: FontWeight.w700,
-      fontSize: textSize ?? AppTypography.listTitle.fontSize,
+      fontSize: textSize ?? AppSizes.statsRowTextSize,
     );
     final resolvedTitleStyle = titleStyle ?? baseStyle;
     final resolvedTrailingStyle = trailingStyle ?? baseStyle;

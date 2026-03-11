@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 
 class StatsAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const StatsAppBar({super.key, required this.title});
+  const StatsAppBar({super.key, required this.title, this.actions});
 
   final Widget title;
+  final List<Widget>? actions;
 
   @override
   Size get preferredSize => const Size.fromHeight(AppSizes.toolbarHeight);
@@ -49,6 +50,7 @@ class StatsAppBar extends StatelessWidget implements PreferredSizeWidget {
           );
         },
       ),
+      actions: actions,
     );
   }
 }
