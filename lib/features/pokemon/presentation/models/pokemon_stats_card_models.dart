@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-enum StatsCardId {
+enum PokemonStatsCardId {
   caught,
   total,
   games,
@@ -10,15 +10,15 @@ enum StatsCardId {
   history,
 }
 
-class StatsCardEntry {
-  const StatsCardEntry({
+class PokemonStatsCardEntry {
+  const PokemonStatsCardEntry({
     required this.id,
     required this.label,
     required this.widget,
     required this.span,
   });
 
-  final StatsCardId id;
+  final PokemonStatsCardId id;
   final String label;
   final Widget widget;
   final int span;

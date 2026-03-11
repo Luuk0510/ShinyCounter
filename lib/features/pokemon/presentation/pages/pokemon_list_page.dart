@@ -59,7 +59,7 @@ class _PokemonListPageState extends State<PokemonListPage>
   Future<void> _confirmDelete(Pokemon pokemon) async {
     final confirmed = await showScaledDialog<bool>(
       context: context,
-      builder: (_) => ConfirmActionDialog(
+      builder: (_) => ConfirmationDialog(
         title: Text(
           '${context.l10n.confirmDeleteTitle} ${pokemon.name}',
           textAlign: TextAlign.center,

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
-import 'package:shiny_counter/features/pokemon/presentation/models/stats_page_layout_models.dart';
+import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_card_models.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/pokemon_stats_page_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
@@ -47,7 +47,9 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     _controller.resetChartRange();
   }
 
-  void _openReorderSheet(Map<StatsCardId, StatsCardEntry> entries) {
+  void _openReorderSheet(
+    Map<PokemonStatsCardId, PokemonStatsCardEntry> entries,
+  ) {
     var workingOrder = _controller.orderFor(entries.keys);
     showPokemonBottomSheet<void>(
       context,
@@ -136,7 +138,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  SheetActionBar(
+                  BottomSheetActionRow(
                     colors: colors,
                     leadingLabel: l10n.statsRangeReset,
                     trailingLabel: l10n.save,
@@ -164,7 +166,10 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     );
   }
 
-  List<Widget> _buildCardLayout(List<StatsCardEntry> entries, bool isWide) {
+  List<Widget> _buildCardLayout(
+    List<PokemonStatsCardEntry> entries,
+    bool isWide,
+  ) {
     if (!isWide) {
       return [
         for (var i = 0; i < entries.length; i++) ...[
@@ -210,7 +215,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     ];
   }
 
-  Map<StatsCardId, StatsCardEntry> _buildEntries(
+  Map<PokemonStatsCardId, PokemonStatsCardEntry> _buildEntries(
     BuildContext context,
     ColorScheme colors,
   ) {
@@ -265,50 +270,50 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
             resets: summary.resetsByGame,
           );
 
-    return <StatsCardId, StatsCardEntry>{
-      StatsCardId.caught: StatsCardEntry(
-        id: StatsCardId.caught,
+    return <PokemonStatsCardId, PokemonStatsCardEntry>{
+      PokemonStatsCardId.caught: PokemonStatsCardEntry(
+        id: PokemonStatsCardId.caught,
         label: l10n.statsCaughtLabel,
         widget: caught,
         span: 1,
       ),
-      StatsCardId.total: StatsCardEntry(
-        id: StatsCardId.total,
+      PokemonStatsCardId.total: PokemonStatsCardEntry(
+        id: PokemonStatsCardId.total,
         label: l10n.statsTotalCountsLabel,
         widget: total,
         span: 1,
       ),
       if (gamesCard != null)
-        StatsCardId.games: StatsCardEntry(
-          id: StatsCardId.games,
+        PokemonStatsCardId.games: PokemonStatsCardEntry(
+          id: PokemonStatsCardId.games,
           label: l10n.statsGamesLabel,
           widget: gamesCard,
           span: 1,
         ),
       if (recentCard != null)
-        StatsCardId.recent: StatsCardEntry(
-          id: StatsCardId.recent,
+        PokemonStatsCardId.recent: PokemonStatsCardEntry(
+          id: PokemonStatsCardId.recent,
           label: l10n.statsRecentLabel,
           widget: recentCard,
           span: 1,
         ),
       if (resetsPokemonCard != null)
-        StatsCardId.resetsPokemon: StatsCardEntry(
-          id: StatsCardId.resetsPokemon,
+        PokemonStatsCardId.resetsPokemon: PokemonStatsCardEntry(
+          id: PokemonStatsCardId.resetsPokemon,
           label: l10n.statsResetsPokemonLabel,
           widget: resetsPokemonCard,
           span: 1,
         ),
       if (resetsCard != null)
-        StatsCardId.resetsGame: StatsCardEntry(
-          id: StatsCardId.resetsGame,
+        PokemonStatsCardId.resetsGame: PokemonStatsCardEntry(
+          id: PokemonStatsCardId.resetsGame,
           label: l10n.statsResetsByGameLabel,
           widget: resetsCard,
           span: 1,
         ),
       if (history != null)
-        StatsCardId.history: StatsCardEntry(
-          id: StatsCardId.history,
+        PokemonStatsCardId.history: PokemonStatsCardEntry(
+          id: PokemonStatsCardId.history,
           label: l10n.huntHistoryTitle,
           widget: history,
           span: 2,

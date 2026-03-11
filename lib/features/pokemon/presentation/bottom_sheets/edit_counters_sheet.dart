@@ -155,7 +155,7 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
             ],
           ),
           const SizedBox(height: AppSpacing.xl),
-          SheetActionBar(
+          BottomSheetActionRow(
             colors: colors,
             leadingLabel: l10n.cancel,
             trailingLabel: l10n.save,

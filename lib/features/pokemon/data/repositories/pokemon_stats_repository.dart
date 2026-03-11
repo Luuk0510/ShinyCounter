@@ -3,8 +3,8 @@ import 'package:shiny_counter/features/pokemon/domain/repositories/stats_reposit
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 
-class StatsRepositoryImpl implements StatsRepository {
-  StatsRepositoryImpl({
+class PokemonStatsRepository implements StatsRepository {
+  PokemonStatsRepository({
     required PokemonRepository pokemonRepository,
     required CounterSync counterSync,
   }) : _pokemonRepository = pokemonRepository,

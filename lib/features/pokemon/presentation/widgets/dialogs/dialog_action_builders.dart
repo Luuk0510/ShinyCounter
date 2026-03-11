@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 
-class DialogActionBar extends StatelessWidget {
-  const DialogActionBar({
+class DialogActionRow extends StatelessWidget {
+  const DialogActionRow({
     super.key,
     required this.colors,
     required this.cancelLabel,
@@ -76,8 +76,8 @@ class DialogActionBar extends StatelessWidget {
   }
 }
 
-class SheetActionBar extends StatelessWidget {
-  const SheetActionBar({
+class BottomSheetActionRow extends StatelessWidget {
+  const BottomSheetActionRow({
     super.key,
     required this.colors,
     required this.leadingLabel,
@@ -138,8 +138,8 @@ class SheetActionBar extends StatelessWidget {
   }
 }
 
-class ConfirmActionDialog extends StatelessWidget {
-  const ConfirmActionDialog({
+class ConfirmationDialog extends StatelessWidget {
+  const ConfirmationDialog({
     super.key,
     required this.title,
     required this.content,
@@ -167,7 +167,7 @@ class ConfirmActionDialog extends StatelessWidget {
         vertical: AppSpacing.sm,
       ),
       actions: [
-        DialogActionBar(
+        DialogActionRow(
           colors: colors,
           cancelLabel: cancelLabel,
           confirmLabel: confirmLabel,

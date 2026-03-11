@@ -217,7 +217,7 @@ class _AddPokemonView extends StatelessWidget {
         vertical: AppSpacing.sm,
       ),
       actions: [
-        DialogActionBar(
+        DialogActionRow(
           colors: colors,
           cancelLabel: l10n.cancel,
           confirmLabel: l10n.choose,

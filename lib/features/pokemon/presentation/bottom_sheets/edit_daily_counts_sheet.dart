@@ -108,7 +108,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            SheetActionBar(
+            BottomSheetActionRow(
               colors: colors,
               leadingLabel: l10n.cancel,
               trailingLabel: l10n.save,

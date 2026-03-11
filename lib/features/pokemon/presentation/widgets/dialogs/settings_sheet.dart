@@ -98,7 +98,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       if (!mounted) return;
       final confirmed = await showScaledDialog<bool>(
         context: context,
-        builder: (_) => ConfirmActionDialog(
+        builder: (_) => ConfirmationDialog(
           title: Text(
             l10n.settingsImportConfirmTitle,
             textAlign: TextAlign.center,

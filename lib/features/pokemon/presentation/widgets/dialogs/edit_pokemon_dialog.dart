@@ -69,7 +69,7 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
         vertical: AppSpacing.sm,
       ),
       actions: [
-        DialogActionBar(
+        DialogActionRow(
           colors: Theme.of(context).colorScheme,
           cancelLabel: l10n.cancel,
           confirmLabel: l10n.save,
