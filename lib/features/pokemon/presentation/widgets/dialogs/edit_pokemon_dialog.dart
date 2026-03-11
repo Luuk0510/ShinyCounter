@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 
 class EditPokemonDialog extends StatefulWidget {
@@ -63,27 +64,17 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
           ],
         ),
       ),
-      actionsAlignment: MainAxisAlignment.center,
       actionsPadding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
         vertical: AppSpacing.sm,
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
-          style: AppButtonStyles.primaryOutline(
-            Theme.of(context).colorScheme,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xl,
-              vertical: AppSpacing.sm,
-            ),
-            useLighter: true,
-          ),
-          child: Text(l10n.cancel, style: AppTypography.button),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        ElevatedButton(
-          onPressed: () {
+        DialogActionBar(
+          colors: Theme.of(context).colorScheme,
+          cancelLabel: l10n.cancel,
+          confirmLabel: l10n.save,
+          onCancel: () => Navigator.of(context).pop<Pokemon?>(null),
+          onConfirm: () {
             final name = _nameController.text.trim();
             if (name.isEmpty) return;
 
@@ -96,14 +87,8 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
               ),
             );
           },
-          style: AppButtonStyles.primaryFilled(
-            Theme.of(context).colorScheme,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xl,
-              vertical: AppSpacing.sm,
-            ),
-          ),
-          child: Text(l10n.save, style: AppTypography.button),
+          cancelTextStyle: AppTypography.button,
+          confirmTextStyle: AppTypography.button,
         ),
       ],
     );

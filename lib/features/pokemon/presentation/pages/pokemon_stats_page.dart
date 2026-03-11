@@ -5,6 +5,7 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/pokemon_stats_page_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_app_bar.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_page_cards.dart';
@@ -134,44 +135,24 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {
-                            setSheetState(
-                              () => workingOrder = List.of(resetOrder),
-                            );
-                          },
-                          style: AppButtonStyles.primaryOutline(
-                            colors,
-                            useLighter: true,
-                          ),
-                          child: Text(
-                            l10n.statsRangeReset,
-                            style: AppTypography.button.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _controller.setCardOrder(workingOrder);
-                            Navigator.of(sheetContext).pop();
-                          },
-                          style: AppButtonStyles.primaryFilled(colors),
-                          child: Text(
-                            l10n.save,
-                            style: AppTypography.button.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  SheetActionBar(
+                    colors: colors,
+                    leadingLabel: l10n.statsRangeReset,
+                    trailingLabel: l10n.save,
+                    spacing: AppSpacing.sm,
+                    onLeadingPressed: () {
+                      setSheetState(() => workingOrder = List.of(resetOrder));
+                    },
+                    onTrailingPressed: () {
+                      _controller.setCardOrder(workingOrder);
+                      Navigator.of(sheetContext).pop();
+                    },
+                    leadingTextStyle: AppTypography.button.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    trailingTextStyle: AppTypography.button.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               );

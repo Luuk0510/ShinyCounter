@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/daily_counts_service.dart';
 
@@ -107,37 +108,18 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: AppButtonStyles.primaryOutline(
-                      colors,
-                      useLighter: true,
-                    ),
-                    child: Text(
-                      l10n.cancel,
-                      style: AppTypography.button.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _save,
-                    style: AppButtonStyles.primaryFilled(colors),
-                    child: Text(
-                      l10n.save,
-                      style: AppTypography.button.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            SheetActionBar(
+              colors: colors,
+              leadingLabel: l10n.cancel,
+              trailingLabel: l10n.save,
+              onLeadingPressed: () => Navigator.of(context).pop(),
+              onTrailingPressed: _save,
+              leadingTextStyle: AppTypography.button.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+              trailingTextStyle: AppTypography.button.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),

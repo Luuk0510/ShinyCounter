@@ -3,6 +3,7 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/detail/date_row.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_field_group.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
 
@@ -154,40 +155,21 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
             ],
           ),
           const SizedBox(height: AppSpacing.xl),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: AppButtonStyles.primaryOutline(
-                    colors,
-                    borderWidth: AppSizes.sheetActionWidth,
-                    useLighter: true,
-                  ),
-                  child: Text(
-                    l10n.cancel,
-                    style: const TextStyle(
-                      fontSize: AppSizes.sheetButtonFont,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _submit,
-                  style: AppButtonStyles.primaryFilled(colors),
-                  child: Text(
-                    l10n.save,
-                    style: const TextStyle(
-                      fontSize: AppSizes.sheetButtonFont,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          SheetActionBar(
+            colors: colors,
+            leadingLabel: l10n.cancel,
+            trailingLabel: l10n.save,
+            leadingBorderWidth: AppSizes.sheetActionWidth,
+            onLeadingPressed: () => Navigator.of(context).pop(),
+            onTrailingPressed: _submit,
+            leadingTextStyle: const TextStyle(
+              fontSize: AppSizes.sheetButtonFont,
+              fontWeight: FontWeight.w600,
+            ),
+            trailingTextStyle: const TextStyle(
+              fontSize: AppSizes.sheetButtonFont,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),
