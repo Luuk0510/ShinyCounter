@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_field_styles.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/detail/date_row.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_field_group.dart';
@@ -105,19 +106,11 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
               TextField(
                 controller: _counterCtrl,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: PokemonFieldDecorations.standard(
                   labelText: l10n.counterLabel,
                   hintText: l10n.enterNumberHint,
-                  labelStyle: const TextStyle(
-                    fontSize: AppSizes.sheetFieldLabel,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  hintStyle: const TextStyle(fontSize: AppSizes.sheetFieldHint),
                 ),
-                style: const TextStyle(
-                  fontSize: AppSizes.sheetFieldText,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: PokemonFieldStyles.input,
               ),
               _DateGroup(
                 start: _start,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_field_styles.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/daily_counts_service.dart';
@@ -165,11 +166,8 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           child: TextField(
             controller: row.controller,
             keyboardType: TextInputType.number,
-            style: AppTypography.button.copyWith(
-              color: colors.onSurface,
-              fontWeight: FontWeight.w700,
-            ),
-            decoration: InputDecoration(
+            style: PokemonFieldStyles.input.copyWith(color: colors.onSurface),
+            decoration: PokemonFieldDecorations.standard(
               labelText: l10n.countLabel,
               isDense: true,
               border: OutlineInputBorder(
@@ -237,7 +235,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(hintText: context.l10n.enterNumberHint),
+            decoration: PokemonFieldDecorations.standard(
+              hintText: context.l10n.enterNumberHint,
+            ),
           ),
           actions: [
             TextButton(
