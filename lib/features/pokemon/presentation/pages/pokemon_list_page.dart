@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
@@ -26,6 +28,9 @@ class PokemonListPage extends StatefulWidget {
 
 class _PokemonListPageState extends State<PokemonListPage>
     with TickerProviderStateMixin {
+  static const double _barBlurSigma = 18;
+  static const double _barSurfaceAlpha = 0.76;
+
   late final PokemonListPageController _controller;
   final ScrollController _listController = ScrollController();
   AnimationController? _sheetController;
@@ -163,6 +168,7 @@ class _PokemonListPageState extends State<PokemonListPage>
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: _buildAppBar(colors),
       body: ListenableBuilder(
         listenable: _controller,
@@ -192,11 +198,22 @@ class _PokemonListPageState extends State<PokemonListPage>
       flexibleSpace: Builder(
         builder: (context) {
           final scopedCard = Theme.of(context).cardColor;
-          return Container(
-            decoration: BoxDecoration(
-              color: scopedCard,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(AppRadii.lg),
+          return ClipRRect(
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(AppRadii.lg),
+            ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: _barBlurSigma,
+                sigmaY: _barBlurSigma,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: scopedCard.withValues(alpha: _barSurfaceAlpha),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(AppRadii.lg),
+                  ),
+                ),
               ),
             ),
           );
@@ -229,19 +246,27 @@ class _PokemonListPageState extends State<PokemonListPage>
 
   Widget _buildBody(ColorScheme colors) {
     final media = MediaQuery.of(context);
+    final topListPadding =
+        media.padding.top + AppSizes.toolbarHeight + AppSpacing.sm;
     final bottomListPadding =
         kBottomNavigationBarHeight + media.padding.bottom + AppSpacing.md;
 
     if (_controller.loading) {
-      return const Center(child: CircularProgressIndicator());
+      return Padding(
+        padding: EdgeInsets.only(top: topListPadding),
+        child: const Center(child: CircularProgressIndicator()),
+      );
     }
     if (_controller.allPokemon.isEmpty) {
-      return PokemonEmptyState(
-        onAddPressed: _onAddPokemon,
-        imageAsset: AppAssets.pokeballIcon,
-        colors: colors,
-        title: context.l10n.emptyTitle,
-        actionLabel: context.l10n.emptyAction,
+      return Padding(
+        padding: EdgeInsets.only(top: topListPadding),
+        child: PokemonEmptyState(
+          onAddPressed: _onAddPokemon,
+          imageAsset: AppAssets.pokeballIcon,
+          colors: colors,
+          title: context.l10n.emptyTitle,
+          actionLabel: context.l10n.emptyAction,
+        ),
       );
     }
 
@@ -311,7 +336,10 @@ class _PokemonListPageState extends State<PokemonListPage>
         thickness: AppSizes.listScrollbarThickness,
         child: ListView(
           controller: _listController,
-          padding: AppInsets.page.copyWith(bottom: bottomListPadding),
+          padding: AppInsets.page.copyWith(
+            top: topListPadding,
+            bottom: bottomListPadding,
+          ),
           children: sections,
         ),
       ),
@@ -360,39 +388,52 @@ class _ListBottomBar extends StatelessWidget {
       top: false,
       left: false,
       right: false,
-      child: Material(
-        color: Theme.of(context).cardColor,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(AppRadii.lg),
-          ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppRadii.lg),
         ),
-        child: SizedBox(
-          height: kBottomNavigationBarHeight,
-          child: Row(
-            children: [
-              _BottomAction(
-                key: PokemonListPage.statsKey,
-                icon: Icons.bar_chart_rounded,
-                label: l10n.statsTitle,
-                onTap: onStats,
-                colors: colors,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: _PokemonListPageState._barBlurSigma,
+            sigmaY: _PokemonListPageState._barBlurSigma,
+          ),
+          child: Material(
+            color: Theme.of(
+              context,
+            ).cardColor.withValues(alpha: _PokemonListPageState._barSurfaceAlpha),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AppRadii.lg),
               ),
-              _BottomAction(
-                key: PokemonListPage.addPokemonKey,
-                icon: Icons.add_circle,
-                label: l10n.tooltipAddPokemon,
-                onTap: onAdd,
-                colors: colors,
+            ),
+            child: SizedBox(
+              height: kBottomNavigationBarHeight,
+              child: Row(
+                children: [
+                  _BottomAction(
+                    key: PokemonListPage.statsKey,
+                    icon: Icons.bar_chart_rounded,
+                    label: l10n.statsTitle,
+                    onTap: onStats,
+                    colors: colors,
+                  ),
+                  _BottomAction(
+                    key: PokemonListPage.addPokemonKey,
+                    icon: Icons.add_circle,
+                    label: l10n.tooltipAddPokemon,
+                    onTap: onAdd,
+                    colors: colors,
+                  ),
+                  _BottomAction(
+                    key: PokemonListPage.managePokemonKey,
+                    icon: Icons.edit_note,
+                    label: l10n.tooltipManagePokemon,
+                    onTap: onManage,
+                    colors: colors,
+                  ),
+                ],
               ),
-              _BottomAction(
-                key: PokemonListPage.managePokemonKey,
-                icon: Icons.edit_note,
-                label: l10n.tooltipManagePokemon,
-                onTap: onManage,
-                colors: colors,
-              ),
-            ],
+            ),
           ),
         ),
       ),
