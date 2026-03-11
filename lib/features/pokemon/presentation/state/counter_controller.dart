@@ -6,10 +6,11 @@ import 'package:shiny_counter/features/pokemon/domain/entities/counter_overlay_p
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
+import 'package:shiny_counter/features/pokemon/presentation/state/controller_base.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/hunt_state_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 
-class CounterController extends ChangeNotifier {
+class CounterController extends ControllerBase {
   CounterController({required this.pokemon, required CounterSync sync})
     : _sync = sync,
       _keys = CounterKeys.fromId(pokemon.id);
@@ -50,12 +51,14 @@ class CounterController extends ChangeNotifier {
   bool get _overlaySupported =>
       !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
-  Future<void> init() async {
+  Future<void> initialize() async {
     if (_overlaySupported) {
       _overlaySub ??= _sync.overlayStream.listen(_onOverlayData);
     }
     await _loadState();
   }
+
+  Future<void> init() => initialize();
 
   @override
   void dispose() {
@@ -97,7 +100,8 @@ class CounterController extends ChangeNotifier {
       _caughtAt = null;
       await sync.setCaughtAt(_keys.counter, null);
     }
-    notifyListeners();
+    if (isDisposed) return;
+    safeNotifyListeners();
     await _updateOverlay();
   }
 
@@ -106,7 +110,7 @@ class CounterController extends ChangeNotifier {
     final sync = _sync;
     await sync.setStartedAt(_keys.counter, value);
     await _updateOverlay();
-    notifyListeners();
+    safeNotifyListeners();
   }
 
   Future<void> setCaughtAtDate(DateTime? value) async {
@@ -121,14 +125,16 @@ class CounterController extends ChangeNotifier {
       }
     }
     await _updateOverlay();
-    notifyListeners();
+    if (isDisposed) return;
+    safeNotifyListeners();
   }
 
   Future<void> setCaughtGame(String? game) async {
     _caughtGame = game;
     final sync = _sync;
     await sync.setCaughtGame(_keys.counter, game);
-    notifyListeners();
+    if (isDisposed) return;
+    safeNotifyListeners();
   }
 
   Future<void> _applyCounterUpdate(
@@ -181,7 +187,8 @@ class CounterController extends ChangeNotifier {
     _isCaught = update.isCaught;
     _caughtGame = update.caughtGame;
     _dailyCounts = update.dailyCounts;
-    notifyListeners();
+    if (isDisposed) return;
+    safeNotifyListeners();
     await _updateOverlay();
   }
 
@@ -198,7 +205,8 @@ class CounterController extends ChangeNotifier {
     if (_pillActive) {
       _startOverlayPoller();
     }
-    notifyListeners();
+    if (isDisposed) return;
+    safeNotifyListeners();
   }
 
   Future<void> _loadState() async {
@@ -210,7 +218,8 @@ class CounterController extends ChangeNotifier {
     _caughtAt = state.caughtAt;
     _caughtGame = state.caughtGame;
     _dailyCounts = state.dailyCounts;
-    notifyListeners();
+    if (isDisposed) return;
+    safeNotifyListeners();
   }
 
   Future<void> _persist({CounterSync? sync}) async {
@@ -229,7 +238,8 @@ class CounterController extends ChangeNotifier {
     _dailyCounts = cleaned;
     final sync = _sync;
     await sync.setDailyCounts(_keys.counter, cleaned);
-    notifyListeners();
+    if (isDisposed) return;
+    safeNotifyListeners();
     await _updateOverlay();
   }
 
@@ -243,7 +253,7 @@ class CounterController extends ChangeNotifier {
     if (data == 'closed') {
       _pillActive = false;
       _overlayPoller?.cancel();
-      notifyListeners();
+      safeNotifyListeners();
       return;
     }
 
@@ -258,7 +268,8 @@ class CounterController extends ChangeNotifier {
     _caughtAt = state.caughtAt;
     _caughtGame = state.caughtGame;
     _dailyCounts = state.dailyCounts;
-    notifyListeners();
+    if (isDisposed) return;
+    safeNotifyListeners();
   }
 
   void _startOverlayPoller() {
@@ -282,7 +293,8 @@ class CounterController extends ChangeNotifier {
       _caughtAt = state.caughtAt;
       _caughtGame = state.caughtGame;
       _dailyCounts = state.dailyCounts;
-      notifyListeners();
+      if (isDisposed) return;
+      safeNotifyListeners();
     });
   }
 

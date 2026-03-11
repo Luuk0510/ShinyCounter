@@ -28,7 +28,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     _controller = PokemonStatsPageController(
       repository: context.read<StatsRepository>(),
     );
-    _controller.loadStats();
+    _controller.initialize();
   }
 
   Future<void> _pickChartRange() async {

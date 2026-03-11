@@ -4,6 +4,7 @@ import 'package:shiny_counter/features/pokemon/domain/entities/date_range.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/stats_models.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/stats_aggregation_service.dart';
+import 'package:shiny_counter/features/pokemon/presentation/state/controller_base.dart';
 
 enum StatsCardId {
   caught,
@@ -15,7 +16,7 @@ enum StatsCardId {
   history,
 }
 
-class PokemonStatsPageController extends ChangeNotifier {
+class PokemonStatsPageController extends LoadableController {
   PokemonStatsPageController({required StatsRepository repository})
     : _statsService = StatsAggregationService(repository: repository),
       _chartRange = _buildDefaultChartRange(),
@@ -36,14 +37,11 @@ class PokemonStatsPageController extends ChangeNotifier {
 
   DateTimeRange _chartRange;
   List<CounterState> _states = const [];
-  bool _loading = true;
   StatsSummary _summary = const StatsSummary.empty();
   List<StatsCardId> _cardOrder;
-  bool _disposed = false;
 
   DateTimeRange get chartRange => _chartRange;
   List<CounterState> get states => List.unmodifiable(_states);
-  bool get loading => _loading;
   StatsSummary get summary => _summary;
   List<StatsCardId> get cardOrder => List.unmodifiable(_cardOrder);
   DateTime get lastSelectableDate {
@@ -58,14 +56,14 @@ class PokemonStatsPageController extends ChangeNotifier {
   );
 
   Future<void> loadStats() async {
+    setLoading(true, notify: false);
     final snapshot = await _statsService.loadStats(
       _domainRangeFromUiRange(_chartRange),
     );
-    if (_disposed) return;
+    if (isDisposed) return;
     _states = snapshot.states;
     _summary = snapshot.summary;
-    _loading = false;
-    _safeNotify();
+    setLoading(false);
   }
 
   void applyChartRange(DateTimeRange range) {
@@ -75,7 +73,7 @@ class PokemonStatsPageController extends ChangeNotifier {
       _states,
       _domainRangeFromUiRange(range),
     );
-    _safeNotify();
+    safeNotifyListeners();
   }
 
   void resetChartRange() {
@@ -94,7 +92,7 @@ class PokemonStatsPageController extends ChangeNotifier {
 
   void setCardOrder(List<StatsCardId> cardOrder) {
     _cardOrder = List.of(cardOrder);
-    _safeNotify();
+    safeNotifyListeners();
   }
 
   List<StatsCardId> resetOrderFor(Iterable<StatsCardId> available) {
@@ -121,14 +119,7 @@ class PokemonStatsPageController extends ChangeNotifier {
     return DateTimeRange(start: start, end: end);
   }
 
-  @override
-  void dispose() {
-    _disposed = true;
-    super.dispose();
-  }
-
-  void _safeNotify() {
-    if (_disposed) return;
-    notifyListeners();
+  Future<void> initialize() async {
+    await loadStats();
   }
 }

@@ -4,6 +4,7 @@ import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
+import 'package:shiny_counter/features/pokemon/presentation/state/controller_base.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
@@ -11,7 +12,7 @@ import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 
 const bool _includeBaseDex = false;
 
-class PokemonListPageController extends ChangeNotifier {
+class PokemonListPageController extends LoadableController {
   PokemonListPageController({
     required PokemonRepository pokemonRepository,
     required CounterSync counterSync,
@@ -27,12 +28,9 @@ class PokemonListPageController extends ChangeNotifier {
   final List<Pokemon> _customPokemon = [];
   final List<Pokemon> _basePokemon = [];
   Set<String> _caught = {};
-  bool _loading = true;
   bool _showUncaught = true;
   bool _showCaught = true;
-  bool _disposed = false;
 
-  bool get loading => _loading;
   bool get showUncaught => _showUncaught;
   bool get showCaught => _showCaught;
   List<Pokemon> get customPokemon => List.unmodifiable(_customPokemon);
@@ -73,32 +71,34 @@ class PokemonListPageController extends ChangeNotifier {
   }
 
   Future<void> loadData() async {
+    setLoading(true, notify: false);
     if (_includeBaseDex) {
       await _loadBasePokemon();
     }
     final custom = await _pokemonRepository.loadCustomPokemon();
-    if (_disposed) return;
+    if (isDisposed) return;
     _customPokemon
       ..clear()
       ..addAll(custom);
     await reloadCaught(notify: false);
-    if (_disposed) return;
-    _loading = false;
-    _safeNotify();
+    if (isDisposed) return;
+    setLoading(false);
   }
 
   Future<void> reloadCaught({bool notify = true}) async {
     _caught = await _pokemonRepository.loadCaught(allPokemon);
     if (notify) {
-      _safeNotify();
+      safeNotifyListeners();
     }
   }
 
   Future<void> addPokemon(Pokemon pokemon) async {
     _customPokemon.add(pokemon);
     await _pokemonRepository.saveCustomPokemon(_customPokemon);
+    if (isDisposed) return;
     await reloadCaught(notify: false);
-    _safeNotify();
+    if (isDisposed) return;
+    safeNotifyListeners();
   }
 
   Future<void> applyPokemonEdit(Pokemon original, Pokemon updated) async {
@@ -108,15 +108,19 @@ class PokemonListPageController extends ChangeNotifier {
     if (index == -1) return;
     _customPokemon[index] = updated;
     await _pokemonRepository.saveCustomPokemon(_customPokemon);
+    if (isDisposed) return;
     await reloadCaught(notify: false);
-    _safeNotify();
+    if (isDisposed) return;
+    safeNotifyListeners();
   }
 
   Future<void> deletePokemon(Pokemon pokemon) async {
     _customPokemon.removeWhere((entry) => entry.id == pokemon.id);
     await _pokemonRepository.saveCustomPokemon(_customPokemon);
+    if (isDisposed) return;
     await reloadCaught(notify: false);
-    _safeNotify();
+    if (isDisposed) return;
+    safeNotifyListeners();
   }
 
   Future<void> deletePokemonAndState(Pokemon pokemon) async {
@@ -126,12 +130,12 @@ class PokemonListPageController extends ChangeNotifier {
 
   void toggleUncaughtSection() {
     _showUncaught = !_showUncaught;
-    _safeNotify();
+    safeNotifyListeners();
   }
 
   void toggleCaughtSection() {
     _showCaught = !_showCaught;
-    _safeNotify();
+    safeNotifyListeners();
   }
 
   Future<void> precacheListSprites(BuildContext context) async {
@@ -177,7 +181,7 @@ class PokemonListPageController extends ChangeNotifier {
     try {
       final names = await PokemonNames.load();
       final sprites = await _spriteService.loadSprites();
-      if (_disposed) return;
+      if (isDisposed) return;
       final chosen = <String, ParsedSprite>{};
       for (final sprite in sprites) {
         if (!sprite.shiny) continue;
@@ -210,16 +214,5 @@ class PokemonListPageController extends ChangeNotifier {
       // If assets fail to load we leave the base list empty; the UI still works
       // with custom Pokemon.
     }
-  }
-
-  @override
-  void dispose() {
-    _disposed = true;
-    super.dispose();
-  }
-
-  void _safeNotify() {
-    if (_disposed) return;
-    notifyListeners();
   }
 }

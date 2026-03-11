@@ -80,7 +80,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     );
     WidgetsBinding.instance.addObserver(this);
     _controller.addListener(_onControllerChanged);
-    _controller.init();
+    _controller.initialize();
     _loadSprites();
   }
 
@@ -134,7 +134,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _controller.init();
+      _controller.initialize();
     }
   }
 
