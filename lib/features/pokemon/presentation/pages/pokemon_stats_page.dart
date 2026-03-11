@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
+import 'package:shiny_counter/features/pokemon/presentation/models/stats_page_layout_models.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/pokemon_stats_page_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
@@ -46,7 +47,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     _controller.resetChartRange();
   }
 
-  void _openReorderSheet(Map<StatsCardId, _StatsCardEntry> entries) {
+  void _openReorderSheet(Map<StatsCardId, StatsCardEntry> entries) {
     var workingOrder = _controller.orderFor(entries.keys);
     showPokemonBottomSheet<void>(
       context,
@@ -163,7 +164,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     );
   }
 
-  List<Widget> _buildCardLayout(List<_StatsCardEntry> entries, bool isWide) {
+  List<Widget> _buildCardLayout(List<StatsCardEntry> entries, bool isWide) {
     if (!isWide) {
       return [
         for (var i = 0; i < entries.length; i++) ...[
@@ -209,7 +210,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     ];
   }
 
-  Map<StatsCardId, _StatsCardEntry> _buildEntries(
+  Map<StatsCardId, StatsCardEntry> _buildEntries(
     BuildContext context,
     ColorScheme colors,
   ) {
@@ -264,49 +265,49 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
             resets: summary.resetsByGame,
           );
 
-    return <StatsCardId, _StatsCardEntry>{
-      StatsCardId.caught: _StatsCardEntry(
+    return <StatsCardId, StatsCardEntry>{
+      StatsCardId.caught: StatsCardEntry(
         id: StatsCardId.caught,
         label: l10n.statsCaughtLabel,
         widget: caught,
         span: 1,
       ),
-      StatsCardId.total: _StatsCardEntry(
+      StatsCardId.total: StatsCardEntry(
         id: StatsCardId.total,
         label: l10n.statsTotalCountsLabel,
         widget: total,
         span: 1,
       ),
       if (gamesCard != null)
-        StatsCardId.games: _StatsCardEntry(
+        StatsCardId.games: StatsCardEntry(
           id: StatsCardId.games,
           label: l10n.statsGamesLabel,
           widget: gamesCard,
           span: 1,
         ),
       if (recentCard != null)
-        StatsCardId.recent: _StatsCardEntry(
+        StatsCardId.recent: StatsCardEntry(
           id: StatsCardId.recent,
           label: l10n.statsRecentLabel,
           widget: recentCard,
           span: 1,
         ),
       if (resetsPokemonCard != null)
-        StatsCardId.resetsPokemon: _StatsCardEntry(
+        StatsCardId.resetsPokemon: StatsCardEntry(
           id: StatsCardId.resetsPokemon,
           label: l10n.statsResetsPokemonLabel,
           widget: resetsPokemonCard,
           span: 1,
         ),
       if (resetsCard != null)
-        StatsCardId.resetsGame: _StatsCardEntry(
+        StatsCardId.resetsGame: StatsCardEntry(
           id: StatsCardId.resetsGame,
           label: l10n.statsResetsByGameLabel,
           widget: resetsCard,
           span: 1,
         ),
       if (history != null)
-        StatsCardId.history: _StatsCardEntry(
+        StatsCardId.history: StatsCardEntry(
           id: StatsCardId.history,
           label: l10n.huntHistoryTitle,
           widget: history,
@@ -371,18 +372,4 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
 
 String _formatRangeLabel(DateTimeRange range) {
   return '${formatDate(range.start)} – ${formatDate(range.end)}';
-}
-
-class _StatsCardEntry {
-  const _StatsCardEntry({
-    required this.id,
-    required this.label,
-    required this.widget,
-    required this.span,
-  });
-
-  final StatsCardId id;
-  final String label;
-  final Widget widget;
-  final int span;
 }

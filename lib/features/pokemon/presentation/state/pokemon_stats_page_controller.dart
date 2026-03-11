@@ -2,19 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/counter_state.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/date_range.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/stats_models.dart';
+import 'package:shiny_counter/features/pokemon/presentation/models/stats_page_layout_models.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/stats_aggregation_service.dart';
 import 'package:shiny_counter/features/pokemon/presentation/state/controller_base.dart';
-
-enum StatsCardId {
-  caught,
-  total,
-  games,
-  recent,
-  resetsPokemon,
-  resetsGame,
-  history,
-}
 
 class PokemonStatsPageController extends LoadableController {
   PokemonStatsPageController({required StatsRepository repository})
