@@ -9,7 +9,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dial
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_app_bar.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_page_cards.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/formatters.dart';
 
 class PokemonStatsPage extends StatefulWidget {
   const PokemonStatsPage({super.key});

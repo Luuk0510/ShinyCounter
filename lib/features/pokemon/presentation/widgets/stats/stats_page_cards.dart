@@ -10,7 +10,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_expandable_section.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_resets_pie_chart.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_row.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/formatters.dart';
 
 class StatsMetricCard extends StatelessWidget {
   const StatsMetricCard({

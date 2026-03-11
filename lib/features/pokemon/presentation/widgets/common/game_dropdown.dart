@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/game_assets.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/game_assets.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/app_image.dart';
 
 class GameDropdown extends StatelessWidget {
