@@ -1,37 +1,37 @@
 # Shiny Counter Code Guide
 
 This document explains how the app is structured, how data flows, and which
-patterns you use so the code is easier to understand and extend.
+patterns the codebase currently uses.
 
-## High‑Level Structure
+## High-Level Structure
 
-```
+```text
 lib/
-  core/        # cross‑feature infrastructure
-  features/    # per‑feature code (pokemon)
+  core/        # app-wide infrastructure
+  features/    # feature code
   l10n/        # ARB + generated localization files
 ```
 
-## Core (shared infrastructure)
+## Core
 
 **Dependency setup**
-- `core/di/app_locator.dart` initializes long‑lived services (prefs, repositories).
-- `core/di/app_providers.dart` wires `Provider` / `ChangeNotifier` instances.
+- `core/di/app_locator.dart` initializes long-lived services and concrete implementations.
+- `core/di/app_providers.dart` exposes them through `Provider` / `ChangeNotifier`.
 
 **Routing**
 - `core/routing/app_router.dart` defines routes and error fallbacks.
 - `core/routing/context_extensions.dart` adds typed navigation helpers.
 
 **Theme + tokens**
-- `core/theme/` is split by concern (colors, spacing, sizes, radii, typography).
-- `core/theme/tokens.dart` re‑exports those files so widgets import one entry.
+- `core/theme/` is split by concern: colors, spacing, sizes, radii, typography.
+- `core/theme/tokens.dart` re-exports those files so widgets can import one entry.
 - `core/theme/theme.dart` builds `ThemeData` from the seed color.
 - `core/theme/theme_notifier.dart` persists theme + accent selection.
 
 **Storage + backup**
 - `core/storage/key_value_store.dart` abstracts SharedPreferences.
 - `core/storage/app_prefs_keys.dart` centralizes keys.
-- `core/storage/app_backup_service.dart` exports/imports prefs as JSON.
+- `core/storage/app_backup_service.dart` exports/imports app-managed prefs as JSON.
 
 **Localization**
 - `lib/l10n/*.arb` are the source of truth.
@@ -39,47 +39,51 @@ lib/
 
 ## Pokemon Feature
 
-```
+```text
 features/pokemon/
-  domain/       # pure business logic + interfaces
-  data/         # persistence + platform adapters
-  shared/       # feature‑level helpers/state
+  domain/       # business logic + interfaces
+  data/         # persistence + concrete implementations
+  shared/       # feature helpers used across layers
   presentation/ # pages + widgets + UI helpers
   overlay/      # Android overlay UI
 ```
 
 ### Domain
-- **Entities**: `domain/entities/pokemon.dart` (core data shape).
+- **Entities**:
+  - `domain/entities/pokemon.dart`
+  - `domain/entities/counter_state.dart`
+  - `domain/entities/stats_models.dart`
 - **Repository interfaces**:
   - `domain/repositories/pokemon_repository.dart`
   - `domain/repositories/stats_repository.dart`
-- **Use cases**:
-  - `toggle_caught.dart`, `save_custom_pokemon.dart`, etc.
 - **Services**:
-  - `domain/services/stats_aggregation_service.dart` for stats summary logic.
-  - `domain/services/counter_sync.dart` (overlay sync contract).
+  - `domain/services/stats_aggregation_service.dart`
+  - `domain/services/counter_sync.dart`
+- **Use cases**:
+  - `domain/usecases/get_sprites_for_dex.dart`
 
 ### Data
-- **Datasources**: low‑level I/O (prefs, overlay channel).
+- **Datasources**:
   - `data/datasources/pokemon_storage.dart`
   - `data/datasources/counter_sync_service.dart`
-- **Repositories**:
-  - `data/repositories/prefs_pokemon_repository.dart`
-  - `data/repositories/stats_repository_impl.dart`
-- **Static assets**: `data/pokemon_names.dart`
+- **Concrete repository/storage implementations**:
+  - `PokemonStorage` implements `PokemonRepository`
+  - `PokemonStatsRepository` implements `StatsRepository`
+- **Static asset helpers**:
+  - `data/pokemon_names.dart`
 
-### Shared (feature‑level helpers)
-- **State**: controllers used by UI
-  - `shared/state/counter_controller.dart`
-  - `shared/state/detail_sprite_controller.dart`
+### Shared
+Only keep items here when they are used across multiple layers.
+
 - **Services**:
-  - `shared/services/hunt_state_service.dart` (start/caught/daily logic)
-  - `shared/services/sprite_service.dart` (sprite caching/parsing)
+  - `shared/services/hunt_state_service.dart`
+  - `shared/services/sprite_service.dart` (`SpriteService` + `PokemonSpriteService`)
   - `shared/services/daily_counts_service.dart`
 - **Utils**:
-  - `shared/utils/dex_utils.dart` (dex parsing/gen ranges)
-  - `shared/utils/counter_keys.dart` (prefs key naming)
-  - `shared/utils/sprite_ordering.dart`, `sprite_parser.dart`, `formatters.dart`
+  - `shared/utils/dex_utils.dart`
+  - `shared/utils/counter_keys.dart`
+  - `shared/utils/sprite_ordering.dart`
+  - `shared/utils/sprite_parser.dart`
 
 ### Presentation
 - **Pages**:
@@ -87,6 +91,11 @@ features/pokemon/
   - `pokemon_detail_page.dart`
   - `pokemon_stats_page.dart`
   - `pokemon_game_stats_page.dart`
+- **Controllers / page state**:
+  - `presentation/state/pokemon_list_page_controller.dart`
+  - `presentation/state/pokemon_stats_page_controller.dart`
+  - `presentation/state/counter_controller.dart`
+  - `presentation/state/detail_sprite_controller.dart`
 - **Dialogs / sheets**:
   - `presentation/widgets/dialogs/*`
   - `presentation/bottom_sheets/*`
@@ -96,53 +105,64 @@ features/pokemon/
   - `presentation/widgets/detail/*`
   - `presentation/widgets/stats/*`
 - **Helpers**:
-  - `presentation/utils/dialogs.dart` (`showScaledDialog`)
-  - `presentation/utils/pokemon_sheets.dart` (`showPokemonBottomSheet`)
+  - `presentation/utils/dialogs.dart`
+  - `presentation/utils/pokemon_sheets.dart`
+  - `presentation/utils/formatters.dart`
+- **Page/UI models**:
+  - `presentation/models/pokemon_stats_card_models.dart`
 
 ### Overlay
 - `overlay/counter_overlay.dart` renders the Android floating counter.
-- Uses `CounterSyncService` + `CounterKeys` to stay in sync with app state.
+- It uses `CounterSyncService` + `CounterKeys` to stay in sync with app state.
 
-## Data Flow (examples)
+## Data Flow
 
 **Counter flow**
 1. `PokemonDetailPage` uses `CounterController`.
-2. `CounterController` reads/writes via `CounterSyncService` and `HuntStateService`.
+2. `CounterController` reads/writes through `CounterSyncService` and `HuntStateService`.
 3. Counter state persists in prefs using keys from `CounterKeys`.
-4. Overlay uses `CounterSyncService` to show the same state.
+4. The overlay uses `CounterSyncService` to show the same state.
+
+**List flow**
+1. `PokemonListPage` delegates orchestration to `PokemonListPageController`.
+2. `PokemonListPageController` loads and mutates data through `PokemonRepository`.
+3. `PokemonStorage` persists the custom list and caught state.
+4. The page focuses on dialogs, navigation, and section rendering.
 
 **Stats flow**
-1. `PokemonStatsPage` requests stats from `StatsAggregationService`.
-2. `StatsAggregationService` pulls data from `StatsRepository`.
-3. Repository loads data from storage and returns a `StatsSummary`.
-4. UI renders `StatsCard` + `StatsRow` + charts with that summary.
+1. `PokemonStatsPage` delegates orchestration to `PokemonStatsPageController`.
+2. `PokemonStatsPageController` requests data from `StatsAggregationService`.
+3. `StatsAggregationService` loads raw source data from `StatsRepository`.
+4. `PokemonStatsRepository` reads storage-backed state and returns stats source data.
+5. The page renders cards, tables, and charts from the controller summary.
 
 **Sprites**
-1. `SpriteService` parses sprite manifests and builds sprite lists.
+1. `SpriteService` / `PokemonSpriteService` parse sprite manifests and build sprite lists.
 2. `sprite_ordering.dart` keeps ordering consistent across views.
-3. UI uses `PokemonImage` / `AppImage` for consistent fallback rendering.
+3. UI uses shared image widgets for consistent fallback rendering.
 
 **Backup**
-- Settings uses `AppBackupService` to export/import JSON of prefs.
+- Settings uses `AppBackupService` to export/import JSON for app-owned preference keys only.
 
-## UI Patterns You Use
+## UI Patterns
 
 - **Tokens first**: sizes, spacing, radii, colors come from `core/theme/*`.
 - **Reusable rows**:
-  - `StatsRow` for table‑like rows
+  - `StatsRow` for table-like rows
   - `SelectableRow` for list selections
 - **Expandable sections**:
-  - `StatsExpandableSection` for “Show all / Show less”
+  - `StatsExpandableSection` for "Show all / Show less"
   - `CollapsibleSection` for list page groups
 - **Dialog/sheet consistency**:
   - `showScaledDialog` for dialogs
   - `showPokemonBottomSheet` + `SafeAreaSheet` for sheets
+  - `ConfirmationDialog`, `DialogActionRow`, and `BottomSheetActionRow` for shared actions
 
 ## State Management
 
-- **Provider** + `ChangeNotifier` for app‑level state:
-  - `ThemeNotifier`, `LocaleNotifier`, controllers
-- Controllers hold UI state and coordinate services/repositories.
+- `Provider` + `ChangeNotifier` for app-level state and feature controllers.
+- Feature pages delegate orchestration to controllers in `presentation/state`.
+- Controllers hold loading state, derived getters, async coordination, and disposal safety.
 
 ## Where to Change What
 
@@ -152,12 +172,10 @@ features/pokemon/
 - **Overlay behavior**: `data/datasources/counter_sync_service.dart`
 - **Sprite ordering/parsing**: `shared/utils/sprite_ordering.dart`
 
-## Design Guideline (keeps code readable)
+## Design Guideline
 
-- Keep **business rules** in services/usecases, not in widget build methods.
-- Keep **prefs key naming** in one place (`CounterKeys`, `AppPrefsKeys`).
-- Use **tokens** rather than magic numbers.
-- Prefer **small reusable widgets** for repeated UI blocks.
-
-If you want, I can keep this doc updated as you add features (stats charts,
-reorder sheets, export/import, etc.) and link to specific files. 
+- Keep business rules in services and controllers, not in widget build methods.
+- Keep prefs key naming in one place (`CounterKeys`, `AppPrefsKeys`).
+- Use tokens rather than magic numbers.
+- Prefer small reusable widgets for repeated UI blocks.
+- Keep page orchestration in `presentation/state` so pages stay focused on rendering.
