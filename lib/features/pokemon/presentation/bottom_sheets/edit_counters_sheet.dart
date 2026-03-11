@@ -4,6 +4,7 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_field_styles.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/detail/date_row.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/counter_input.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_field_group.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
@@ -169,11 +170,9 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
   }
 
   void _submit() {
-    final parsed = int.tryParse(_counterCtrl.text.trim());
-    if (parsed == null || parsed < 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.l10n.invalidCounter)));
+    final parsed = parseNonNegativeInt(_counterCtrl.text);
+    if (parsed == null) {
+      showInvalidCounterSnackBar(context);
       return;
     }
     Navigator.of(context).pop(

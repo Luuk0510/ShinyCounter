@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/utils/counter_input.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_field_styles.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
@@ -234,11 +235,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
             ),
             TextButton(
               onPressed: () {
-                final parsed = int.tryParse(controller.text.trim());
-                if (parsed == null || parsed < 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(context.l10n.invalidCounter)),
-                  );
+                final parsed = parseNonNegativeInt(controller.text);
+                if (parsed == null) {
+                  showInvalidCounterSnackBar(context);
                   return;
                 }
                 Navigator.of(context).pop(parsed);
@@ -265,11 +264,9 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
   void _save() {
     final counts = <String, int>{};
     for (final row in _rows) {
-      final parsed = int.tryParse(row.controller.text.trim());
-      if (parsed == null || parsed < 0) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(context.l10n.invalidCounter)));
+      final parsed = parseNonNegativeInt(row.controller.text);
+      if (parsed == null) {
+        showInvalidCounterSnackBar(context);
         return;
       }
       if (parsed == 0) continue;
