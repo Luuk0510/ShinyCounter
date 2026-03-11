@@ -163,7 +163,6 @@ class _PokemonListPageState extends State<PokemonListPage>
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBody: true,
-      extendBodyBehindAppBar: true,
       appBar: _buildAppBar(colors),
       body: ListenableBuilder(
         listenable: _controller,
@@ -229,6 +228,10 @@ class _PokemonListPageState extends State<PokemonListPage>
   }
 
   Widget _buildBody(ColorScheme colors) {
+    final media = MediaQuery.of(context);
+    final bottomListPadding =
+        kBottomNavigationBarHeight + media.padding.bottom + AppSpacing.md;
+
     if (_controller.loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -308,7 +311,7 @@ class _PokemonListPageState extends State<PokemonListPage>
         thickness: AppSizes.listScrollbarThickness,
         child: ListView(
           controller: _listController,
-          padding: AppInsets.page.copyWith(bottom: AppSpacing.xs),
+          padding: AppInsets.page.copyWith(bottom: bottomListPadding),
           children: sections,
         ),
       ),
