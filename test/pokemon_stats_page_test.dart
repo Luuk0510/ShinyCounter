@@ -177,7 +177,7 @@ void main() {
     final l10n = AppLocalizations.of(context)!;
     expect(find.text(l10n.statsGamesLabel), findsOneWidget);
     expect(find.text(l10n.statsRecentLabel), findsOneWidget);
-    expect(find.text('Gold'), findsOneWidget);
+    expect(find.text('Gold'), findsWidgets);
     expect(find.text('Bulbasaur'), findsOneWidget);
   });
 

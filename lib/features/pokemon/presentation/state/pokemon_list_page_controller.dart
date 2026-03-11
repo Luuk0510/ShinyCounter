@@ -52,8 +52,7 @@ class PokemonListPageController extends ChangeNotifier {
   List<Pokemon> get uncaughtPokemon =>
       allPokemon.where((pokemon) => !isCaught(pokemon)).toList();
 
-  List<Pokemon> get caughtPokemon =>
-      allPokemon.where(isCaught).toList();
+  List<Pokemon> get caughtPokemon => allPokemon.where(isCaught).toList();
 
   bool isCustomPokemon(Pokemon pokemon) {
     return _customPokemon.any((entry) => entry.id == pokemon.id);
@@ -103,7 +102,9 @@ class PokemonListPageController extends ChangeNotifier {
   }
 
   Future<void> applyPokemonEdit(Pokemon original, Pokemon updated) async {
-    final index = _customPokemon.indexWhere((pokemon) => pokemon.id == original.id);
+    final index = _customPokemon.indexWhere(
+      (pokemon) => pokemon.id == original.id,
+    );
     if (index == -1) return;
     _customPokemon[index] = updated;
     await _pokemonRepository.saveCustomPokemon(_customPokemon);

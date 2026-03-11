@@ -50,11 +50,17 @@ class PokemonStatsPageController extends ChangeNotifier {
     final now = DateTime.now();
     return DateTime(now.year, now.month, now.day);
   }
-  DateTime get firstSelectableDate =>
-      DateTime(lastSelectableDate.year - 1, lastSelectableDate.month, lastSelectableDate.day);
+
+  DateTime get firstSelectableDate => DateTime(
+    lastSelectableDate.year - 1,
+    lastSelectableDate.month,
+    lastSelectableDate.day,
+  );
 
   Future<void> loadStats() async {
-    final snapshot = await _statsService.loadStats(_domainRangeFromUiRange(_chartRange));
+    final snapshot = await _statsService.loadStats(
+      _domainRangeFromUiRange(_chartRange),
+    );
     if (_disposed) return;
     _states = snapshot.states;
     _summary = snapshot.summary;

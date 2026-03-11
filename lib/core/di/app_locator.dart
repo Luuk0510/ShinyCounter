@@ -1,5 +1,4 @@
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
-import 'package:shiny_counter/features/pokemon/data/repositories/prefs_pokemon_repository.dart';
 import 'package:shiny_counter/features/pokemon/data/repositories/stats_repository_impl.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
@@ -21,9 +20,7 @@ class AppLocator {
 
   Future<void> init() async {
     prefsStore = SharedPrefsStore();
-    pokemonRepository = PrefsPokemonRepository(
-      storage: PokemonStorage(store: prefsStore),
-    );
+    pokemonRepository = PokemonStorage(store: prefsStore);
     counterSyncService = CounterSyncService(store: prefsStore);
     statsRepository = StatsRepositoryImpl(
       pokemonRepository: pokemonRepository,
