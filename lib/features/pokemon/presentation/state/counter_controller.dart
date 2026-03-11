@@ -58,8 +58,6 @@ class CounterController extends ControllerBase {
     await _loadState();
   }
 
-  Future<void> init() => initialize();
-
   @override
   void dispose() {
     _overlaySub?.cancel();

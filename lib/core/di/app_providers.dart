@@ -22,6 +22,6 @@ List<SingleChildWidget> buildAppProviders() {
     ),
     Provider<StatsRepository>.value(value: AppLocator.instance.statsRepository),
     Provider<CounterSync>.value(value: AppLocator.instance.counterSyncService),
-    Provider<SpriteService>.value(value: AppLocator.instance.spriteRepository),
+    Provider<SpriteService>.value(value: AppLocator.instance.spriteService),
   ];
 }

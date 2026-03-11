@@ -15,7 +15,7 @@ class AppLocator {
   late final PokemonRepository pokemonRepository;
   late final StatsRepository statsRepository;
   late final CounterSync counterSyncService;
-  late final SpriteService spriteRepository;
+  late final SpriteService spriteService;
   late final KeyValueStore prefsStore;
 
   Future<void> init() async {
@@ -26,6 +26,6 @@ class AppLocator {
       pokemonRepository: pokemonRepository,
       counterSync: counterSyncService,
     );
-    spriteRepository = SpriteRepository();
+    spriteService = PokemonSpriteService();
   }
 }
