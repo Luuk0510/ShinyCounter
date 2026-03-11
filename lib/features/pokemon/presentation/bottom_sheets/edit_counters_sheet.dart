@@ -7,6 +7,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/detail/date_
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_field_group.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/sheet_header.dart';
 
 class EditSheetResult {
   const EditSheetResult({
@@ -87,20 +88,7 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: AppSizes.sheetHandleWidth,
-            height: AppSizes.sheetHandleHeight,
-            decoration: BoxDecoration(
-              color: colors.outlineVariant,
-              borderRadius: BorderRadius.circular(AppRadii.sm),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            l10n.editSheetTitle,
-            style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: AppSpacing.lg),
+          SheetHeader(title: l10n.editSheetTitle),
           DialogFieldGroup(
             children: [
               TextField(

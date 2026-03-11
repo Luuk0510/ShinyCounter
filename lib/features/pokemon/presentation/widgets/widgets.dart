@@ -16,6 +16,7 @@ export 'dialogs/dialog_entry.dart';
 export 'dialogs/dialog_field_group.dart';
 export 'dialogs/edit_pokemon_dialog.dart';
 export 'dialogs/safe_area_sheet.dart';
+export 'dialogs/sheet_header.dart';
 export 'dialogs/settings_sheet.dart';
 export 'filters/search_gen_filter_row.dart';
 export 'list/collapsible_section.dart';

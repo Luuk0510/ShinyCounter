@@ -4,6 +4,7 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_field_styles.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/sheet_header.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/daily_counts_service.dart';
 
 class EditDailyCountsSheet extends StatefulWidget {
@@ -61,25 +62,11 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: Container(
-                width: AppSizes.sheetHandleWidth,
-                height: AppSizes.sheetHandleHeight,
-                decoration: BoxDecoration(
-                  color: colors.outlineVariant,
-                  borderRadius: BorderRadius.circular(AppRadii.sm),
-                ),
+              child: SheetHeader(
+                title: l10n.huntHistoryTitle,
+                bottomSpacing: AppSpacing.md,
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
-            Center(
-              child: Text(
-                l10n.huntHistoryTitle,
-                style: AppTypography.title.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
             Expanded(
               child: ListView.separated(
                 padding: const EdgeInsets.only(top: AppSpacing.sm),
