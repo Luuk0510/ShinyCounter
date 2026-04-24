@@ -126,7 +126,6 @@ class _PokemonSectionState extends State<PokemonSection> {
       child: AnimatedList(
         key: _listKey,
         initialItemCount: _items.length,
-        padding: EdgeInsets.zero,
         shrinkWrap: true,
         primary: false,
         physics: const NeverScrollableScrollPhysics(),

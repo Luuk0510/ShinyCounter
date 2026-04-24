@@ -1,19 +1,17 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_counters_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_daily_counts_sheet.dart';
-import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
+import 'package:shiny_counter/features/pokemon/shared/state/counter_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
-import 'package:shiny_counter/features/pokemon/presentation/utils/formatters.dart';
-import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 
 class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({super.key, required this.pokemon});
@@ -25,40 +23,25 @@ class PokemonDetailPage extends StatefulWidget {
 }
 
 class _PokemonDetailPageState extends State<PokemonDetailPage>
-    with WidgetsBindingObserver, TickerProviderStateMixin {
+    with WidgetsBindingObserver {
   late final CounterController _controller;
-  late final PageController _spritePager;
-  late final AnimationController _sparkleController;
-  int _currentSpriteIndex = 0;
-  bool _showNormal = false;
-  bool _buttonPressed = false;
-  List<String> _shinySprites = [];
-  final Map<String, String?> _normalMap = {};
-  bool _spritesLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _spritePager = PageController();
-    _sparkleController = AnimationController(
-      vsync: this,
-      duration: AppAnim.sparkleDuration,
-    );
     _controller = CounterController(
       pokemon: widget.pokemon,
       sync: context.read<CounterSync>(),
+      toggleCaughtUseCase: context.read<ToggleCaughtUseCase?>(),
     );
     WidgetsBinding.instance.addObserver(this);
     _controller.addListener(_onControllerChanged);
-    _controller.initialize();
-    _loadSprites();
+    _controller.init();
   }
 
   @override
   void dispose() {
     _controller.removeListener(_onControllerChanged);
-    _spritePager.dispose();
-    _sparkleController.dispose();
     _controller.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -69,42 +52,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     setState(() {});
   }
 
-  Future<void> _loadSprites() async {
-    final parsed = SpriteParser.parse(widget.pokemon.imagePath.split('/').last);
-    if (parsed == null) {
-      if (mounted) {
-        setState(() => _spritesLoading = false);
-      }
-      return;
-    }
-    setState(() => _spritesLoading = true);
-    final service = context.read<SpriteService>();
-    final assets = await service.spritesForDex(parsed.dex);
-    if (!mounted) return;
-    final shiny = assets.where((p) => p.shiny).toList()
-      ..sort(compareSpritesForDetail);
-    final normal = assets.where((p) => !p.shiny).toList()
-      ..sort(compareSpritesForDetail);
-    _normalMap.clear();
-    for (final s in shiny) {
-      final match = normal.firstWhere(
-        (n) => n.form == s.form && n.gender == s.gender,
-        orElse: () => s,
-      );
-      _normalMap[s.path] = match.shiny ? null : match.path;
-    }
-    setState(() {
-      _shinySprites = shiny.map((e) => e.path).toList();
-      _currentSpriteIndex = 0;
-      _showNormal = false;
-      _spritesLoading = false;
-    });
-  }
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _controller.initialize();
+      _controller.init();
     }
   }
 
@@ -129,17 +80,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   Future<void> _toggleCaught() async {
     await _hapticTap();
     await _controller.toggleCaught();
-  }
-
-  Future<void> _handleCatchTap() async {
-    final wasCaught = _controller.isCaught;
-    setState(() => _buttonPressed = true);
-    await Future.delayed(AppAnim.faster);
-    if (mounted) setState(() => _buttonPressed = false);
-    if (!wasCaught) {
-      _sparkleController.forward(from: 0);
-    }
-    await _toggleCaught();
   }
 
   Future<void> _showEditDialog() async {
@@ -197,7 +137,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: DetailAppBar(
+      appBar: _DetailAppBar(
         pokemonName: widget.pokemon.name,
         onEdit: _showEditDialog,
         onTogglePill: _togglePill,
@@ -223,32 +163,13 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    DetailSpriteGallery(
-                      colors: colors,
-                      pokemon: widget.pokemon,
-                      spritePager: _spritePager,
-                      currentSpriteIndex: _currentSpriteIndex,
-                      showNormal: _showNormal,
-                      spritesLoading: _spritesLoading,
-                      shinySprites: _shinySprites,
-                      normalMap: _normalMap,
-                      spriteService: context.read<SpriteService>(),
-                      onToggleVariant: () =>
-                          setState(() => _showNormal = !_showNormal),
-                      onPageChanged: (idx) => setState(() {
-                        _currentSpriteIndex = idx;
-                        _showNormal = false;
-                      }),
-                    ),
+                    DetailSpriteViewer(pokemon: widget.pokemon),
                     const SizedBox(height: AppSpacing.sm),
-                    CatchStatusButton(
-                      colors: colors,
+                    CatchButton(
                       caught: _controller.isCaught,
-                      buttonPressed: _buttonPressed,
-                      sparkleAnimation: _sparkleController,
-                      onTap: _handleCatchTap,
+                      onTap: _toggleCaught,
                     ),
-                    DetailInfoSection(
+                    _DetailInfoSection(
                       colors: colors,
                       controller: _controller,
                       onEdit: _showEditDialog,
@@ -264,6 +185,123 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _DetailAppBar({
+    required this.pokemonName,
+    required this.onEdit,
+    required this.onTogglePill,
+  });
+
+  final String pokemonName;
+  final VoidCallback onEdit;
+  final VoidCallback onTogglePill;
+
+  @override
+  Size get preferredSize => const Size.fromHeight(AppSizes.toolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return RoundedAppBar(
+      title: Text(
+        pokemonName,
+        style: Theme.of(context).textTheme.titleLarge?.merge(
+          AppTypography.title.copyWith(fontWeight: FontWeight.w700),
+        ),
+      ),
+      actions: [
+        IconButton(
+          iconSize: AppSizes.appBarActionIcon,
+          icon: const Icon(Icons.edit),
+          tooltip: context.l10n.editCounterTooltip,
+          onPressed: onEdit,
+        ),
+        IconButton(
+          iconSize: AppSizes.appBarActionIcon,
+          icon: const Icon(Icons.open_in_new_rounded),
+          tooltip: context.l10n.openOverlayTooltip,
+          onPressed: onTogglePill,
+        ),
+      ],
+    );
+  }
+}
+
+class _DetailInfoSection extends StatelessWidget {
+  const _DetailInfoSection({
+    required this.colors,
+    required this.controller,
+    required this.onEdit,
+    required this.onDailyCounts,
+    required this.onGameChanged,
+    required this.onIncrement,
+    required this.onDecrement,
+  });
+
+  final ColorScheme colors;
+  final CounterController controller;
+  final VoidCallback onEdit;
+  final VoidCallback onDailyCounts;
+  final ValueChanged<String?> onGameChanged;
+  final VoidCallback onIncrement;
+  final VoidCallback onDecrement;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.lg),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CounterControls(
+            count: controller.counter,
+            enabled: !controller.isCaught,
+            onDecrement: onDecrement,
+            onIncrement: onIncrement,
+            onEdit: onEdit,
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          Align(
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IntrinsicWidth(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onEdit,
+                    child: CountInfoCard(
+                      colors: colors,
+                      startedAt: controller.startedAt,
+                      caughtAt: controller.caughtAt,
+                      caughtGame: controller.caughtGame,
+                      formatter: formatDate,
+                      onSelectGame: onEdit,
+                      onGameChanged: onGameChanged,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: onDailyCounts,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 200),
+                    child: DailyCountsList(
+                      colors: colors,
+                      dailyCounts: controller.dailyCounts,
+                      dayFormatter: formatDayKey,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,8 +1,13 @@
 import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
-import 'package:shiny_counter/features/pokemon/data/repositories/pokemon_stats_repository.dart';
+import 'package:shiny_counter/features/pokemon/data/repositories/prefs_pokemon_repository.dart';
+import 'package:shiny_counter/features/pokemon/data/repositories/stats_repository_impl.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/pokemon_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
+import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/core/storage/key_value_store.dart';
 import 'package:shiny_counter/features/pokemon/data/datasources/pokemon_storage.dart';
@@ -15,17 +20,27 @@ class AppLocator {
   late final PokemonRepository pokemonRepository;
   late final StatsRepository statsRepository;
   late final CounterSync counterSyncService;
-  late final SpriteService spriteService;
+  late final LoadCustomPokemonUseCase loadCustomPokemon;
+  late final SaveCustomPokemonUseCase saveCustomPokemon;
+  late final LoadCaughtUseCase loadCaught;
+  late final ToggleCaughtUseCase toggleCaught;
+  late final SpriteService spriteRepository;
   late final KeyValueStore prefsStore;
 
   Future<void> init() async {
     prefsStore = SharedPrefsStore();
-    pokemonRepository = PokemonStorage(store: prefsStore);
+    pokemonRepository = PrefsPokemonRepository(
+      storage: PokemonStorage(store: prefsStore),
+    );
     counterSyncService = CounterSyncService(store: prefsStore);
-    statsRepository = PokemonStatsRepository(
+    statsRepository = StatsRepositoryImpl(
       pokemonRepository: pokemonRepository,
       counterSync: counterSyncService,
     );
-    spriteService = PokemonSpriteService();
+    loadCustomPokemon = LoadCustomPokemonUseCase(pokemonRepository);
+    saveCustomPokemon = SaveCustomPokemonUseCase(pokemonRepository);
+    loadCaught = LoadCaughtUseCase(pokemonRepository);
+    toggleCaught = ToggleCaughtUseCase(counterSyncService);
+    spriteRepository = SpriteRepository();
   }
 }

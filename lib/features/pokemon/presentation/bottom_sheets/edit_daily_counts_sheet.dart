@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
-import 'package:shiny_counter/features/pokemon/presentation/utils/counter_input.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_field_styles.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/sheet_header.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/daily_counts_service.dart';
 
 class EditDailyCountsSheet extends StatefulWidget {
@@ -63,11 +59,25 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: SheetHeader(
-                title: l10n.huntHistoryTitle,
-                bottomSpacing: AppSpacing.md,
+              child: Container(
+                width: AppSizes.sheetHandleWidth,
+                height: AppSizes.sheetHandleHeight,
+                decoration: BoxDecoration(
+                  color: colors.outlineVariant,
+                  borderRadius: BorderRadius.circular(AppRadii.sm),
+                ),
               ),
             ),
+            const SizedBox(height: AppSpacing.lg),
+            Center(
+              child: Text(
+                l10n.huntHistoryTitle,
+                style: AppTypography.title.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
             Expanded(
               child: ListView.separated(
                 padding: const EdgeInsets.only(top: AppSpacing.sm),
@@ -97,18 +107,37 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            BottomSheetActionRow(
-              colors: colors,
-              leadingLabel: l10n.cancel,
-              trailingLabel: l10n.save,
-              onLeadingPressed: () => Navigator.of(context).pop(),
-              onTrailingPressed: _save,
-              leadingTextStyle: AppTypography.button.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-              trailingTextStyle: AppTypography.button.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: AppButtonStyles.primaryOutline(
+                      colors,
+                      useLighter: true,
+                    ),
+                    child: Text(
+                      l10n.cancel,
+                      style: AppTypography.button.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _save,
+                    style: AppButtonStyles.primaryFilled(colors),
+                    child: Text(
+                      l10n.save,
+                      style: AppTypography.button.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -154,8 +183,11 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           child: TextField(
             controller: row.controller,
             keyboardType: TextInputType.number,
-            style: PokemonFieldStyles.input.copyWith(color: colors.onSurface),
-            decoration: PokemonFieldDecorations.standard(
+            style: AppTypography.button.copyWith(
+              color: colors.onSurface,
+              fontWeight: FontWeight.w700,
+            ),
+            decoration: InputDecoration(
               labelText: l10n.countLabel,
               isDense: true,
               border: OutlineInputBorder(
@@ -223,9 +255,7 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
-            decoration: PokemonFieldDecorations.standard(
-              hintText: context.l10n.enterNumberHint,
-            ),
+            decoration: InputDecoration(hintText: context.l10n.enterNumberHint),
           ),
           actions: [
             TextButton(
@@ -235,9 +265,11 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
             ),
             TextButton(
               onPressed: () {
-                final parsed = parseNonNegativeInt(controller.text);
-                if (parsed == null) {
-                  showInvalidCounterSnackBar(context);
+                final parsed = int.tryParse(controller.text.trim());
+                if (parsed == null || parsed < 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(context.l10n.invalidCounter)),
+                  );
                   return;
                 }
                 Navigator.of(context).pop(parsed);
@@ -264,9 +296,11 @@ class _EditDailyCountsSheetState extends State<EditDailyCountsSheet> {
   void _save() {
     final counts = <String, int>{};
     for (final row in _rows) {
-      final parsed = parseNonNegativeInt(row.controller.text);
-      if (parsed == null) {
-        showInvalidCounterSnackBar(context);
+      final parsed = int.tryParse(row.controller.text.trim());
+      if (parsed == null || parsed < 0) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.invalidCounter)));
         return;
       }
       if (parsed == 0) continue;

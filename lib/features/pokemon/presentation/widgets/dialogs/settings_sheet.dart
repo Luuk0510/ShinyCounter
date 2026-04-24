@@ -6,15 +6,13 @@ import 'package:file_saver/file_saver.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shiny_counter/core/app_metadata.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/storage/app_backup_service.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_actions.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/settings_sections.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
-import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 class SettingsDialog extends StatefulWidget {
@@ -66,7 +64,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       final path = await FileSaver.instance.saveAs(
         name: filename.replaceAll('.json', ''),
         bytes: bytes,
-        ext: 'json',
+        fileExtension: 'json',
         mimeType: MimeType.json,
       );
       if (path == null || path.isEmpty) return;
@@ -85,7 +83,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
   Future<void> _importBackup() async {
     final l10n = context.l10n;
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: const ['json'],
         withData: true,
@@ -96,24 +94,22 @@ class _SettingsDialogState extends State<SettingsDialog> {
       final path = file.path;
       if (bytes == null && path == null) return;
       if (!mounted) return;
-      final confirmed = await showScaledDialog<bool>(
+      final confirmed = await showConfirmDialog(
         context: context,
-        builder: (_) => ConfirmationDialog(
-          title: Text(
-            l10n.settingsImportConfirmTitle,
-            textAlign: TextAlign.center,
-            style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
-          ),
-          content: Text(
-            l10n.settingsImportConfirmMessage,
-            textAlign: TextAlign.center,
-            style: AppTypography.button.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-          cancelLabel: l10n.cancel,
-          confirmLabel: l10n.settingsImportConfirmAction,
+        title: Text(
+          l10n.settingsImportConfirmTitle,
+          textAlign: TextAlign.center,
+          style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
         ),
+        content: Text(
+          l10n.settingsImportConfirmMessage,
+          textAlign: TextAlign.center,
+          style: AppTypography.button.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        cancelLabel: l10n.cancel,
+        confirmLabel: l10n.settingsImportConfirmAction,
       );
       if (confirmed != true) return;
 
@@ -208,7 +204,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              context.l10n.settingsVersion(AppMetadata.version),
+              'v2.2.1',
               style: AppTypography.button.copyWith(
                 fontSize: AppSizes.overlayLabelSize,
                 color: colors.onSurfaceVariant,

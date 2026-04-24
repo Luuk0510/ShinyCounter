@@ -1,60 +1,33 @@
 # Shiny Counter
 
-A Flutter app for tracking Pokemon shiny hunts.
+Pokémon shiny counter app in Flutter.
 
 ## Features
 
-- Custom Pokemon list, dex-sorted, with collapsible caught/uncaught sections and empty states.
-- Manage Pokemon sheet with search by name/dex, gen filter, clear shortcut, empty-state messaging, and per-Pokemon edit/delete actions.
-- Add Pokemon dialog with search + gen filter and a shiny-only sprite picker that skips mega/gmax forms.
-- Detail page with counter (+/-, manual), caught toggle, start/catch dates, game selection, shiny/normal sprite toggle, and form-aware sprite paging.
-- Stats pages with overall stats, caught-by-game tables, recent catches, and count history by date range.
-- Game stats page with per-game caught lists and direct navigation to detail.
-- Android overlay mini-counter with show/share/close support through `CounterSyncService`.
-- Themes and localization persisted through SharedPreferences.
-- Backup import/export scoped to app-managed preference keys only.
-- Sprite loading and precaching handled through `PokemonSpriteService`.
-
-## Structure
-
-```text
-lib/
-  core/        # app-wide DI, routing, theme, storage, metadata
-  features/
-    pokemon/
-      data/         # persistence and concrete implementations
-      domain/       # entities, contracts, stats/business rules
-      presentation/
-        pages/      # screens
-        state/      # page/controllers
-        widgets/    # reusable UI pieces
-        utils/      # UI helpers
-        models/     # page/UI-specific models
-      shared/       # feature utilities used across layers
-      overlay/      # Android overlay UI
-  l10n/        # ARB + generated localization files
-```
-
-Current examples:
-- `PokemonStorage` is the concrete `PokemonRepository`
-- `PokemonStatsRepository` is the concrete `StatsRepository`
-- `PokemonSpriteService` is the concrete sprite loader/cache service
-- page orchestration lives in `presentation/state`, such as `PokemonListPageController` and `PokemonStatsPageController`
-- shared dialog/sheet helpers live in `presentation/widgets/dialogs`, such as `ConfirmationDialog`, `DialogActionRow`, and `BottomSheetActionRow`
+- Pokémon list (base + custom), dex-sorted; collapsible caught/uncaught sections; empty states and search/gen filters aligned across add/manage.
+- Manage Pokémon sheet: search by name/dex, gen filter, clear (X) shortcut, empty-state messaging, and per-Pokémon edit/delete actions.
+- Add Pokémon dialog: pick from dex list with search + gen filter, shiny-only sprite picker (skips mega/gmax), dex labels hide raw `custom_*` ids, clear (X) shortcut, and empty state.
+- Detail page: counter (+/-, manual), caught toggle, start/catch dates, game selection, shiny/normal sprite toggle (mega before gmax), and form-aware sprite paging.
+- Stats pages: overall stats (caught count, total counts), caught-by-game table with expand, recent catches list, and counts chart with date range + reset.
+- Game stats page: per-game caught list with counts and direct navigation to detail.
+- Android overlay mini-counter: show/share/close via CounterSyncService; can be pinned to lock position.
+- Themes: System/Light/Dark/OLED and Language: EN/NL — both persisted via SharedPreferences.
+- Persistence: counters, caught status, daily counts, custom list, theme, and language stored via SharedPreferences (KeyValueStore facade); overlay/list/detail stay in sync.
+- Sprite handling: precache helper, shiny/normal pairing, mega before gmax ordering for detail, and shared dex parsing/labels for consistent display.
 
 ## Usage
 
-1. `flutter pub get`
-2. `flutter gen-l10n`
-3. `flutter run`
-4. `flutter test`
-5. Coverage:
-   - `flutter test --coverage`
+1. `flutter pub get` (installs dependencies listed in `pubspec.yaml`)
+2. `flutter gen-l10n` (generates localization files from `lib/l10n/*.arb`)
+3. `flutter run` (Run application)
+4. `flutter test` (Execute all tests)
+5. Coverage:  
+   - `flutter test --coverage`  
    - `dart run tools/lcov_viewer.dart coverage/lcov.info > coverage/coverage.html`
 
 ## Notes
 
-- Overlay requests "draw over other apps" permission on Android.
+- Overlay requests “draw over other apps” permission on Android.
 - Pinning the overlay makes it non-draggable; unpin to drag again.
-- Dex display uses `#xxxx`; custom entries still store as `custom_<dex>_<suffix>` to avoid collisions.
-- When no game is selected in detail, the UI shows a dropdown; after selection it can be changed from the edit sheet.
+- Dex display: UI shows `#xxxx`; custom entries still store as `custom_<dex>_<suffix>` to avoid collisions.
+- When no game is selected in detail, you see a dropdown; after selection it shows text and you can change it via the edit sheet.

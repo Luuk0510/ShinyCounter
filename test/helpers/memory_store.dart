@@ -31,10 +31,6 @@ class MemoryKeyValueStore implements KeyValueStore {
   }
 
   @override
-  Future<Map<String, Object?>> snapshot({bool reload = false}) async =>
-      Map<String, Object?>.from(_values);
-
-  @override
   Future<void> remove(String key) async {
     _values.remove(key);
   }

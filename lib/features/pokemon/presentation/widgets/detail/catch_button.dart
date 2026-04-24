@@ -5,42 +5,41 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/app_assets.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 
-class CatchStatusButton extends StatelessWidget {
-  const CatchStatusButton({
-    super.key,
-    required this.colors,
-    required this.caught,
-    required this.buttonPressed,
-    required this.sparkleAnimation,
-    required this.onTap,
-  });
+class CatchButton extends StatefulWidget {
+  const CatchButton({super.key, required this.caught, required this.onTap});
 
-  final ColorScheme colors;
   final bool caught;
-  final bool buttonPressed;
-  final Animation<double> sparkleAnimation;
-  final VoidCallback onTap;
+  final Future<void> Function() onTap;
 
-  static const List<_SparkleBurstSpec> _sparkleBurst = [
-    _SparkleBurstSpec(
+  @override
+  State<CatchButton> createState() => _CatchButtonState();
+}
+
+class _CatchButtonState extends State<CatchButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _sparkleController;
+  bool _buttonPressed = false;
+
+  static const List<SparkleBurstSpec> _sparkleBurst = [
+    SparkleBurstSpec(
       offset: Offset(-28, -18),
       delay: 0.0,
       scale: 1.0,
       turns: AppAnim.sparkleRotationTurns,
     ),
-    _SparkleBurstSpec(
+    SparkleBurstSpec(
       offset: Offset(30, -10),
       delay: 0.08,
       scale: 0.85,
       turns: -AppAnim.sparkleRotationTurns * 0.9,
     ),
-    _SparkleBurstSpec(
+    SparkleBurstSpec(
       offset: Offset(-22, 22),
       delay: 0.12,
       scale: 0.75,
       turns: AppAnim.sparkleRotationTurns * 0.7,
     ),
-    _SparkleBurstSpec(
+    SparkleBurstSpec(
       offset: Offset(18, 28),
       delay: 0.16,
       scale: 0.7,
@@ -49,13 +48,40 @@ class CatchStatusButton extends StatelessWidget {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _sparkleController = AnimationController(
+      vsync: this,
+      duration: AppAnim.sparkleDuration,
+    );
+  }
+
+  @override
+  void dispose() {
+    _sparkleController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleTap() async {
+    final wasCaught = widget.caught;
+    setState(() => _buttonPressed = true);
+    await Future.delayed(AppAnim.faster);
+    if (mounted) setState(() => _buttonPressed = false);
+    if (!wasCaught) {
+      _sparkleController.forward(from: 0);
+    }
+    await widget.onTap();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final bg = widget.caught ? Colors.green.shade600 : colors.secondary;
+    final fg = widget.caught ? Colors.black : colors.onSecondary;
     final l10n = context.l10n;
-    final bg = caught ? Colors.green.shade600 : colors.secondary;
-    final fg = caught ? Colors.black : colors.onSecondary;
 
     final button = AnimatedScale(
-      scale: buttonPressed ? AppAnim.buttonPressScale : 1,
+      scale: _buttonPressed ? AppAnim.buttonPressScale : 1,
       duration: AppAnim.fast,
       curve: AppAnim.easeOutCubic,
       child: AnimatedContainer(
@@ -71,14 +97,15 @@ class CatchStatusButton extends StatelessWidget {
           child: InkWell(
             key: const Key('detail.catchButton'),
             borderRadius: BorderRadius.circular(AppRadii.md),
-            onTap: onTap,
+            onTap: _handleTap,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
               child: AnimatedSwitcher(
                 duration: AppAnim.fast,
+                transitionBuilder: (child, animation) => child,
                 child: Text(
-                  caught ? l10n.buttonCaught : l10n.buttonCatch,
-                  key: ValueKey(caught),
+                  widget.caught ? l10n.buttonCaught : l10n.buttonCatch,
+                  key: ValueKey(widget.caught),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: AppSizes.buttonTextSize,
@@ -86,7 +113,6 @@ class CatchStatusButton extends StatelessWidget {
                     color: fg,
                   ),
                 ),
-                transitionBuilder: (child, animation) => child,
               ),
             ),
           ),
@@ -102,14 +128,14 @@ class CatchStatusButton extends StatelessWidget {
         Positioned.fill(
           child: IgnorePointer(
             child: AnimatedBuilder(
-              animation: sparkleAnimation,
+              animation: _sparkleController,
               builder: (context, child) {
-                final t = sparkleAnimation.value;
+                final t = _sparkleController.value;
                 return Stack(
                   alignment: Alignment.center,
                   children: [
                     for (final spec in _sparkleBurst)
-                      _SparkleBurst(
+                      SparkleBurst(
                         spec: spec,
                         t: t,
                         baseSize: AppSizes.catchSparkleSize,
@@ -125,8 +151,8 @@ class CatchStatusButton extends StatelessWidget {
   }
 }
 
-class _SparkleBurstSpec {
-  const _SparkleBurstSpec({
+class SparkleBurstSpec {
+  const SparkleBurstSpec({
     required this.offset,
     required this.delay,
     required this.scale,
@@ -139,14 +165,15 @@ class _SparkleBurstSpec {
   final double turns;
 }
 
-class _SparkleBurst extends StatelessWidget {
-  const _SparkleBurst({
+class SparkleBurst extends StatelessWidget {
+  const SparkleBurst({
+    super.key,
     required this.spec,
     required this.t,
     required this.baseSize,
   });
 
-  final _SparkleBurstSpec spec;
+  final SparkleBurstSpec spec;
   final double t;
   final double baseSize;
 
