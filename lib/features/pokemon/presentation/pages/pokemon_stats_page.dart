@@ -360,49 +360,43 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
           );
 
     return <_StatsCardId, _StatsCardEntry>{
-      _StatsCardId.caught: _StatsCardEntry(
-        id: _StatsCardId.caught,
+      _StatsCardId.caught: _entry(
+        _StatsCardId.caught,
         label: l10n.statsCaughtLabel,
         widget: caught,
-        span: 1,
       ),
-      _StatsCardId.total: _StatsCardEntry(
-        id: _StatsCardId.total,
+      _StatsCardId.total: _entry(
+        _StatsCardId.total,
         label: l10n.statsTotalCountsLabel,
         widget: total,
-        span: 1,
       ),
       if (gamesCard != null)
-        _StatsCardId.games: _StatsCardEntry(
-          id: _StatsCardId.games,
+        _StatsCardId.games: _entry(
+          _StatsCardId.games,
           label: l10n.statsGamesLabel,
           widget: gamesCard,
-          span: 1,
         ),
       if (recentCard != null)
-        _StatsCardId.recent: _StatsCardEntry(
-          id: _StatsCardId.recent,
+        _StatsCardId.recent: _entry(
+          _StatsCardId.recent,
           label: l10n.statsRecentLabel,
           widget: recentCard,
-          span: 1,
         ),
       if (resetsPokemonCard != null)
-        _StatsCardId.resetsPokemon: _StatsCardEntry(
-          id: _StatsCardId.resetsPokemon,
+        _StatsCardId.resetsPokemon: _entry(
+          _StatsCardId.resetsPokemon,
           label: l10n.statsResetsPokemonLabel,
           widget: resetsPokemonCard,
-          span: 1,
         ),
       if (resetsCard != null)
-        _StatsCardId.resetsGame: _StatsCardEntry(
-          id: _StatsCardId.resetsGame,
+        _StatsCardId.resetsGame: _entry(
+          _StatsCardId.resetsGame,
           label: l10n.statsResetsByGameLabel,
           widget: resetsCard,
-          span: 1,
         ),
       if (history != null)
-        _StatsCardId.history: _StatsCardEntry(
-          id: _StatsCardId.history,
+        _StatsCardId.history: _entry(
+          _StatsCardId.history,
           label: l10n.huntHistoryTitle,
           widget: history,
           span: 2,
@@ -467,6 +461,15 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
             ),
     );
   }
+}
+
+_StatsCardEntry _entry(
+  _StatsCardId id, {
+  required String label,
+  required Widget widget,
+  int span = 1,
+}) {
+  return _StatsCardEntry(id: id, label: label, widget: widget, span: span);
 }
 
 String _formatRangeLabel(DateTimeRange range) {

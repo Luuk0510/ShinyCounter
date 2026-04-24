@@ -139,80 +139,34 @@ class _PokemonListPageState extends State<PokemonListPage>
 
   Future<void> _confirmDelete(Pokemon pokemon) async {
     final colors = Theme.of(context).colorScheme;
-    final confirmed = await showScaledDialog<bool>(
+    final message = context.l10n.confirmDeleteMessage(pokemon.name);
+    final parts = message.split(pokemon.name);
+    final after = parts.length > 1 ? parts.sublist(1).join(pokemon.name) : '';
+    final confirmed = await showConfirmDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Theme.of(context).cardColor,
-        surfaceTintColor: Colors.transparent,
-        title: Text(
-          '${context.l10n.confirmDeleteTitle} ${pokemon.name}',
-          textAlign: TextAlign.center,
-          style: Theme.of(
-            context,
-          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-        ),
-        content: Builder(
-          builder: (context) {
-            final message = context.l10n.confirmDeleteMessage(pokemon.name);
-            final parts = message.split(pokemon.name);
-            final after = parts.length > 1
-                ? parts.sublist(1).join(pokemon.name)
-                : '';
-            return RichText(
-              text: TextSpan(
-                style: AppTypography.button.copyWith(color: colors.onSurface),
-                children: [
-                  TextSpan(text: parts.first),
-                  TextSpan(
-                    text: pokemon.name,
-                    style: AppTypography.button.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  TextSpan(text: after),
-                ],
-              ),
-            );
-          },
-        ),
-        actionsAlignment: MainAxisAlignment.center,
-        actionsPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.sm,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            style: AppButtonStyles.primaryOutline(
-              colors,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-                vertical: AppSpacing.sm,
-              ),
-              useLighter: true,
-            ),
-            child: Text(
-              context.l10n.confirmDeleteCancel,
-              style: AppTypography.button.copyWith(fontWeight: FontWeight.w700),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: AppButtonStyles.destructiveFilled(
-              colors,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-                vertical: AppSpacing.sm,
-              ),
-            ),
-            child: Text(
-              context.l10n.confirmDeleteDelete,
-              style: AppTypography.button.copyWith(fontWeight: FontWeight.w700),
-            ),
-          ),
-        ],
+      title: Text(
+        '${context.l10n.confirmDeleteTitle} ${pokemon.name}',
+        textAlign: TextAlign.center,
+        style: Theme.of(
+          context,
+        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
       ),
+      content: RichText(
+        text: TextSpan(
+          style: AppTypography.button.copyWith(color: colors.onSurface),
+          children: [
+            TextSpan(text: parts.first),
+            TextSpan(
+              text: pokemon.name,
+              style: AppTypography.button.copyWith(fontWeight: FontWeight.w800),
+            ),
+            TextSpan(text: after),
+          ],
+        ),
+      ),
+      cancelLabel: context.l10n.confirmDeleteCancel,
+      confirmLabel: context.l10n.confirmDeleteDelete,
+      destructive: true,
     );
 
     if (confirmed == true) {
@@ -297,44 +251,9 @@ class _PokemonListPageState extends State<PokemonListPage>
   }
 
   PreferredSizeWidget _buildAppBar(ColorScheme colors) {
-    return AppBar(
-      scrolledUnderElevation: 0,
-      elevation: 0,
-      centerTitle: true,
-      toolbarHeight: AppSizes.toolbarHeight,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(AppRadii.lg),
-        ),
-      ),
-      backgroundColor: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
-      flexibleSpace: Builder(
-        builder: (context) {
-          final scopedCard = Theme.of(context).cardColor;
-          return Container(
-            decoration: BoxDecoration(
-              color: scopedCard,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(AppRadii.lg),
-              ),
-            ),
-          );
-        },
-      ),
+    return RoundedAppBar(
       foregroundColor: colors.onSurface,
-      title: LayoutBuilder(
-        builder: (context, constraints) {
-          return ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: constraints.maxWidth),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.center,
-              child: _ListAppBarTitle(title: context.l10n.appTitle),
-            ),
-          );
-        },
-      ),
+      title: _ListAppBarTitle(title: context.l10n.appTitle),
       actions: [
         IconButton(
           key: PokemonListPage.settingsKey,

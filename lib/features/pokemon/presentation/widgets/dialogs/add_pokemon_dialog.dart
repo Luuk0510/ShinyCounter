@@ -11,6 +11,7 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/filters/sear
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/selectable_row.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_actions.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 
 class AddPokemonController extends ChangeNotifier {
@@ -226,51 +227,33 @@ class _AddPokemonView extends StatelessWidget {
         },
       ),
       actionsAlignment: MainAxisAlignment.center,
-      actionsPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.sm,
+      actionsPadding: dialogActionsPadding,
+      actions: dialogActions(
+        context: context,
+        cancelKey: AddPokemonDialog.cancelButtonKey,
+        confirmKey: AddPokemonDialog.chooseButtonKey,
+        cancelLabel: l10n.cancel,
+        confirmLabel: l10n.choose,
+        buttonPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xl,
+          vertical: AppSpacing.xs,
+        ),
+        onCancel: () => Navigator.of(context).pop<Pokemon?>(null),
+        onConfirm: controller.selected == null
+            ? null
+            : () {
+                final sprite = controller.selected!;
+                final name = controller.displayName(sprite);
+                Navigator.of(context).pop<Pokemon?>(
+                  Pokemon(
+                    id: _generateId(sprite.dex),
+                    name: name,
+                    imagePath: sprite.path,
+                    isLocalFile: false,
+                  ),
+                );
+              },
       ),
-      actions: [
-        TextButton(
-          key: AddPokemonDialog.cancelButtonKey,
-          onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
-          style: AppButtonStyles.primaryOutline(
-            colors,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xl,
-              vertical: AppSpacing.xs,
-            ),
-            useLighter: true,
-          ),
-          child: Text(l10n.cancel, style: AppTypography.button),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        ElevatedButton(
-          key: AddPokemonDialog.chooseButtonKey,
-          onPressed: controller.selected == null
-              ? null
-              : () {
-                  final sprite = controller.selected!;
-                  final name = controller.displayName(sprite);
-                  Navigator.of(context).pop<Pokemon?>(
-                    Pokemon(
-                      id: _generateId(sprite.dex),
-                      name: name,
-                      imagePath: sprite.path,
-                      isLocalFile: false,
-                    ),
-                  );
-                },
-          style: AppButtonStyles.primaryFilled(
-            colors,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xl,
-              vertical: AppSpacing.xs,
-            ),
-          ),
-          child: Text(l10n.choose, style: AppTypography.button),
-        ),
-      ],
     );
   }
 }

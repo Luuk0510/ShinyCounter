@@ -11,8 +11,8 @@ import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/storage/app_backup_service.dart';
 import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_actions.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/settings_sections.dart';
-import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 class SettingsDialog extends StatefulWidget {
@@ -94,65 +94,22 @@ class _SettingsDialogState extends State<SettingsDialog> {
       final path = file.path;
       if (bytes == null && path == null) return;
       if (!mounted) return;
-      final confirmed = await showScaledDialog<bool>(
+      final confirmed = await showConfirmDialog(
         context: context,
-        builder: (_) => AlertDialog(
-          backgroundColor: Theme.of(context).cardColor,
-          surfaceTintColor: Colors.transparent,
-          title: Text(
-            l10n.settingsImportConfirmTitle,
-            textAlign: TextAlign.center,
-            style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
-          ),
-          content: Text(
-            l10n.settingsImportConfirmMessage,
-            textAlign: TextAlign.center,
-            style: AppTypography.button.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-          actionsAlignment: MainAxisAlignment.center,
-          actionsPadding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.sm,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              style: AppButtonStyles.primaryOutline(
-                Theme.of(context).colorScheme,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                  vertical: AppSpacing.sm,
-                ),
-                useLighter: true,
-              ),
-              child: Text(
-                l10n.cancel,
-                style: AppTypography.button.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: AppButtonStyles.primaryFilled(
-                Theme.of(context).colorScheme,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                  vertical: AppSpacing.sm,
-                ),
-              ),
-              child: Text(
-                l10n.settingsImportConfirmAction,
-                style: AppTypography.button.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
+        title: Text(
+          l10n.settingsImportConfirmTitle,
+          textAlign: TextAlign.center,
+          style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
         ),
+        content: Text(
+          l10n.settingsImportConfirmMessage,
+          textAlign: TextAlign.center,
+          style: AppTypography.button.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        cancelLabel: l10n.cancel,
+        confirmLabel: l10n.settingsImportConfirmAction,
       );
       if (confirmed != true) return;
 

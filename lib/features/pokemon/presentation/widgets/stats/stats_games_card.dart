@@ -3,8 +3,7 @@ import 'package:shiny_counter/core/routing/context_extensions.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_card.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_expandable_section.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_expandable_list_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_row.dart';
 
 class StatsGamesCard extends StatelessWidget {
@@ -23,45 +22,14 @@ class StatsGamesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return StatsCard(
+    return StatsExpandableListCard<GameCatchStat>(
       title: label,
-      child: Align(
-        alignment: Alignment.center,
-        child: StatsExpandableSection(
-          itemCount: games.length,
-          foregroundColor: colors.onSurfaceVariant,
-          parentController: parentController,
-          builder: (visibleCount) {
-            final visibleGames = games.take(visibleCount).toList();
-            return _StatsGamesTable(
-              games: visibleGames,
-              caughtByGame: caughtByGame,
-            );
-          },
-        ),
+      items: games,
+      parentController: parentController,
+      itemBuilder: (context, game) => _StatsGamesRow(
+        game: game,
+        items: caughtByGame[game.game] ?? const [],
       ),
-    );
-  }
-}
-
-class _StatsGamesTable extends StatelessWidget {
-  const _StatsGamesTable({required this.games, required this.caughtByGame});
-
-  final List<GameCatchStat> games;
-  final Map<String, List<PokemonCaughtEntry>> caughtByGame;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        for (final game in games)
-          _StatsGamesRow(
-            game: game,
-            items: caughtByGame[game.game] ?? const [],
-          ),
-      ],
     );
   }
 }

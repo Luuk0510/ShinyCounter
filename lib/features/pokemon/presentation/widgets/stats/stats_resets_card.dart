@@ -4,7 +4,7 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_image.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_card.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_expandable_section.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_expandable_list_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_resets_pie_chart.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_row.dart';
 
@@ -37,34 +37,11 @@ class StatsPokemonResetsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return StatsCard(
+    return StatsExpandableListCard<PokemonResetStat>(
       title: label,
-      child: Align(
-        alignment: Alignment.center,
-        child: StatsExpandableSection(
-          itemCount: items.length,
-          foregroundColor: colors.onSurfaceVariant,
-          parentController: parentController,
-          builder: (visibleCount) {
-            final visibleItems = items.take(visibleCount).toList();
-            return _StatsPokemonResetsTable(items: visibleItems);
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _StatsPokemonResetsTable extends StatelessWidget {
-  const _StatsPokemonResetsTable({required this.items});
-
-  final List<PokemonResetStat> items;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [for (final item in items) _StatsPokemonResetsRow(item: item)],
+      items: items,
+      parentController: parentController,
+      itemBuilder: (context, item) => _StatsPokemonResetsRow(item: item),
     );
   }
 }

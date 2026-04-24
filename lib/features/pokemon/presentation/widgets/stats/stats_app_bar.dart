@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/common/rounded_app_bar.dart';
 
 class StatsAppBar extends StatelessWidget implements PreferredSizeWidget {
   const StatsAppBar({super.key, required this.title, this.actions});
@@ -12,45 +13,6 @@ class StatsAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      scrolledUnderElevation: 0,
-      elevation: 0,
-      centerTitle: true,
-      toolbarHeight: AppSizes.toolbarHeight,
-      backgroundColor: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
-      iconTheme: const IconThemeData(size: AppSizes.appBarActionIcon),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(AppRadii.lg),
-        ),
-      ),
-      flexibleSpace: Builder(
-        builder: (context) {
-          final scopedCard = Theme.of(context).cardColor;
-          return Container(
-            decoration: BoxDecoration(
-              color: scopedCard,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(AppRadii.lg),
-              ),
-            ),
-          );
-        },
-      ),
-      title: LayoutBuilder(
-        builder: (context, constraints) {
-          return ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: constraints.maxWidth),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.center,
-              child: title,
-            ),
-          );
-        },
-      ),
-      actions: actions,
-    );
+    return RoundedAppBar(title: title, actions: actions);
   }
 }
