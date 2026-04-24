@@ -40,6 +40,18 @@
   "@statsGamesLabel": {
     "description": ""
   },
+  "statsResetsByGameLabel": "Resets per game",
+  "@statsResetsByGameLabel": {
+    "description": ""
+  },
+  "statsResetsPokemonLabel": "Meeste resets",
+  "@statsResetsPokemonLabel": {
+    "description": ""
+  },
+  "statsResetsEmpty": "Nog geen resets",
+  "@statsResetsEmpty": {
+    "description": ""
+  },
   "statsGamesShowMore": "Toon alles",
   "@statsGamesShowMore": {
     "description": ""
@@ -54,6 +66,14 @@
   },
   "statsRangeReset": "Reset",
   "@statsRangeReset": {
+    "description": ""
+  },
+  "statsEditLayout": "Indeling bewerken",
+  "@statsEditLayout": {
+    "description": ""
+  },
+  "statsArrangeTitle": "Kaarten ordenen",
+  "@statsArrangeTitle": {
     "description": ""
   },
   "manageTitle": "Beheer Pokémon",

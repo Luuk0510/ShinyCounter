@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/routing/app_router.dart';
 import 'package:shiny_counter/core/theme/app_assets.dart';
-import 'package:shiny_counter/features/pokemon/data/datasources/counter_sync_service.dart';
+import 'package:shiny_counter/features/pokemon/domain/entities/counter_state.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_stats_page.dart';
@@ -65,6 +65,21 @@ Future<void> _pumpUntilLoaded(WidgetTester tester) async {
     await tester.pump(const Duration(milliseconds: 50));
   }
   await tester.pumpAndSettle();
+}
+
+Future<void> _scrollUntilFound(
+  WidgetTester tester,
+  Finder finder, {
+  Offset delta = const Offset(0, -420),
+}) async {
+  final listFinder = find.byType(ListView);
+  for (var i = 0; i < 6; i++) {
+    if (finder.evaluate().isNotEmpty) {
+      return;
+    }
+    await tester.drag(listFinder, delta);
+    await tester.pumpAndSettle();
+  }
 }
 
 void main() {
@@ -173,10 +188,18 @@ void main() {
 
     expect(find.text('4 / 4'), findsOneWidget);
     expect(find.text('100'), findsOneWidget);
-    expect(find.byType(StatsCountsChart, skipOffstage: false), findsOneWidget);
+    final chartFinder = find.byType(StatsCountsChart);
+    await _scrollUntilFound(tester, chartFinder);
+    expect(chartFinder, findsOneWidget);
 
     final context = tester.element(find.byType(PokemonStatsPage));
     final l10n = AppLocalizations.of(context)!;
+    await _scrollUntilFound(
+      tester,
+      find.text(l10n.statsGamesLabel),
+      delta: const Offset(0, 420),
+    );
+
     final gamesCard = find.ancestor(
       of: find.text(l10n.statsGamesLabel),
       matching: find.byType(StatsCard),
@@ -187,14 +210,33 @@ void main() {
     );
 
     expect(showMore, findsOneWidget);
-    expect(find.text('Silver'), findsNothing);
+    await tester.ensureVisible(showMore);
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(of: gamesCard, matching: find.text('Silver')),
+      findsNothing,
+    );
 
     await tester.tap(showMore);
     await tester.pumpAndSettle();
 
-    expect(find.text('Silver'), findsOneWidget);
+    expect(
+      find.descendant(of: gamesCard, matching: find.text('Silver')),
+      findsOneWidget,
+    );
 
-    await tester.tap(find.text('Bulbasaur'));
+    final recentCard = find.ancestor(
+      of: find.text(l10n.statsRecentLabel),
+      matching: find.byType(StatsCard),
+    );
+    final bulbasaur = find.descendant(
+      of: recentCard,
+      matching: find.text('Bulbasaur'),
+    );
+    expect(bulbasaur, findsOneWidget);
+    await tester.ensureVisible(bulbasaur);
+    await tester.pumpAndSettle();
+    await tester.tap(bulbasaur);
     await tester.pumpAndSettle();
 
     expect(find.text('Pokemon Detail'), findsOneWidget);
@@ -252,7 +294,15 @@ void main() {
 
     await _pumpUntilLoaded(tester);
 
-    await tester.tap(find.text('Gold'));
+    final context = tester.element(find.byType(PokemonStatsPage));
+    final l10n = AppLocalizations.of(context)!;
+    final gamesCard = find.ancestor(
+      of: find.text(l10n.statsGamesLabel),
+      matching: find.byType(StatsCard),
+    );
+    final goldRow = find.descendant(of: gamesCard, matching: find.text('Gold'));
+
+    await tester.tap(goldRow);
     await tester.pumpAndSettle();
 
     expect(find.text('Stats Game'), findsOneWidget);

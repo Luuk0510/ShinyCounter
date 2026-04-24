@@ -29,6 +29,7 @@ class _OverlayAppState extends State<_OverlayApp> {
   int _count = 0;
   bool _enabled = true;
   final HuntStateService _huntState = HuntStateService();
+  late final CounterSyncService _sync = CounterSyncService();
 
   @override
   void initState() {
@@ -63,14 +64,13 @@ class _OverlayAppState extends State<_OverlayApp> {
     if (!_enabled) return;
     final keys = _keys;
     if (keys == null) return;
-    final sync = await CounterSyncService.instance();
-    final state = await sync.loadState(keys.counter, keys.caught);
+    final state = await _sync.loadState(keys.counter, keys.caught);
     final current = state.count;
     var next = current + delta;
     if (next < 0) next = 0;
     await _huntState.applyCountChange(
       keys: keys,
-      sync: sync,
+      sync: _sync,
       previousCount: current,
       nextCount: next,
       isCaught: state.isCaught,
@@ -79,7 +79,7 @@ class _OverlayAppState extends State<_OverlayApp> {
       caughtGame: state.caughtGame,
       dailyCounts: state.dailyCounts,
     );
-    await sync.setCounter(keys.counter, next);
+    await _sync.setCounter(keys.counter, next);
     if (!mounted) return;
     setState(() {
       _count = next;

@@ -37,6 +37,13 @@ void main() {
     expect(stat.count, 7);
   });
 
+  test('GameResetStat stores game and count', () {
+    const stat = GameResetStat('Crystal', 123);
+
+    expect(stat.game, 'Crystal');
+    expect(stat.count, 123);
+  });
+
   test('StatsSummary copyWith updates daily totals', () {
     const empty = StatsSummary.empty();
     final daily = [StatsDailyCount(date: DateTime(2024, 4, 4), count: 5)];

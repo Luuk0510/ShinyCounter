@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import '../../overlay/counter_overlay_message.dart';
-import '../../data/datasources/counter_sync_service.dart';
+import '../entities/counter_state.dart';
+import '../entities/counter_overlay_payload.dart';
 
 /// Abstraction for persisting counter state and syncing overlay data.
 abstract class CounterSync {
@@ -20,17 +20,17 @@ abstract class CounterSync {
   Future<void> clearHuntDates(String counterKey);
   Future<void> setDailyCounts(String counterKey, Map<String, int> counts);
   Future<bool> ensureOverlay(
-    CounterOverlayMessage message, {
+    CounterOverlayPayload payload, {
     int width = 360,
     int height = 220,
   });
   Future<void> showOverlay(
-    CounterOverlayMessage message, {
+    CounterOverlayPayload payload, {
     int width = 360,
     int height = 220,
   });
   Future<bool> isOverlayActive();
-  Future<void> shareToOverlay(CounterOverlayMessage message);
+  Future<void> shareToOverlay(CounterOverlayPayload payload);
   Future<void> closeOverlay();
   Stream<dynamic> get overlayStream;
 }

@@ -3,6 +3,7 @@ import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_actions.dart';
 
 class EditPokemonDialog extends StatefulWidget {
   const EditPokemonDialog({super.key, required this.pokemon});
@@ -64,48 +65,26 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
         ),
       ),
       actionsAlignment: MainAxisAlignment.center,
-      actionsPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.sm,
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop<Pokemon?>(null),
-          style: AppButtonStyles.primaryOutline(
-            Theme.of(context).colorScheme,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xl,
-              vertical: AppSpacing.sm,
-            ),
-            useLighter: true,
-          ),
-          child: Text(l10n.cancel, style: AppTypography.button),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        ElevatedButton(
-          onPressed: () {
-            final name = _nameController.text.trim();
-            if (name.isEmpty) return;
+      actionsPadding: dialogActionsPadding,
+      actions: dialogActions(
+        context: context,
+        cancelLabel: l10n.cancel,
+        confirmLabel: l10n.save,
+        onCancel: () => Navigator.of(context).pop<Pokemon?>(null),
+        onConfirm: () {
+          final name = _nameController.text.trim();
+          if (name.isEmpty) return;
 
-            Navigator.of(context).pop<Pokemon?>(
-              Pokemon(
-                id: widget.pokemon.id,
-                name: name,
-                imagePath: widget.pokemon.imagePath,
-                isLocalFile: widget.pokemon.isLocalFile,
-              ),
-            );
-          },
-          style: AppButtonStyles.primaryFilled(
-            Theme.of(context).colorScheme,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xl,
-              vertical: AppSpacing.sm,
+          Navigator.of(context).pop<Pokemon?>(
+            Pokemon(
+              id: widget.pokemon.id,
+              name: name,
+              imagePath: widget.pokemon.imagePath,
+              isLocalFile: widget.pokemon.isLocalFile,
             ),
-          ),
-          child: Text(l10n.save, style: AppTypography.button),
-        ),
-      ],
+          );
+        },
+      ),
     );
   }
 }

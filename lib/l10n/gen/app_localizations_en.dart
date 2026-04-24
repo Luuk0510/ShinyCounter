@@ -39,6 +39,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsGamesLabel => 'Caught in games';
 
   @override
+  String get statsResetsByGameLabel => 'Resets by game';
+
+  @override
+  String get statsResetsPokemonLabel => 'Most resets';
+
+  @override
+  String get statsResetsEmpty => 'No resets yet';
+
+  @override
   String get statsGamesShowMore => 'Show all';
 
   @override
@@ -49,6 +58,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statsRangeReset => 'Reset';
+
+  @override
+  String get statsEditLayout => 'Edit layout';
+
+  @override
+  String get statsArrangeTitle => 'Arrange cards';
 
   @override
   String get manageTitle => 'Manage Pokémon';

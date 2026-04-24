@@ -6,6 +6,7 @@ class AppSizes {
   static const toolbarHeight = 52.0;
   static const appBarActionIcon = 28.0;
   static const appBarTitleIcon = 36.0; // animated_app_icon.dart
+  static const statsReorderHandle = 32.0;
 
   // settings_sheet.dart
   static const sheetHandleWidth = 44.0;
@@ -39,14 +40,26 @@ class AppSizes {
 
   // pokemon_stats_page.dart
   static const statsPokemonImage = 44.0;
-  static const statsGameCountWidth = 64.0;
+  static const statsGameCountWidth = 50.0;
   static const statsCaughtGameTableMaxWidth = 230.0;
   static const statsRecentCatchTableMaxWidth = 300.0;
+  static const statsResetsPokemonTableMaxWidth = 260.0;
   static const statsDateWidth = 115.0;
   static const statsRowTextSize = 20.0;
+  static const statsExpandableMaxVisible = 10;
+  static const statsExpandableRowHeight =
+      statsPokemonImage + (AppSpacing.xs * 2);
   static const statsChartHeight = 200.0;
   static const statsChartHeightCompact = 180.0;
+  static const statsPieChartMaxSize = 300.0;
+  static const statsPieChartMinSize = 180.0;
   static const statsChartStroke = 2.0;
+  static const statsPieRadiusFactor = 0.34;
+  static const statsPieCenterSpaceFactor = 0.22;
+  static const statsPieSectionGap = 1.5;
+  static const statsPieLabelMinPercent = 7.0;
+  static const statsPieLabelOffset = 0.6;
+  static const statsPieLegendMinWidth = 560.0;
   static const statsRangeTextSize = 16.0;
   static const statsRangeStackWidth = 360.0;
   static const statsRangeStackGap = 0.0;
