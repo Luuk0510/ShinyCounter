@@ -1,18 +1,20 @@
 import 'dart:convert';
 
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shiny_counter/core/storage/app_prefs_keys.dart';
+import 'package:shiny_counter/core/storage/key_value_store.dart';
 
 class AppBackupService {
-  AppBackupService({Future<SharedPreferences>? prefs})
-    : _prefs = prefs ?? SharedPreferences.getInstance();
+  AppBackupService({KeyValueStore? store})
+    : _store = store ?? SharedPrefsStore();
 
-  final Future<SharedPreferences> _prefs;
+  final KeyValueStore _store;
 
   Future<String> exportJson() async {
-    final prefs = await _prefs;
+    final prefs = await _store.snapshot();
     final data = <String, Object?>{};
-    for (final key in prefs.getKeys()) {
-      data[key] = prefs.get(key);
+    for (final entry in prefs.entries) {
+      if (!AppPrefsKeys.isManagedKey(entry.key)) continue;
+      data[entry.key] = entry.value;
     }
     final payload = <String, Object?>{
       'version': 1,
@@ -31,24 +33,22 @@ class AppBackupService {
     if (prefsData is! Map) {
       throw const FormatException('Missing prefs data');
     }
-    final prefs = await _prefs;
+    final currentPrefs = await _store.snapshot();
     if (clearExisting) {
-      await prefs.clear();
+      for (final key in currentPrefs.keys.where(AppPrefsKeys.isManagedKey)) {
+        await _store.remove(key);
+      }
     }
     for (final entry in prefsData.entries) {
       final key = entry.key.toString();
+      if (!AppPrefsKeys.isManagedKey(key)) continue;
       final value = entry.value;
       if (value is int) {
-        await prefs.setInt(key, value);
-      } else if (value is double) {
-        await prefs.setDouble(key, value);
+        await _store.setInt(key, value);
       } else if (value is bool) {
-        await prefs.setBool(key, value);
+        await _store.setBool(key, value);
       } else if (value is String) {
-        await prefs.setString(key, value);
-      } else if (value is List) {
-        final list = value.whereType<String>().toList();
-        await prefs.setStringList(key, list);
+        await _store.setString(key, value);
       }
     }
   }

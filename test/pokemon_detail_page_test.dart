@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
@@ -5,7 +7,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_detail_page.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
@@ -34,7 +35,6 @@ Widget _wrap(
       providers: [
         ChangeNotifierProvider<ThemeNotifier>(create: (_) => ThemeNotifier()),
         Provider<CounterSync>.value(value: sync),
-        Provider<ToggleCaughtUseCase?>.value(value: null),
         Provider<SpriteService>.value(value: spriteService),
       ],
       child: MaterialApp(
@@ -50,6 +50,35 @@ Widget _wrap(
       ),
     ),
   );
+}
+
+class _DelayedSpriteService implements SpriteService {
+  _DelayedSpriteService(this._completer);
+
+  final Completer<List<ParsedSprite>> _completer;
+
+  @override
+  Future<List<ParsedSprite>> loadSprites({bool refresh = false}) async =>
+      _completer.future;
+
+  @override
+  Future<List<ParsedSprite>> spritesForDex(
+    String dex, {
+    bool refresh = false,
+  }) async => _completer.future;
+
+  @override
+  Future<void> warmupForDexes(
+    Iterable<String> dexes, {
+    bool refresh = false,
+  }) async {}
+
+  @override
+  Future<void> precacheSpritePaths(
+    BuildContext context,
+    Iterable<String> assetPaths, {
+    bool dedupe = true,
+  }) async {}
 }
 
 void main() {
@@ -218,5 +247,31 @@ void main() {
 
     final addButton = find.widgetWithIcon(ElevatedButton, Icons.add);
     expect(tester.widget<ElevatedButton>(addButton).onPressed, isNull);
+  });
+
+  testWidgets('disposing during sprite load does not call setState', (
+    tester,
+  ) async {
+    final completer = Completer<List<ParsedSprite>>();
+    final spriteService = _DelayedSpriteService(completer);
+    const pokemon = Pokemon(
+      id: '0001',
+      name: 'Bulbasaur',
+      imagePath: 'assets/pokemons/0001_base_m_s.png',
+    );
+
+    await tester.pumpWidget(
+      _wrap(
+        PokemonDetailPage(pokemon: pokemon),
+        sync: FakeCounterSync(),
+        spriteService: spriteService,
+      ),
+    );
+    await tester.pumpWidget(const SizedBox.shrink());
+
+    completer.complete(const []);
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
   });
 }

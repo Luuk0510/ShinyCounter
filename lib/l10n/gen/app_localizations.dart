@@ -392,6 +392,24 @@ abstract class AppLocalizations {
   /// **'Import failed'**
   String get settingsImportFailed;
 
+  /// No description provided for @settingsVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String settingsVersion(Object version);
+
+  /// Shown when the pokemon detail route is opened without a Pokemon.
+  ///
+  /// In en, this message translates to:
+  /// **'No Pokémon provided'**
+  String get routeErrorMissingPokemon;
+
+  /// Shown when the game stats route is opened without game args.
+  ///
+  /// In en, this message translates to:
+  /// **'No game provided'**
+  String get routeErrorMissingGame;
+
   ///
   ///
   /// In en, this message translates to:

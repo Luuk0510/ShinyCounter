@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/overlay/counter_overlay_message.dart';
-import 'package:shiny_counter/features/pokemon/shared/state/counter_controller.dart';
+import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
 
 import 'helpers/fakes.dart';
 
@@ -47,9 +47,26 @@ void main() {
       sync.caughtGame['counter_001'] = 'violet';
       sync.counters['counter_001'] = 10;
       final controller = CounterController(pokemon: pokemon, sync: sync);
-      await controller.init();
+      await controller.initialize();
 
       await controller.setCounter(0);
+
+      expect(controller.counter, 0);
+      expect(controller.isCaught, isFalse);
+      expect(controller.caughtGame, isNull);
+      expect(sync.caught['caught_001'], isFalse);
+      expect(sync.caughtGame['counter_001'], isNull);
+    });
+
+    test('setCounterManual to zero clears caught state and game', () async {
+      final sync = FakeCounterSync();
+      sync.caught['caught_001'] = true;
+      sync.caughtGame['counter_001'] = 'violet';
+      sync.counters['counter_001'] = 10;
+      final controller = CounterController(pokemon: pokemon, sync: sync);
+      await controller.initialize();
+
+      await controller.setCounterManual(0);
 
       expect(controller.counter, 0);
       expect(controller.isCaught, isFalse);
@@ -102,7 +119,7 @@ void main() {
       sync.counters['counter_001'] = 5;
       sync.caught['caught_001'] = true;
       final controller = CounterController(pokemon: pokemon, sync: sync);
-      await controller.init();
+      await controller.initialize();
 
       sync.emitOverlay(
         const CounterOverlayMessage(
@@ -121,7 +138,7 @@ void main() {
     test('overlay closed event clears pillActive', () async {
       final sync = FakeCounterSync();
       final controller = CounterController(pokemon: pokemon, sync: sync);
-      await controller.init();
+      await controller.initialize();
 
       await controller.toggleOverlay(); // activates via fake ensureOverlay
       sync.emitOverlay('closed');
@@ -135,7 +152,7 @@ void main() {
       () async {
         final sync = FakeCounterSync();
         final controller = CounterController(pokemon: pokemon, sync: sync);
-        await controller.init();
+        await controller.initialize();
         controller.setCaughtGame('violet');
 
         await controller.setCaughtAtDate(DateTime(2024, 1, 1));
@@ -152,7 +169,7 @@ void main() {
       () async {
         final sync = FakeCounterSync();
         final controller = CounterController(pokemon: pokemon, sync: sync);
-        await controller.init();
+        await controller.initialize();
 
         await controller.setStartedAtDate(DateTime(2024, 1, 2));
         expect(sync.shareCount, 0);
@@ -169,7 +186,7 @@ void main() {
       () async {
         final sync = FakeCounterSync();
         final controller = CounterController(pokemon: pokemon, sync: sync);
-        await controller.init();
+        await controller.initialize();
         await controller.increment();
         final startedBefore = controller.startedAt;
 
@@ -185,7 +202,7 @@ void main() {
     test('toggleCaught at zero sets caughtAt but not startedAt', () async {
       final sync = FakeCounterSync();
       final controller = CounterController(pokemon: pokemon, sync: sync);
-      await controller.init();
+      await controller.initialize();
 
       await controller.toggleCaught();
 
@@ -197,7 +214,7 @@ void main() {
     test('overlay message with different counterKey is ignored', () async {
       final sync = FakeCounterSync();
       final controller = CounterController(pokemon: pokemon, sync: sync);
-      await controller.init();
+      await controller.initialize();
       controller.setCounterManual(3);
 
       sync.emitOverlay(
@@ -229,7 +246,7 @@ void main() {
       () async {
         final sync = FakeCounterSync();
         final controller = CounterController(pokemon: pokemon, sync: sync);
-        await controller.init();
+        await controller.initialize();
 
         await controller.setDailyCounts({'2024-01-01': 0});
 
@@ -242,7 +259,7 @@ void main() {
     test('decrement is no-op when caught or zero', () async {
       final sync = FakeCounterSync();
       final controller = CounterController(pokemon: pokemon, sync: sync);
-      await controller.init();
+      await controller.initialize();
 
       await controller.decrement();
       expect(controller.counter, 0);

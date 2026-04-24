@@ -8,9 +8,11 @@ class CollapsibleSection extends StatelessWidget {
     required this.expanded,
     required this.onToggle,
     required this.child,
-    this.headerPadding = const EdgeInsets.symmetric(
-      horizontal: AppSizes.cardPaddingH,
-      vertical: AppSizes.cardPaddingV,
+    this.headerPadding = const EdgeInsets.fromLTRB(
+      AppSizes.cardPaddingH,
+      AppSpacing.xxs,
+      AppSizes.cardPaddingH,
+      AppSpacing.xxs,
     ),
   });
 

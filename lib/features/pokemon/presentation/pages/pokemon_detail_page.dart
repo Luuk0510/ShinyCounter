@@ -5,10 +5,9 @@ import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
-import 'package:shiny_counter/features/pokemon/domain/usecases/toggle_caught.dart';
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_counters_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/bottom_sheets/edit_daily_counts_sheet.dart';
-import 'package:shiny_counter/features/pokemon/shared/state/counter_controller.dart';
+import 'package:shiny_counter/features/pokemon/presentation/state/counter_controller.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
@@ -32,7 +31,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     _controller = CounterController(
       pokemon: widget.pokemon,
       sync: context.read<CounterSync>(),
-      toggleCaughtUseCase: context.read<ToggleCaughtUseCase?>(),
     );
     WidgetsBinding.instance.addObserver(this);
     _controller.addListener(_onControllerChanged);
@@ -55,7 +53,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _controller.init();
+      _controller.initialize();
     }
   }
 
@@ -137,7 +135,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: _DetailAppBar(
+      appBar: DetailAppBar(
         pokemonName: widget.pokemon.name,
         onEdit: _showEditDialog,
         onTogglePill: _togglePill,

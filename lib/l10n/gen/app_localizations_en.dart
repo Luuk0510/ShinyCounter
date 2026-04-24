@@ -159,6 +159,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsImportFailed => 'Import failed';
 
   @override
+  String settingsVersion(Object version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get routeErrorMissingPokemon => 'No Pokémon provided';
+
+  @override
+  String get routeErrorMissingGame => 'No game provided';
+
+  @override
   String get colorDefault => 'Default';
 
   @override

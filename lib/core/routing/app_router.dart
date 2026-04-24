@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_detail_page.dart';
@@ -28,8 +29,8 @@ class AppRouter {
             builder: (context, state) {
               final extra = state.extra;
               if (extra is! Pokemon) {
-                return const _RouteErrorPage(
-                  message: 'Geen Pokémon meegegeven',
+                return _RouteErrorPage(
+                  message: context.l10n.routeErrorMissingPokemon,
                 );
               }
               return PokemonDetailPage(pokemon: extra);
@@ -44,7 +45,9 @@ class AppRouter {
             builder: (context, state) {
               final extra = state.extra;
               if (extra is! PokemonGameStatsArgs) {
-                return const _RouteErrorPage(message: 'Geen game meegegeven');
+                return _RouteErrorPage(
+                  message: context.l10n.routeErrorMissingGame,
+                );
               }
               return PokemonGameStatsPage(args: extra);
             },

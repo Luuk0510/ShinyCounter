@@ -150,7 +150,7 @@ void main() {
       'assets/pokemons/0002_form_f_s.png',
       'assets/ignore/me.txt',
     ]);
-    final repo = SpriteRepository(bundle: bundle);
+    final repo = PokemonSpriteService(bundle: bundle);
 
     final all = await repo.loadSprites();
     expect(all.length, 2);
@@ -169,7 +169,7 @@ void main() {
       'assets/pokemons/0003_form_m_n.png',
       'assets/pokemons/0004_form_m_n.png',
     ]);
-    final repo = SpriteRepository(bundle: bundle);
+    final repo = PokemonSpriteService(bundle: bundle);
 
     await repo.warmupForDexes(['0003']);
     final dex3 = await repo.spritesForDex('0003');
@@ -184,7 +184,7 @@ void main() {
     tester,
   ) async {
     final bundle = _CountingBundle();
-    final repo = SpriteRepository(bundle: bundle);
+    final repo = PokemonSpriteService(bundle: bundle);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -211,7 +211,7 @@ void main() {
 
   test('warmupForDexes skips cached dexes unless refresh is true', () async {
     final bundle = _FakeBundle(['assets/pokemons/0005_form_m_n.png']);
-    final repo = SpriteRepository(bundle: bundle);
+    final repo = PokemonSpriteService(bundle: bundle);
 
     await repo.warmupForDexes(['0005']);
     expect(bundle.manifestLoads, 1);
