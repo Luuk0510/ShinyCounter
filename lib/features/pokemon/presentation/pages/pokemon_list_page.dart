@@ -10,18 +10,12 @@ import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_caught.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/load_custom_pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/usecases/save_custom_pokemon.dart';
-import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/sprite_parser.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/widgets.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
-import 'package:shiny_counter/features/pokemon/shared/utils/sprite_ordering.dart';
-
-// Toggle to include the full dex by default. Off preserves the original
-// behavior (only custom/selected Pokémon).
-const bool _includeBaseDex = false;
 
 class PokemonListPage extends StatefulWidget {
   const PokemonListPage({super.key});
@@ -41,7 +35,6 @@ class _PokemonListPageState extends State<PokemonListPage>
   late final SaveCustomPokemonUseCase _saveCustomPokemon;
   late final LoadCaughtUseCase _loadCaught;
   final List<Pokemon> _customPokemon = [];
-  final List<Pokemon> _basePokemon = [];
   Set<String> _caught = {};
   bool _loading = true;
   final ScrollController _listController = ScrollController();
@@ -54,7 +47,7 @@ class _PokemonListPageState extends State<PokemonListPage>
   }
 
   List<Pokemon> get _allPokemon {
-    final combined = [..._basePokemon, ..._customPokemon];
+    final combined = [..._customPokemon];
     combined.sort(pokemonDexComparator);
     return combined;
   }
@@ -74,9 +67,6 @@ class _PokemonListPageState extends State<PokemonListPage>
   }
 
   Future<void> _loadData() async {
-    if (_includeBaseDex) {
-      await _loadBasePokemon();
-    }
     final custom = await _loadCustomPokemon();
     setState(() {
       _customPokemon
@@ -94,67 +84,6 @@ class _PokemonListPageState extends State<PokemonListPage>
     final caught = await _loadCaught(_allPokemon);
     if (mounted) {
       setState(() => _caught = caught);
-    }
-  }
-
-  int? _genderPriority(String token) {
-    switch (token) {
-      case 'm':
-      case 'md':
-      case 'mo':
-        return 0;
-      case 'mf':
-      case 'uk':
-        return 1;
-      case 'f':
-      case 'fd':
-      case 'fo':
-        return 2;
-      default:
-        return null;
-    }
-  }
-
-  Future<void> _loadBasePokemon() async {
-    if (_basePokemon.isNotEmpty) return;
-    try {
-      final names = await PokemonNames.load();
-      if (!mounted) return;
-      final sprites = await context.read<SpriteService>().loadSprites();
-      final chosen = <String, ParsedSprite>{};
-      for (final sprite in sprites) {
-        if (!sprite.shiny) continue;
-        if (isMegaOrGmaxForm(sprite.form)) continue;
-        final priority = _genderPriority(sprite.gender);
-        if (priority == null) continue;
-        final current = chosen[sprite.dex];
-        if (current == null ||
-            priority < _genderPriority(current.gender)! ||
-            (priority == _genderPriority(current.gender)! &&
-                sprite.form.compareTo(current.form) < 0)) {
-          chosen[sprite.dex] = sprite;
-        }
-      }
-
-      if (!mounted) return;
-      setState(() {
-        _basePokemon
-          ..clear()
-          ..addAll(
-            chosen.values.map(
-              (sprite) => Pokemon(
-                id: sprite.dex,
-                name: names.nameFor(sprite.dex),
-                imagePath: sprite.path,
-                isLocalFile: false,
-              ),
-            ),
-          );
-        _basePokemon.sort(pokemonDexComparator);
-      });
-    } catch (_) {
-      // If assets fail to load we leave the base list empty; the UI still works
-      // with custom Pokémon.
     }
   }
 
