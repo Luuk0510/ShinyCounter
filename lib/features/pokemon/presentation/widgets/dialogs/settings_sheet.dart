@@ -6,7 +6,6 @@ import 'package:file_saver/file_saver.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shiny_counter/core/app_metadata.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/l10n/locale_notifier.dart';
 import 'package:shiny_counter/core/storage/app_backup_service.dart';
@@ -205,7 +204,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              context.l10n.settingsVersion(AppMetadata.version),
+              'v2.2.1',
               style: AppTypography.button.copyWith(
                 fontSize: AppSizes.overlayLabelSize,
                 color: colors.onSurfaceVariant,

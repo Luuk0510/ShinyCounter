@@ -52,7 +52,6 @@ class HuntStateService {
       nextStartedAt = null;
       nextCaughtAt = null;
       nextCaught = false;
-      nextGame = null;
       await sync.clearHuntDates(keys.counter);
       await sync.setCaught(keys.caught, false);
     }

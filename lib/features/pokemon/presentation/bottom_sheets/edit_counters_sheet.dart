@@ -2,13 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/common/game_dropdown.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_field_styles.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/detail/date_row.dart';
-import 'package:shiny_counter/features/pokemon/presentation/utils/counter_input.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_field_group.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/sheet_header.dart';
 
 class EditSheetResult {
   const EditSheetResult({
@@ -89,17 +85,38 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SheetHeader(title: l10n.editSheetTitle),
+          Container(
+            width: AppSizes.sheetHandleWidth,
+            height: AppSizes.sheetHandleHeight,
+            decoration: BoxDecoration(
+              color: colors.outlineVariant,
+              borderRadius: BorderRadius.circular(AppRadii.sm),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            l10n.editSheetTitle,
+            style: AppTypography.title.copyWith(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: AppSpacing.lg),
           DialogFieldGroup(
             children: [
               TextField(
                 controller: _counterCtrl,
                 keyboardType: TextInputType.number,
-                decoration: PokemonFieldDecorations.standard(
+                decoration: InputDecoration(
                   labelText: l10n.counterLabel,
                   hintText: l10n.enterNumberHint,
+                  labelStyle: const TextStyle(
+                    fontSize: AppSizes.sheetFieldLabel,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  hintStyle: const TextStyle(fontSize: AppSizes.sheetFieldHint),
                 ),
-                style: PokemonFieldStyles.input,
+                style: const TextStyle(
+                  fontSize: AppSizes.sheetFieldText,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               _DateGroup(
                 start: _start,
@@ -137,21 +154,40 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
             ],
           ),
           const SizedBox(height: AppSpacing.xl),
-          BottomSheetActionRow(
-            colors: colors,
-            leadingLabel: l10n.cancel,
-            trailingLabel: l10n.save,
-            leadingBorderWidth: AppSizes.sheetActionWidth,
-            onLeadingPressed: () => Navigator.of(context).pop(),
-            onTrailingPressed: _submit,
-            leadingTextStyle: const TextStyle(
-              fontSize: AppSizes.sheetButtonFont,
-              fontWeight: FontWeight.w600,
-            ),
-            trailingTextStyle: const TextStyle(
-              fontSize: AppSizes.sheetButtonFont,
-              fontWeight: FontWeight.w700,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: AppButtonStyles.primaryOutline(
+                    colors,
+                    borderWidth: AppSizes.sheetActionWidth,
+                    useLighter: true,
+                  ),
+                  child: Text(
+                    l10n.cancel,
+                    style: const TextStyle(
+                      fontSize: AppSizes.sheetButtonFont,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _submit,
+                  style: AppButtonStyles.primaryFilled(colors),
+                  child: Text(
+                    l10n.save,
+                    style: const TextStyle(
+                      fontSize: AppSizes.sheetButtonFont,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -170,9 +206,11 @@ class _EditCountersSheetState extends State<EditCountersSheet> {
   }
 
   void _submit() {
-    final parsed = parseNonNegativeInt(_counterCtrl.text);
-    if (parsed == null) {
-      showInvalidCounterSnackBar(context);
+    final parsed = int.tryParse(_counterCtrl.text.trim());
+    if (parsed == null || parsed < 0) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.invalidCounter)));
       return;
     }
     Navigator.of(context).pop(

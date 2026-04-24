@@ -8,8 +8,6 @@ import 'package:shiny_counter/features/pokemon/domain/entities/stats_models.dart
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/pokemon_sheets.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/safe_area_sheet.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_app_bar.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_games_card.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_metric_card.dart';
@@ -26,37 +24,101 @@ class PokemonStatsPage extends StatefulWidget {
 }
 
 class _PokemonStatsPageState extends State<PokemonStatsPage> {
-  late final PokemonStatsPageController _controller;
+  static const int _defaultChartDays = 30;
+  static const List<_StatsCardId> _defaultCardOrder = [
+    _StatsCardId.caught,
+    _StatsCardId.total,
+    _StatsCardId.games,
+    _StatsCardId.recent,
+    _StatsCardId.resetsPokemon,
+    _StatsCardId.resetsGame,
+    _StatsCardId.history,
+  ];
+
+  late final StatsAggregationService _statsService;
+  late DateTimeRange _chartRange;
+  List<CounterState> _states = const [];
+  bool _loading = true;
+  StatsSummary _summary = const StatsSummary.empty();
   final ScrollController _scrollController = ScrollController();
+  late List<_StatsCardId> _cardOrder;
 
   @override
   void initState() {
     super.initState();
-    _controller = PokemonStatsPageController(
+    _statsService = StatsAggregationService(
       repository: context.read<StatsRepository>(),
     );
-    _controller.initialize();
+    _chartRange = _defaultChartRange();
+    _cardOrder = List.of(_defaultCardOrder);
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    final snapshot = await _statsService.loadStats(
+      _domainRangeFromUiRange(_chartRange),
+    );
+    if (!mounted) return;
+    setState(() {
+      _states = snapshot.states;
+      _summary = snapshot.summary;
+      _loading = false;
+    });
+  }
+
+  DateTimeRange _defaultChartRange() {
+    final now = DateTime.now();
+    final end = DateTime(now.year, now.month, now.day);
+    final start = end.subtract(const Duration(days: _defaultChartDays - 1));
+    return DateTimeRange(start: start, end: end);
   }
 
   Future<void> _pickChartRange() async {
+    final now = DateTime.now();
+    final lastDate = DateTime(now.year, now.month, now.day);
+    final firstDate = DateTime(now.year - 1, now.month, now.day);
     final range = await showDateRangePicker(
       context: context,
-      firstDate: _controller.firstSelectableDate,
-      lastDate: _controller.lastSelectableDate,
-      initialDateRange: _controller.chartRange,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      initialDateRange: _chartRange,
     );
-    if (range == null || !mounted) return;
-    _controller.applyChartRange(range);
+    if (range == null) return;
+    if (!mounted) return;
+    setState(() {
+      _chartRange = range;
+      _summary = _statsService.updateSummaryForRange(
+        _summary,
+        _states,
+        _domainRangeFromUiRange(range),
+      );
+    });
   }
 
   void _resetChartRange() {
-    _controller.resetChartRange();
+    final range = _defaultChartRange();
+    setState(() {
+      _chartRange = range;
+      _summary = _statsService.updateSummaryForRange(
+        _summary,
+        _states,
+        _domainRangeFromUiRange(range),
+      );
+    });
   }
 
-  void _openReorderSheet(
-    Map<PokemonStatsCardId, PokemonStatsCardEntry> entries,
-  ) {
-    var workingOrder = _controller.orderFor(entries.keys);
+  DateRange _domainRangeFromUiRange(DateTimeRange range) {
+    return DateRange(start: range.start, end: range.end);
+  }
+
+  void _openReorderSheet(Map<_StatsCardId, _StatsCardEntry> entries) {
+    final order = _cardOrder.where(entries.containsKey).toList(growable: true);
+    for (final id in entries.keys) {
+      if (!order.contains(id)) {
+        order.add(id);
+      }
+    }
+    var workingOrder = List<_StatsCardId>.of(order);
     showPokemonBottomSheet<void>(
       context,
       showDragHandle: true,
@@ -66,7 +128,12 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
             MediaQuery.of(sheetContext).size.height *
             AppSizes.dialogHeightFactor;
         final colors = Theme.of(sheetContext).colorScheme;
-        final resetOrder = _controller.resetOrderFor(entries.keys);
+        final resetOrder = [
+          for (final id in _defaultCardOrder)
+            if (entries.containsKey(id)) id,
+          for (final id in entries.keys)
+            if (!_defaultCardOrder.contains(id)) id,
+        ];
         return SafeAreaSheet(
           safeAreaTop: true,
           safeAreaBottom: true,
@@ -144,24 +211,44 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  BottomSheetActionRow(
-                    colors: colors,
-                    leadingLabel: l10n.statsRangeReset,
-                    trailingLabel: l10n.save,
-                    spacing: AppSpacing.sm,
-                    onLeadingPressed: () {
-                      setSheetState(() => workingOrder = List.of(resetOrder));
-                    },
-                    onTrailingPressed: () {
-                      _controller.setCardOrder(workingOrder);
-                      Navigator.of(sheetContext).pop();
-                    },
-                    leadingTextStyle: AppTypography.button.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                    trailingTextStyle: AppTypography.button.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            setSheetState(
+                              () => workingOrder = List.of(resetOrder),
+                            );
+                          },
+                          style: AppButtonStyles.primaryOutline(
+                            colors,
+                            useLighter: true,
+                          ),
+                          child: Text(
+                            l10n.statsRangeReset,
+                            style: AppTypography.button.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() => _cardOrder = List.of(workingOrder));
+                            Navigator.of(sheetContext).pop();
+                          },
+                          style: AppButtonStyles.primaryFilled(colors),
+                          child: Text(
+                            l10n.save,
+                            style: AppTypography.button.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               );
@@ -172,10 +259,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     );
   }
 
-  List<Widget> _buildCardLayout(
-    List<PokemonStatsCardEntry> entries,
-    bool isWide,
-  ) {
+  List<Widget> _buildCardLayout(List<_StatsCardEntry> entries, bool isWide) {
     if (!isWide) {
       return [
         for (var i = 0; i < entries.length; i++) ...[
@@ -221,58 +305,58 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     ];
   }
 
-  Map<PokemonStatsCardId, PokemonStatsCardEntry> _buildEntries(
+  Map<_StatsCardId, _StatsCardEntry> _buildEntries(
     BuildContext context,
     ColorScheme colors,
   ) {
     final l10n = context.l10n;
     final caught = StatsMetricCard(
       label: l10n.statsCaughtLabel,
-      value: '${summary.caughtPokemon} / ${summary.totalPokemon}',
+      value: '${_summary.caughtPokemon} / ${_summary.totalPokemon}',
       colors: colors,
     );
     final total = StatsMetricCard(
       label: l10n.statsTotalCountsLabel,
-      value: '${summary.totalCounts}',
+      value: '${_summary.totalCounts}',
       colors: colors,
     );
-    final history = summary.dailyTotals.isEmpty
+    final history = _summary.dailyTotals.isEmpty
         ? null
         : StatsCountsChartCard(
             label: l10n.huntHistoryTitle,
-            rangeLabel: _formatRangeLabel(_controller.chartRange),
+            rangeLabel: _formatRangeLabel(_chartRange),
             onPickRange: _pickChartRange,
             onResetRange: _resetChartRange,
-            counts: summary.dailyTotals,
+            counts: _summary.dailyTotals,
           );
 
-    final gamesCard = summary.caughtGames.isEmpty
+    final gamesCard = _summary.caughtGames.isEmpty
         ? null
         : StatsGamesCard(
             label: l10n.statsGamesLabel,
-            games: summary.caughtGames,
-            caughtByGame: summary.caughtByGame,
+            games: _summary.caughtGames,
+            caughtByGame: _summary.caughtByGame,
             parentController: _scrollController,
           );
-    final recentCard = summary.recentCaught.isEmpty
+    final recentCard = _summary.recentCaught.isEmpty
         ? null
         : StatsRecentCard(
             label: l10n.statsRecentLabel,
-            items: summary.recentCaught,
+            items: _summary.recentCaught,
             parentController: _scrollController,
           );
-    final resetsPokemonCard = summary.resetsByPokemon.isEmpty
+    final resetsPokemonCard = _summary.resetsByPokemon.isEmpty
         ? null
         : StatsPokemonResetsCard(
             label: l10n.statsResetsPokemonLabel,
-            items: summary.resetsByPokemon,
+            items: _summary.resetsByPokemon,
             parentController: _scrollController,
           );
-    final resetsCard = summary.resetsByGame.isEmpty
+    final resetsCard = _summary.resetsByGame.isEmpty
         ? null
         : StatsResetsCard(
             label: l10n.statsResetsByGameLabel,
-            resets: summary.resetsByGame,
+            resets: _summary.resetsByGame,
           );
 
     return <_StatsCardId, _StatsCardEntry>{
@@ -322,7 +406,6 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
 
   @override
   void dispose() {
-    _controller.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -332,16 +415,49 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
     final colors = Theme.of(context).colorScheme;
     final l10n = context.l10n;
 
-    return ListenableBuilder(
-      listenable: _controller,
-      builder: (context, _) {
-        return Scaffold(
-          appBar: StatsAppBar(
-            title: Text(
-              l10n.statsTitle,
-              style: Theme.of(context).textTheme.titleLarge?.merge(
-                AppTypography.title.copyWith(fontWeight: FontWeight.w700),
-              ),
+    return Scaffold(
+      appBar: StatsAppBar(
+        title: Text(
+          l10n.statsTitle,
+          style: Theme.of(context).textTheme.titleLarge?.merge(
+            AppTypography.title.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ),
+        actions: [
+          IconButton(
+            tooltip: l10n.statsEditLayout,
+            onPressed: _loading
+                ? null
+                : () => _openReorderSheet(_buildEntries(context, colors)),
+            icon: const Icon(Icons.tune),
+          ),
+        ],
+      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth >= 600;
+                final entries = _buildEntries(context, colors);
+                final ordered = <_StatsCardEntry>[];
+                final order = _cardOrder
+                    .where(entries.containsKey)
+                    .toList(growable: true);
+                for (final id in entries.keys) {
+                  if (!order.contains(id)) {
+                    order.add(id);
+                  }
+                }
+                for (final id in order) {
+                  ordered.add(entries[id]!);
+                }
+                final viewInset = MediaQuery.of(context).viewPadding.bottom;
+                return ListView(
+                  controller: _scrollController,
+                  padding: AppInsets.pageWithBottomInset(viewInset),
+                  children: _buildCardLayout(ordered, isWide),
+                );
+              },
             ),
     );
   }

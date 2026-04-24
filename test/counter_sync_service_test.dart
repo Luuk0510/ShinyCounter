@@ -39,14 +39,6 @@ class _MemoryStore implements KeyValueStore {
   Future<bool?> getBool(String key) async => bools[key];
 
   @override
-  Future<Map<String, Object?>> snapshot({bool reload = false}) async {
-    if (reload) {
-      reloads++;
-    }
-    return {...strings, ...ints, ...bools};
-  }
-
-  @override
   Future<void> setBool(String key, bool value) async {
     bools[key] = value;
   }

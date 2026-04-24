@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shiny_counter/features/pokemon/presentation/utils/formatters.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 
 void main() {
   group('formatters', () {

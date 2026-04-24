@@ -1,20 +1,18 @@
 import 'dart:convert';
 
-import 'package:shiny_counter/core/storage/app_prefs_keys.dart';
-import 'package:shiny_counter/core/storage/key_value_store.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppBackupService {
-  AppBackupService({KeyValueStore? store})
-    : _store = store ?? SharedPrefsStore();
+  AppBackupService({Future<SharedPreferences>? prefs})
+    : _prefs = prefs ?? SharedPreferences.getInstance();
 
-  final KeyValueStore _store;
+  final Future<SharedPreferences> _prefs;
 
   Future<String> exportJson() async {
-    final prefs = await _store.snapshot();
+    final prefs = await _prefs;
     final data = <String, Object?>{};
-    for (final entry in prefs.entries) {
-      if (!AppPrefsKeys.isManagedKey(entry.key)) continue;
-      data[entry.key] = entry.value;
+    for (final key in prefs.getKeys()) {
+      data[key] = prefs.get(key);
     }
     final payload = <String, Object?>{
       'version': 1,
@@ -33,22 +31,24 @@ class AppBackupService {
     if (prefsData is! Map) {
       throw const FormatException('Missing prefs data');
     }
-    final currentPrefs = await _store.snapshot();
+    final prefs = await _prefs;
     if (clearExisting) {
-      for (final key in currentPrefs.keys.where(AppPrefsKeys.isManagedKey)) {
-        await _store.remove(key);
-      }
+      await prefs.clear();
     }
     for (final entry in prefsData.entries) {
       final key = entry.key.toString();
-      if (!AppPrefsKeys.isManagedKey(key)) continue;
       final value = entry.value;
       if (value is int) {
-        await _store.setInt(key, value);
+        await prefs.setInt(key, value);
+      } else if (value is double) {
+        await prefs.setDouble(key, value);
       } else if (value is bool) {
-        await _store.setBool(key, value);
+        await prefs.setBool(key, value);
       } else if (value is String) {
-        await _store.setString(key, value);
+        await prefs.setString(key, value);
+      } else if (value is List) {
+        final list = value.whereType<String>().toList();
+        await prefs.setStringList(key, list);
       }
     }
   }

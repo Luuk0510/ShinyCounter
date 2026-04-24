@@ -165,20 +165,6 @@
   "settingsImportSuccess": "Backup imported",
   "settingsExportFailed": "Export failed",
   "settingsImportFailed": "Import failed",
-  "settingsVersion": "Version {version}",
-  "@settingsVersion": {
-    "placeholders": {
-      "version": {}
-    }
-  },
-  "routeErrorMissingPokemon": "No Pokémon provided",
-  "@routeErrorMissingPokemon": {
-    "description": "Shown when the pokemon detail route is opened without a Pokemon."
-  },
-  "routeErrorMissingGame": "No game provided",
-  "@routeErrorMissingGame": {
-    "description": "Shown when the game stats route is opened without game args."
-  },
   "@settingsAccentColor": {
     "description": ""
   },

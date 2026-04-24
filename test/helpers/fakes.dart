@@ -23,7 +23,6 @@ class FakeCounterSync implements CounterSync {
   Future<void> clearHuntDates(String counterKey) async {
     started[counterKey] = null;
     caughtAt[counterKey] = null;
-    caughtGame[counterKey] = null;
   }
 
   @override
@@ -52,17 +51,6 @@ class FakeCounterSync implements CounterSync {
       caughtGame: caughtGame[counterKey],
       dailyCounts: daily[counterKey] ?? const {},
     );
-  }
-
-  @override
-  Future<List<CounterState>> loadStates(Iterable<String> counterKeys) async {
-    return [
-      for (final counterKey in counterKeys)
-        await loadState(
-          counterKey,
-          counterKey.replaceFirst('counter_', 'caught_'),
-        ),
-    ];
   }
 
   @override

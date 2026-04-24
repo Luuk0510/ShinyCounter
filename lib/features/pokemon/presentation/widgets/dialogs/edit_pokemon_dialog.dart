@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/common/pokemon_field_styles.dart';
-import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_action_builders.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_actions.dart';
 
@@ -48,11 +46,19 @@ class _EditPokemonDialogState extends State<EditPokemonDialog> {
           children: [
             TextField(
               controller: _nameController,
-              decoration: PokemonFieldDecorations.standard(
+              decoration: InputDecoration(
                 labelText: l10n.nameLabel,
                 hintText: l10n.nameHint,
+                labelStyle: const TextStyle(
+                  fontSize: AppSizes.sheetFieldLabel,
+                  fontWeight: FontWeight.w700,
+                ),
+                hintStyle: const TextStyle(fontSize: AppSizes.sheetFieldHint),
               ),
-              style: PokemonFieldStyles.input,
+              style: const TextStyle(
+                fontSize: AppSizes.sheetFieldText,
+                fontWeight: FontWeight.w800,
+              ),
               textCapitalization: TextCapitalization.words,
             ),
           ],

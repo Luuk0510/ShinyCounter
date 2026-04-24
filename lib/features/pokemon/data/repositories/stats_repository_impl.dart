@@ -3,8 +3,8 @@ import 'package:shiny_counter/features/pokemon/domain/repositories/stats_reposit
 import 'package:shiny_counter/features/pokemon/domain/services/counter_sync.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/counter_keys.dart';
 
-class PokemonStatsRepository implements StatsRepository {
-  PokemonStatsRepository({
+class StatsRepositoryImpl implements StatsRepository {
+  StatsRepositoryImpl({
     required PokemonRepository pokemonRepository,
     required CounterSync counterSync,
   }) : _pokemonRepository = pokemonRepository,
@@ -17,8 +17,11 @@ class PokemonStatsRepository implements StatsRepository {
   Future<StatsSourceData> loadStatsSource() async {
     final pokemon = await _pokemonRepository.loadCustomPokemon();
     final caught = await _pokemonRepository.loadCaught(pokemon);
-    final states = await _counterSync.loadStates(
-      pokemon.map((p) => CounterKeys.fromId(p.id).counter),
+    final states = await Future.wait(
+      pokemon.map((p) {
+        final keys = CounterKeys.fromId(p.id);
+        return _counterSync.loadState(keys.counter, keys.caught);
+      }),
     );
     return StatsSourceData(pokemon: pokemon, caught: caught, states: states);
   }

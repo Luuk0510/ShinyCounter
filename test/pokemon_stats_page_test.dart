@@ -10,7 +10,8 @@ import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
 import 'package:shiny_counter/features/pokemon/domain/repositories/stats_repository.dart';
 import 'package:shiny_counter/features/pokemon/presentation/pages/pokemon_stats_page.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_card.dart';
-import 'package:shiny_counter/features/pokemon/presentation/utils/game_assets.dart';
+import 'package:shiny_counter/features/pokemon/presentation/widgets/stats/stats_counts_chart.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/game_assets.dart';
 import 'package:shiny_counter/l10n/gen/app_localizations.dart';
 
 import 'helpers/test_asset_bundle.dart';
@@ -84,7 +85,7 @@ Future<void> _scrollUntilFound(
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('stats page shows summary, games, and recent stats', (
+  testWidgets('stats page shows summary, games, recent, and chart', (
     tester,
   ) async {
     final now = DateTime.now();
@@ -187,6 +188,9 @@ void main() {
 
     expect(find.text('4 / 4'), findsOneWidget);
     expect(find.text('100'), findsOneWidget);
+    final chartFinder = find.byType(StatsCountsChart);
+    await _scrollUntilFound(tester, chartFinder);
+    expect(chartFinder, findsOneWidget);
 
     final context = tester.element(find.byType(PokemonStatsPage));
     final l10n = AppLocalizations.of(context)!;

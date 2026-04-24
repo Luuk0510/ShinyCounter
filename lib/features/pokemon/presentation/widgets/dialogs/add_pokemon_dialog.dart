@@ -5,7 +5,6 @@ import 'package:shiny_counter/core/theme/theme_notifier.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/data/pokemon_names.dart';
 import 'package:shiny_counter/features/pokemon/domain/entities/pokemon.dart';
-import 'package:shiny_counter/features/pokemon/presentation/state/controller_base.dart';
 import 'package:shiny_counter/features/pokemon/shared/services/sprite_service.dart';
 import 'package:shiny_counter/features/pokemon/shared/utils/dex_utils.dart';
 import 'package:shiny_counter/features/pokemon/presentation/widgets/filters/search_gen_filter_row.dart';
@@ -15,28 +14,33 @@ import 'package:shiny_counter/features/pokemon/presentation/widgets/common/selec
 import 'package:shiny_counter/features/pokemon/presentation/widgets/dialogs/dialog_actions.dart';
 import 'package:shiny_counter/features/pokemon/presentation/utils/dialogs.dart';
 
-class AddPokemonController extends LoadableController {
+class AddPokemonController extends ChangeNotifier {
   AddPokemonController({required SpriteService spriteService})
-    : _spriteService = spriteService;
+    : _spriteService = spriteService {
+    _init();
+  }
 
   final SpriteService _spriteService;
 
   final List<SpriteOption> _sprites = [];
   SpriteOption? _selectedSprite;
   String _search = '';
+  bool _loading = true;
   PokemonNames? _names;
   int? _selectedGen; // null = all
+  bool _disposed = false;
 
   List<SpriteOption> get sprites => List.unmodifiable(_sprites);
   SpriteOption? get selected => _selectedSprite;
+  bool get loading => _loading;
   String get search => _search;
   int? get selectedGen => _selectedGen;
 
-  Future<void> initialize() async {
-    setLoading(true, notify: false);
+  Future<void> _init() async {
     await Future.wait([_loadNames(), _loadSprites()]);
-    if (isDisposed) return;
-    setLoading(false);
+    if (_disposed) return;
+    _loading = false;
+    _safeNotify();
   }
 
   Future<void> _loadNames() async {
@@ -46,7 +50,7 @@ class AddPokemonController extends LoadableController {
   Future<void> _loadSprites() async {
     try {
       final parsedSprites = await _spriteService.loadSprites(refresh: true);
-      if (isDisposed) return;
+      if (_disposed) return;
       final Map<String, SpriteOption> chosen = {};
       for (final parsed in parsedSprites) {
         if (!parsed.shiny) continue; // only shiny choices
@@ -73,7 +77,7 @@ class AddPokemonController extends LoadableController {
           chosen.values.toList()..sort((a, b) => a.dex.compareTo(b.dex)),
         );
     } catch (_) {
-      if (isDisposed) return;
+      if (_disposed) return;
       _sprites.clear();
     }
   }
@@ -93,19 +97,19 @@ class AddPokemonController extends LoadableController {
 
   void setSearch(String value) {
     _search = value;
-    safeNotifyListeners();
+    _safeNotify();
   }
 
   void setGen(int? gen) {
     _selectedGen = gen;
-    safeNotifyListeners();
+    _safeNotify();
   }
 
   void clearSearch() => setSearch('');
 
   void select(SpriteOption sprite) {
     _selectedSprite = sprite;
-    safeNotifyListeners();
+    _safeNotify();
   }
 
   String displayName(SpriteOption sprite) =>
@@ -136,6 +140,17 @@ class AddPokemonController extends LoadableController {
         return null;
     }
   }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  void _safeNotify() {
+    if (_disposed) return;
+    notifyListeners();
+  }
 }
 
 class AddPokemonDialog extends StatelessWidget {
@@ -149,8 +164,7 @@ class AddPokemonDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<AddPokemonController>(
       create: (_) =>
-          AddPokemonController(spriteService: context.read<SpriteService>())
-            ..initialize(),
+          AddPokemonController(spriteService: context.read<SpriteService>()),
       child: const _AddPokemonView(),
     );
   }

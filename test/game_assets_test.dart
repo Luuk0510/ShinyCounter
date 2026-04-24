@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shiny_counter/features/pokemon/presentation/utils/game_assets.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/game_assets.dart';
 
 void main() {
   test('provides logos for key games', () {

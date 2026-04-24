@@ -4,7 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:shiny_counter/core/theme/tokens.dart';
 import 'package:shiny_counter/features/pokemon/presentation/models/pokemon_stats_models.dart';
-import 'package:shiny_counter/features/pokemon/presentation/utils/formatters.dart';
+import 'package:shiny_counter/features/pokemon/shared/utils/formatters.dart';
 
 class StatsCountsChart extends StatefulWidget {
   const StatsCountsChart({

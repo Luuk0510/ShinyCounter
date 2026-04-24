@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shiny_counter/core/l10n/l10n.dart';
@@ -40,6 +38,8 @@ class _PokemonListPageState extends State<PokemonListPage>
   Set<String> _caught = {};
   bool _loading = true;
   final ScrollController _listController = ScrollController();
+  bool _showUncaught = true;
+  bool _showCaught = true;
   AnimationController? _sheetController;
 
   bool _isCustomPokemon(Pokemon pokemon) {
@@ -55,11 +55,9 @@ class _PokemonListPageState extends State<PokemonListPage>
   @override
   void initState() {
     super.initState();
-    _controller = PokemonListPageController(
-      pokemonRepository: context.read(),
-      counterSync: context.read(),
-      spriteService: context.read(),
-    );
+    _loadCustomPokemon = context.read<LoadCustomPokemonUseCase>();
+    _saveCustomPokemon = context.read<SaveCustomPokemonUseCase>();
+    _loadCaught = context.read<LoadCaughtUseCase>();
     _sheetController = AnimationController(
       vsync: this,
       duration: AppAnim.sheetDuration,
@@ -115,11 +113,28 @@ class _PokemonListPageState extends State<PokemonListPage>
   Future<void> _onAddPokemon() async {
     final newPokemon = await showAddPokemonDialog(context);
     if (newPokemon == null) return;
-    await _controller.addPokemon(newPokemon);
+
+    setState(() {
+      _customPokemon.add(newPokemon);
+    });
+    await _saveCustomPokemon(_customPokemon);
+    await _reloadCaught();
   }
 
   Future<void> _applyPokemonEdit(Pokemon original, Pokemon updated) async {
-    await _controller.applyPokemonEdit(original, updated);
+    final index = _customPokemon.indexWhere((p) => p.id == original.id);
+    if (index == -1) return;
+
+    setState(() {
+      _customPokemon[index] = updated;
+    });
+
+    await _saveCustomPokemon(_customPokemon);
+    await _reloadCaught();
+  }
+
+  Future<void> _clearPokemonState(Pokemon pokemon) async {
+    await context.read<CounterSync>().clearPokemonState(pokemon.id);
   }
 
   Future<void> _confirmDelete(Pokemon pokemon) async {
@@ -155,20 +170,24 @@ class _PokemonListPageState extends State<PokemonListPage>
     );
 
     if (confirmed == true) {
-      await _controller.deletePokemonAndState(pokemon);
+      setState(() {
+        _customPokemon.removeWhere((p) => p.id == pokemon.id);
+      });
+      await _saveCustomPokemon(_customPokemon);
+      await _clearPokemonState(pokemon);
+      await _reloadCaught();
     }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     _sheetController?.dispose();
     _listController.dispose();
     super.dispose();
   }
 
   Future<void> _openManagePokemonList() async {
-    final pokemonSorted = _controller.customPokemonSorted;
+    final pokemonSorted = [..._customPokemon]..sort(pokemonDexComparator);
     if (pokemonSorted.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -185,7 +204,8 @@ class _PokemonListPageState extends State<PokemonListPage>
       builder: (context) => ManageListView(pokemonSorted: pokemonSorted),
     );
 
-    if (action == null || !mounted) return;
+    if (action == null) return;
+    if (!mounted) return;
     if (action.delete) {
       await _confirmDelete(action.pokemon);
     } else {
@@ -198,7 +218,7 @@ class _PokemonListPageState extends State<PokemonListPage>
 
   Future<void> _openDetail(Pokemon pokemon) async {
     await context.goToPokemon(pokemon);
-    await _controller.reloadCaught();
+    await _reloadCaught();
   }
 
   Future<void> _openSettings() async {
@@ -208,22 +228,20 @@ class _PokemonListPageState extends State<PokemonListPage>
       builder: (_) => const SettingsDialog(),
     );
     if (!mounted) return;
-    await _controller.refresh(context);
+    await _loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final uncaught = _allPokemon.where((p) => !_isCaught(p)).toList()
+      ..sort(pokemonDexComparator);
+    final caught = _allPokemon.where((p) => _isCaught(p)).toList()
+      ..sort(pokemonDexComparator);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      extendBody: true,
-      extendBodyBehindAppBar: true,
       appBar: _buildAppBar(colors),
-      body: ListenableBuilder(
-        listenable: _controller,
-        builder: (context, _) => _buildBody(colors),
-      ),
+      body: _buildBody(colors, uncaught, caught),
       bottomNavigationBar: _ListBottomBar(
         onStats: () => context.goToStats(),
         onAdd: _onAddPokemon,
@@ -248,54 +266,44 @@ class _PokemonListPageState extends State<PokemonListPage>
     );
   }
 
-  Widget _buildBody(ColorScheme colors) {
-    final media = MediaQuery.of(context);
-    final topListPadding =
-        media.padding.top + AppSizes.toolbarHeight + AppSpacing.sm;
-    final bottomListPadding =
-        kBottomNavigationBarHeight + media.padding.bottom + AppSpacing.md;
-
-    if (_controller.loading) {
-      return Padding(
-        padding: EdgeInsets.only(top: topListPadding),
-        child: const Center(child: CircularProgressIndicator()),
-      );
+  Widget _buildBody(
+    ColorScheme colors,
+    List<Pokemon> uncaught,
+    List<Pokemon> caught,
+  ) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
     }
-    if (_controller.allPokemon.isEmpty) {
-      return Padding(
-        padding: EdgeInsets.only(top: topListPadding),
-        child: PokemonEmptyState(
-          onAddPressed: _onAddPokemon,
-          imageAsset: AppAssets.pokeballIcon,
-          colors: colors,
-          title: context.l10n.emptyTitle,
-          actionLabel: context.l10n.emptyAction,
-        ),
+    if (_allPokemon.isEmpty) {
+      return PokemonEmptyState(
+        onAddPressed: _onAddPokemon,
+        imageAsset: AppAssets.pokeballIcon,
+        colors: colors,
+        title: context.l10n.emptyTitle,
+        actionLabel: context.l10n.emptyAction,
       );
     }
 
-    final uncaught = _controller.uncaughtPokemonSorted;
-    final caught = _controller.caughtPokemonSorted;
     final sections = <Widget>[];
     if (uncaught.isNotEmpty) {
       sections.add(
         PokemonSection(
           title: context.l10n.sectionUncaught,
-          expanded: _controller.showUncaught,
-          onToggle: _controller.toggleUncaughtSection,
+          expanded: _showUncaught,
+          onToggle: () => setState(() => _showUncaught = !_showUncaught),
           pokemons: uncaught,
-          isCaught: _controller.isCaught,
+          isCaught: _isCaught,
           onTap: _openDetail,
-          canManage: _controller.isCustomPokemon,
+          canManage: _isCustomPokemon,
           onEdit: (pokemon) async {
-            if (!_controller.isCustomPokemon(pokemon)) return;
+            if (!_isCustomPokemon(pokemon)) return;
             final updated = await showEditPokemonDialog(context, pokemon);
             if (updated != null) {
               await _applyPokemonEdit(pokemon, updated);
             }
           },
           onDelete: (pokemon) async {
-            if (!_controller.isCustomPokemon(pokemon)) return;
+            if (!_isCustomPokemon(pokemon)) return;
             await _confirmDelete(pokemon);
           },
         ),
@@ -305,21 +313,21 @@ class _PokemonListPageState extends State<PokemonListPage>
       sections.add(
         PokemonSection(
           title: context.l10n.sectionCaught,
-          expanded: _controller.showCaught,
-          onToggle: _controller.toggleCaughtSection,
+          expanded: _showCaught,
+          onToggle: () => setState(() => _showCaught = !_showCaught),
           pokemons: caught,
-          isCaught: _controller.isCaught,
+          isCaught: _isCaught,
           onTap: _openDetail,
-          canManage: _controller.isCustomPokemon,
+          canManage: _isCustomPokemon,
           onEdit: (pokemon) async {
-            if (!_controller.isCustomPokemon(pokemon)) return;
+            if (!_isCustomPokemon(pokemon)) return;
             final updated = await showEditPokemonDialog(context, pokemon);
             if (updated != null) {
               await _applyPokemonEdit(pokemon, updated);
             }
           },
           onDelete: (pokemon) async {
-            if (!_controller.isCustomPokemon(pokemon)) return;
+            if (!_isCustomPokemon(pokemon)) return;
             await _confirmDelete(pokemon);
           },
         ),
@@ -340,10 +348,7 @@ class _PokemonListPageState extends State<PokemonListPage>
         thickness: AppSizes.listScrollbarThickness,
         child: ListView(
           controller: _listController,
-          padding: AppInsets.page.copyWith(
-            top: topListPadding,
-            bottom: bottomListPadding,
-          ),
+          padding: AppInsets.page.copyWith(bottom: AppSpacing.xs),
           children: sections,
         ),
       ),
@@ -392,52 +397,39 @@ class _ListBottomBar extends StatelessWidget {
       top: false,
       left: false,
       right: false,
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppRadii.lg),
-        ),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: _PokemonListPageState._barBlurSigma,
-            sigmaY: _PokemonListPageState._barBlurSigma,
+      child: Material(
+        color: Theme.of(context).cardColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadii.lg),
           ),
-          child: Material(
-            color: Theme.of(context).cardColor.withValues(
-              alpha: _PokemonListPageState._barSurfaceAlpha,
-            ),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(AppRadii.lg),
+        ),
+        child: SizedBox(
+          height: kBottomNavigationBarHeight,
+          child: Row(
+            children: [
+              _BottomAction(
+                key: PokemonListPage.statsKey,
+                icon: Icons.bar_chart_rounded,
+                label: l10n.statsTitle,
+                onTap: onStats,
+                colors: colors,
               ),
-            ),
-            child: SizedBox(
-              height: kBottomNavigationBarHeight,
-              child: Row(
-                children: [
-                  _BottomAction(
-                    key: PokemonListPage.statsKey,
-                    icon: Icons.bar_chart_rounded,
-                    label: l10n.statsTitle,
-                    onTap: onStats,
-                    colors: colors,
-                  ),
-                  _BottomAction(
-                    key: PokemonListPage.addPokemonKey,
-                    icon: Icons.add_circle,
-                    label: l10n.tooltipAddPokemon,
-                    onTap: onAdd,
-                    colors: colors,
-                  ),
-                  _BottomAction(
-                    key: PokemonListPage.managePokemonKey,
-                    icon: Icons.edit_note,
-                    label: l10n.tooltipManagePokemon,
-                    onTap: onManage,
-                    colors: colors,
-                  ),
-                ],
+              _BottomAction(
+                key: PokemonListPage.addPokemonKey,
+                icon: Icons.add_circle,
+                label: l10n.tooltipAddPokemon,
+                onTap: onAdd,
+                colors: colors,
               ),
-            ),
+              _BottomAction(
+                key: PokemonListPage.managePokemonKey,
+                icon: Icons.edit_note,
+                label: l10n.tooltipManagePokemon,
+                onTap: onManage,
+                colors: colors,
+              ),
+            ],
           ),
         ),
       ),
