@@ -64,7 +64,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       final path = await FileSaver.instance.saveAs(
         name: filename.replaceAll('.json', ''),
         bytes: bytes,
-        ext: 'json',
+        fileExtension: 'json',
         mimeType: MimeType.json,
       );
       if (path == null || path.isEmpty) return;
@@ -83,7 +83,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
   Future<void> _importBackup() async {
     final l10n = context.l10n;
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: const ['json'],
         withData: true,

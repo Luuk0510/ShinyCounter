@@ -67,13 +67,17 @@ Future<void> _pumpUntilLoaded(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-Future<void> _scrollUntilFound(WidgetTester tester, Finder finder) async {
+Future<void> _scrollUntilFound(
+  WidgetTester tester,
+  Finder finder, {
+  Offset delta = const Offset(0, -420),
+}) async {
   final listFinder = find.byType(ListView);
   for (var i = 0; i < 6; i++) {
     if (finder.evaluate().isNotEmpty) {
       return;
     }
-    await tester.drag(listFinder, const Offset(0, -420));
+    await tester.drag(listFinder, delta);
     await tester.pumpAndSettle();
   }
 }
@@ -190,6 +194,12 @@ void main() {
 
     final context = tester.element(find.byType(PokemonStatsPage));
     final l10n = AppLocalizations.of(context)!;
+    await _scrollUntilFound(
+      tester,
+      find.text(l10n.statsGamesLabel),
+      delta: const Offset(0, 420),
+    );
+
     final gamesCard = find.ancestor(
       of: find.text(l10n.statsGamesLabel),
       matching: find.byType(StatsCard),
@@ -200,14 +210,33 @@ void main() {
     );
 
     expect(showMore, findsOneWidget);
-    expect(find.text('Silver'), findsNothing);
+    await tester.ensureVisible(showMore);
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(of: gamesCard, matching: find.text('Silver')),
+      findsNothing,
+    );
 
     await tester.tap(showMore);
     await tester.pumpAndSettle();
 
-    expect(find.text('Silver'), findsOneWidget);
+    expect(
+      find.descendant(of: gamesCard, matching: find.text('Silver')),
+      findsOneWidget,
+    );
 
-    await tester.tap(find.text('Bulbasaur'));
+    final recentCard = find.ancestor(
+      of: find.text(l10n.statsRecentLabel),
+      matching: find.byType(StatsCard),
+    );
+    final bulbasaur = find.descendant(
+      of: recentCard,
+      matching: find.text('Bulbasaur'),
+    );
+    expect(bulbasaur, findsOneWidget);
+    await tester.ensureVisible(bulbasaur);
+    await tester.pumpAndSettle();
+    await tester.tap(bulbasaur);
     await tester.pumpAndSettle();
 
     expect(find.text('Pokemon Detail'), findsOneWidget);

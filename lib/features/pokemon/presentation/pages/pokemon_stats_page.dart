@@ -162,7 +162,7 @@ class _PokemonStatsPageState extends State<PokemonStatsPage> {
                     child: ReorderableListView(
                       shrinkWrap: true,
                       buildDefaultDragHandles: false,
-                      proxyDecorator: (child, _, __) {
+                      proxyDecorator: (child, _, _) {
                         return Material(
                           color: colors.primary.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(AppRadii.md),
